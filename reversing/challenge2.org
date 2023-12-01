@@ -147,4 +147,18 @@ or     eax, edx
 ret
 #+end_src
 
-TODO: Final explanation
+Note that adding a number to itself (multiplying by two) is the same as shifting
+to the left. The previous code could have been written as:
+
+#+begin_src nasm
+...
+and    eax, 0x55555555
+and    edx, 0xaaaaaaaa
+shl    eax, 1
+shr    edx, 1
+...
+#+end_src
+
+Which matches the previous operations.
+
+The final OR'd result will be saved to =eax= and returned.

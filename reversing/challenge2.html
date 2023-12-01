@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2023-12-01 Fri 23:33 -->
+<!-- 2023-12-02 Sat 00:37 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Challenge 2</title>
@@ -206,14 +206,14 @@ Original challenge link: <a href="https://challenges.re/2/">Click me</a>
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org67037e2">1. Original assembly</a></li>
-<li><a href="#org22abea1">2. Analysis</a></li>
+<li><a href="#org13945df">1. Original assembly</a></li>
+<li><a href="#orgbf52ce4">2. Analysis</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org67037e2" class="outline-2">
-<h2 id="org67037e2"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org13945df" class="outline-2">
+<h2 id="org13945df"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 This is the original assembly code from the challenge. I just formatted it a
@@ -248,8 +248,8 @@ bit.
 </div>
 </div>
 
-<div id="outline-container-org22abea1" class="outline-2">
-<h2 id="org22abea1"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-orgbf52ce4" class="outline-2">
+<h2 id="orgbf52ce4"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Let's try to figure this out step by step.
@@ -339,7 +339,7 @@ them back together.
 Let's try to visualize these last steps with an example:
 </p>
 
-<pre class="example" id="org0099304">
+<pre class="example" id="org97494ff">
 Base number:    0xDEADBEEF  0b11011110101011011011111011101111
 
 After masking:
@@ -394,7 +394,26 @@ And finally, it does a similar operation with <b>every bit</b>:
 </div>
 
 <p>
-TODO: Final explanation
+Note that adding a number to itself (multiplying by two) is the same as shifting
+to the left. The previous code could have been written as:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm">...
+<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x55555555</span>
+<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xaaaaaaaa</span>
+<span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">1</span>
+<span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
+...
+</pre>
+</div>
+
+<p>
+Which matches the previous operations.
+</p>
+
+<p>
+The final OR'd result will be saved to <code>eax</code> and returned.
 </p>
 </div>
 </div>
