@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2023-12-01 Fri 21:19 -->
+<!-- 2023-12-01 Fri 23:33 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Challenge 2</title>
@@ -206,14 +206,14 @@ Original challenge link: <a href="https://challenges.re/2/">Click me</a>
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org2a1cbba">1. Original assembly</a></li>
-<li><a href="#org1f257da">2. Analysis</a></li>
+<li><a href="#org67037e2">1. Original assembly</a></li>
+<li><a href="#org22abea1">2. Analysis</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org2a1cbba" class="outline-2">
-<h2 id="org2a1cbba"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org67037e2" class="outline-2">
+<h2 id="org67037e2"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 This is the original assembly code from the challenge. I just formatted it a
@@ -248,8 +248,8 @@ bit.
 </div>
 </div>
 
-<div id="outline-container-org1f257da" class="outline-2">
-<h2 id="org1f257da"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-org22abea1" class="outline-2">
+<h2 id="org22abea1"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Let's try to figure this out step by step.
@@ -284,6 +284,118 @@ access the parameters:
     <span style="color: #feacd0;">ret</span>                         <span style="color: #989898;">; </span><span style="color: #989898;">Next value on the stack is the return address, popped by `ret`</span>
 </pre>
 </div>
+
+<p>
+Next, it uses <code>bswap</code> to reverse the bytes (not bits) in the <code>eax</code> register. From
+<a href="https://www.felixcloutier.com/x86/bswap">felixcloutier.com</a>:
+</p>
+
+<blockquote>
+<p>
+BSWAP — Byte Swap
+</p>
+
+<p>
+Reverses the byte order of a 32-bit [&#x2026;] register. This instruction is provided
+for converting little-endian values to big-endian format and vice versa.
+</p>
+</blockquote>
+
+<p>
+So it will convert <code>0x11223344</code> to <code>0x44332211</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #feacd0;">bswap</span>   <span style="color: #6ae4b9;">eax</span>
+</pre>
+</div>
+
+<p>
+Next, it copies <code>eax</code> to <code>edx</code>, and masks <code>eax</code> with <code>0x0f0f0f0f</code> and <code>edx</code> with
+<code>0xf0f0f0f0</code>. This will store the higher half of the bytes inside <code>eax</code>, and the
+lower part in <code>edx</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0f0f0f0f</span>
+<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xf0f0f0f0</span>
+</pre>
+</div>
+
+<p>
+After that, it shifts <code>eax</code> 4 bits to the left, <code>edx</code> 4 bits to the right, and OR's
+them back together.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">4</span>
+<span style="color: #feacd0;">shl</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">4</span>
+<span style="color: #feacd0;">or</span>      <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+</pre>
+</div>
+
+<p>
+Let's try to visualize these last steps with an example:
+</p>
+
+<pre class="example" id="org0099304">
+Base number:    0xDEADBEEF  0b11011110101011011011111011101111
+
+After masking:
+         (eax)  0x0E0D0E0F  0b00001110000011010000111000001111
+         (edx)  0xD0A0B0E0  0b11010000101000001011000011100000
+
+After shifting:
+         (eax)  0xE0D0E0F0  0b11100000110100001110000011110000
+         (edx)  0x0D0A0B0E  0b00001101000010100000101100001110
+
+After merging:  0xEDDAEBFE  0b11101101110110101110101111111110
+</pre>
+
+<p>
+As you can see, every byte has been swapped with the next one.
+</p>
+
+<p>
+Right after that, we copy the result back to <code>edx</code>, and we do a similar
+operation. In this case, however, we will be swapping <b>bit pairs</b>, instead of
+bytes:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b00110011001100110011001100110011</span>
+<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xcccccccc</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b11001100110011001100110011001100</span>
+<span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">2</span>
+<span style="color: #feacd0;">shl</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">2</span>
+<span style="color: #feacd0;">or</span>      <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+</pre>
+</div>
+
+<p>
+Bits 0 and 1 have been swapped with bits 2 and 3, bits 4 and 5 have been swapped
+with bits 6 and 7, etc.
+</p>
+
+<p>
+And finally, it does a similar operation with <b>every bit</b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x55555555</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b01010101010101010101010101010101</span>
+<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xaaaaaaaa</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b10101010101010101010101010101010</span>
+<span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
+<span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
+<span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+<span style="color: #feacd0;">ret</span>
+</pre>
+</div>
+
+<p>
+TODO: Final explanation
+</p>
 </div>
 </div>
 </div>

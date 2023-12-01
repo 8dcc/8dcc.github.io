@@ -13,7 +13,7 @@ Original challenge link: [[https://challenges.re/2/][Click me]]
 This is the original assembly code from the challenge. I just formatted it a
 bit.
 
-#+BEGIN_SRC nasm
+#+begin_src nasm
 func:
     mov    eax, DWORD PTR [esp + 0x4]
     bswap  eax
@@ -36,7 +36,7 @@ func:
     shr    edx, 1
     or     eax, edx
     ret
-#+END_SRC
+#+end_src
 
 * Analysis
 
@@ -47,7 +47,7 @@ the return address is pushed to the stack, and since this program was compiled
 with =-m32=, it takes 4 bytes. We can add these 4 bytes to the =esp= register to
 skip over the return address.
 
-#+BEGIN_SRC nasm
+#+begin_src nasm
 mov     eax, DWORD PTR [esp + 0x4]
 #+end_src
 
@@ -66,40 +66,85 @@ func:
     ret                         ; Next value on the stack is the return address, popped by `ret`
 #+end_src
 
-#+begin_comment
+Next, it uses =bswap= to reverse the bytes (not bits) in the =eax= register. From
+[[https://www.felixcloutier.com/x86/bswap][felixcloutier.com]]:
 
-TODO
+#+begin_quote
+BSWAP — Byte Swap
+
+Reverses the byte order of a 32-bit [...] register. This instruction is provided
+for converting little-endian values to big-endian format and vice versa.
+#+end_quote
+
+So it will convert =0x11223344= to =0x44332211=.
 
 #+begin_src nasm
-   4:          bswap  eax               ; Swap (reverse) bits of eax
-   6:          mov    edx, eax          ; Move reversed 1st arg to edx
-   8:          and    eax, 0x0f0f0f0f
-   d:          and    edx, 0xf0f0f0f0   ; Clear eax
-  13:          shr    edx, 0x4          ; edx = rev_arg0 >> 4;
-  16:          shl    eax, 0x4          ; eax = 0 << 4;
-  19:          or     eax, edx          ; eax = 0 | rev_arg0;
-  1b:          mov    edx, eax          ; Copy eax to edx
+bswap   eax
+#+end_src
 
-               ; eax and edx contain the same values, the reversed arg0, shifted
-               ; 4 bits to the right.
+Next, it copies =eax= to =edx=, and masks =eax= with =0x0f0f0f0f= and =edx= with
+=0xf0f0f0f0=. This will store the higher half of the bytes inside =eax=, and the
+lower part in =edx=.
 
-  1d:          and    eax, 0x33333333   ; 0b00110011001100110011001100110011
-  22:          and    edx, 0xcccccccc   ; 0b11001100110011001100110011001100
-  28:          shr    edx, 0x2          ; edx >> 2
-  2b:          shl    eax, 0x2          ; eax << 2
-  2e:          or     eax, edx          ; Or the two masked and shifted numbers
+#+begin_src nasm
+mov     edx, eax
+and     eax, 0x0f0f0f0f
+and     edx, 0xf0f0f0f0
+#+end_src
 
-               ; Every pair of bits have been swapped in the number (bits 0 and
-               ; 1 swapped with bits 2 and 3, bits 4 and 5 swapped with bits 6
-               ; and 7, etc.).
+After that, it shifts =eax= 4 bits to the left, =edx= 4 bits to the right, and OR's
+them back together.
 
-  30:          mov    edx, eax          ; Copy number to edx
-  32:          and    eax, 0x55555555   ; 0b01010101010101010101010101010101
-  37:          and    edx, 0xaaaaaaaa   ; 0b10101010101010101010101010101010
-  3d:          add    eax, eax          ; TODO
-  3f:          shr    edx, 1            ; edx <<= 1
-  41:          or     eax, edx          ; return eax | edx;
-  43:          ret
-#+END_SRC
+#+begin_src nasm
+shr     edx, 4
+shl     eax, 4
+or      eax, edx
+#+end_src
 
-#+end_comment
+Let's try to visualize these last steps with an example:
+
+#+begin_example
+Base number:    0xDEADBEEF  0b11011110101011011011111011101111
+
+After masking:
+         (eax)  0x0E0D0E0F  0b00001110000011010000111000001111
+         (edx)  0xD0A0B0E0  0b11010000101000001011000011100000
+
+After shifting:
+         (eax)  0xE0D0E0F0  0b11100000110100001110000011110000
+         (edx)  0x0D0A0B0E  0b00001101000010100000101100001110
+
+After merging:  0xEDDAEBFE  0b11101101110110101110101111111110
+#+end_example
+
+As you can see, every byte has been swapped with the next one.
+
+Right after that, we copy the result back to =edx=, and we do a similar
+operation. In this case, however, we will be swapping *bit pairs*, instead of
+bytes:
+
+#+begin_src nasm
+mov     edx, eax
+and     eax, 0x33333333   ; 0b00110011001100110011001100110011
+and     edx, 0xcccccccc   ; 0b11001100110011001100110011001100
+shr     edx, 2
+shl     eax, 2
+or      eax, edx
+#+end_src
+
+Bits 0 and 1 have been swapped with bits 2 and 3, bits 4 and 5 have been swapped
+with bits 6 and 7, etc.
+
+And finally, it does a similar operation with *every bit*:
+
+#+begin_src nasm
+mov    edx, eax
+and    eax, 0x55555555   ; 0b01010101010101010101010101010101
+and    edx, 0xaaaaaaaa   ; 0b10101010101010101010101010101010
+add    eax, eax
+shr    edx, 1
+or     eax, edx
+ret
+#+end_src
+
+TODO: Final explanation
