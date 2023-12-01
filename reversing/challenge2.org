@@ -1,8 +1,105 @@
 #+TITLE: Challenge 2
+#+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
-#+AUTHOR: 8dcc
+#+HTML_HEAD: <style>pre.src{background:#111111;color:white;} </style>
+
+Original challenge link: [[https://challenges.re/2/][Click me]]
 
 #+TOC: headlines 2
 
+* Original assembly
+
+This is the original assembly code from the challenge. I just formatted it a
+bit.
+
+#+BEGIN_SRC nasm
+func:
+    mov    eax, DWORD PTR [esp + 0x4]
+    bswap  eax
+    mov    edx, eax
+    and    eax, 0x0f0f0f0f
+    and    edx, 0xf0f0f0f0
+    shr    edx, 4
+    shl    eax, 4
+    or     eax, edx
+    mov    edx, eax
+    and    eax, 0x33333333
+    and    edx, 0xcccccccc
+    shr    edx, 2
+    shl    eax, 2
+    or     eax, edx
+    mov    edx, eax
+    and    eax, 0x55555555
+    and    edx, 0xaaaaaaaa
+    add    eax, eax
+    shr    edx, 1
+    or     eax, edx
+    ret
+#+END_SRC
+
+* Analysis
+
+Let's try to figure this out step by step.
+
+First of all, it loads the function argument into =eax=. When calling a function,
+the return address is pushed to the stack, and since this program was compiled
+with =-m32=, it takes 4 bytes. We can add these 4 bytes to the =esp= register to
+skip over the return address.
+
+#+BEGIN_SRC nasm
+mov     eax, DWORD PTR [esp + 0x4]
+#+end_src
+
+Note that we are *not* using the =ebp= register to preserve the stack frame. If the
+function started like this, we would also have to "skip" over the pushed =ebp= to
+access the parameters:
+
+#+begin_src nasm
+func:
+    push    ebp                 ; Preserve caller's stack frame (pushing another 4 bytes)
+    mov     ebp, esp            ; Store current stack frame
+    mov     eax, [esp + 0x8]    ; Skip over pushed EBP and the return address (4 + 4)
+    ...
+    mov     esp, ebp            ; Restore stack frame
+    pop     ebp                 ; Pop caller's stack frame
+    ret                         ; Next value on the stack is the return address, popped by `ret`
+#+end_src
+
+#+begin_comment
+
 TODO
+
+#+begin_src nasm
+   4:          bswap  eax               ; Swap (reverse) bits of eax
+   6:          mov    edx, eax          ; Move reversed 1st arg to edx
+   8:          and    eax, 0x0f0f0f0f
+   d:          and    edx, 0xf0f0f0f0   ; Clear eax
+  13:          shr    edx, 0x4          ; edx = rev_arg0 >> 4;
+  16:          shl    eax, 0x4          ; eax = 0 << 4;
+  19:          or     eax, edx          ; eax = 0 | rev_arg0;
+  1b:          mov    edx, eax          ; Copy eax to edx
+
+               ; eax and edx contain the same values, the reversed arg0, shifted
+               ; 4 bits to the right.
+
+  1d:          and    eax, 0x33333333   ; 0b00110011001100110011001100110011
+  22:          and    edx, 0xcccccccc   ; 0b11001100110011001100110011001100
+  28:          shr    edx, 0x2          ; edx >> 2
+  2b:          shl    eax, 0x2          ; eax << 2
+  2e:          or     eax, edx          ; Or the two masked and shifted numbers
+
+               ; Every pair of bits have been swapped in the number (bits 0 and
+               ; 1 swapped with bits 2 and 3, bits 4 and 5 swapped with bits 6
+               ; and 7, etc.).
+
+  30:          mov    edx, eax          ; Copy number to edx
+  32:          and    eax, 0x55555555   ; 0b01010101010101010101010101010101
+  37:          and    edx, 0xaaaaaaaa   ; 0b10101010101010101010101010101010
+  3d:          add    eax, eax          ; TODO
+  3f:          shr    edx, 1            ; edx <<= 1
+  41:          or     eax, edx          ; return eax | edx;
+  43:          ret
+#+END_SRC
+
+#+end_comment

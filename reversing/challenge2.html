@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2023-12-01 Fri 20:23 -->
+<!-- 2023-12-01 Fri 21:19 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Challenge 2</title>
@@ -193,13 +193,99 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { }
 </style>
+<style>pre.src{background:#111111;color:white;} </style>
 </head>
 <body>
 <div id="content" class="content">
 <h1 class="title">Challenge 2</h1>
 <p>
-TODO
+Original challenge link: <a href="https://challenges.re/2/">Click me</a>
 </p>
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org2a1cbba">1. Original assembly</a></li>
+<li><a href="#org1f257da">2. Analysis</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org2a1cbba" class="outline-2">
+<h2 id="org2a1cbba"><span class="section-number-2">1.</span> Original assembly</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This is the original assembly code from the challenge. I just formatted it a
+bit.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
+    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">DWORD</span> PTR [<span style="color: #6ae4b9;">esp</span> + <span style="color: #88ca9f;">0x4</span>]
+    <span style="color: #feacd0;">bswap</span>  <span style="color: #6ae4b9;">eax</span>
+    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0f0f0f0f</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xf0f0f0f0</span>
+    <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">4</span>
+    <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">4</span>
+    <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xcccccccc</span>
+    <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">2</span>
+    <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">2</span>
+    <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x55555555</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xaaaaaaaa</span>
+    <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
+    <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
+    <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+    <span style="color: #feacd0;">ret</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1f257da" class="outline-2">
+<h2 id="org1f257da"><span class="section-number-2">2.</span> Analysis</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Let's try to figure this out step by step.
+</p>
+
+<p>
+First of all, it loads the function argument into <code>eax</code>. When calling a function,
+the return address is pushed to the stack, and since this program was compiled
+with <code>-m32</code>, it takes 4 bytes. We can add these 4 bytes to the <code>esp</code> register to
+skip over the return address.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">DWORD</span> PTR [<span style="color: #6ae4b9;">esp</span> + <span style="color: #88ca9f;">0x4</span>]
+</pre>
+</div>
+
+<p>
+Note that we are <b>not</b> using the <code>ebp</code> register to preserve the stack frame. If the
+function started like this, we would also have to "skip" over the pushed <code>ebp</code> to
+access the parameters:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">ebp</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">Preserve caller's stack frame (pushing another 4 bytes)</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">ebp</span>, <span style="color: #6ae4b9;">esp</span>            <span style="color: #989898;">; </span><span style="color: #989898;">Store current stack frame</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, [<span style="color: #6ae4b9;">esp</span> + <span style="color: #88ca9f;">0x8</span>]    <span style="color: #989898;">; </span><span style="color: #989898;">Skip over pushed EBP and the return address (4 + 4)</span>
+    ...
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">esp</span>, <span style="color: #6ae4b9;">ebp</span>            <span style="color: #989898;">; </span><span style="color: #989898;">Restore stack frame</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">ebp</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">Pop caller's stack frame</span>
+    <span style="color: #feacd0;">ret</span>                         <span style="color: #989898;">; </span><span style="color: #989898;">Next value on the stack is the return address, popped by `ret`</span>
+</pre>
+</div>
+</div>
+</div>
 </div>
 </body>
 </html>
