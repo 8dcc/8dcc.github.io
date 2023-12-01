@@ -10,12 +10,12 @@ Original challenge link: [[https://challenges.re/2/][Click me]]
 
 * Original assembly
 
-This is the original assembly code from the challenge. I just formatted it a
-bit.
+This is the original assembly code from the challenge, I just formatted it a
+bit to fit the [[https://www.nasm.us/][nasm]] syntax.
 
 #+begin_src nasm
 func:
-    mov    eax, DWORD PTR [esp + 0x4]
+    mov    eax, [esp + 0x4]
     bswap  eax
     mov    edx, eax
     and    eax, 0x0f0f0f0f
@@ -48,7 +48,7 @@ with =-m32=, it takes 4 bytes. We can add these 4 bytes to the =esp= register to
 skip over the return address.
 
 #+begin_src nasm
-mov     eax, DWORD PTR [esp + 0x4]
+mov     eax, [esp + 0x4]
 #+end_src
 
 Note that we are *not* using the =ebp= register to preserve the stack frame. If the
@@ -162,3 +162,36 @@ shr    edx, 1
 Which matches the previous operations.
 
 The final OR'd result will be saved to =eax= and returned.
+
+* Inverse function
+
+The bit swapping sections are the same, just in a different order.
+
+#+begin_src nasm
+inverse:
+    mov    eax, [esp + 0x4]
+
+    mov    edx, eax
+    and    eax, 0x55555555
+    and    edx, 0xaaaaaaaa
+    shl    eax, 1
+    shr    edx, 1
+    or     eax, edx
+
+    mov    edx, eax
+    and    eax, 0x33333333
+    and    edx, 0xcccccccc
+    shl    eax, 2
+    shr    edx, 2
+    or     eax, edx
+
+    mov    edx, eax
+    and    eax, 0x0f0f0f0f
+    and    edx, 0xf0f0f0f0
+    shl    eax, 4
+    shr    edx, 4
+    or     eax, edx
+
+    bswap  eax
+    ret
+#+end_src
