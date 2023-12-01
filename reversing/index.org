@@ -1,9 +1,7 @@
 #+TITLE: Reversing
+#+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
-#+AUTHOR: 8dcc
-
-#+TOC: headlines 2
 
 Different challenges from [[https://challenges.re/][challenges.re]].
 

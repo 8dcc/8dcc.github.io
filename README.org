@@ -1,14 +1,11 @@
 #+TITLE: 8dcc's blog
+#+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
 #+EXPORT_FILE_NAME: index.html
-#+AUTHOR: 8dcc
-
-#+TOC: headlines 2
 
 I will use this blog to post information in a more centralized way, instead of
 spreading it across the wikis of the different projects.
-
 
 Links:
 - [[file:reversing/index.org][Reverse Engineering]]
