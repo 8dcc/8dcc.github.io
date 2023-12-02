@@ -24,7 +24,7 @@ This is the original function, adapted to fit the [[https://www.nasm.us/][nasm]]
 #+begin_src nasm
 f:
     mov     edx, edi
-    shr     edx
+    shr     edx, 1
     or      edx, edi
     mov     eax, edx
     shr     eax, 2
@@ -72,7 +72,7 @@ After that, it shifts the value in the =edx= register (the function argument) 1
 bit to the right, and it OR's it with the original unshifted value from =edi=.
 
 #+begin_src nasm
-shr     edx
+shr     edx, 1
 or      edx, edi
 #+end_src
 
@@ -120,16 +120,33 @@ every bit from there will be set.
 
 [[file:../img/slomo.gif]]
 
-Finally, it multiplies the last value (In our example =0xFFFFFFFF=) by the
-previous value (=0xFFFF0000=), and by 79355661 (=0x4badf0d=), and shifts the =eax=
-register 26 bits to the right.
+Then, it performs a signed multiplication on the last value (currently stored
+in =edx=, in our example =0xFFFFFFFF=) and 79355661 (=0x4BADF0D=), and stores it in
+=eax=.
 
-TODO: How do we get the final index? Finish this section.
+From [[https://www.felixcloutier.com/x86/imul][felixcloutier.com]]:
+
+#+begin_quote
+*IMUL — Signed Multiply*
+
+Performs a signed multiplication of two operands. This instruction has three
+forms, depending on the number of operands:
+- *Three-operand form*: This form requires a destination operand (the first
+  operand) and two source operands (the second and the third operands). Here,
+  the first source operand [...] is multiplied by the second source operand (an
+  immediate value). The intermediate product [...] is truncated and stored in
+  the destination operand (a general-purpose register).
+#+end_quote
+
+Then, it shifts the =eax= register 26 bits to the right.
 
 #+begin_src nasm
 imul    eax, edx, 79355661 ; 0x4badf0d
 shr     eax, 26
 #+end_src
+
+The value of =eax= after the multiplication would be =0xFB4520F3=, which would be
+=0x3E= (62) after shifting it 26 bits to the left.
 
 It then uses the value stored in the =eax= register as an index for the =v=
 array. To access the index, we multiply the position by the size of each
@@ -140,3 +157,24 @@ element. In this case, 4 bytes, since the exercise specifies that they are
 mov     eax, v[0 + rax * 4]
 ret
 #+end_src
+
+So, what's the item at position 62 in our array? Turns out it's zero.
+
+Let's try to use another number to see how it changes:
+
+#+begin_example
+Initial number:            0x000F0055  0b00000000000011110000000001010101
+After shifting and ORing:  0x000FFFFF  0b00000000000011111111111111111111
+After the multiplication:  0xEC1520F3  0b11101100000101010010000011110011
+After the last shift:      59
+Number at that index:      12
+#+end_example
+
+It looks like it's calculating the *position of the first set bit starting from
+the left* (starting from zero). Or, in other words, the number of cleared bits
+after the first /Shift + OR/ step.
+
+For example, for =0x80000000= (=0b10000000000000000000000000000000=), the first set
+bit is the 32nd bit from the right, so there are *0 spaces left*. For =0x000F0055=
+(=0b00000000000011110000000001010101=), it would be the 20th bit from the right,
+or there are *12 spaces left*.
