@@ -192,7 +192,7 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { }
 </style>
-<style>pre.src{background:#111111;color:white;} </style>
+<link rel="stylesheet" type="text/css" href="../css/main.css" />
 </head>
 <body>
 <div id="content" class="content">
@@ -205,14 +205,14 @@ Original challenge link: <a href="https://challenges.re/3/">Click me</a>
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgc1f7f72">1. Original assembly</a></li>
-<li><a href="#orgdfb1288">2. Analysis</a></li>
+<li><a href="#org9a964ee">1. Original assembly</a></li>
+<li><a href="#org4297600">2. Analysis</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgc1f7f72" class="outline-2">
-<h2 id="orgc1f7f72"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org9a964ee" class="outline-2">
+<h2 id="org9a964ee"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 This array of 32-bit integers is available to the function.
@@ -256,8 +256,8 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </div>
 </div>
 
-<div id="outline-container-orgdfb1288" class="outline-2">
-<h2 id="orgdfb1288"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-org4297600" class="outline-2">
+<h2 id="org4297600"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First of all, it loads the function argument into <code>edx</code>.
@@ -405,7 +405,7 @@ every bit from there will be set.
 </p>
 
 
-<div id="orgda52dfb" class="figure">
+<div id="orgc5f70f3" class="figure">
 <p><img src="../img/slomo.gif" alt="slomo.gif" />
 </p>
 </div>
@@ -474,7 +474,7 @@ So, what's the item at position 62 in our array? Turns out it's zero.
 Let's try to use another number to see how it changes:
 </p>
 
-<pre class="example" id="orge832d8d">
+<pre class="example" id="org082b024">
 Initial number:            0x000F0055  0b00000000000011110000000001010101
 After shifting and ORing:  0x000FFFFF  0b00000000000011111111111111111111
 After the multiplication:  0xEC1520F3  0b11101100000101010010000011110011

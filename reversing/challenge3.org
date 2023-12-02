@@ -2,7 +2,7 @@
 #+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
-#+HTML_HEAD: <style>pre.src{background:#111111;color:white;} </style>
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
 
 Original challenge link: [[https://challenges.re/3/][Click me]]
 
