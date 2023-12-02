@@ -4,11 +4,15 @@
 #+STARTUP: showeverything
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
 
-Original challenge link: [[https://challenges.re/3/][Click me]]
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
 
 #+TOC: headlines 2
 
 * Original assembly
+
+Original challenge link: [[https://challenges.re/3/][Click me]].
 
 This array of 32-bit integers is available to the function.
 

@@ -3,6 +3,10 @@
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
 
+[[file:../index.org][Index]]
+
+-----
+
 Good resources for learning and practicing reverse engineering:
 
 - [[https://www.felixcloutier.com/x86/][Online x86 and amd64 instruction reference]]

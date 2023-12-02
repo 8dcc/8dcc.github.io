@@ -198,23 +198,29 @@
 <div id="content" class="content">
 <h1 class="title">Challenge 2</h1>
 <p>
-Original challenge link: <a href="https://challenges.re/2/">Click me</a>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
 </p>
+
+<hr />
 
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org1cce217">1. Original assembly</a></li>
-<li><a href="#org2d9656e">2. Analysis</a></li>
-<li><a href="#org0bc87aa">3. Inverse function</a></li>
+<li><a href="#org885789e">1. Original assembly</a></li>
+<li><a href="#org1bf46f2">2. Analysis</a></li>
+<li><a href="#org3c0b8a5">3. Inverse function</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org1cce217" class="outline-2">
-<h2 id="org1cce217"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org885789e" class="outline-2">
+<h2 id="org885789e"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
+<p>
+Original challenge link: <a href="https://challenges.re/2/">Click me</a>.
+</p>
+
 <p>
 This is the original assembly code from the challenge, I just formatted it a
 bit to fit the <a href="https://www.nasm.us/">nasm</a> syntax.
@@ -248,8 +254,8 @@ bit to fit the <a href="https://www.nasm.us/">nasm</a> syntax.
 </div>
 </div>
 
-<div id="outline-container-org2d9656e" class="outline-2">
-<h2 id="org2d9656e"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-org1bf46f2" class="outline-2">
+<h2 id="org1bf46f2"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Let's try to figure this out step by step.
@@ -356,7 +362,7 @@ them back together.
 Let's try to visualize these last steps with an example:
 </p>
 
-<pre class="example" id="org7273a57">
+<pre class="example" id="org1f2de18">
 Base number:    0xDEADBEEF  0b11011110101011011011111011101111
 
 After masking:
@@ -435,8 +441,8 @@ The final OR'd result will be saved to <code>eax</code> and returned.
 </div>
 </div>
 
-<div id="outline-container-org0bc87aa" class="outline-2">
-<h2 id="org0bc87aa"><span class="section-number-2">3.</span> Inverse function</h2>
+<div id="outline-container-org3c0b8a5" class="outline-2">
+<h2 id="org3c0b8a5"><span class="section-number-2">3.</span> Inverse function</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The bit swapping sections are the same, just in a different order.
