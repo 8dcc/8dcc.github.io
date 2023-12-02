@@ -205,15 +205,15 @@ Original challenge link: <a href="https://challenges.re/2/">Click me</a>
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org3a38e8c">1. Original assembly</a></li>
-<li><a href="#org0f1d58e">2. Analysis</a></li>
-<li><a href="#orgcfa10ab">3. Inverse function</a></li>
+<li><a href="#org3dea862">1. Original assembly</a></li>
+<li><a href="#orgc2fad35">2. Analysis</a></li>
+<li><a href="#org40e3321">3. Inverse function</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org3a38e8c" class="outline-2">
-<h2 id="org3a38e8c"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org3dea862" class="outline-2">
+<h2 id="org3dea862"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 This is the original assembly code from the challenge, I just formatted it a
@@ -248,18 +248,35 @@ bit to fit the <a href="https://www.nasm.us/">nasm</a> syntax.
 </div>
 </div>
 
-<div id="outline-container-org0f1d58e" class="outline-2">
-<h2 id="org0f1d58e"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-orgc2fad35" class="outline-2">
+<h2 id="orgc2fad35"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Let's try to figure this out step by step.
 </p>
 
 <p>
-First of all, it loads the function argument into <code>eax</code>. When calling a function,
-the return address is pushed to the stack, and since this program was compiled
-with <code>-m32</code>, it takes 4 bytes. We can add these 4 bytes to the <code>esp</code> register to
-skip over the return address.
+First of all, it loads the function argument into <code>eax</code>. Since this program was
+compiled with <code>-m32</code>, it follows the <a href="https://www.sco.com/developers/devspecs/abi386-4.pdf">i386 System V ABI</a>.
+</p>
+
+<blockquote>
+<p>
+<b>i386 System V ABI - Registers and the Stack Frame (Page 37)</b>
+</p>
+
+<p>
+Argument words are pushed onto the stack in reverse order (that is, the
+rightmost argument in C call syntax has the highest address), preserving the
+stack's word alignment. All incoming arguments appear on the stack, residing in
+the stack frame of the caller.
+</p>
+</blockquote>
+
+<p>
+The caller, after pushing the function parameters, pushes the return address to
+the stack with the <code>call</code> instruction, taking up 4 bytes. We can add these 4 bytes
+to the <code>esp</code> register to skip over the return address and get the parameters.
 </p>
 
 <div class="org-src-container">
@@ -292,7 +309,7 @@ Next, it uses <code>bswap</code> to reverse the bytes (not bits) in the <code>ea
 
 <blockquote>
 <p>
-BSWAP — Byte Swap
+<b>BSWAP — Byte Swap</b>
 </p>
 
 <p>
@@ -339,7 +356,7 @@ them back together.
 Let's try to visualize these last steps with an example:
 </p>
 
-<pre class="example" id="org3d22472">
+<pre class="example" id="org5758d95">
 Base number:    0xDEADBEEF  0b11011110101011011011111011101111
 
 After masking:
@@ -418,8 +435,8 @@ The final OR'd result will be saved to <code>eax</code> and returned.
 </div>
 </div>
 
-<div id="outline-container-orgcfa10ab" class="outline-2">
-<h2 id="orgcfa10ab"><span class="section-number-2">3.</span> Inverse function</h2>
+<div id="outline-container-org40e3321" class="outline-2">
+<h2 id="org40e3321"><span class="section-number-2">3.</span> Inverse function</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The bit swapping sections are the same, just in a different order.

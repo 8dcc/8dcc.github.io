@@ -42,10 +42,21 @@ func:
 
 Let's try to figure this out step by step.
 
-First of all, it loads the function argument into =eax=. When calling a function,
-the return address is pushed to the stack, and since this program was compiled
-with =-m32=, it takes 4 bytes. We can add these 4 bytes to the =esp= register to
-skip over the return address.
+First of all, it loads the function argument into =eax=. Since this program was
+compiled with =-m32=, it follows the [[https://www.sco.com/developers/devspecs/abi386-4.pdf][i386 System V ABI]].
+
+#+begin_quote
+*i386 System V ABI - Registers and the Stack Frame (Page 37)*
+
+Argument words are pushed onto the stack in reverse order (that is, the
+rightmost argument in C call syntax has the highest address), preserving the
+stack's word alignment. All incoming arguments appear on the stack, residing in
+the stack frame of the caller.
+#+end_quote
+
+The caller, after pushing the function parameters, pushes the return address to
+the stack with the =call= instruction, taking up 4 bytes. We can add these 4 bytes
+to the =esp= register to skip over the return address and get the parameters.
 
 #+begin_src nasm
 mov     eax, [esp + 0x4]
@@ -70,7 +81,7 @@ Next, it uses =bswap= to reverse the bytes (not bits) in the =eax= register. Fro
 [[https://www.felixcloutier.com/x86/bswap][felixcloutier.com]]:
 
 #+begin_quote
-BSWAP — Byte Swap
+*BSWAP — Byte Swap*
 
 Reverses the byte order of a 32-bit [...] register. This instruction is provided
 for converting little-endian values to big-endian format and vice versa.
