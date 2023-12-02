@@ -41,6 +41,7 @@ f:
     imul    eax, edx, 79355661 ; 0x4badf0d
     shr     eax, 26
     mov     eax, v[0 + rax * 4]
+    ret
 #+end_src
 
 * Analysis
@@ -48,8 +49,7 @@ f:
 First of all, it loads the function argument into =edx=.
 
 #+begin_src nasm
-f:
-    mov     edx, edi
+mov     edx, edi
 #+end_src
 
 Keep in mind that this is a 64-bit program, so the [[https://raw.githubusercontent.com/wiki/hjl-tools/x86-psABI/x86-64-psABI-1.0.pdf][x86-64 calling convention]] is
@@ -67,3 +67,76 @@ order) for passing as follows:
 - If the class is INTEGER, the next available register of the sequence =%rdi=,
   =%rsi=, =%rdx=, =%rcx=, =%r8= and =%r9= is used.
 #+end_quote
+
+After that, it shifts the value in the =edx= register (the function argument) 1
+bit to the right, and it OR's it with the original unshifted value from =edi=.
+
+#+begin_src nasm
+shr     edx
+or      edx, edi
+#+end_src
+
+Next, it moves the OR'd value to =eax=, and shifts it again 2 bits to the
+right. Then it OR's them back into =eax=.
+
+#+begin_src nasm
+mov     eax, edx
+shr     eax, 2
+or      eax, edx
+#+end_src
+
+It repeats that same process, duplicating the number of bits shifted every time:
+
+#+begin_src nasm
+mov     edx, eax
+shr     edx, 4
+or      edx, eax
+
+mov     eax, edx
+shr     eax, 8
+or      eax, edx
+
+mov     edx, eax
+shr     edx, 16
+or      edx, eax
+#+end_src
+
+Let's have a look at what this is doing to the bits of our input:
+
+| Shifted | Hex value  | Binary value                       |
+|---------+------------+------------------------------------|
+|       0 | =0x80000000= | =0b10000000000000000000000000000000= |
+|       1 | =0xC0000000= | =0b11000000000000000000000000000000= |
+|       2 | =0xF0000000= | =0b11110000000000000000000000000000= |
+|       4 | =0xFF000000= | =0b11111111000000000000000000000000= |
+|       8 | =0xFFFF0000= | =0b11111111111111110000000000000000= |
+|      16 | =0xFFFFFFFF= | =0b11111111111111111111111111111111= |
+
+Each value shows the number after shifting and ORing it with the previous
+value. The first value would be our input, but as you can imagine, the result
+ends up being the same even if there is more than one bit set on the input
+value. The only thing that matters from the input is the last set bit, since
+every bit from there will be set.
+
+[[file:../img/slomo.gif]]
+
+Finally, it multiplies the last value (In our example =0xFFFFFFFF=) by the
+previous value (=0xFFFF0000=), and by 79355661 (=0x4badf0d=), and shifts the =eax=
+register 26 bits to the right.
+
+TODO: How do we get the final index? Finish this section.
+
+#+begin_src nasm
+imul    eax, edx, 79355661 ; 0x4badf0d
+shr     eax, 26
+#+end_src
+
+It then uses the value stored in the =eax= register as an index for the =v=
+array. To access the index, we multiply the position by the size of each
+element. In this case, 4 bytes, since the exercise specifies that they are
+32-bit integers.
+
+#+begin_src nasm
+mov     eax, v[0 + rax * 4]
+ret
+#+end_src
