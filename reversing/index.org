@@ -7,3 +7,4 @@ Different challenges from [[https://challenges.re/][challenges.re]].
 
 Links:
 - [[file:challenge2.org][Challenge 2]]
+- [[file:challenge3.org][Challenge 3]]

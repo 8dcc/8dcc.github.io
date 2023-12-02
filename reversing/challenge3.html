@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2023-12-02 Sat 16:07 -->
+<!-- 2023-12-02 Sat 16:18 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reversing</title>
+<title>Challenge 3</title>
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -193,21 +193,109 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { }
 </style>
+<style>pre.src{background:#111111;color:white;} </style>
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">Reversing</h1>
+<h1 class="title">Challenge 3</h1>
 <p>
-Different challenges from <a href="https://challenges.re/">challenges.re</a>.
+Original challenge link: <a href="https://challenges.re/3/">Click me</a>
+</p>
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org72adad6">1. Original assembly</a></li>
+<li><a href="#org60c698f">2. Analysis</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org72adad6" class="outline-2">
+<h2 id="org72adad6"><span class="section-number-2">1.</span> Original assembly</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This array of 32-bit integers is available to the function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">int32_t</span> <span style="color: #6ae4b9;">v</span>[<span style="color: #88ca9f;">64</span>] = { -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">31</span>, <span style="color: #88ca9f;">8</span>,  <span style="color: #88ca9f;">30</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">7</span>,  -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">29</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">26</span>, <span style="color: #88ca9f;">6</span>,  -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">2</span>,  -<span style="color: #88ca9f;">1</span>,
+                  -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">28</span>, -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">19</span>, <span style="color: #88ca9f;">25</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">5</span>,  -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">17</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">23</span>, <span style="color: #88ca9f;">14</span>, <span style="color: #88ca9f;">1</span>,  -<span style="color: #88ca9f;">1</span>,
+                  <span style="color: #88ca9f;">9</span>,  -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">27</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">3</span>,  -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">20</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">18</span>, <span style="color: #88ca9f;">24</span>, <span style="color: #88ca9f;">15</span>, <span style="color: #88ca9f;">10</span>,
+                  -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">4</span>,  -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">21</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">16</span>, <span style="color: #88ca9f;">11</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">22</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">12</span>, <span style="color: #88ca9f;">13</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">0</span>,  -<span style="color: #88ca9f;">1</span> };
+</pre>
+</div>
+
+<p>
+This is the original function, adapted to fit the <a href="https://www.nasm.us/">nasm</a> syntax.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">f</span>:
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">edi</span>
+    <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>
+    <span style="color: #feacd0;">or</span>      <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">edi</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+    <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">2</span>
+    <span style="color: #feacd0;">or</span>      <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+    <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">4</span>
+    <span style="color: #feacd0;">or</span>      <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+    <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">8</span>
+    <span style="color: #feacd0;">or</span>      <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+    <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">16</span>
+    <span style="color: #feacd0;">or</span>      <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+    <span style="color: #feacd0;">imul</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">79355661</span> <span style="color: #989898;">; </span><span style="color: #989898;">0x4badf0d</span>
+    <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">26</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, v[<span style="color: #88ca9f;">0</span> + <span style="color: #6ae4b9;">rax</span> * <span style="color: #88ca9f;">4</span>]
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org60c698f" class="outline-2">
+<h2 id="org60c698f"><span class="section-number-2">2.</span> Analysis</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+First of all, it loads the function argument into <code>edx</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">f</span>:
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">edi</span>
+</pre>
+</div>
+
+<p>
+Keep in mind that this is a 64-bit program, so the <a href="https://raw.githubusercontent.com/wiki/hjl-tools/x86-psABI/x86-64-psABI-1.0.pdf">x86-64 calling convention</a> is
+different from the <a href="https://www.sco.com/developers/devspecs/abi386-4.pdf">i386 calling convention</a>:
+</p>
+
+<blockquote>
+<p>
+<b>AMD64 System V ABI - 3.2.3 Parameter Passing</b>
 </p>
 
 <p>
-Links:
+After the argument values have been computed, they are placed either in
+registers or pushed on the stack. [&#x2026;]
 </p>
+
+<p>
+Once arguments are classified, the registers get assigned (in left-to-right
+order) for passing as follows:
+</p>
+
 <ul class="org-ul">
-<li><a href="challenge2.html">Challenge 2</a></li>
-<li><a href="challenge3.html">Challenge 3</a></li>
+<li>If the class is INTEGER, the next available register of the sequence <code>%rdi</code>,
+<code>%rsi</code>, <code>%rdx</code>, <code>%rcx</code>, <code>%r8</code> and <code>%r9</code> is used.</li>
 </ul>
+</blockquote>
+</div>
+</div>
 </div>
 </body>
 </html>
