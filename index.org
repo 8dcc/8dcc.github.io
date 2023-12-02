@@ -2,7 +2,6 @@
 #+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
-#+EXPORT_FILE_NAME: index.html
 
 I will use this blog to post information in a more centralized way, instead of
 spreading it across the wikis of the different projects.
