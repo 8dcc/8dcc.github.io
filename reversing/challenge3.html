@@ -207,16 +207,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgb944468">1. Original assembly</a></li>
-<li><a href="#org5b745dc">2. Analysis</a></li>
-<li><a href="#org4ea9a77">3. C version</a></li>
-<li><a href="#org72a0a7e">4. More information</a></li>
+<li><a href="#org843dc38">1. Original assembly</a></li>
+<li><a href="#orgf446de4">2. Analysis</a></li>
+<li><a href="#org8bd8da0">3. C version</a></li>
+<li><a href="#org7d93e0b">4. More information</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgb944468" class="outline-2">
-<h2 id="orgb944468"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org843dc38" class="outline-2">
+<h2 id="org843dc38"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/3/">Click me</a>.
@@ -264,8 +264,8 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </div>
 </div>
 
-<div id="outline-container-org5b745dc" class="outline-2">
-<h2 id="org5b745dc"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-orgf446de4" class="outline-2">
+<h2 id="orgf446de4"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First of all, it loads the function argument into <code>edx</code>.
@@ -413,7 +413,7 @@ every bit from there will be set.
 </p>
 
 
-<div id="org78425b5" class="figure">
+<div id="org13d1a7c" class="figure">
 <p><img src="../img/slomo.gif" alt="slomo.gif" />
 </p>
 </div>
@@ -482,7 +482,7 @@ So, what's the item at position 62 in our array? Turns out it's zero.
 Let's try to use another number to see how it changes:
 </p>
 
-<pre class="example" id="org546dd41">
+<pre class="example" id="org655cb06">
 Initial number:            0x000F0055  0b00000000000011110000000001010101
 After shifting and ORing:  0x000FFFFF  0b00000000000011111111111111111111
 After the multiplication:  0xEC1520F3  0b11101100000101010010000011110011
@@ -505,13 +505,13 @@ so there are <b>12 spaces left</b>.
 
 <p>
 Finally, we could say that this is an algorithm for <b>counting the leading zero
-bits of a double word</b>. See <a href="#org72a0a7e">More information</a>.
+bits of a double word</b>. See <a href="#org7d93e0b">More information</a>.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org4ea9a77" class="outline-2">
-<h2 id="org4ea9a77"><span class="section-number-2">3.</span> C version</h2>
+<div id="outline-container-org8bd8da0" class="outline-2">
+<h2 id="org8bd8da0"><span class="section-number-2">3.</span> C version</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 I made a similar version using a <code>for</code> loop instead of copying and pasting the
@@ -542,7 +542,7 @@ I made a similar version using a <code>for</code> loop instead of copying and pa
     <span style="color: #ff6f9f;">return</span> v[tmp];
 }
 
-<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PRINT_EXPR</span>(<span style="color: #6ae4b9;">E</span>) printf(<span style="color: #00d3d0;">"%s -&gt; %d\n"</span>, #E, E);
+<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PRINT_EXPR</span>(<span style="color: #6ae4b9;">E</span>) printf(<span style="color: #00d3d0;">"%s -&gt; %d\n"</span>, #E, E)
 
 <span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
     PRINT_EXPR(func(<span style="color: #88ca9f;">0x80000000</span>));
@@ -554,8 +554,8 @@ I made a similar version using a <code>for</code> loop instead of copying and pa
 </div>
 </div>
 
-<div id="outline-container-org72a0a7e" class="outline-2">
-<h2 id="org72a0a7e"><span class="section-number-2">4.</span> More information</h2>
+<div id="outline-container-org7d93e0b" class="outline-2">
+<h2 id="org7d93e0b"><span class="section-number-2">4.</span> More information</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 After emailing Dennis Yurichev, the owner of the <a href="https://challenges.re/">challenges.re</a> website, I

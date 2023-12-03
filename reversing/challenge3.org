@@ -215,7 +215,7 @@ static int func(uint32_t num) {
     return v[tmp];
 }
 
-#define PRINT_EXPR(E) printf("%s -> %d\n", #E, E);
+#define PRINT_EXPR(E) printf("%s -> %d\n", #E, E)
 
 int main(void) {
     PRINT_EXPR(func(0x80000000));
