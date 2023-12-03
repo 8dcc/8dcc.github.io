@@ -181,7 +181,7 @@ after the first /Shift + OR/ step.
 For example, for =0x80000000= (=0b10000000000000000000000000000000=), the first set
 bit is the 32nd bit from the right, so there are *0 spaces left*. For =0x000F0055=
 (=0b00000000000011110000000001010101=), it would be the 20th bit from the right,
-or there are *12 spaces left*.
+so there are *12 spaces left*.
 
 * C version
 
