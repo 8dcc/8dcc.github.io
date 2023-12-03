@@ -182,3 +182,45 @@ For example, for =0x80000000= (=0b10000000000000000000000000000000=), the first 
 bit is the 32nd bit from the right, so there are *0 spaces left*. For =0x000F0055=
 (=0b00000000000011110000000001010101=), it would be the 20th bit from the right,
 or there are *12 spaces left*.
+
+* C version
+
+I made a similar version using a =for= loop instead of copying and pasting the
+/Shift + OR/ code 5 times.
+
+#+begin_src C :results output
+#include <stdint.h>
+#include <stdio.h>
+
+static int32_t v[64] = { -1, 31, 8,  30, -1, 7,  -1, -1, 29, -1, 26, 6,  -1,
+                         -1, 2,  -1, -1, 28, -1, -1, -1, 19, 25, -1, 5,  -1,
+                         17, -1, 23, 14, 1,  -1, 9,  -1, -1, -1, 27, -1, 3,
+                         -1, -1, -1, 20, -1, 18, 24, 15, 10, -1, -1, 4,  -1,
+                         21, -1, 16, 11, -1, 22, -1, 12, 13, -1, 0,  -1 };
+
+static int func(uint32_t num) {
+    uint32_t tmp = num;
+
+    for (int i = 1; i <= 16; i *= 2) {
+        tmp >>= i;
+        num |= tmp;
+        tmp = num;
+    }
+
+    tmp *= 0x4BADF0D;
+    tmp >>= 26;
+    return v[tmp];
+}
+
+#define PRINT_EXPR(E) printf("%s -> %d\n", #E, E);
+
+int main(void) {
+    PRINT_EXPR(func(0x80000000));
+    PRINT_EXPR(func(0x000F0055));
+    return 0;
+}
+#+end_src
+
+#+RESULTS:
+: func(0x80000000) -> 0
+: func(0x000F0055) -> 12

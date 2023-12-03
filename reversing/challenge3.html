@@ -207,14 +207,15 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org9630941">1. Original assembly</a></li>
-<li><a href="#org6bc588d">2. Analysis</a></li>
+<li><a href="#orgf9bb85b">1. Original assembly</a></li>
+<li><a href="#orgc386710">2. Analysis</a></li>
+<li><a href="#org2b7c700">3. C version</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org9630941" class="outline-2">
-<h2 id="org9630941"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-orgf9bb85b" class="outline-2">
+<h2 id="orgf9bb85b"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/3/">Click me</a>.
@@ -262,8 +263,8 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </div>
 </div>
 
-<div id="outline-container-org6bc588d" class="outline-2">
-<h2 id="org6bc588d"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-orgc386710" class="outline-2">
+<h2 id="orgc386710"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First of all, it loads the function argument into <code>edx</code>.
@@ -411,7 +412,7 @@ every bit from there will be set.
 </p>
 
 
-<div id="orgd928b23" class="figure">
+<div id="org9b3acda" class="figure">
 <p><img src="../img/slomo.gif" alt="slomo.gif" />
 </p>
 </div>
@@ -480,7 +481,7 @@ So, what's the item at position 62 in our array? Turns out it's zero.
 Let's try to use another number to see how it changes:
 </p>
 
-<pre class="example" id="org9afdaa6">
+<pre class="example" id="orgbf43a51">
 Initial number:            0x000F0055  0b00000000000011110000000001010101
 After shifting and ORing:  0x000FFFFF  0b00000000000011111111111111111111
 After the multiplication:  0xEC1520F3  0b11101100000101010010000011110011
@@ -500,6 +501,50 @@ bit is the 32nd bit from the right, so there are <b>0 spaces left</b>. For <code
 (<code>0b00000000000011110000000001010101</code>), it would be the 20th bit from the right,
 or there are <b>12 spaces left</b>.
 </p>
+</div>
+</div>
+
+<div id="outline-container-org2b7c700" class="outline-2">
+<h2 id="org2b7c700"><span class="section-number-2">3.</span> C version</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+I made a similar version using a <code>for</code> loop instead of copying and pasting the
+<i>Shift + OR</i> code 5 times.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+
+<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">int32_t</span> <span style="color: #6ae4b9;">v</span>[<span style="color: #88ca9f;">64</span>] = { -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">31</span>, <span style="color: #88ca9f;">8</span>,  <span style="color: #88ca9f;">30</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">7</span>,  -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">29</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">26</span>, <span style="color: #88ca9f;">6</span>,  -<span style="color: #88ca9f;">1</span>,
+                         -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">2</span>,  -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">28</span>, -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">19</span>, <span style="color: #88ca9f;">25</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">5</span>,  -<span style="color: #88ca9f;">1</span>,
+                         <span style="color: #88ca9f;">17</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">23</span>, <span style="color: #88ca9f;">14</span>, <span style="color: #88ca9f;">1</span>,  -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">9</span>,  -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">27</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">3</span>,
+                         -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">20</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">18</span>, <span style="color: #88ca9f;">24</span>, <span style="color: #88ca9f;">15</span>, <span style="color: #88ca9f;">10</span>, -<span style="color: #88ca9f;">1</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">4</span>,  -<span style="color: #88ca9f;">1</span>,
+                         <span style="color: #88ca9f;">21</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">16</span>, <span style="color: #88ca9f;">11</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">22</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">12</span>, <span style="color: #88ca9f;">13</span>, -<span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">0</span>,  -<span style="color: #88ca9f;">1</span> };
+
+<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">num</span>) {
+    <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">tmp</span> = num;
+
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">1</span>; i &lt;= <span style="color: #88ca9f;">16</span>; i *= <span style="color: #88ca9f;">2</span>) {
+        tmp &gt;&gt;= i;
+        num |= tmp;
+        tmp = num;
+    }
+
+    tmp *= <span style="color: #88ca9f;">0x4BADF0D</span>;
+    tmp &gt;&gt;= <span style="color: #88ca9f;">26</span>;
+    <span style="color: #ff6f9f;">return</span> v[tmp];
+}
+
+<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PRINT_EXPR</span>(<span style="color: #6ae4b9;">E</span>) printf(<span style="color: #00d3d0;">"%s -&gt; %d\n"</span>, #E, E);
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
+    PRINT_EXPR(func(<span style="color: #88ca9f;">0x80000000</span>));
+    PRINT_EXPR(func(<span style="color: #88ca9f;">0x000F0055</span>));
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+}
+</pre>
+</div>
 </div>
 </div>
 </div>
