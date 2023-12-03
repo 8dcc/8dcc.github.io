@@ -174,14 +174,17 @@ After the last shift:      59
 Number at that index:      12
 #+end_example
 
-It looks like it's calculating the *position of the first set bit starting from
-the left* (starting from zero). Or, in other words, the number of cleared bits
+It looks like it's calculating the position of the first set bit starting from
+the left (starting from zero). Or, in other words, the number of cleared bits
 after the first /Shift + OR/ step.
 
 For example, for =0x80000000= (=0b10000000000000000000000000000000=), the first set
 bit is the 32nd bit from the right, so there are *0 spaces left*. For =0x000F0055=
 (=0b00000000000011110000000001010101=), it would be the 20th bit from the right,
 so there are *12 spaces left*.
+
+Finally, we could say that this is an algorithm for *counting the leading zero
+bits of a double word*. See [[*More information][More information]].
 
 * C version
 
@@ -224,3 +227,39 @@ int main(void) {
 #+RESULTS:
 : func(0x80000000) -> 0
 : func(0x000F0055) -> 12
+
+* More information
+
+After emailing Dennis Yurichev, the owner of the [[https://challenges.re/][challenges.re]] website, I
+discovered that this called a [[https://en.wikipedia.org/wiki/Find_first_set][find first set]] algorithm. From Wikipedia:
+
+#+begin_quote
+In computer software and hardware, *find first set* (*ffs*) or *find first one* is a
+bit operation that, given an unsigned machine word, designates the index or
+position of the least significant bit set to one in the word counting from the
+least significant bit position.
+#+end_quote
+
+From [[https://αβγ.ελ/math-notes.pdf][Dennis' math notes]]:
+
+#+begin_quote
+*9.5.3 Leading zero bits counting*
+
+For example, =0x100= becomes =0x1ff=, =0x1000= becomes =0x1fff=, =0x20000= becomes
+=0x3ffff=, =0x12340000= becomes =0x1fffffff=. It works because all 1 bits are
+gradually propagated towards the lowest bit in 32-bit number, while zero bits at
+the left of most significant 1 bit are not touched.
+
+It's possible to add 1 to resulting number, so it will becomes 0x2000 or
+0x20000000, but in fact, since multiplication by magic number is used, these
+numbers are very close to each other, so there are no error
+
+[...]
+
+The magic number I found using just brute-force, so the readers will not be able
+to google it, for the sake of exercise.
+
+The code is tricky after all, and the moral of the exercise is that practicing
+reverse engineer sometimes may just observe input/outputs to understand code's
+behavior instead of diving into it.
+#+end_quote

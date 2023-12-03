@@ -207,15 +207,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org5f6143c">1. Original assembly</a></li>
-<li><a href="#org4bf66a5">2. Analysis</a></li>
-<li><a href="#orga79adfd">3. C version</a></li>
+<li><a href="#orgb944468">1. Original assembly</a></li>
+<li><a href="#org5b745dc">2. Analysis</a></li>
+<li><a href="#org4ea9a77">3. C version</a></li>
+<li><a href="#org72a0a7e">4. More information</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org5f6143c" class="outline-2">
-<h2 id="org5f6143c"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-orgb944468" class="outline-2">
+<h2 id="orgb944468"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/3/">Click me</a>.
@@ -263,8 +264,8 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </div>
 </div>
 
-<div id="outline-container-org4bf66a5" class="outline-2">
-<h2 id="org4bf66a5"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-org5b745dc" class="outline-2">
+<h2 id="org5b745dc"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First of all, it loads the function argument into <code>edx</code>.
@@ -412,7 +413,7 @@ every bit from there will be set.
 </p>
 
 
-<div id="orgf286a02" class="figure">
+<div id="org78425b5" class="figure">
 <p><img src="../img/slomo.gif" alt="slomo.gif" />
 </p>
 </div>
@@ -481,7 +482,7 @@ So, what's the item at position 62 in our array? Turns out it's zero.
 Let's try to use another number to see how it changes:
 </p>
 
-<pre class="example" id="org943cd14">
+<pre class="example" id="org546dd41">
 Initial number:            0x000F0055  0b00000000000011110000000001010101
 After shifting and ORing:  0x000FFFFF  0b00000000000011111111111111111111
 After the multiplication:  0xEC1520F3  0b11101100000101010010000011110011
@@ -490,8 +491,8 @@ Number at that index:      12
 </pre>
 
 <p>
-It looks like it's calculating the <b>position of the first set bit starting from
-the left</b> (starting from zero). Or, in other words, the number of cleared bits
+It looks like it's calculating the position of the first set bit starting from
+the left (starting from zero). Or, in other words, the number of cleared bits
 after the first <i>Shift + OR</i> step.
 </p>
 
@@ -501,11 +502,16 @@ bit is the 32nd bit from the right, so there are <b>0 spaces left</b>. For <code
 (<code>0b00000000000011110000000001010101</code>), it would be the 20th bit from the right,
 so there are <b>12 spaces left</b>.
 </p>
+
+<p>
+Finally, we could say that this is an algorithm for <b>counting the leading zero
+bits of a double word</b>. See <a href="#org72a0a7e">More information</a>.
+</p>
 </div>
 </div>
 
-<div id="outline-container-orga79adfd" class="outline-2">
-<h2 id="orga79adfd"><span class="section-number-2">3.</span> C version</h2>
+<div id="outline-container-org4ea9a77" class="outline-2">
+<h2 id="org4ea9a77"><span class="section-number-2">3.</span> C version</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 I made a similar version using a <code>for</code> loop instead of copying and pasting the
@@ -545,6 +551,63 @@ I made a similar version using a <code>for</code> loop instead of copying and pa
 }
 </pre>
 </div>
+</div>
+</div>
+
+<div id="outline-container-org72a0a7e" class="outline-2">
+<h2 id="org72a0a7e"><span class="section-number-2">4.</span> More information</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+After emailing Dennis Yurichev, the owner of the <a href="https://challenges.re/">challenges.re</a> website, I
+discovered that this called a <a href="https://en.wikipedia.org/wiki/Find_first_set">find first set</a> algorithm. From Wikipedia:
+</p>
+
+<blockquote>
+<p>
+In computer software and hardware, <b>find first set</b> (<b>ffs</b>) or <b>find first one</b> is a
+bit operation that, given an unsigned machine word, designates the index or
+position of the least significant bit set to one in the word counting from the
+least significant bit position.
+</p>
+</blockquote>
+
+<p>
+From <a href="https://αβγ.ελ/math-notes.pdf">Dennis' math notes</a>:
+</p>
+
+<blockquote>
+<p>
+<b>9.5.3 Leading zero bits counting</b>
+</p>
+
+<p>
+For example, <code>0x100</code> becomes <code>0x1ff</code>, <code>0x1000</code> becomes <code>0x1fff</code>, <code>0x20000</code> becomes
+<code>0x3ffff</code>, <code>0x12340000</code> becomes <code>0x1fffffff</code>. It works because all 1 bits are
+gradually propagated towards the lowest bit in 32-bit number, while zero bits at
+the left of most significant 1 bit are not touched.
+</p>
+
+<p>
+It's possible to add 1 to resulting number, so it will becomes 0x2000 or
+0x20000000, but in fact, since multiplication by magic number is used, these
+numbers are very close to each other, so there are no error
+</p>
+
+<p>
+[&#x2026;]
+</p>
+
+<p>
+The magic number I found using just brute-force, so the readers will not be able
+to google it, for the sake of exercise.
+</p>
+
+<p>
+The code is tricky after all, and the moral of the exercise is that practicing
+reverse engineer sometimes may just observe input/outputs to understand code's
+behavior instead of diving into it.
+</p>
+</blockquote>
 </div>
 </div>
 </div>
