@@ -22,15 +22,18 @@ func:
     shr     edx, 1
     and     edx, 0x55555555         ; 0b01010101010101010101010101010101
     sub     edi, edx
+
     mov     eax, edi
     shr     edi, 2
     and     eax, 0x33333333         ; 0b00110011001100110011001100110011
     and     edi, 0x33333333         ; 0b00110011001100110011001100110011
     add     edi, eax
+
     mov     eax, edi
     shr     eax, 4
     add     eax, edi
     and     eax, 0x0f0f0f0f         ; 0b00001111000011110000111100001111
+
     imul    eax, eax, 0x01010101    ; 0b00000001000000010000000100000001
     shr     eax, 24
     ret
@@ -235,5 +238,52 @@ other ones, right before returning the upper one?*
 
 #+begin_comment
 TODO: Answer this last question.
-TODO: C translation of the original code.
 #+end_comment
+
+* C translation
+
+These are two C translation of the x86 assembly code, one uses multiplication
+for the last step, while the other uses shifting.
+
+#+begin_src C :results output
+#include <stdint.h>
+#include <stdio.h>
+
+uint32_t count_bits(uint32_t num) {
+    num -= (num >> 1) & 0x55555555;                       /* First 4 instructions */
+    num = ((num >> 2) & 0x33333333) + (num & 0x33333333); /* Next 5 instructions */
+    num += (num >> 4);                                    /* Next 3 instructions */
+    num &= 0x0f0f0f0f;                                    /* Next instruction */
+    num = (num * 0x01010101) >> 24;                       /* Next 2 instructions */
+    return num;                                           /* Last instruction */
+}
+
+/* Without the 0x01010101 constant */
+uint32_t count_bits_shifting(uint32_t num) {
+    num -= (num >> 1) & 0x55555555;
+    num = ((num >> 2) & 0x33333333) + (num & 0x33333333);
+    num += (num >> 4);
+    num &= 0x0f0f0f0f;
+
+    num += (num << 16);
+    num += (num << 8);
+    num >>= 24;
+    return num;
+}
+
+#define PRINT_EXPR(E) printf("%s -> %d\n", #E, E)
+
+int main(void) {
+    PRINT_EXPR(count_bits(0x000000AB));          /* 5 */
+    PRINT_EXPR(count_bits(0xDEADBEEF));          /* 24 */
+    PRINT_EXPR(count_bits_shifting(0x000000AB)); /* 5 */
+    PRINT_EXPR(count_bits_shifting(0xDEADBEEF)); /* 24 */
+    return 0;
+}
+#+end_src
+
+#+RESULTS:
+: count_bits(0x000000AB) -> 5
+: count_bits(0xDEADBEEF) -> 24
+: count_bits_shifting(0x000000AB) -> 5
+: count_bits_shifting(0xDEADBEEF) -> 24
