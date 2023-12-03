@@ -188,8 +188,8 @@ bits of a double word*. See [[*More information][More information]].
 
 * C version
 
-I made a similar version using a =for= loop instead of copying and pasting the
-/Shift + OR/ code 5 times.
+I made a similar version, but it's not exactly a /translation/ since I am using a
+=for= loop instead of copying and pasting the /Shift + OR/ code 5 times.
 
 #+begin_src C :results output
 #include <stdint.h>
@@ -218,8 +218,8 @@ static int func(uint32_t num) {
 #define PRINT_EXPR(E) printf("%s -> %d\n", #E, E)
 
 int main(void) {
-    PRINT_EXPR(func(0x80000000));
-    PRINT_EXPR(func(0x000F0055));
+    PRINT_EXPR(func(0x80000000)); /* 0 */
+    PRINT_EXPR(func(0x000F0055)); /* 12 */
     return 0;
 }
 #+end_src
@@ -252,7 +252,7 @@ the left of most significant 1 bit are not touched.
 
 It's possible to add 1 to resulting number, so it will becomes 0x2000 or
 0x20000000, but in fact, since multiplication by magic number is used, these
-numbers are very close to each other, so there are no error
+numbers are very close to each other, so there is no error.
 
 [...]
 
