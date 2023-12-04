@@ -42,7 +42,7 @@ f:
     mov     edx, eax
     shr     edx, 16
     or      edx, eax
-    imul    eax, edx, 79355661 ; 0x4badf0d
+    imul    eax, edx, 79355661 ; 0x4BADF0D
     shr     eax, 26
     mov     eax, v[0 + rax * 4]
     ret
@@ -145,7 +145,7 @@ forms, depending on the number of operands:
 Then, it shifts the =eax= register 26 bits to the right.
 
 #+begin_src nasm
-imul    eax, edx, 79355661 ; 0x4badf0d
+imul    eax, edx, 79355661 ; 0x4BADF0D
 shr     eax, 26
 #+end_src
 

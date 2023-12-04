@@ -22,20 +22,20 @@ func:
     mov    eax, [esp + 0x4]
     bswap  eax
     mov    edx, eax
-    and    eax, 0x0f0f0f0f
-    and    edx, 0xf0f0f0f0
+    and    eax, 0x0F0F0F0F
+    and    edx, 0xF0F0F0F0
     shr    edx, 4
     shl    eax, 4
     or     eax, edx
     mov    edx, eax
     and    eax, 0x33333333
-    and    edx, 0xcccccccc
+    and    edx, 0xCCCCCCCC
     shr    edx, 2
     shl    eax, 2
     or     eax, edx
     mov    edx, eax
     and    eax, 0x55555555
-    and    edx, 0xaaaaaaaa
+    and    edx, 0xAAAAAAAA
     add    eax, eax
     shr    edx, 1
     or     eax, edx
@@ -103,8 +103,8 @@ lower part in =edx=.
 
 #+begin_src nasm
 mov     edx, eax
-and     eax, 0x0f0f0f0f
-and     edx, 0xf0f0f0f0
+and     eax, 0x0F0F0F0F
+and     edx, 0xF0F0F0F0
 #+end_src
 
 After that, it shifts =eax= 4 bits to the left, =edx= 4 bits to the right, and OR's
@@ -141,7 +141,7 @@ bytes:
 #+begin_src nasm
 mov     edx, eax
 and     eax, 0x33333333   ; 0b00110011001100110011001100110011
-and     edx, 0xcccccccc   ; 0b11001100110011001100110011001100
+and     edx, 0xCCCCCCCC   ; 0b11001100110011001100110011001100
 shr     edx, 2
 shl     eax, 2
 or      eax, edx
@@ -155,7 +155,7 @@ And finally, it does a similar operation with *every bit*:
 #+begin_src nasm
 mov    edx, eax
 and    eax, 0x55555555   ; 0b01010101010101010101010101010101
-and    edx, 0xaaaaaaaa   ; 0b10101010101010101010101010101010
+and    edx, 0xAAAAAAAA   ; 0b10101010101010101010101010101010
 add    eax, eax
 shr    edx, 1
 or     eax, edx
@@ -168,7 +168,7 @@ to the left. The previous code could have been written as:
 #+begin_src nasm
 ...
 and    eax, 0x55555555
-and    edx, 0xaaaaaaaa
+and    edx, 0xAAAAAAAA
 shl    eax, 1
 shr    edx, 1
 ...
@@ -178,7 +178,41 @@ Which matches the previous operations.
 
 The final OR'd result will be saved to =eax= and returned.
 
+* C translation
+
+This is a simple C translation of the assembly:
+
+#+begin_src C
+#include <stdint.h>
+#include <byteswap.h>
+#include <stdio.h>
+
+uint32_t swap(uint32_t num) {
+    num = bswap_32(num);
+    num = ((num & 0x0F0F0F0F) << 4) | ((num & 0xF0F0F0F0) >> 4);
+    num = ((num & 0x33333333) << 2) | ((num & 0xCCCCCCCC) >> 2);
+    num = ((num & 0x55555555) << 1) | ((num & 0xAAAAAAAA) >> 1);
+    return num;
+}
+
+#define PRINT_EXPR(E) printf("%s 0x%X\n", #E, E)
+
+int main(void) {
+    PRINT_EXPR(swap(0xDEADBEEF));       /* 0xF77DB57B */
+    PRINT_EXPR(swap(swap(0xDEADBEEF))); /* 0xDEADBEEF */
+    return 0;
+}
+#+end_src
+
+#+RESULTS:
+| swap(0xDEADBEEF)       | 0xF77DB57B |
+| swap(swap(0xDEADBEEF)) | 0xDEADBEEF |
+
 * Inverse function
+
+I made my own inverse function before realizing that the original swapping
+function is actually an [[https://en.wikipedia.org/wiki/Involution_(mathematics)][involutory function]], so using it on its own output
+produces the original input.
 
 The bit swapping sections are the same, just in a different order.
 
@@ -188,21 +222,21 @@ inverse:
 
     mov    edx, eax
     and    eax, 0x55555555
-    and    edx, 0xaaaaaaaa
+    and    edx, 0xAAAAAAAA
     shl    eax, 1
     shr    edx, 1
     or     eax, edx
 
     mov    edx, eax
     and    eax, 0x33333333
-    and    edx, 0xcccccccc
+    and    edx, 0xCCCCCCCC
     shl    eax, 2
     shr    edx, 2
     or     eax, edx
 
     mov    edx, eax
-    and    eax, 0x0f0f0f0f
-    and    edx, 0xf0f0f0f0
+    and    eax, 0x0F0F0F0F
+    and    edx, 0xF0F0F0F0
     shl    eax, 4
     shr    edx, 4
     or     eax, edx

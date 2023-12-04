@@ -207,16 +207,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org4b4b736">1. Original assembly</a></li>
-<li><a href="#org0ddb77b">2. Analysis</a></li>
-<li><a href="#orgf8dc193">3. C version</a></li>
-<li><a href="#orgc09cc95">4. More information</a></li>
+<li><a href="#org3e30377">1. Original assembly</a></li>
+<li><a href="#org18d5f8c">2. Analysis</a></li>
+<li><a href="#org6e7b318">3. C version</a></li>
+<li><a href="#org8c33333">4. More information</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org4b4b736" class="outline-2">
-<h2 id="org4b4b736"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org3e30377" class="outline-2">
+<h2 id="org3e30377"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/3/">Click me</a>.
@@ -255,7 +255,7 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
     <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
     <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">16</span>
     <span style="color: #feacd0;">or</span>      <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">imul</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">79355661</span> <span style="color: #989898;">; </span><span style="color: #989898;">0x4badf0d</span>
+    <span style="color: #feacd0;">imul</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">79355661</span> <span style="color: #989898;">; </span><span style="color: #989898;">0x4BADF0D</span>
     <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">26</span>
     <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, v[<span style="color: #88ca9f;">0</span> + <span style="color: #6ae4b9;">rax</span> * <span style="color: #88ca9f;">4</span>]
     <span style="color: #feacd0;">ret</span>
@@ -264,8 +264,8 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </div>
 </div>
 
-<div id="outline-container-org0ddb77b" class="outline-2">
-<h2 id="org0ddb77b"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-org18d5f8c" class="outline-2">
+<h2 id="org18d5f8c"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First of all, it loads the function argument into <code>edx</code>.
@@ -413,7 +413,7 @@ every bit from there will be set.
 </p>
 
 
-<div id="org47c24e5" class="figure">
+<div id="org407f005" class="figure">
 <p><img src="../img/slomo.gif" alt="slomo.gif" />
 </p>
 </div>
@@ -451,7 +451,7 @@ Then, it shifts the <code>eax</code> register 26 bits to the right.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">imul</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">79355661</span> <span style="color: #989898;">; </span><span style="color: #989898;">0x4badf0d</span>
+<pre class="src src-nasm"><span style="color: #feacd0;">imul</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">79355661</span> <span style="color: #989898;">; </span><span style="color: #989898;">0x4BADF0D</span>
 <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">26</span>
 </pre>
 </div>
@@ -482,7 +482,7 @@ So, what's the item at position 62 in our array? Turns out it's zero.
 Let's try to use another number to see how it changes:
 </p>
 
-<pre class="example" id="orga2f673c">
+<pre class="example" id="orgc7f7964">
 Initial number:            0x000F0055  0b00000000000011110000000001010101
 After shifting and ORing:  0x000FFFFF  0b00000000000011111111111111111111
 After the multiplication:  0xEC1520F3  0b11101100000101010010000011110011
@@ -505,13 +505,13 @@ so there are <b>12 spaces left</b>.
 
 <p>
 Finally, we could say that this is an algorithm for <b>counting the leading zero
-bits of a double word</b>. See <a href="#orgc09cc95">More information</a>.
+bits of a double word</b>. See <a href="#org8c33333">More information</a>.
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgf8dc193" class="outline-2">
-<h2 id="orgf8dc193"><span class="section-number-2">3.</span> C version</h2>
+<div id="outline-container-org6e7b318" class="outline-2">
+<h2 id="org6e7b318"><span class="section-number-2">3.</span> C version</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 I made a similar version, but it's not exactly a <i>translation</i> since I am using a
@@ -554,8 +554,8 @@ I made a similar version, but it's not exactly a <i>translation</i> since I am u
 </div>
 </div>
 
-<div id="outline-container-orgc09cc95" class="outline-2">
-<h2 id="orgc09cc95"><span class="section-number-2">4.</span> More information</h2>
+<div id="outline-container-org8c33333" class="outline-2">
+<h2 id="org8c33333"><span class="section-number-2">4.</span> More information</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 After emailing Dennis Yurichev, the owner of the <a href="https://challenges.re/">challenges.re</a> website, I

@@ -207,15 +207,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org885789e">1. Original assembly</a></li>
-<li><a href="#org1bf46f2">2. Analysis</a></li>
-<li><a href="#org3c0b8a5">3. Inverse function</a></li>
+<li><a href="#orgc828679">1. Original assembly</a></li>
+<li><a href="#org762cb70">2. Analysis</a></li>
+<li><a href="#orgcc38deb">3. C translation</a></li>
+<li><a href="#org626409e">4. Inverse function</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org885789e" class="outline-2">
-<h2 id="org885789e"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-orgc828679" class="outline-2">
+<h2 id="orgc828679"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/2/">Click me</a>.
@@ -231,20 +232,20 @@ bit to fit the <a href="https://www.nasm.us/">nasm</a> syntax.
     <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">eax</span>, [<span style="color: #6ae4b9;">esp</span> + <span style="color: #88ca9f;">0x4</span>]
     <span style="color: #feacd0;">bswap</span>  <span style="color: #6ae4b9;">eax</span>
     <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0f0f0f0f</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xf0f0f0f0</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0F0F0F0F</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xF0F0F0F0</span>
     <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">4</span>
     <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">4</span>
     <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
     <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
     <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xcccccccc</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xCCCCCCCC</span>
     <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">2</span>
     <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">2</span>
     <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
     <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
     <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x55555555</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xaaaaaaaa</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xAAAAAAAA</span>
     <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
     <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
     <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
@@ -254,8 +255,8 @@ bit to fit the <a href="https://www.nasm.us/">nasm</a> syntax.
 </div>
 </div>
 
-<div id="outline-container-org1bf46f2" class="outline-2">
-<h2 id="org1bf46f2"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-org762cb70" class="outline-2">
+<h2 id="org762cb70"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Let's try to figure this out step by step.
@@ -341,8 +342,8 @@ lower part in <code>edx</code>.
 
 <div class="org-src-container">
 <pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0f0f0f0f</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xf0f0f0f0</span>
+<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0F0F0F0F</span>
+<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xF0F0F0F0</span>
 </pre>
 </div>
 
@@ -362,7 +363,7 @@ them back together.
 Let's try to visualize these last steps with an example:
 </p>
 
-<pre class="example" id="org1f2de18">
+<pre class="example" id="org50f598c">
 Base number:    0xDEADBEEF  0b11011110101011011011111011101111
 
 After masking:
@@ -389,7 +390,7 @@ bytes:
 <div class="org-src-container">
 <pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
 <span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b00110011001100110011001100110011</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xcccccccc</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b11001100110011001100110011001100</span>
+<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xCCCCCCCC</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b11001100110011001100110011001100</span>
 <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">2</span>
 <span style="color: #feacd0;">shl</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">2</span>
 <span style="color: #feacd0;">or</span>      <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
@@ -408,7 +409,7 @@ And finally, it does a similar operation with <b>every bit</b>:
 <div class="org-src-container">
 <pre class="src src-nasm"><span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
 <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x55555555</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b01010101010101010101010101010101</span>
-<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xaaaaaaaa</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b10101010101010101010101010101010</span>
+<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xAAAAAAAA</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b10101010101010101010101010101010</span>
 <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
 <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
 <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
@@ -424,7 +425,7 @@ to the left. The previous code could have been written as:
 <div class="org-src-container">
 <pre class="src src-nasm">...
 <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x55555555</span>
-<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xaaaaaaaa</span>
+<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xAAAAAAAA</span>
 <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">1</span>
 <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
 ...
@@ -441,9 +442,47 @@ The final OR'd result will be saved to <code>eax</code> and returned.
 </div>
 </div>
 
-<div id="outline-container-org3c0b8a5" class="outline-2">
-<h2 id="org3c0b8a5"><span class="section-number-2">3.</span> Inverse function</h2>
+<div id="outline-container-orgcc38deb" class="outline-2">
+<h2 id="orgcc38deb"><span class="section-number-2">3.</span> C translation</h2>
 <div class="outline-text-2" id="text-3">
+<p>
+This is a simple C translation of the assembly:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;byteswap.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+
+<span style="color: #79a8ff;">uint32_t</span> <span style="color: #4ae2ff;">swap</span>(<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">num</span>) {
+    num = bswap_32(num);
+    num = ((num &amp; <span style="color: #88ca9f;">0x0F0F0F0F</span>) &lt;&lt; <span style="color: #88ca9f;">4</span>) | ((num &amp; <span style="color: #88ca9f;">0xF0F0F0F0</span>) &gt;&gt; <span style="color: #88ca9f;">4</span>);
+    num = ((num &amp; <span style="color: #88ca9f;">0x33333333</span>) &lt;&lt; <span style="color: #88ca9f;">2</span>) | ((num &amp; <span style="color: #88ca9f;">0xCCCCCCCC</span>) &gt;&gt; <span style="color: #88ca9f;">2</span>);
+    num = ((num &amp; <span style="color: #88ca9f;">0x55555555</span>) &lt;&lt; <span style="color: #88ca9f;">1</span>) | ((num &amp; <span style="color: #88ca9f;">0xAAAAAAAA</span>) &gt;&gt; <span style="color: #88ca9f;">1</span>);
+    <span style="color: #ff6f9f;">return</span> num;
+}
+
+<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PRINT_EXPR</span>(<span style="color: #6ae4b9;">E</span>) printf(<span style="color: #00d3d0;">"%s 0x%X\n"</span>, #E, E)
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
+    PRINT_EXPR(swap(<span style="color: #88ca9f;">0xDEADBEEF</span>));       <span style="color: #989898;">/* </span><span style="color: #989898;">0xF77DB57B</span><span style="color: #989898;"> */</span>
+    PRINT_EXPR(swap(swap(<span style="color: #88ca9f;">0xDEADBEEF</span>))); <span style="color: #989898;">/* </span><span style="color: #989898;">0xDEADBEEF</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org626409e" class="outline-2">
+<h2 id="org626409e"><span class="section-number-2">4.</span> Inverse function</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+I made my own inverse function before realizing that the original swapping
+function is actually an <a href="https://en.wikipedia.org/wiki/Involution_(mathematics)">involutory function</a>, so using it on its own output
+produces the original input.
+</p>
+
 <p>
 The bit swapping sections are the same, just in a different order.
 </p>
@@ -454,21 +493,21 @@ The bit swapping sections are the same, just in a different order.
 
     <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
     <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x55555555</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xaaaaaaaa</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xAAAAAAAA</span>
     <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">1</span>
     <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
     <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
 
     <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
     <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xcccccccc</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xCCCCCCCC</span>
     <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">2</span>
     <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">2</span>
     <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
 
     <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0f0f0f0f</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xf0f0f0f0</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0F0F0F0F</span>
+    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xF0F0F0F0</span>
     <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">4</span>
     <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">4</span>
     <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
