@@ -207,16 +207,18 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org399ea0a">1. Original assembly</a></li>
-<li><a href="#orgc4a1b60">2. Analysis</a></li>
-<li><a href="#org0d59b08">3. Why do some versions use the <code>0x01010101</code> constant?</a></li>
-<li><a href="#org9283e3e">4. C translation</a></li>
+<li><a href="#org392f083">1. Original assembly</a></li>
+<li><a href="#org0eeffee">2. Analysis</a></li>
+<li><a href="#org23c60e2">3. Why does this work?</a></li>
+<li><a href="#orgd28b314">4. Why do some versions use the <code>0x01010101</code> constant?</a></li>
+<li><a href="#orgd4f9e00">5. C translation</a></li>
+<li><a href="#org9a91dae">6. Iterative C version</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org399ea0a" class="outline-2">
-<h2 id="org399ea0a"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org392f083" class="outline-2">
+<h2 id="org392f083"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/4/">Click me</a>.
@@ -252,81 +254,41 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </div>
 </div>
 
-<div id="outline-container-orgc4a1b60" class="outline-2">
-<h2 id="orgc4a1b60"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-org0eeffee" class="outline-2">
+<h2 id="org0eeffee"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First of all, it loads the function argument into <code>edx</code>, and shifts it one bit to
-the right.
+the right. Then it AND's the <code>edx</code> register to keep only the even bits (0, 2, &#x2026;,
+30). Now, the bits at odd positions (1, 3, &#x2026;, 31) are being moved to the
+adjacent position.
+</p>
+
+<p>
+This value in the <code>edx</code> register will is then subtracted from the original
+argument in <code>edi</code>.
 </p>
 
 <div class="org-src-container">
 <pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">edi</span>
 <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
+<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0x55555555</span> <span style="color: #989898;">; </span><span style="color: #989898;">0b01010101010101010101010101010101</span>
+<span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #6ae4b9;">edx</span>
 </pre>
 </div>
-
-<p>
-It AND's the <code>edx</code> register to keep only the even bits (0, 2, &#x2026;, 30).
-</p>
-
-<div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0x55555555</span> <span style="color: #989898;">; </span><span style="color: #989898;">0b01010101010101010101010101010101</span>
-</pre>
-</div>
-
-<p>
-The bits at odd positions (1, 3, &#x2026;, 31) are being moved to the adjacent
-position (0, 2, &#x2026;, 30).
-</p>
-
-<p>
-It subtracts this value in the <code>edx</code> register from the original argument in <code>edi</code>,
-copying the result to <code>eax</code>.
-</p>
-
-<div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #6ae4b9;">edx</span>
-<span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edi</span>
-</pre>
-</div>
-
-<p>
-Let's visualize what we are doing:
-</p>
-
-<pre class="example" id="org8c504d2">
-Base:         0xDEADBEEF  0b11011110101011011011111011101111
-Shift + AND:  0x45545555  0b01000101010101000101010101010101
-Subtraction:  0x9959699A  0b10011001010110010110100110011010
-</pre>
 
 <p>
 It then adds the even pairs of bits (<code>eax</code>) to the odd pairs of bits (<code>edi</code>).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #88ca9f;">2</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span>         <span style="color: #989898;">; </span><span style="color: #989898;">0b00110011001100110011001100110011</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #88ca9f;">0x33333333</span>         <span style="color: #989898;">; </span><span style="color: #989898;">0b00110011001100110011001100110011</span>
+<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edi</span>
+<span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #88ca9f;">2</span>
+<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span> <span style="color: #989898;">; </span><span style="color: #989898;">0b00110011001100110011001100110011</span>
+<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #88ca9f;">0x33333333</span> <span style="color: #989898;">; </span><span style="color: #989898;">0b00110011001100110011001100110011</span>
 <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #6ae4b9;">eax</span>
 </pre>
 </div>
-
-<p>
-So inside <code>edi</code>, the bits 0 and 1 will be shifted to bits 2 and 3 respectively,
-and so on. Visually:
-</p>
-
-<pre class="example" id="org0d0d6ba">
-Base:          0x9959699A  0b10011001010110010110100110011010 (eax)
-After shift:   0x26565A66  0b00100110010101100101101001100110 (edi)
-
-After AND:     0x11112112  0b00010001000100010010000100010010 (eax)
-               0x22121222  0b00100010000100100001001000100010 (edi)
-               ----------------------------------------------
-After adding:  0x33233334  0b00110011001000110011001100110100 (edi)
-</pre>
 
 <p>
 After that, it copies the result back to <code>eax</code>, shifts it 4 bits to the right, and
@@ -341,19 +303,9 @@ adds the original value stored in <code>edi</code>.
 </div>
 
 <p>
-In our example:
-</p>
-
-<pre class="example" id="orgb40ba31">
-Base:            0x33233334  0b110011001000110011001100110100 (edi)
-After shifting:  0x03323333  0b000011001100100011001100110011 (eax)
-After adding:    0x36556667  0b110110010101010110011001100111 (eax)
-</pre>
-
-<p>
-Then, it keeps every even group of 4 bits into <code>eax</code>, and multiplies them by
-<code>0x01010101</code>. Keep in mind that since it's specifying <code>eax</code> as the destination
-register, it will truncate the value and keep the lower 32 bits.
+Then, it discards every 4 bits of <code>eax</code>, and multiplies that by <code>0x01010101</code>. Keep
+in mind that since it's specifying <code>eax</code> as the destination register, it will
+truncate the value and keep the lower 32 bits.
 </p>
 
 <div class="org-src-container">
@@ -371,17 +323,6 @@ It then shifts the result 24 bits to the right, before returning it.
 <span style="color: #feacd0;">ret</span>
 </pre>
 </div>
-
-<p>
-Example of the last steps:
-</p>
-
-<pre class="example" id="orgf48162c">
-Base:                  0x36556667  0b00110110010101010110011001100111
-After AND:             0x06050607  0b00000110000001010000011000000111
-After multiplication:  0x18120d07  0b00011000000100100000110100000111 (truncated)
-After shifting:        0x18        0b00011000
-</pre>
 
 <p>
 Let's test it with some other numbers to see how the result changes:
@@ -440,6 +381,12 @@ Let's test it with some other numbers to see how the result changes:
 <td class="org-left"><code>0b11111111</code></td>
 <td class="org-left"><code>0x8</code></td>
 </tr>
+
+<tr>
+<td class="org-left"><code>0xDEADBEEF</code></td>
+<td class="org-left"><code>0b11011110101011011011111011101111</code></td>
+<td class="org-left"><code>0x18</code></td>
+</tr>
 </tbody>
 </table>
 
@@ -450,9 +397,99 @@ our input.
 </div>
 </div>
 
-<div id="outline-container-org0d59b08" class="outline-2">
-<h2 id="org0d59b08"><span class="section-number-2">3.</span> Why do some versions use the <code>0x01010101</code> constant?</h2>
+<div id="outline-container-org23c60e2" class="outline-2">
+<h2 id="org23c60e2"><span class="section-number-2">3.</span> Why does this work?</h2>
 <div class="outline-text-2" id="text-3">
+<p>
+After discovering what this functions does, I decided to look a bit more into
+how it works. I discovered <a href="https://stackoverflow.com/questions/109023/count-the-number-of-set-bits-in-a-32-bit-integer">this</a> stackoverflow link. Turns out this is called
+calculating the <a href="https://en.wikipedia.org/wiki/Hamming_weight">Hamming weight</a>.
+</p>
+
+<p>
+The assembly function is the simplified version of this one:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">count_bits</span>(<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">x</span>) {
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Put count of each 2 bits into those 2 bits</span><span style="color: #989898;"> */</span>
+    x = (x &amp; <span style="color: #88ca9f;">0x55555555</span>) + ((x &gt;&gt; <span style="color: #88ca9f;">1</span>) &amp; <span style="color: #88ca9f;">0x55555555</span>);
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Put count of each 4 bits into those 4 bits</span><span style="color: #989898;"> */</span>
+    x = (x &amp; <span style="color: #88ca9f;">0x33333333</span>) + ((x &gt;&gt; <span style="color: #88ca9f;">2</span>) &amp; <span style="color: #88ca9f;">0x33333333</span>);
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Put count of each 8 bits into those 8 bits</span><span style="color: #989898;"> */</span>
+    x = (x &amp; <span style="color: #88ca9f;">0x0f0f0f0f</span>) + ((x &gt;&gt; <span style="color: #88ca9f;">4</span>) &amp; <span style="color: #88ca9f;">0x0f0f0f0f</span>);
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">If (x &lt;= 0xFF), propagates lower byte to the upper ones. I am not sure</span>
+<span style="color: #989898;">     * why this works for bigger values.</span><span style="color: #989898;"> */</span>
+    x *= <span style="color: #88ca9f;">0x01010101</span>;
+    <span style="color: #ff6f9f;">return</span> x &gt;&gt; <span style="color: #88ca9f;">24</span>;
+}
+
+printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
+</pre>
+</div>
+
+<p>
+Keep in mind that:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Hex</th>
+<th scope="col" class="org-left">Binary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>0x55555555</code></td>
+<td class="org-left"><code>0b01010101010101010101010101010101</code></td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x33333333</code></td>
+<td class="org-left"><code>0b00110011001100110011001100110011</code></td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x0f0f0f0f</code></td>
+<td class="org-left"><code>0b00001111000011110000111100001111</code></td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The last multiplication and shifting step is used to skip the following lines:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C">x = (x &amp; <span style="color: #88ca9f;">0x00ff00ff</span>) + ((x &gt;&gt;  <span style="color: #88ca9f;">8</span>) &amp; <span style="color: #88ca9f;">0x00ff00ff</span>);
+x = (x &amp; <span style="color: #88ca9f;">0x0000ffff</span>) + ((x &gt;&gt; <span style="color: #88ca9f;">16</span>) &amp; <span style="color: #88ca9f;">0x0000ffff</span>);
+</pre>
+</div>
+
+<p>
+I still can't fully understand how this works, though.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd28b314" class="outline-2">
+<h2 id="orgd28b314"><span class="section-number-2">4.</span> Why do some versions use the <code>0x01010101</code> constant?</h2>
+<div class="outline-text-2" id="text-4">
 <p>
 In the assembly code, the value was used for multiplication, right before
 shifting and returning.
@@ -468,7 +505,7 @@ Multiplying small values (less or equal than <code>0xFF</code>) by <code>0x01010
 to the remaining 3 bytes of the <code>DWORD</code>. For example:
 </p>
 
-<pre class="example" id="orgace8185">
+<pre class="example" id="org34848a5">
       0xAB                          0b10101011
 0x01010101  0b00000001000000010000000100000001
 ---------------------------------------------- (MUL)
@@ -549,7 +586,7 @@ see that these two shifts from ARM are doing the same as the <code>0x01010101</c
 multiplication:
 </p>
 
-<pre class="example" id="orgc197914">
+<pre class="example" id="org33b264b">
 Base:               0x000000AB
 After first shift:  0x00AB0000
                     ---------- (ADD)
@@ -571,9 +608,9 @@ other ones, right before returning the upper one?</b>
 </div>
 </div>
 
-<div id="outline-container-org9283e3e" class="outline-2">
-<h2 id="org9283e3e"><span class="section-number-2">4.</span> C translation</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-orgd4f9e00" class="outline-2">
+<h2 id="orgd4f9e00"><span class="section-number-2">5.</span> C translation</h2>
+<div class="outline-text-2" id="text-5">
 <p>
 These are two C translation of the x86 assembly code, one uses multiplication
 for the last step, while the other uses shifting.
@@ -605,15 +642,38 @@ for the last step, while the other uses shifting.
     <span style="color: #ff6f9f;">return</span> num;
 }
 
-<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PRINT_EXPR</span>(<span style="color: #6ae4b9;">E</span>) printf(<span style="color: #00d3d0;">"%s -&gt; %d\n"</span>, #E, E)
+printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>));          <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>));          <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits_shifting(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits_shifting(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
+</pre>
+</div>
+</div>
+</div>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
-    PRINT_EXPR(count_bits(<span style="color: #88ca9f;">0x000000AB</span>));          <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
-    PRINT_EXPR(count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>));          <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
-    PRINT_EXPR(count_bits_shifting(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
-    PRINT_EXPR(count_bits_shifting(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+<div id="outline-container-org9a91dae" class="outline-2">
+<h2 id="org9a91dae"><span class="section-number-2">6.</span> Iterative C version</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+A simpler (but probably slower) way of doing it with a <code>for</code> loop:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">count_bits</span>(<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">x</span>) {
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ret</span> = <span style="color: #88ca9f;">0</span>;
+
+    <span style="color: #ff6f9f;">for</span> (; x &gt; <span style="color: #88ca9f;">0</span>; x &gt;&gt;= <span style="color: #88ca9f;">1</span>)
+        <span style="color: #ff6f9f;">if</span> (x &amp; <span style="color: #88ca9f;">1</span>)
+            ret++;
+
+    <span style="color: #ff6f9f;">return</span> ret;
 }
+
+printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
 </pre>
 </div>
 </div>

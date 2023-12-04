@@ -4,13 +4,6 @@
 #+STARTUP: showeverything
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
 
-#+begin_comment
-TODO: Answer the last question in "Why do some versions use the =0x01010101=
-constant?".
-TODO: The math behind the algorithm for getting the number of bits is not really
-clear to me.
-#+end_comment
-
 [[file:../index.org][Index]] | [[file:index.org][Up]]
 
 -----
@@ -49,59 +42,29 @@ func:
 * Analysis
 
 First of all, it loads the function argument into =edx=, and shifts it one bit to
-the right.
+the right. Then it AND's the =edx= register to keep only the even bits (0, 2, ...,
+30). Now, the bits at odd positions (1, 3, ..., 31) are being moved to the
+adjacent position.
+
+This value in the =edx= register will is then subtracted from the original
+argument in =edi=.
 
 #+begin_src nasm
 mov     edx, edi
 shr     edx, 1
-#+end_src
-
-It AND's the =edx= register to keep only the even bits (0, 2, ..., 30).
-
-#+begin_src nasm
 and     edx, 0x55555555 ; 0b01010101010101010101010101010101
-#+end_src
-
-The bits at odd positions (1, 3, ..., 31) are being moved to the adjacent
-position (0, 2, ..., 30).
-
-It subtracts this value in the =edx= register from the original argument in =edi=,
-copying the result to =eax=.
-
-#+begin_src nasm
 sub     edi, edx
-mov     eax, edi
 #+end_src
-
-Let's visualize what we are doing:
-
-#+begin_example
-Base:         0xDEADBEEF  0b11011110101011011011111011101111
-Shift + AND:  0x45545555  0b01000101010101000101010101010101
-Subtraction:  0x9959699A  0b10011001010110010110100110011010
-#+end_example
 
 It then adds the even pairs of bits (=eax=) to the odd pairs of bits (=edi=).
 
 #+begin_src nasm
+mov     eax, edi
 shr     edi, 2
-and     eax, 0x33333333         ; 0b00110011001100110011001100110011
-and     edi, 0x33333333         ; 0b00110011001100110011001100110011
+and     eax, 0x33333333 ; 0b00110011001100110011001100110011
+and     edi, 0x33333333 ; 0b00110011001100110011001100110011
 add     edi, eax
 #+end_src
-
-So inside =edi=, the bits 0 and 1 will be shifted to bits 2 and 3 respectively,
-and so on. Visually:
-
-#+begin_example
-Base:          0x9959699A  0b10011001010110010110100110011010 (eax)
-After shift:   0x26565A66  0b00100110010101100101101001100110 (edi)
-
-After AND:     0x11112112  0b00010001000100010010000100010010 (eax)
-               0x22121222  0b00100010000100100001001000100010 (edi)
-               ----------------------------------------------
-After adding:  0x33233334  0b00110011001000110011001100110100 (edi)
-#+end_example
 
 After that, it copies the result back to =eax=, shifts it 4 bits to the right, and
 adds the original value stored in =edi=.
@@ -112,17 +75,9 @@ shr     eax, 4
 add     eax, edi
 #+end_src
 
-In our example:
-
-#+begin_example
-Base:            0x33233334  0b110011001000110011001100110100 (edi)
-After shifting:  0x03323333  0b000011001100100011001100110011 (eax)
-After adding:    0x36556667  0b110110010101010110011001100111 (eax)
-#+end_example
-
-Then, it keeps every even group of 4 bits into =eax=, and multiplies them by
-=0x01010101=. Keep in mind that since it's specifying =eax= as the destination
-register, it will truncate the value and keep the lower 32 bits.
+Then, it discards every 4 bits of =eax=, and multiplies that by =0x01010101=. Keep
+in mind that since it's specifying =eax= as the destination register, it will
+truncate the value and keep the lower 32 bits.
 
 #+begin_src nasm
 and     eax, 0x0f0f0f0f      ; 0b00001111000011110000111100001111
@@ -136,28 +91,73 @@ shr     eax, 24
 ret
 #+end_src
 
-Example of the last steps:
-
-#+begin_example
-Base:                  0x36556667  0b00110110010101010110011001100111
-After AND:             0x06050607  0b00000110000001010000011000000111
-After multiplication:  0x18120d07  0b00011000000100100000110100000111 (truncated)
-After shifting:        0x18        0b00011000
-#+end_example
-
 Let's test it with some other numbers to see how the result changes:
 
-| Hex input | Binary input | Output |
-|-----------+--------------+--------|
-| =0x00=      | =0b00000000=   | =0x0=    |
-| =0x01=      | =0b00000001=   | =0x1=    |
-| =0x02=      | =0b00000010=   | =0x1=    |
-| =0x03=      | =0b00000011=   | =0x2=    |
-| =0x0F=      | =0b00001111=   | =0x4=    |
-| =0xFF=      | =0b11111111=   | =0x8=    |
+| Hex input  | Binary input                       | Output |
+|------------+------------------------------------+--------|
+| =0x00=       | =0b00000000=                         | =0x0=    |
+| =0x01=       | =0b00000001=                         | =0x1=    |
+| =0x02=       | =0b00000010=                         | =0x1=    |
+| =0x03=       | =0b00000011=                         | =0x2=    |
+| =0x0F=       | =0b00001111=                         | =0x4=    |
+| =0xFF=       | =0b11111111=                         | =0x8=    |
+| =0xDEADBEEF= | =0b11011110101011011011111011101111= | =0x18=   |
 
 With this, can see that it's a function for *counting the number of set bits* in
 our input.
+
+* Why does this work?
+
+After discovering what this functions does, I decided to look a bit more into
+how it works. I discovered [[https://stackoverflow.com/questions/109023/count-the-number-of-set-bits-in-a-32-bit-integer][this]] stackoverflow link. Turns out this is called
+calculating the [[https://en.wikipedia.org/wiki/Hamming_weight][Hamming weight]].
+
+The assembly function is the simplified version of this one:
+
+#+begin_src C
+#include <stdint.h>
+#include <stdio.h>
+
+int count_bits(uint32_t x) {
+    /* Put count of each 2 bits into those 2 bits */
+    x = (x & 0x55555555) + ((x >> 1) & 0x55555555);
+
+    /* Put count of each 4 bits into those 4 bits */
+    x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+
+    /* Put count of each 8 bits into those 8 bits */
+    x = (x & 0x0f0f0f0f) + ((x >> 4) & 0x0f0f0f0f);
+
+    /* If (x <= 0xFF), propagates lower byte to the upper ones. I am not sure
+     * why this works for bigger values. */
+    x *= 0x01010101;
+    return x >> 24;
+}
+
+printf("%d\n", count_bits(0x000000AB)); /* 5 */
+printf("%d\n", count_bits(0xDEADBEEF)); /* 24 */
+#+end_src
+
+#+RESULTS:
+|  5 |
+| 24 |
+
+Keep in mind that:
+
+|        Hex | Binary                             |
+|------------+------------------------------------|
+| =0x55555555= | =0b01010101010101010101010101010101= |
+| =0x33333333= | =0b00110011001100110011001100110011= |
+| =0x0f0f0f0f= | =0b00001111000011110000111100001111= |
+
+The last multiplication and shifting step is used to skip the following lines:
+
+#+begin_src C
+x = (x & 0x00ff00ff) + ((x >>  8) & 0x00ff00ff);
+x = (x & 0x0000ffff) + ((x >> 16) & 0x0000ffff);
+#+end_src
+
+I still can't fully understand how this works, though.
 
 * Why do some versions use the =0x01010101= constant?
 
@@ -250,7 +250,7 @@ other ones, right before returning the upper one?*
 These are two C translation of the x86 assembly code, one uses multiplication
 for the last step, while the other uses shifting.
 
-#+begin_src C :results output
+#+begin_src C
 #include <stdint.h>
 #include <stdio.h>
 
@@ -276,19 +276,40 @@ uint32_t count_bits_shifting(uint32_t num) {
     return num;
 }
 
-#define PRINT_EXPR(E) printf("%s -> %d\n", #E, E)
-
-int main(void) {
-    PRINT_EXPR(count_bits(0x000000AB));          /* 5 */
-    PRINT_EXPR(count_bits(0xDEADBEEF));          /* 24 */
-    PRINT_EXPR(count_bits_shifting(0x000000AB)); /* 5 */
-    PRINT_EXPR(count_bits_shifting(0xDEADBEEF)); /* 24 */
-    return 0;
-}
+printf("%d\n", count_bits(0x000000AB));          /* 5 */
+printf("%d\n", count_bits(0xDEADBEEF));          /* 24 */
+printf("%d\n", count_bits_shifting(0x000000AB)); /* 5 */
+printf("%d\n", count_bits_shifting(0xDEADBEEF)); /* 24 */
 #+end_src
 
 #+RESULTS:
-: count_bits(0x000000AB) -> 5
-: count_bits(0xDEADBEEF) -> 24
-: count_bits_shifting(0x000000AB) -> 5
-: count_bits_shifting(0xDEADBEEF) -> 24
+|  5 |
+| 24 |
+|  5 |
+| 24 |
+
+* Iterative C version
+
+A simpler (but probably slower) way of doing it with a =for= loop:
+
+#+begin_src C
+#include <stdint.h>
+#include <stdio.h>
+
+int count_bits(uint32_t x) {
+    int ret = 0;
+
+    for (; x > 0; x >>= 1)
+        if (x & 1)
+            ret++;
+
+    return ret;
+}
+
+printf("%d\n", count_bits(0x000000AB)); /* 5 */
+printf("%d\n", count_bits(0xDEADBEEF)); /* 24 */
+#+end_src
+
+#+RESULTS:
+|  5 |
+| 24 |
