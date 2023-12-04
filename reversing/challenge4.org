@@ -4,6 +4,13 @@
 #+STARTUP: showeverything
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
 
+#+begin_comment
+TODO: Answer the last question in "Why do some versions use the =0x01010101=
+constant?".
+TODO: The math behind the algorithm for getting the number of bits is not really
+clear to me.
+#+end_comment
+
 [[file:../index.org][Index]] | [[file:index.org][Up]]
 
 -----
@@ -55,7 +62,7 @@ It AND's the =edx= register to keep only the even bits (0, 2, ..., 30).
 and     edx, 0x55555555 ; 0b01010101010101010101010101010101
 #+end_src
 
-The bits at odd positions (1, 3, ..., 31) are being moved to the previous
+The bits at odd positions (1, 3, ..., 31) are being moved to the adjacent
 position (0, 2, ..., 30).
 
 It subtracts this value in the =edx= register from the original argument in =edi=,
@@ -83,7 +90,8 @@ and     edi, 0x33333333         ; 0b00110011001100110011001100110011
 add     edi, eax
 #+end_src
 
-Visually:
+So inside =edi=, the bits 0 and 1 will be shifted to bits 2 and 3 respectively,
+and so on. Visually:
 
 #+begin_example
 Base:          0x9959699A  0b10011001010110010110100110011010 (eax)
@@ -95,7 +103,8 @@ After AND:     0x11112112  0b00010001000100010010000100010010 (eax)
 After adding:  0x33233334  0b00110011001000110011001100110100 (edi)
 #+end_example
 
-After that, it copies the result back to =eax=, and shifts it 4 bits to the right.
+After that, it copies the result back to =eax=, shifts it 4 bits to the right, and
+adds the original value stored in =edi=.
 
 #+begin_src nasm
 mov     eax, edi
@@ -235,10 +244,6 @@ and adding vs. multiplying by a constant.
 
 My final question, however, is: *Why would you do copy the lower byte to the
 other ones, right before returning the upper one?*
-
-#+begin_comment
-TODO: Answer this last question.
-#+end_comment
 
 * C translation
 
