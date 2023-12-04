@@ -7,6 +7,13 @@
 
 -----
 
+List of my posts solving RE challenges:
+- [[file:challenge2.org][Challenge 2]]
+- [[file:challenge3.org][Challenge 3]]
+- [[file:challenge4.org][Challenge 4]]
+
+-----
+
 Good resources for learning and practicing reverse engineering:
 
 - [[https://www.felixcloutier.com/x86/][Online x86 and amd64 instruction reference]]
@@ -17,7 +24,20 @@ Good resources for learning and practicing reverse engineering:
   system design, and much more.
 - [[https://challenges.re/][challenges.re]], has a lot of challenges with different difficulties.
 
-List of my posts solving RE challenges:
-- [[file:challenge2.org][Challenge 2]]
-- [[file:challenge3.org][Challenge 3]]
-- [[file:challenge4.org][Challenge 4]]
+Throughout this section, you might see some references to the *Intel Software
+Developer Manual*. The manuals on the official website are regularly updated, so you can read and
+download the specific version of the volumes I used for the references  from the
+following links (See also, [[https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html][Intel download page]]):
+
+- Intel SDM, Volume 1: [[file:../manuals/intel-sdm-vol-1.pdf][253665-sdm-vol-1.pdf]]
+- Intel SDM, Volume 2: [[file:../manuals/intel-sdm-vol-2abcd.pdf][325383-sdm-vol-2abcd.pdf]]
+- Intel SDM, Volume 3: [[file:../manuals/intel-sdm-vol-3abcd.pdf][325384-sdm-vol-3abcd.pdf]]
+- Intel SDM, Volume 4: [[file:../manuals/intel-sdm-vol-4.pdf][335592-sdm-vol-4.pdf]]
+- AMD Manual: [[file:../manuals/amd-manual.pdf][24593.pdf]]
+
+References to the manuals look something like:
+
+#+begin_quote
+See /Intel SDM, Vol. 1, Chapter 1.2.3/, /Intel SDM, Vol. 3, Figure 4-5/ and /AMD
+Manual, Figure 6-7/.
+#+end_quote
