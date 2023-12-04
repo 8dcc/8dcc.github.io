@@ -73,7 +73,7 @@ order) for passing as follows:
 #+end_quote
 
 After that, it shifts the value in the =edx= register (the function argument) 1
-bit to the right, and it OR's it with the original unshifted value from =edi=.
+bit to the right, and OR's it with the original unshifted value from =edi=.
 
 #+begin_src nasm
 shr     edx, 1

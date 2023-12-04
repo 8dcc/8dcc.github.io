@@ -130,11 +130,11 @@ After shifting: 0xE0D0E0F0  0b11100000110100001110000011110000 (eax)
 After merging:  0xEDDAEBFE  0b11101101110110101110101111111110
 #+end_example
 
-As you can see, every byte has been swapped with the next one.
+As you can see, every 4 bits have been swapped with the adjacent ones.
 
 Right after that, we copy the result back to =edx=, and we do a similar
 operation. In this case, however, we will be swapping *bit pairs*, instead of
-bytes:
+groups of four:
 
 #+begin_src nasm
 mov     edx, eax
