@@ -7,7 +7,7 @@ I will use this blog to post information in a more centralized way, instead of
 spreading it across the wikis of the different projects.
 
 Current sections:
-- [[file:reversing/index.org][Reverse Engineering]]
+- [[file:reversing/index.org][Reverse engineering]]
 
 I will probably end up moving other documentations I have written for my
 projects here, but until then, make sure you also check out:
@@ -17,3 +17,6 @@ My external links:
 - [[https://github.com/8dcc][GitHub]]
 - [[https://github.com/stars/8dcc/lists/my-dope-shit][List of my best repositories]]
 - [[https://www.codewars.com/users/8dcc][Codewars profile]]
+
+Feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this blog if you find any errors or if you have any
+suggestions.
