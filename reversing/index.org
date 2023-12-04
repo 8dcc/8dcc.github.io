@@ -1,4 +1,4 @@
-#+TITLE: Reversing
+#+TITLE: Reverse engineering
 #+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
