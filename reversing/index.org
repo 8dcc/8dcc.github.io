@@ -1,9 +1,8 @@
 #+TITLE: Reverse engineering
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
+#+OPTIONS: toc:nil num:nil
 #+STARTUP: showeverything
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-#+HTML_HEAD: <style>.section-number-2{display: none;}</style>
 
 [[file:../index.org][Index]]
 
