@@ -16,7 +16,7 @@ Original challenge link: [[https://challenges.re/5/][Click me]].
 
 This is the original function, adapted to fit the [[https://www.nasm.us/][nasm]] syntax.
 
-#+begin_src nasm
+#+begin_src nasm -n
 func:
     cmp     rcx, rsi
     ja      .L10
@@ -59,7 +59,10 @@ func:
 
 * Assembly notes
 
-Some important notes before converting the code to a higher level language.
+Here are some important notes before converting the code to a higher level
+language.
+
+** First checks
 
 As you can see, the first thing the function does is check if =rcx= is greater
 than =rsi=. If it is, it returns zero. Otherwise, it subtracts =rcx= from =rsi=, adds
@@ -70,11 +73,52 @@ concepts you need to know to understand this:
   rel32= is =0F 84 cd=.
 - Both of these instructions just check the =ZF= bit inside the EFLAGS
   register. See /Intel SDM, Vol. 1, Chapter 3.4.3/ and /Vol. 1, Chapter 5.1.7/.
-- This is not only changed by the =cmp= instruction, but also by other
+- The =cmp= instruction just subtracts the second operand from the first operand,
+  but setting the flags without saving the result in the first operand.
+- This flag is not only changed by the =cmp= instruction, but also by other
   instructions like =add=, =sub=, etc.
 
 So in this case, it's checking if =rsi= minus =rcx= plus one is zero or not. In
 other words, if =rcx= is equal to =rsi+1=. If it is, it returns zero.
+
+** Function parameters
+
+We can see that the function has 4 parameters because registers =rdi=, =rsi=, =rdx=
+and =rcx= are being used. See [[file:challenge3.org][challenge 3]] for more information on the AMD64 System
+V ABI.
+
+Another important thing to note is how we know the types of the function
+parameters. We know the first argument (=rdi=) is a pointer because right after
+=.L4= it's being used for indexing. We can determine the type of the pointer
+because:
+
+1. It's not multiplying the index by the size of the elements (e.g. =i*4= for
+   arrays of DWORDs), so we can asume the size of each element is one byte.
+2. Right after =.L8=, you can see it's moving and comparing byte pointers, so it's
+   not hard to see that these are =char*=.
+
+** Function return type
+
+We can tell that the function returns a =char*= because at line 31 of the assembly
+code, it's returning without changing the value of =rax=, and the only place it's
+modified is at line 20, where it loads the address of a character inside the
+string.
+
+The other place where we don't return zero is at line 10, where we return the
+first parameter, which as we know is a =char*=.
+
+** Constructing the =for= loops
+
+We can see that they are =for= loops because it's initializing a variable right
+before labels (=.L4= and =.L8=) that will be used for iteration.
+
+I found that a good approach is to look at the places where those labels are
+being used, and get the loop condition from there.
+
+** Conditional move
+
+After =.L8=, it compares =rax[rsi]= with =rdx[rsi]=, and moves =r9d= to =r8d= if they are
+not equal. To do this, it uses the =cmovne= instruction.
 
 * C translation
 
@@ -83,22 +127,106 @@ convert the assembly code into a higher level language like C, and try to figure
 out what the function does from there.
 
 #+begin_src C
-int func(int rdi, int rsi, int rdx, int rcx) {
+#include <stdint.h>
+#include <stddef.h>
+
+char* func(char* rdi, int rsi, char* rdx, int rcx) {
     if (rcx > rsi)
         /* .L10 */
-        return 0;
+        return NULL;
 
-    rsi -= rcx + 1;
+    rsi     = (rsi - rcx) + 1;
+    int r11 = rsi;
 
     if (rsi == 0)
         /* .L10 */
-        return 0;
+        return NULL;
 
     if (rcx == 0)
         return rdi;
 
     /* .L16 */
+    const int r9 = 1;
 
-    // TODO
+    for (int r10 = 0; r10 != r11; r10++) {
+        /* .L4 */
+        char* rax = &rdi[r10];
+
+        int r8 = 0;
+        for (int rsi = 0; rsi != rcx; rsi++) {
+            /* .L8 */
+            char ebx = rdx[rsi];
+
+            if (rax[rsi] != ebx)
+                r8 = r9;
+        }
+
+        if (r8 == 0)
+            return rax;
+    }
+
+    return NULL;
 }
 #+end_src
+
+After changing some variable names and simplifying:
+
+#+begin_src C
+#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <stdio.h>
+
+char* func(char* str1, int n1, char* str2, int n2) {
+    if (n2 > n1)
+        /* .L10 */
+        return NULL;
+
+    n1 = (n1 - n2) + 1;
+
+    /* NOTE: `r11` is just used to store the original `rsi` (n1), since `rsi`
+     ,* it's going to be used as iterator for the second loop (j). Since I
+     create
+     ,* a `j` variable, I don't need this aux variable. */
+
+    if (n1 == 0)
+        /* .L10 */
+        return NULL;
+
+    if (n2 == 0)
+        return str1;
+
+    /* .L16 */
+    /* NOTE: r9 is only used once and it's value (true) never changes */
+
+    for (int i = 0; i != n1; i++) {
+        /* .L4 */
+        char* substring = &str1[i];
+
+        bool failed = false;
+        for (int j = 0; j != n2; j++) {
+            /* .L8 */
+            if (substring[j] != str2[j])
+                failed = true;
+        }
+
+        if (!failed)
+            return substring;
+    }
+
+    return NULL;
+}
+
+char* result = func("Hello, world!", 13, "world", 5);
+printf("%p\n\"%s\"\n", result, result); /* "world!" */
+#+end_src
+
+#+RESULTS:
+| 0x564f148d0011 |
+|         world! |
+
+As we can see, the function is used to return the first match of =str2= inside
+=str1=. You also need to provide the lengths of the strings.
+
+Note that the =n1= and =n2= parameters are the lengths of the strings. In the
+example we pass 5 instead of 6 (=sizeof("world")=) so ="world\0"= matches ="world!"=.

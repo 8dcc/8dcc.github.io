@@ -207,15 +207,23 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgee58135">1. Original assembly</a></li>
-<li><a href="#org684126d">2. Assembly notes</a></li>
-<li><a href="#orgc69475c">3. C translation</a></li>
+<li><a href="#org6c6a872">1. Original assembly</a></li>
+<li><a href="#orgab8f01b">2. Assembly notes</a>
+<ul>
+<li><a href="#org7c868d2">2.1. First checks</a></li>
+<li><a href="#org5f058f9">2.2. Function parameters</a></li>
+<li><a href="#orgaac39ec">2.3. Function return type</a></li>
+<li><a href="#orgdfaac26">2.4. Constructing the <code>for</code> loops</a></li>
+<li><a href="#org6b21c5a">2.5. Conditional move</a></li>
+</ul>
+</li>
+<li><a href="#org32ff6aa">3. C translation</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgee58135" class="outline-2">
-<h2 id="orgee58135"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org6c6a872" class="outline-2">
+<h2 id="org6c6a872"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/5/">Click me</a>.
@@ -226,56 +234,61 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-    <span style="color: #feacd0;">cmp</span>     <span style="color: #6ae4b9;">rcx</span>, <span style="color: #6ae4b9;">rsi</span>
-    <span style="color: #feacd0;">ja</span>      .L10
-    <span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">rsi</span>, <span style="color: #6ae4b9;">rcx</span>
-    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">rsi</span>, <span style="color: #88ca9f;">1</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r11</span>, <span style="color: #6ae4b9;">rsi</span>
-    <span style="color: #feacd0;">je</span>      .L10
-    <span style="color: #feacd0;">test</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #6ae4b9;">rcx</span>
-    <span style="color: #feacd0;">jne</span>     .L16
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rdi</span>
-    <span style="color: #feacd0;">ret</span>
-<span style="color: #4ae2ff;">.L10</span>:
-    <span style="color: #feacd0;">xor</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">ret</span>
-<span style="color: #4ae2ff;">.L16</span>:
-    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbx</span>
-    <span style="color: #feacd0;">xor</span>     <span style="color: #6ae4b9;">r10d</span>, <span style="color: #6ae4b9;">r10d</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r9d</span>, <span style="color: #88ca9f;">1</span>
-<span style="color: #4ae2ff;">.L4</span>:
-    <span style="color: #feacd0;">lea</span>     <span style="color: #6ae4b9;">rax</span>, [<span style="color: #6ae4b9;">rdi</span> + <span style="color: #6ae4b9;">r10</span>]
-    <span style="color: #feacd0;">xor</span>     <span style="color: #6ae4b9;">esi</span>, <span style="color: #6ae4b9;">esi</span>
-    <span style="color: #feacd0;">xor</span>     <span style="color: #6ae4b9;">r8d</span>, <span style="color: #6ae4b9;">r8d</span>
-<span style="color: #4ae2ff;">.L8</span>:
-    <span style="color: #feacd0;">movzx</span>   <span style="color: #6ae4b9;">ebx</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rdx</span> + <span style="color: #6ae4b9;">rsi</span>]
-    <span style="color: #feacd0;">cmp</span>     <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rax</span> + <span style="color: #6ae4b9;">rsi</span>], <span style="color: #6ae4b9;">bl</span>
-    <span style="color: #feacd0;">cmovne</span>  <span style="color: #6ae4b9;">r8d</span>, <span style="color: #6ae4b9;">r9d</span>
-    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">rsi</span>, <span style="color: #88ca9f;">1</span>
-    <span style="color: #feacd0;">cmp</span>     <span style="color: #6ae4b9;">rsi</span>, <span style="color: #6ae4b9;">rcx</span>
-    <span style="color: #feacd0;">jne</span>     .L8
-    <span style="color: #feacd0;">test</span>    <span style="color: #6ae4b9;">r8d</span>, <span style="color: #6ae4b9;">r8d</span>
-    <span style="color: #feacd0;">je</span>      .L12
-    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">r10</span>, <span style="color: #88ca9f;">1</span>
-    <span style="color: #feacd0;">cmp</span>     <span style="color: #6ae4b9;">r10</span>, <span style="color: #6ae4b9;">r11</span>
-    <span style="color: #feacd0;">jne</span>     .L4
-    <span style="color: #feacd0;">xor</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-<span style="color: #4ae2ff;">.L12</span>:
-    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbx</span>
-    <span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span class="linenr"> 1: </span><span style="color: #4ae2ff;">func</span>:
+<span class="linenr"> 2: </span>    <span style="color: #feacd0;">cmp</span>     <span style="color: #6ae4b9;">rcx</span>, <span style="color: #6ae4b9;">rsi</span>
+<span class="linenr"> 3: </span>    <span style="color: #feacd0;">ja</span>      .L10
+<span class="linenr"> 4: </span>    <span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">rsi</span>, <span style="color: #6ae4b9;">rcx</span>
+<span class="linenr"> 5: </span>    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">rsi</span>, <span style="color: #88ca9f;">1</span>
+<span class="linenr"> 6: </span>    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r11</span>, <span style="color: #6ae4b9;">rsi</span>
+<span class="linenr"> 7: </span>    <span style="color: #feacd0;">je</span>      .L10
+<span class="linenr"> 8: </span>    <span style="color: #feacd0;">test</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #6ae4b9;">rcx</span>
+<span class="linenr"> 9: </span>    <span style="color: #feacd0;">jne</span>     .L16
+<span class="linenr">10: </span>    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rdi</span>
+<span class="linenr">11: </span>    <span style="color: #feacd0;">ret</span>
+<span class="linenr">12: </span><span style="color: #4ae2ff;">.L10</span>:
+<span class="linenr">13: </span>    <span style="color: #feacd0;">xor</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
+<span class="linenr">14: </span>    <span style="color: #feacd0;">ret</span>
+<span class="linenr">15: </span><span style="color: #4ae2ff;">.L16</span>:
+<span class="linenr">16: </span>    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbx</span>
+<span class="linenr">17: </span>    <span style="color: #feacd0;">xor</span>     <span style="color: #6ae4b9;">r10d</span>, <span style="color: #6ae4b9;">r10d</span>
+<span class="linenr">18: </span>    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r9d</span>, <span style="color: #88ca9f;">1</span>
+<span class="linenr">19: </span><span style="color: #4ae2ff;">.L4</span>:
+<span class="linenr">20: </span>    <span style="color: #feacd0;">lea</span>     <span style="color: #6ae4b9;">rax</span>, [<span style="color: #6ae4b9;">rdi</span> + <span style="color: #6ae4b9;">r10</span>]
+<span class="linenr">21: </span>    <span style="color: #feacd0;">xor</span>     <span style="color: #6ae4b9;">esi</span>, <span style="color: #6ae4b9;">esi</span>
+<span class="linenr">22: </span>    <span style="color: #feacd0;">xor</span>     <span style="color: #6ae4b9;">r8d</span>, <span style="color: #6ae4b9;">r8d</span>
+<span class="linenr">23: </span><span style="color: #4ae2ff;">.L8</span>:
+<span class="linenr">24: </span>    <span style="color: #feacd0;">movzx</span>   <span style="color: #6ae4b9;">ebx</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rdx</span> + <span style="color: #6ae4b9;">rsi</span>]
+<span class="linenr">25: </span>    <span style="color: #feacd0;">cmp</span>     <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rax</span> + <span style="color: #6ae4b9;">rsi</span>], <span style="color: #6ae4b9;">bl</span>
+<span class="linenr">26: </span>    <span style="color: #feacd0;">cmovne</span>  <span style="color: #6ae4b9;">r8d</span>, <span style="color: #6ae4b9;">r9d</span>
+<span class="linenr">27: </span>    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">rsi</span>, <span style="color: #88ca9f;">1</span>
+<span class="linenr">28: </span>    <span style="color: #feacd0;">cmp</span>     <span style="color: #6ae4b9;">rsi</span>, <span style="color: #6ae4b9;">rcx</span>
+<span class="linenr">29: </span>    <span style="color: #feacd0;">jne</span>     .L8
+<span class="linenr">30: </span>    <span style="color: #feacd0;">test</span>    <span style="color: #6ae4b9;">r8d</span>, <span style="color: #6ae4b9;">r8d</span>
+<span class="linenr">31: </span>    <span style="color: #feacd0;">je</span>      .L12
+<span class="linenr">32: </span>    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">r10</span>, <span style="color: #88ca9f;">1</span>
+<span class="linenr">33: </span>    <span style="color: #feacd0;">cmp</span>     <span style="color: #6ae4b9;">r10</span>, <span style="color: #6ae4b9;">r11</span>
+<span class="linenr">34: </span>    <span style="color: #feacd0;">jne</span>     .L4
+<span class="linenr">35: </span>    <span style="color: #feacd0;">xor</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
+<span class="linenr">36: </span><span style="color: #4ae2ff;">.L12</span>:
+<span class="linenr">37: </span>    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbx</span>
+<span class="linenr">38: </span>    <span style="color: #feacd0;">ret</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org684126d" class="outline-2">
-<h2 id="org684126d"><span class="section-number-2">2.</span> Assembly notes</h2>
+<div id="outline-container-orgab8f01b" class="outline-2">
+<h2 id="orgab8f01b"><span class="section-number-2">2.</span> Assembly notes</h2>
 <div class="outline-text-2" id="text-2">
 <p>
-Some important notes before converting the code to a higher level language.
+Here are some important notes before converting the code to a higher level
+language.
 </p>
+</div>
 
+<div id="outline-container-org7c868d2" class="outline-3">
+<h3 id="org7c868d2"><span class="section-number-3">2.1.</span> First checks</h3>
+<div class="outline-text-3" id="text-2-1">
 <p>
 As you can see, the first thing the function does is check if <code>rcx</code> is greater
 than <code>rsi</code>. If it is, it returns zero. Otherwise, it subtracts <code>rcx</code> from <code>rsi</code>, adds
@@ -288,7 +301,9 @@ concepts you need to know to understand this:
   rel32</code> is <code>0F 84 cd</code>.</li>
 <li>Both of these instructions just check the <code>ZF</code> bit inside the EFLAGS
 register. See <i>Intel SDM, Vol. 1, Chapter 3.4.3</i> and <i>Vol. 1, Chapter 5.1.7</i>.</li>
-<li>This is not only changed by the <code>cmp</code> instruction, but also by other
+<li>The <code>cmp</code> instruction just subtracts the second operand from the first operand,
+but setting the flags without saving the result in the first operand.</li>
+<li>This flag is not only changed by the <code>cmp</code> instruction, but also by other
 instructions like <code>add</code>, <code>sub</code>, etc.</li>
 </ul>
 
@@ -299,8 +314,76 @@ other words, if <code>rcx</code> is equal to <code>rsi+1</code>. If it is, it re
 </div>
 </div>
 
-<div id="outline-container-orgc69475c" class="outline-2">
-<h2 id="orgc69475c"><span class="section-number-2">3.</span> C translation</h2>
+<div id="outline-container-org5f058f9" class="outline-3">
+<h3 id="org5f058f9"><span class="section-number-3">2.2.</span> Function parameters</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+We can see that the function has 4 parameters because registers <code>rdi</code>, <code>rsi</code>, <code>rdx</code>
+and <code>rcx</code> are being used. See <a href="challenge3.html">challenge 3</a> for more information on the AMD64 System
+V ABI.
+</p>
+
+<p>
+Another important thing to note is how we know the types of the function
+parameters. We know the first argument (<code>rdi</code>) is a pointer because right after
+<code>.L4</code> it's being used for indexing. We can determine the type of the pointer
+because:
+</p>
+
+<ol class="org-ol">
+<li>It's not multiplying the index by the size of the elements (e.g. <code>i*4</code> for
+arrays of DWORDs), so we can asume the size of each element is one byte.</li>
+<li>Right after <code>.L8</code>, you can see it's moving and comparing byte pointers, so it's
+not hard to see that these are <code>char*</code>.</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgaac39ec" class="outline-3">
+<h3 id="orgaac39ec"><span class="section-number-3">2.3.</span> Function return type</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+We can tell that the function returns a <code>char*</code> because at line 31 of the assembly
+code, it's returning without changing the value of <code>rax</code>, and the only place it's
+modified is at line 20, where it loads the address of a character inside the
+string.
+</p>
+
+<p>
+The other place where we don't return zero is at line 10, where we return the
+first parameter, which as we know is a <code>char*</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgdfaac26" class="outline-3">
+<h3 id="orgdfaac26"><span class="section-number-3">2.4.</span> Constructing the <code>for</code> loops</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+We can see that they are <code>for</code> loops because it's initializing a variable right
+before labels (<code>.L4</code> and <code>.L8</code>) that will be used for iteration.
+</p>
+
+<p>
+I found that a good approach is to look at the places where those labels are
+being used, and get the loop condition from there.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org6b21c5a" class="outline-3">
+<h3 id="org6b21c5a"><span class="section-number-3">2.5.</span> Conditional move</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+After <code>.L8</code>, it compares <code>rax[rsi]</code> with <code>rdx[rsi]</code>, and moves <code>r9d</code> to <code>r8d</code> if they are
+not equal. To do this, it uses the <code>cmovne</code> instruction.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org32ff6aa" class="outline-2">
+<h2 id="org32ff6aa"><span class="section-number-2">3.</span> C translation</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 From the <a href="challenge4.html">previous challenge</a>, I learned that it's a good approach to first
@@ -309,26 +392,113 @@ out what the function does from there.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">rdi</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">rsi</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">rdx</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">rcx</span>) {
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stddef.h&gt;</span>
+
+<span style="color: #79a8ff;">char</span>* <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">rdi</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">rsi</span>, <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">rdx</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">rcx</span>) {
     <span style="color: #ff6f9f;">if</span> (rcx &gt; rsi)
         <span style="color: #989898;">/* </span><span style="color: #989898;">.L10</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
 
-    rsi -= rcx + <span style="color: #88ca9f;">1</span>;
+    rsi     = (rsi - rcx) + <span style="color: #88ca9f;">1</span>;
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">r11</span> = rsi;
 
     <span style="color: #ff6f9f;">if</span> (rsi == <span style="color: #88ca9f;">0</span>)
         <span style="color: #989898;">/* </span><span style="color: #989898;">.L10</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
 
     <span style="color: #ff6f9f;">if</span> (rcx == <span style="color: #88ca9f;">0</span>)
         <span style="color: #ff6f9f;">return</span> rdi;
 
     <span style="color: #989898;">/* </span><span style="color: #989898;">.L16</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">r9</span> = <span style="color: #88ca9f;">1</span>;
 
-    <span style="color: #989898;">// </span><span style="color: #cabf00; font-weight: bold;">TODO</span>
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">r10</span> = <span style="color: #88ca9f;">0</span>; r10 != r11; r10++) {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">.L4</span><span style="color: #989898;"> */</span>
+        <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">rax</span> = &amp;rdi[r10];
+
+        <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">r8</span> = <span style="color: #88ca9f;">0</span>;
+        <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">rsi</span> = <span style="color: #88ca9f;">0</span>; rsi != rcx; rsi++) {
+            <span style="color: #989898;">/* </span><span style="color: #989898;">.L8</span><span style="color: #989898;"> */</span>
+            <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">ebx</span> = rdx[rsi];
+
+            <span style="color: #ff6f9f;">if</span> (rax[rsi] != ebx)
+                r8 = r9;
+        }
+
+        <span style="color: #ff6f9f;">if</span> (r8 == <span style="color: #88ca9f;">0</span>)
+            <span style="color: #ff6f9f;">return</span> rax;
+    }
+
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
 }
 </pre>
 </div>
+
+<p>
+After changing some variable names and simplifying:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdbool.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stddef.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+
+<span style="color: #79a8ff;">char</span>* <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">str1</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">n1</span>, <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">str2</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">n2</span>) {
+    <span style="color: #ff6f9f;">if</span> (n2 &gt; n1)
+        <span style="color: #989898;">/* </span><span style="color: #989898;">.L10</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+
+    n1 = (n1 - n2) + <span style="color: #88ca9f;">1</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #44bc44; font-weight: bold;">NOTE:</span><span style="color: #989898;"> `r11` is just used to store the original `rsi` (n1), since `rsi`</span>
+<span style="color: #989898;">     * it's going to be used as iterator for the second loop (j). Since I</span>
+<span style="color: #989898;">     create</span>
+<span style="color: #989898;">     * a `j` variable, I don't need this aux variable.</span><span style="color: #989898;"> */</span>
+
+    <span style="color: #ff6f9f;">if</span> (n1 == <span style="color: #88ca9f;">0</span>)
+        <span style="color: #989898;">/* </span><span style="color: #989898;">.L10</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+
+    <span style="color: #ff6f9f;">if</span> (n2 == <span style="color: #88ca9f;">0</span>)
+        <span style="color: #ff6f9f;">return</span> str1;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">.L16</span><span style="color: #989898;"> */</span>
+    <span style="color: #989898;">/* </span><span style="color: #44bc44; font-weight: bold;">NOTE:</span><span style="color: #989898;"> r9 is only used once and it's value (true) never changes</span><span style="color: #989898;"> */</span>
+
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i != n1; i++) {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">.L4</span><span style="color: #989898;"> */</span>
+        <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">substring</span> = &amp;str1[i];
+
+        <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">failed</span> = <span style="color: #88ca9f;">false</span>;
+        <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">j</span> = <span style="color: #88ca9f;">0</span>; j != n2; j++) {
+            <span style="color: #989898;">/* </span><span style="color: #989898;">.L8</span><span style="color: #989898;"> */</span>
+            <span style="color: #ff6f9f;">if</span> (substring[j] != str2[j])
+                failed = <span style="color: #88ca9f;">true</span>;
+        }
+
+        <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>failed)
+            <span style="color: #ff6f9f;">return</span> substring;
+    }
+
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+}
+
+<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">result</span> = func(<span style="color: #00d3d0;">"Hello, world!"</span>, <span style="color: #88ca9f;">13</span>, <span style="color: #00d3d0;">"world"</span>, <span style="color: #88ca9f;">5</span>);
+printf(<span style="color: #00d3d0;">"%p\n\"%s\"\n"</span>, result, result); <span style="color: #989898;">/* </span><span style="color: #989898;">"world!"</span><span style="color: #989898;"> */</span>
+</pre>
+</div>
+
+<p>
+As we can see, the function is used to return the first match of <code>str2</code> inside
+<code>str1</code>. You also need to provide the lengths of the strings.
+</p>
+
+<p>
+Note that the <code>n1</code> and <code>n2</code> parameters are the lengths of the strings. In the
+example we pass 5 instead of 6 (<code>sizeof("world")</code>) so <code>"world\0"</code> matches <code>"world!"</code>.
+</p>
 </div>
 </div>
 </div>
