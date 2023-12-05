@@ -207,23 +207,23 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org6c6a872">1. Original assembly</a></li>
-<li><a href="#orgab8f01b">2. Assembly notes</a>
+<li><a href="#orgbc92b85">1. Original assembly</a></li>
+<li><a href="#org2125400">2. Assembly notes</a>
 <ul>
-<li><a href="#org7c868d2">2.1. First checks</a></li>
-<li><a href="#org5f058f9">2.2. Function parameters</a></li>
-<li><a href="#orgaac39ec">2.3. Function return type</a></li>
-<li><a href="#orgdfaac26">2.4. Constructing the <code>for</code> loops</a></li>
-<li><a href="#org6b21c5a">2.5. Conditional move</a></li>
+<li><a href="#org2b58b0e">2.1. First checks</a></li>
+<li><a href="#orgca93310">2.2. Function parameters</a></li>
+<li><a href="#org6ab03d9">2.3. Function return type</a></li>
+<li><a href="#org2a7f9ec">2.4. Constructing the <code>for</code> loops</a></li>
+<li><a href="#org3d31225">2.5. Conditional move</a></li>
 </ul>
 </li>
-<li><a href="#org32ff6aa">3. C translation</a></li>
+<li><a href="#org9faec9d">3. C translation</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org6c6a872" class="outline-2">
-<h2 id="org6c6a872"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-orgbc92b85" class="outline-2">
+<h2 id="orgbc92b85"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/5/">Click me</a>.
@@ -277,8 +277,8 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </div>
 </div>
 
-<div id="outline-container-orgab8f01b" class="outline-2">
-<h2 id="orgab8f01b"><span class="section-number-2">2.</span> Assembly notes</h2>
+<div id="outline-container-org2125400" class="outline-2">
+<h2 id="org2125400"><span class="section-number-2">2.</span> Assembly notes</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Here are some important notes before converting the code to a higher level
@@ -286,8 +286,8 @@ language.
 </p>
 </div>
 
-<div id="outline-container-org7c868d2" class="outline-3">
-<h3 id="org7c868d2"><span class="section-number-3">2.1.</span> First checks</h3>
+<div id="outline-container-org2b58b0e" class="outline-3">
+<h3 id="org2b58b0e"><span class="section-number-3">2.1.</span> First checks</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 As you can see, the first thing the function does is check if <code>rcx</code> is greater
@@ -314,8 +314,8 @@ other words, if <code>rcx</code> is equal to <code>rsi+1</code>. If it is, it re
 </div>
 </div>
 
-<div id="outline-container-org5f058f9" class="outline-3">
-<h3 id="org5f058f9"><span class="section-number-3">2.2.</span> Function parameters</h3>
+<div id="outline-container-orgca93310" class="outline-3">
+<h3 id="orgca93310"><span class="section-number-3">2.2.</span> Function parameters</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 We can see that the function has 4 parameters because registers <code>rdi</code>, <code>rsi</code>, <code>rdx</code>
@@ -330,17 +330,17 @@ parameters. We know the first argument (<code>rdi</code>) is a pointer because r
 because:
 </p>
 
-<ol class="org-ol">
+<ul class="org-ul">
 <li>It's not multiplying the index by the size of the elements (e.g. <code>i*4</code> for
 arrays of DWORDs), so we can asume the size of each element is one byte.</li>
 <li>Right after <code>.L8</code>, you can see it's moving and comparing byte pointers, so it's
 not hard to see that these are <code>char*</code>.</li>
-</ol>
+</ul>
 </div>
 </div>
 
-<div id="outline-container-orgaac39ec" class="outline-3">
-<h3 id="orgaac39ec"><span class="section-number-3">2.3.</span> Function return type</h3>
+<div id="outline-container-org6ab03d9" class="outline-3">
+<h3 id="org6ab03d9"><span class="section-number-3">2.3.</span> Function return type</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 We can tell that the function returns a <code>char*</code> because at line 31 of the assembly
@@ -356,34 +356,97 @@ first parameter, which as we know is a <code>char*</code>.
 </div>
 </div>
 
-<div id="outline-container-orgdfaac26" class="outline-3">
-<h3 id="orgdfaac26"><span class="section-number-3">2.4.</span> Constructing the <code>for</code> loops</h3>
+<div id="outline-container-org2a7f9ec" class="outline-3">
+<h3 id="org2a7f9ec"><span class="section-number-3">2.4.</span> Constructing the <code>for</code> loops</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
-We can see that they are <code>for</code> loops because it's initializing a variable right
-before labels (<code>.L4</code> and <code>.L8</code>) that will be used for iteration.
+We can see that the labels <code>.L4</code> and <code>.L8</code> are being used as loops because of the
+conditional jumps at lines 29 and 34 of the assembly code. We can get the loop
+conditions right before the jumps.
 </p>
 
 <p>
-I found that a good approach is to look at the places where those labels are
-being used, and get the loop condition from there.
+For the outer loop, the condition is:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">while</span> (r10 != r11) {
+    <span style="color: #989898;">// </span><span style="color: #989898;">...</span>
+}
+</pre>
+</div>
+
+<p>
+And for the inner loop, the condition is:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">while</span> (rsi != rcx) {
+    <span style="color: #989898;">// </span><span style="color: #989898;">...</span>
+}
+</pre>
+</div>
+
+
+<p>
+We can tell that they are actually <code>for</code> loops because:
+</p>
+
+
+<ul class="org-ul">
+<li>One of the variables used for the loop's condition is initialized before the
+loop starts (before the label used for jumping). In the first loop, the <code>r10</code>
+register is initialized to zero (line 17), and in the inner loop, the <code>rsi</code>
+register is also initialized to zero (line 21).</li>
+<li>Right before checking the conditions, the loops increment those same variables
+(<code>rsi</code> on line 27 and <code>r10</code> on line 32).</li>
+</ul>
+
+<p>
+In my opinion, the best approach when trying to understand a label's purpose is
+to look at the places where those labels are being used, and get the
+loop/conditional information directly from there.
+</p>
+
+<p>
+Also note that the <code>rsi</code> variable is now being used as the iterator for the inner
+loop, instead of holding the old result of subtracting the arguments. This old
+value was stored in the <code>r11</code> register on line 6. It's important to know where the
+meaning/usage of the registers change.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org6b21c5a" class="outline-3">
-<h3 id="org6b21c5a"><span class="section-number-3">2.5.</span> Conditional move</h3>
+<div id="outline-container-org3d31225" class="outline-3">
+<h3 id="org3d31225"><span class="section-number-3">2.5.</span> Conditional move</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
-After <code>.L8</code>, it compares <code>rax[rsi]</code> with <code>rdx[rsi]</code>, and moves <code>r9d</code> to <code>r8d</code> if they are
-not equal. To do this, it uses the <code>cmovne</code> instruction.
+After <code>.L8</code>, on line 25, it compares <code>rax[rsi]</code> with <code>rdx[rsi]</code>, and moves <code>r9d</code> to <code>r8d</code>
+if they are not equal. To do this, it uses the <code>cmovne</code> instruction:
 </p>
+
+<blockquote>
+<p>
+<b>CMOVcc — Conditional Move</b>
+</p>
+
+<ul class="org-ul">
+<li><code>CMOVNE r32, r/m32</code>: Move if not equal (<code>ZF</code> = 0).</li>
+</ul>
+
+<p>
+Each of the <code>CMOVcc</code> instructions performs a move operation if the status flags in
+the EFLAGS register (<code>CF</code>, <code>OF</code>, <code>PF</code>, <code>SF</code>, and <code>ZF</code>) are in a specified state (or
+condition). [&#x2026;] If the condition is not satisfied, a move is not performed and
+execution continues with the instruction following the <code>CMOVcc</code> instruction.
+</p>
+</blockquote>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org32ff6aa" class="outline-2">
-<h2 id="org32ff6aa"><span class="section-number-2">3.</span> C translation</h2>
+<div id="outline-container-org9faec9d" class="outline-2">
+<h2 id="org9faec9d"><span class="section-number-2">3.</span> C translation</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 From the <a href="challenge4.html">previous challenge</a>, I learned that it's a good approach to first

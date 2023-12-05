@@ -92,10 +92,10 @@ parameters. We know the first argument (=rdi=) is a pointer because right after
 =.L4= it's being used for indexing. We can determine the type of the pointer
 because:
 
-1. It's not multiplying the index by the size of the elements (e.g. =i*4= for
-   arrays of DWORDs), so we can asume the size of each element is one byte.
-2. Right after =.L8=, you can see it's moving and comparing byte pointers, so it's
-   not hard to see that these are =char*=.
+- It's not multiplying the index by the size of the elements (e.g. =i*4= for
+  arrays of DWORDs), so we can asume the size of each element is one byte.
+- Right after =.L8=, you can see it's moving and comparing byte pointers, so it's
+  not hard to see that these are =char*=.
 
 ** Function return type
 
@@ -109,16 +109,61 @@ first parameter, which as we know is a =char*=.
 
 ** Constructing the =for= loops
 
-We can see that they are =for= loops because it's initializing a variable right
-before labels (=.L4= and =.L8=) that will be used for iteration.
+We can see that the labels =.L4= and =.L8= are being used as loops because of the
+conditional jumps at lines 29 and 34 of the assembly code. We can get the loop
+conditions right before the jumps.
 
-I found that a good approach is to look at the places where those labels are
-being used, and get the loop condition from there.
+For the outer loop, the condition is:
+
+#+begin_src C
+while (r10 != r11) {
+    // ...
+}
+#+end_src
+
+And for the inner loop, the condition is:
+
+#+begin_src C
+while (rsi != rcx) {
+    // ...
+}
+#+end_src
+
+
+We can tell that they are actually =for= loops because:
+
+
+- One of the variables used for the loop's condition is initialized before the
+  loop starts (before the label used for jumping). In the first loop, the =r10=
+  register is initialized to zero (line 17), and in the inner loop, the =rsi=
+  register is also initialized to zero (line 21).
+- Right before checking the conditions, the loops increment those same variables
+  (=rsi= on line 27 and =r10= on line 32).
+
+In my opinion, the best approach when trying to understand a label's purpose is
+to look at the places where those labels are being used, and get the
+loop/conditional information directly from there.
+
+Also note that the =rsi= variable is now being used as the iterator for the inner
+loop, instead of holding the old result of subtracting the arguments. This old
+value was stored in the =r11= register on line 6. It's important to know where the
+meaning/usage of the registers change.
 
 ** Conditional move
 
-After =.L8=, it compares =rax[rsi]= with =rdx[rsi]=, and moves =r9d= to =r8d= if they are
-not equal. To do this, it uses the =cmovne= instruction.
+After =.L8=, on line 25, it compares =rax[rsi]= with =rdx[rsi]=, and moves =r9d= to =r8d=
+if they are not equal. To do this, it uses the =cmovne= instruction:
+
+#+begin_quote
+*CMOVcc — Conditional Move*
+
+- =CMOVNE r32, r/m32=: Move if not equal (=ZF= = 0).
+
+Each of the =CMOVcc= instructions performs a move operation if the status flags in
+the EFLAGS register (=CF=, =OF=, =PF=, =SF=, and =ZF=) are in a specified state (or
+condition). [...] If the condition is not satisfied, a move is not performed and
+execution continues with the instruction following the =CMOVcc= instruction.
+#+end_quote
 
 * C translation
 
