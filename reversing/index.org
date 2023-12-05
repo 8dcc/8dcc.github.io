@@ -15,6 +15,7 @@ List of my posts solving RE challenges:
 - [[file:challenge2.org][Challenge 2]]
 - [[file:challenge3.org][Challenge 3]]
 - [[file:challenge4.org][Challenge 4]]
+- [[file:challenge5.org][Challenge 5]]
 
 * External resources
 

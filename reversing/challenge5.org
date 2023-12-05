@@ -1,0 +1,104 @@
+#+TITLE: Challenge 5
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: showeverything
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Original assembly
+
+Original challenge link: [[https://challenges.re/5/][Click me]].
+
+This is the original function, adapted to fit the [[https://www.nasm.us/][nasm]] syntax.
+
+#+begin_src nasm
+func:
+    cmp     rcx, rsi
+    ja      .L10
+    sub     rsi, rcx
+    add     rsi, 1
+    mov     r11, rsi
+    je      .L10
+    test    rcx, rcx
+    jne     .L16
+    mov     rax, rdi
+    ret
+.L10:
+    xor     eax, eax
+    ret
+.L16:
+    push    rbx
+    xor     r10d, r10d
+    mov     r9d, 1
+.L4:
+    lea     rax, [rdi + r10]
+    xor     esi, esi
+    xor     r8d, r8d
+.L8:
+    movzx   ebx, BYTE [rdx + rsi]
+    cmp     BYTE [rax + rsi], bl
+    cmovne  r8d, r9d
+    add     rsi, 1
+    cmp     rsi, rcx
+    jne     .L8
+    test    r8d, r8d
+    je      .L12
+    add     r10, 1
+    cmp     r10, r11
+    jne     .L4
+    xor     eax, eax
+.L12:
+    pop     rbx
+    ret
+#+end_src
+
+* Assembly notes
+
+Some important notes before converting the code to a higher level language.
+
+As you can see, the first thing the function does is check if =rcx= is greater
+than =rsi=. If it is, it returns zero. Otherwise, it subtracts =rcx= from =rsi=, adds
+one to =rsi=, and uses another =je= instruction to branch. There are some key
+concepts you need to know to understand this:
+
+- The =je= and =jz= instructions are the same. The [[https://www.felixcloutier.com/x86/jcc][opcode]] for both =je rel32= and =jz
+  rel32= is =0F 84 cd=.
+- Both of these instructions just check the =ZF= bit inside the EFLAGS
+  register. See /Intel SDM, Vol. 1, Chapter 3.4.3/ and /Vol. 1, Chapter 5.1.7/.
+- This is not only changed by the =cmp= instruction, but also by other
+  instructions like =add=, =sub=, etc.
+
+So in this case, it's checking if =rsi= minus =rcx= plus one is zero or not. In
+other words, if =rcx= is equal to =rsi+1=. If it is, it returns zero.
+
+* C translation
+
+From the [[file:challenge4.org][previous challenge]], I learned that it's a good approach to first
+convert the assembly code into a higher level language like C, and try to figure
+out what the function does from there.
+
+#+begin_src C
+int func(int rdi, int rsi, int rdx, int rcx) {
+    if (rcx > rsi)
+        /* .L10 */
+        return 0;
+
+    rsi -= rcx + 1;
+
+    if (rsi == 0)
+        /* .L10 */
+        return 0;
+
+    if (rcx == 0)
+        return rdi;
+
+    /* .L16 */
+
+    // TODO
+}
+#+end_src
