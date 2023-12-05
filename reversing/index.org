@@ -2,17 +2,21 @@
 #+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+#+HTML_HEAD: <style>.section-number-2{display: none;}</style>
 
 [[file:../index.org][Index]]
 
 -----
+
+* Solved challenges
 
 List of my posts solving RE challenges:
 - [[file:challenge2.org][Challenge 2]]
 - [[file:challenge3.org][Challenge 3]]
 - [[file:challenge4.org][Challenge 4]]
 
------
+* External resources
 
 Good resources for learning and practicing reverse engineering:
 
@@ -23,6 +27,8 @@ Good resources for learning and practicing reverse engineering:
   a great resource to learn about assembly, compiler optimizations, operating
   system design, and much more.
 - [[https://challenges.re/][challenges.re]], has a lot of challenges with different difficulties.
+
+* Intel manuals
 
 Throughout this section, you might see some references to the *Intel Software
 Developer Manual*. The manuals on the official website are regularly updated, so you can read and
