@@ -7,13 +7,16 @@ I will use this blog to post information in a more centralized way, instead of
 spreading it across the wikis of the different projects.
 
 Current sections:
+
 - [[file:reversing/index.org][Reverse engineering]]
 
 I will probably end up moving other documentations I have written for my
 projects here, but until then, make sure you also check out:
+
 - The [[https://github.com/fs-os/fs-os/wiki][fs-os wiki]], explaining the details of [[https://github.com/fs-os/fs-os][my operating system]].
 
 My external links:
+
 - [[https://github.com/8dcc][GitHub]]
 - [[https://github.com/stars/8dcc/lists/my-dope-shit][List of my best repositories]]
 - [[https://www.codewars.com/users/8dcc][Codewars profile]]
