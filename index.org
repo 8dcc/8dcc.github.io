@@ -9,6 +9,7 @@ spreading it across the wikis of the different projects.
 Current sections:
 
 - [[file:reversing/index.org][Reverse engineering]]
+- [[file:programming/index.org][Programming]]
 
 I will probably end up moving other documentations I have written for my
 projects here, but until then, make sure you also check out:
