@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Binary signature scanning</title>
+<meta name="author" content="8dcc" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Binary signature scanning</h1>
+<p>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
+</p>
+
+<hr />
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org8a4de84">1. What is signature scanning?</a></li>
+<li><a href="#org5186a94">2. Finding the function inside the binary</a></li>
+<li><a href="#org1782bd9">3. Getting the signature</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org8a4de84" class="outline-2">
+<h2 id="org8a4de84"><span class="section-number-2">1.</span> What is signature scanning?</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+First, let's have a look at a sample program:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+
+<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">my_func</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span>) {
+    <span style="color: #ff6f9f;">if</span> (y &gt; x || y &lt; <span style="color: #88ca9f;">0</span> || y &gt; <span style="color: #88ca9f;">32</span>)
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+
+    puts(<span style="color: #00d3d0;">"Hello from my_func!"</span>);
+
+    <span style="color: #ff6f9f;">return</span> (x &gt;&gt; y) * <span style="color: #88ca9f;">3</span>;
+}
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span> = <span style="color: #88ca9f;">0x100</span>;
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span> = <span style="color: #88ca9f;">4</span>;
+    printf(<span style="color: #00d3d0;">"%d\n"</span>, my_func(x, y));
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+}
+</pre>
+</div>
+
+<p>
+Imagine we wanted to find something in memory, like that <code>my_func</code> function, but
+we don't have access to the symbol. One valid approach would be to scan the
+memory of the loaded binary, and search for the bytes corresponding to the
+function or variable.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org5186a94" class="outline-2">
+<h2 id="org5186a94"><span class="section-number-2">2.</span> Finding the function inside the binary</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+I will compile the binary with <code>gcc 13.2.1</code>. We need to use <code>-O0</code> so the function
+call doesn't get optimized. I also used <code>strip</code> so we can't see the symbol names
+later:
+</p>
+
+<pre class="example">
+gcc -Wall -Wextra -O0 -o example.out example.c
+strip example.out
+</pre>
+
+<p>
+Let's have a look at the generated binary using <a href="https://cutter.re/">cutter</a>, in my case version
+2.3.1. First of all, go to <code>Edit &gt; Preferences</code> and make sure the following
+settings are enabled in the disassembly tab:
+</p>
+
+<ul class="org-ul">
+<li>Display the bytes of each instruction -&gt; Enabled</li>
+<li>Number of bytes of each instruction -&gt; 8</li>
+<li>Align bytes to the left -&gt; Enabled</li>
+<li>Separate bytes with whitespace -&gt; Enabled</li>
+</ul>
+
+<p>
+You can mess with the rest of the settings to match your taste. Note that all
+this settings can be configured in <a href="https://rizin.re/">rizin</a>, the back-end and CLI version of
+cutter.
+</p>
+
+<p>
+Now that we configured cutter, we can see the assembly bytes of each
+instruction. These are the bytes that we will be using for our signature, but
+first, we need to find what we are looking for from cutter.
+</p>
+
+<p>
+This is the disassembly of the main function:
+</p>
+
+
+<div id="org27b405f" class="figure">
+<p><img src="../img/signature-scanning1.png" alt="signature-scanning1.png" />
+</p>
+</div>
+
+<p>
+As you can see, in <code>main+0x8</code> we are loading <code>0x100</code> and <code>4</code> into the local
+variables, and in <code>main+0x1c</code> we are loading them into the registers used for
+function parameters according to the AMD64 System V ABI. In <code>main+0x20</code>, we are
+calling <code>my_func</code>. Let's double-click it to have a look at the assembly:
+</p>
+
+
+<div id="orgee11205" class="figure">
+<p><img src="../img/signature-scanning2.png" alt="signature-scanning2.png" />
+</p>
+</div>
+
+<p>
+Yeah, that looks like our function.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1782bd9" class="outline-2">
+<h2 id="org1782bd9"><span class="section-number-2">3.</span> Getting the signature</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+The signature is going to be an arbitrary number of bytes from the target
+function. However, some of the bytes will not be constant, so we need to have
+that in mind.
+</p>
+
+<p>
+For example, the last 4 bytes of <code>fcn.00001149+0x29</code> are not guaranteed to be
+<code>8b 0e 00 00</code>. In our signature, we will have to use something like <code>? ? ? ?</code> to
+identify it (some signature scanning functions use an extra mask parameter to
+indicate which bytes are unknown).
+</p>
+
+<p>
+Some plugins like <a href="https://hex-rays.com/ida-pro/">IDA</a>'s <a href="https://github.com/ajkhoury/SigMaker-x64">sigmaker</a> are able to generate the signatures from a
+selection. I decided to use cutter just to show that you only need a
+disassembler.
+</p>
+
+
+<div id="orge7bd082" class="figure">
+<p><img src="../img/signature-scanning3.png" alt="signature-scanning3.png" />
+</p>
+</div>
+
+<p>
+For our signature, we should use enough bytes to make sure they are unique for
+the function/variable we are looking for. Here is a signature of the whole
+function, but we shouldn't need more than 10 instructions:
+</p>
+
+<pre class="example" id="org6133574">
+55 48 89 E5 48 83 EC 10 89 7D FC 89 75 F8 8B 45 F8 3B 45 FC 7F 0C 83 7D F8 00 78
+06 83 7D F8 20 7E 07 B8 ? ? ? ? EB 1F 48 8D 05 ? ? ? ? 48 89 C7 E8 ? ? ? ? 8B 45
+F8 8B 55 FC 89 C1 D3 FA 89 D0 01 C0 01 D0 C9 C3
+</pre>
+</div>
+</div>
+</div>
+</body>
+</html>
