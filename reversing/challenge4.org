@@ -75,9 +75,9 @@ shr     eax, 4
 add     eax, edi
 #+end_src
 
-Then, it discards every 4 bits of =eax=, and multiplies that by =0x01010101=. Keep
-in mind that since it's specifying =eax= as the destination register, it will
-truncate the value and keep the lower 32 bits.
+Then, it discards the even [[https://en.wikipedia.org/wiki/Nibble][nibbles]] of =eax=, and multiplies that by
+=0x01010101=. Keep in mind that since it's specifying =eax= as the destination
+register, it will truncate the value and keep the lower 32 bits.
 
 #+begin_src nasm
 and     eax, 0x0f0f0f0f      ; 0b00001111000011110000111100001111

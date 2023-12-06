@@ -207,16 +207,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org5ca4302">1. Original assembly</a></li>
-<li><a href="#orgd215fae">2. Analysis</a></li>
-<li><a href="#org05844d9">3. C translation</a></li>
-<li><a href="#org0cf244e">4. Inverse function</a></li>
+<li><a href="#org97ae778">1. Original assembly</a></li>
+<li><a href="#org14c38e7">2. Analysis</a></li>
+<li><a href="#orgc98c2d9">3. C translation</a></li>
+<li><a href="#org64b81ad">4. Inverse function</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org5ca4302" class="outline-2">
-<h2 id="org5ca4302"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org97ae778" class="outline-2">
+<h2 id="org97ae778"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/2/">Click me</a>.
@@ -255,8 +255,8 @@ bit to fit the <a href="https://www.nasm.us/">nasm</a> syntax.
 </div>
 </div>
 
-<div id="outline-container-orgd215fae" class="outline-2">
-<h2 id="orgd215fae"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-org14c38e7" class="outline-2">
+<h2 id="org14c38e7"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Let's try to figure this out step by step.
@@ -363,7 +363,7 @@ them back together.
 Let's try to visualize these last steps with an example:
 </p>
 
-<pre class="example" id="org41aed35">
+<pre class="example" id="orge663395">
 Base number:    0xDEADBEEF  0b11011110101011011011111011101111
 
 After masking:  0x0E0D0E0F  0b00001110000011010000111000001111 (eax)
@@ -376,13 +376,14 @@ After merging:  0xEDDAEBFE  0b11101101110110101110101111111110
 </pre>
 
 <p>
-As you can see, every 4 bits have been swapped with the adjacent ones.
+As you can see, every <a href="https://en.wikipedia.org/wiki/Nibble">nibble</a> (group of 4 bits) has been swapped with the
+adjacent one.
 </p>
 
 <p>
 Right after that, we copy the result back to <code>edx</code>, and we do a similar
 operation. In this case, however, we will be swapping <b>bit pairs</b>, instead of
-groups of four:
+nibbles:
 </p>
 
 <div class="org-src-container">
@@ -440,8 +441,8 @@ The final OR'd result will be saved to <code>eax</code> and returned.
 </div>
 </div>
 
-<div id="outline-container-org05844d9" class="outline-2">
-<h2 id="org05844d9"><span class="section-number-2">3.</span> C translation</h2>
+<div id="outline-container-orgc98c2d9" class="outline-2">
+<h2 id="orgc98c2d9"><span class="section-number-2">3.</span> C translation</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 This is a simple C translation of the assembly:
@@ -472,8 +473,8 @@ This is a simple C translation of the assembly:
 </div>
 </div>
 
-<div id="outline-container-org0cf244e" class="outline-2">
-<h2 id="org0cf244e"><span class="section-number-2">4.</span> Inverse function</h2>
+<div id="outline-container-org64b81ad" class="outline-2">
+<h2 id="org64b81ad"><span class="section-number-2">4.</span> Inverse function</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 I made my own inverse function before realizing that the original swapping
