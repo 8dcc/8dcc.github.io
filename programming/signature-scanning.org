@@ -1,4 +1,4 @@
-#+TITLE: Binary signature scanning
+#+TITLE: Signature scanning
 #+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
@@ -37,16 +37,21 @@ int main(void) {
 #+RESULTS:
 : 48
 
-Imagine we wanted to find something in memory, like that =my_func= function, but
-we don't have access to the symbol. One valid approach would be to scan the
+Imagine we are, for example, injecting a =.dll= or =.so= into a process, and we want
+to find a function or a value at runtime. A valid approach would be to scan the
 memory of the loaded binary, and search for the bytes corresponding to the
-function or variable.
+function or variable. Then, depending on what we are actually looking for, we
+could read the information, call the function, or even overwrite the bytes
+directly from memory (after changing the necessary permissions, of course).
+
+In our case, we would want to look for the bytes of the binary corresponding to
+=my_func=.
 
 * Finding the function inside the binary
 
-I will compile the binary with =gcc 13.2.1=. We need to use =-O0= so the function
-call doesn't get optimized. I also used =strip= so we can't see the symbol names
-later:
+I will compile the previous source with =gcc 13.2.1=. We need to use =-O0= so the
+function call doesn't get optimized. I also used =strip= to "simulate" a real
+world scenario where we can't just look at the symbols.
 
 #+begin_src
 gcc -Wall -Wextra -O0 -o example.out example.c
@@ -54,17 +59,18 @@ strip example.out
 #+end_src
 
 Let's have a look at the generated binary using [[https://cutter.re/][cutter]], in my case version
-2.3.1. First of all, go to =Edit > Preferences= and make sure the following
-settings are enabled in the disassembly tab:
+2.3.1. First, we need to change some settings. Go to =Edit > Preferences= and make
+sure the following settings are enabled in the disassembly tab:
 
-- Display the bytes of each instruction -> Enabled
-- Number of bytes of each instruction -> 8
-- Align bytes to the left -> Enabled
-- Separate bytes with whitespace -> Enabled
+- /Display the bytes of each instruction:/ Enabled
+- /Number of bytes of each instruction:/ 8
+- /Align bytes to the left:/ Enabled
+- /Separate bytes with whitespace:/ Enabled
 
-You can mess with the rest of the settings to match your taste. Note that all
-this settings can be configured in [[https://rizin.re/][rizin]], the back-end and CLI version of
-cutter.
+You can change the rest of the settings to match your taste. Note that you could
+also be using [[https://rizin.re/][rizin]] for all the following steps, the backend and CLI version of
+cutter. All the mentioned settings can be changed in rizin by using the name in
+parentheses in the cutter menu.
 
 Now that we configured cutter, we can see the assembly bytes of each
 instruction. These are the bytes that we will be using for our signature, but
@@ -102,7 +108,7 @@ disassembler.
 
 For our signature, we should use enough bytes to make sure they are unique for
 the function/variable we are looking for. Here is a signature of the whole
-function, but we shouldn't need more than 10 instructions:
+function, but in practice, we shouldn't need more than 10 instructions:
 
 #+begin_example
 55 48 89 E5 48 83 EC 10 89 7D FC 89 75 F8 8B 45 F8 3B 45 FC 7F 0C 83 7D F8 00 78

@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Binary signature scanning</title>
+<title>Signature scanning</title>
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -196,7 +196,7 @@
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">Binary signature scanning</h1>
+<h1 class="title">Signature scanning</h1>
 <p>
 <a href="../index.html">Index</a> | <a href="index.html">Up</a>
 </p>
@@ -207,15 +207,15 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org8a4de84">1. What is signature scanning?</a></li>
-<li><a href="#org5186a94">2. Finding the function inside the binary</a></li>
-<li><a href="#org1782bd9">3. Getting the signature</a></li>
+<li><a href="#org5893945">1. What is signature scanning?</a></li>
+<li><a href="#org6465077">2. Finding the function inside the binary</a></li>
+<li><a href="#org62a3366">3. Getting the signature</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org8a4de84" class="outline-2">
-<h2 id="org8a4de84"><span class="section-number-2">1.</span> What is signature scanning?</h2>
+<div id="outline-container-org5893945" class="outline-2">
+<h2 id="org5893945"><span class="section-number-2">1.</span> What is signature scanning?</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 First, let's have a look at a sample program:
@@ -243,21 +243,28 @@ First, let's have a look at a sample program:
 </div>
 
 <p>
-Imagine we wanted to find something in memory, like that <code>my_func</code> function, but
-we don't have access to the symbol. One valid approach would be to scan the
+Imagine we are, for example, injecting a <code>.dll</code> or <code>.so</code> into a process, and we want
+to find a function or a value at runtime. A valid approach would be to scan the
 memory of the loaded binary, and search for the bytes corresponding to the
-function or variable.
+function or variable. Then, depending on what we are actually looking for, we
+could read the information, call the function, or even overwrite the bytes
+directly from memory (after changing the necessary permissions, of course).
+</p>
+
+<p>
+In our case, we would want to look for the bytes of the binary corresponding to
+<code>my_func</code>.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org5186a94" class="outline-2">
-<h2 id="org5186a94"><span class="section-number-2">2.</span> Finding the function inside the binary</h2>
+<div id="outline-container-org6465077" class="outline-2">
+<h2 id="org6465077"><span class="section-number-2">2.</span> Finding the function inside the binary</h2>
 <div class="outline-text-2" id="text-2">
 <p>
-I will compile the binary with <code>gcc 13.2.1</code>. We need to use <code>-O0</code> so the function
-call doesn't get optimized. I also used <code>strip</code> so we can't see the symbol names
-later:
+I will compile the previous source with <code>gcc 13.2.1</code>. We need to use <code>-O0</code> so the
+function call doesn't get optimized. I also used <code>strip</code> to "simulate" a real
+world scenario where we can't just look at the symbols.
 </p>
 
 <pre class="example">
@@ -267,21 +274,22 @@ strip example.out
 
 <p>
 Let's have a look at the generated binary using <a href="https://cutter.re/">cutter</a>, in my case version
-2.3.1. First of all, go to <code>Edit &gt; Preferences</code> and make sure the following
-settings are enabled in the disassembly tab:
+2.3.1. First, we need to change some settings. Go to <code>Edit &gt; Preferences</code> and make
+sure the following settings are enabled in the disassembly tab:
 </p>
 
 <ul class="org-ul">
-<li>Display the bytes of each instruction -&gt; Enabled</li>
-<li>Number of bytes of each instruction -&gt; 8</li>
-<li>Align bytes to the left -&gt; Enabled</li>
-<li>Separate bytes with whitespace -&gt; Enabled</li>
+<li><i>Display the bytes of each instruction:</i> Enabled</li>
+<li><i>Number of bytes of each instruction:</i> 8</li>
+<li><i>Align bytes to the left:</i> Enabled</li>
+<li><i>Separate bytes with whitespace:</i> Enabled</li>
 </ul>
 
 <p>
-You can mess with the rest of the settings to match your taste. Note that all
-this settings can be configured in <a href="https://rizin.re/">rizin</a>, the back-end and CLI version of
-cutter.
+You can change the rest of the settings to match your taste. Note that you could
+also be using <a href="https://rizin.re/">rizin</a> for all the following steps, the backend and CLI version of
+cutter. All the mentioned settings can be changed in rizin by using the name in
+parentheses in the cutter menu.
 </p>
 
 <p>
@@ -295,7 +303,7 @@ This is the disassembly of the main function:
 </p>
 
 
-<div id="org27b405f" class="figure">
+<div id="org063c3df" class="figure">
 <p><img src="../img/signature-scanning1.png" alt="signature-scanning1.png" />
 </p>
 </div>
@@ -308,7 +316,7 @@ calling <code>my_func</code>. Let's double-click it to have a look at the assemb
 </p>
 
 
-<div id="orgee11205" class="figure">
+<div id="org2cf88e1" class="figure">
 <p><img src="../img/signature-scanning2.png" alt="signature-scanning2.png" />
 </p>
 </div>
@@ -319,8 +327,8 @@ Yeah, that looks like our function.
 </div>
 </div>
 
-<div id="outline-container-org1782bd9" class="outline-2">
-<h2 id="org1782bd9"><span class="section-number-2">3.</span> Getting the signature</h2>
+<div id="outline-container-org62a3366" class="outline-2">
+<h2 id="org62a3366"><span class="section-number-2">3.</span> Getting the signature</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The signature is going to be an arbitrary number of bytes from the target
@@ -342,7 +350,7 @@ disassembler.
 </p>
 
 
-<div id="orge7bd082" class="figure">
+<div id="org2aa38cb" class="figure">
 <p><img src="../img/signature-scanning3.png" alt="signature-scanning3.png" />
 </p>
 </div>
@@ -350,10 +358,10 @@ disassembler.
 <p>
 For our signature, we should use enough bytes to make sure they are unique for
 the function/variable we are looking for. Here is a signature of the whole
-function, but we shouldn't need more than 10 instructions:
+function, but in practice, we shouldn't need more than 10 instructions:
 </p>
 
-<pre class="example" id="org6133574">
+<pre class="example" id="org17ea478">
 55 48 89 E5 48 83 EC 10 89 7D FC 89 75 F8 8B 45 F8 3B 45 FC 7F 0C 83 7D F8 00 78
 06 83 7D F8 20 7E 07 B8 ? ? ? ? EB 1F 48 8D 05 ? ? ? ? 48 89 C7 E8 ? ? ? ? 8B 45
 F8 8B 55 FC 89 C1 D3 FA 89 D0 01 C0 01 D0 C9 C3
