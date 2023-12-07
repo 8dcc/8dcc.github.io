@@ -269,6 +269,8 @@ void* find_sig(const char* module, const char* pattern) {
         return NULL;
     }
 
+    /* TODO: The size of the binary is not right when passing NULL to
+     ,* dlopen() */
     uint8_t* start = (uint8_t*)link->l_addr;
     uint8_t* end   = start + link->phdr[0].p_memsz;
 
