@@ -30,6 +30,11 @@ int main(void) {
     int x = 0x100;
     int y = 4;
     printf("%d\n", my_func(x, y));
+
+    /* Infinite loop for injecting later */
+    for (;;)
+        ;
+
     return 0;
 }
 #+end_src
@@ -97,8 +102,7 @@ that in mind.
 
 For example, the last 4 bytes of =fcn.00001149+0x29= are not guaranteed to be
 =8b 0e 00 00=. In our signature, we will have to use something like =? ? ? ?= to
-identify it (some signature scanning functions use an extra mask parameter to
-indicate which bytes are unknown).
+identify it.
 
 Some plugins like [[https://hex-rays.com/ida-pro/][IDA]]'s [[https://github.com/ajkhoury/SigMaker-x64][sigmaker]] are able to generate the signatures from a
 selection. I decided to use cutter just to show that you only need a
@@ -108,10 +112,273 @@ disassembler.
 
 For our signature, we should use enough bytes to make sure they are unique for
 the function/variable we are looking for. Here is a signature of the whole
-function, but in practice, we shouldn't need more than 10 instructions:
+function, but in practice, we shouldn't need more than 10 instructions.
 
 #+begin_example
 55 48 89 E5 48 83 EC 10 89 7D FC 89 75 F8 8B 45 F8 3B 45 FC 7F 0C 83 7D F8 00 78
 06 83 7D F8 20 7E 07 B8 ? ? ? ? EB 1F 48 8D 05 ? ? ? ? 48 89 C7 E8 ? ? ? ? 8B 45
 F8 8B 55 FC 89 C1 D3 FA 89 D0 01 C0 01 D0 C9 C3
 #+end_example
+
+These kind of signature is usually called IDA format, but there are also code
+signatures which contain the bytes directly in an array. To differentiate
+between ='?'= and =0x3F=, these normally use an extra mask parameter to indicate
+which bytes are unknown. IDA patterns are usually cleaner, but make the
+signature scanning function a bit larger.
+
+* Signature scanning function
+
+This is a simple function that scans a memory area from =start= to =end= and
+searches for a =pattern= in IDA format.
+
+** Parsing the IDA pattern string
+
+First, we would need a function to convert those ="E5 "= strings into =0xE5=. Here
+it is:
+
+#+begin_src C
+#include <stdint.h>
+
+/* "E0" -> 224 */
+uint8_t hex_to_byte(const char* hex) {
+    int ret = 0;
+
+    /* Skip leading spaces, if any */
+    while (*hex == ' ')
+        hex++;
+
+    /* Store a byte (two digits of string) */
+    for (int i = 0; i < 2 && hex[i] != '\0'; i++) {
+        char c = hex[i];
+
+        /* For example "E ", although the format should always be "0E" */
+        if (c == ' ')
+            break;
+
+        uint8_t n = 0;
+        if (c >= '0' && c <= '9')
+            n = c - '0';
+        else if (c >= 'a' && c <= 'f')
+            n = 10 + c - 'a';
+        else if (c >= 'A' && c <= 'F')
+            n = 10 + c - 'A';
+
+        /* Shift size of 0xF and add the next half of byte */
+        ret <<= 4;
+        ret |= n & 0xF;
+    }
+
+    return ret & 0xFF;
+}
+#+end_src
+
+** =sigscan= function
+
+And with that, we can make our =sigscan= function:
+
+#+begin_src C
+#include <stdint.h>
+
+void* sigscan(void* start, void* end, const char* pattern) {
+    /* Skip preceding spaces from pattern, if any */
+    while (*pattern == ' ')
+        pattern++;
+
+    /* Current position in memory and current position in pattern */
+    uint8_t* mem_ptr = start;
+    char* pat_ptr    = pattern;
+
+    /* Iterate until we reach the end of the memory or the end of the pattern */
+    while ((void*)mem_ptr < end && *pat_ptr != '\0') {
+        /* Wildcard, always match */
+        if (*pat_ptr == '?') {
+            mem_ptr++;
+            pat_ptr++;
+
+            /* Remove trailing spaces after '?'
+             ,* NOTE: I reused this code, but you could use `goto` */
+            while (*pat_ptr == ' ')
+                pat_ptr++;
+
+            continue;
+        }
+
+        /* "E0" -> 224 */
+        uint8_t cur_byte = hex_to_byte(pat_ptr);
+
+        if (*mem_ptr == cur_byte) {
+            /* Found exact byte match in sequence, go to next byte in memory */
+            mem_ptr++;
+
+            /* Go to next byte separator in pattern (space) */
+            while (*pat_ptr != ' ' && *pat_ptr != '\0')
+                pat_ptr++;
+        } else {
+            /* Byte didn't match, check pattern from the begining on the next
+             ,* position in memory */
+            start++;
+            mem_ptr = start;
+            pat_ptr = pattern;
+        }
+
+        /* Skip trailing spaces */
+        while (*pat_ptr == ' ')
+            pat_ptr++;
+    }
+
+    /* If we reached end of pattern, return the match. Otherwise, NULL */
+    return (*pat_ptr == '\0') ? start : NULL;
+}
+#+end_src
+
+** Getting the bounds of a loaded module
+
+On linux, we could use =dlopen()= to get the start and end addresses of a loaded
+module if we were, for example, injecting our own shared object.
+
+We have to make our own version of [[https://man.cx/dlopen][=link_map=]] to include =link->phdr[0].p_memsz= (to
+get the size of the loaded module).
+
+#+begin_src C
+#include <stdint.h>
+#include <link.h>
+#include <dlfcn.h>
+#include <stdio.h>
+
+struct our_link_map {
+    /* Base from link.h */
+    ElfW(Addr) l_addr;
+    const char* l_name;
+    ElfW(Dyn) * l_ld;
+    struct our_link_map* l_next;
+    struct our_link_map* l_prev;
+
+    /* Added */
+    struct our_link_map* real;
+    long int ns;
+    struct libname_list* moduleName;
+    ElfW(Dyn) *
+      info[DT_NUM + DT_VERSIONTAGNUM + DT_EXTRANUM + DT_VALNUM + DT_ADDRNUM];
+    const ElfW(Phdr) * phdr;
+};
+
+void* find_sig(const char* module, const char* pattern) {
+    struct our_link_map* link = dlopen(module, RTLD_NOLOAD | RTLD_NOW);
+    if (!link) {
+        fprintf(stderr, "Can't open module \"%s\"", module);
+        return NULL;
+    }
+
+    uint8_t* start = (uint8_t*)link->l_addr;
+    uint8_t* end   = start + link->phdr[0].p_memsz;
+
+    dlclose(link);
+
+    return sigscan(start, end, pattern);
+}
+#+end_src
+
+As far as I know, the windows equivalent of =dlopen= would be [[https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya][=LoadLibraryA=]] and
+[[https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress][=GetProcAddress=]]. If you have more information on how this is done on windows,
+feel free to [[https://github.com/8dcc/8dcc.github.io/pulls][contribute]].
+
+If we wanted to get the bounds of the main binary, we could use =NULL= as
+parameter to =find_sig=, so it gets passed to =dlopen=.
+
+#+begin_quote
+*dlopen(3)*
+
+If filename is NULL, then the returned handle is for the main program. If
+filename contains a slash ("/"), then it is interpreted as a (relative or
+absolute) pathname.
+#+end_quote
+
+* Using our =find_sig= function
+
+Now that we have the signature and our function for scanning, we just have to
+create a library we can inject into a running process.
+
+#+begin_src C
+#include <stdio.h>
+
+/* Random '?' just to show wilcards */
+#define MY_SIG "55 48 89 E5 48 83 EC 10 89 ? ? ? ? F8 8B 45 F8 ? ? FC 7F 0C 83"
+
+/* For readability */
+typedef int (*func_ptr_t)(int, int);
+
+/* Entry point when injected */
+__attribute__((constructor)) void load(void) {
+    puts("Library loaded.");
+
+    func_ptr_t found_func = find_sig(NULL, MY_SIG);
+    if (found_func == NULL) {
+        fprintf(stderr, "my_lib: Could not find function.\n");
+        return;
+    }
+
+    printf("my_lib: Found function at %p\n", found_func);
+
+    int a = found_func(0x500, 4);
+    printf("my_lib: Function returned %d\n", a);
+
+    int b = found_func(0x1000, 4);
+    printf("my_lib: Function returned %d\n", b);
+}
+
+/* Entry point when unloaded */
+__attribute__((destructor)) void unload() {
+    /* TODO: Clean up stuff, if needed */
+    puts("Library unloaded.");
+}
+#+end_src
+
+* Injecting script and final Makefile
+
+We can inject our library into the binary the [[https://www.sourceware.org/gdb/][GNU Debugger]].
+
+First, we attach to the PID of our target process (=example.out=), and, after
+locating =dlopen= and =dlerror=, we call =dlopen= with two arguments: the path of our
+library and the number 2, which corresponds to =RTLD_NOW=.
+
+#+begin_src bash
+pid=$(pidof "example.out")
+libpath=$(realpath "my_lib.so")
+
+if [ "$pid" == "" ]; then
+   echo "inject.sh: process not running."
+   exit 1
+fi
+
+sudo gdb -n -q -batch                                  \
+    -ex "attach $pid"                                  \
+    -ex "set \$dlopen = (void* (*)(char*, int))dlopen" \
+    -ex "set \$dlerror = (char* (*)(void))dlerror"     \
+    -ex "call \$dlopen(\"$libpath\", 2)"               \
+    -ex "call \$dlerror()"                             \
+    -ex "detach"                                       \
+    -ex "quit"
+#+end_src
+
+This is the final Makefile for compiling the example app, the library and for
+injecting:
+
+#+begin_src makefile
+CC=gcc
+CFLAGS=-Wall -Wextra -O0 -fPIC
+LDFLAGS=
+
+.PHONY: all inject
+
+all: example.out my_lib.so
+
+example.out: example.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+my_lib.so: my_lib.c
+	$(CC) $(CFLAGS) -shared -o $@ $< $(LDFLAGS)
+
+# NOTE: Make sure example.out is running
+inject: my_lib.so
+	bash ./inject.sh
+#+end_src
