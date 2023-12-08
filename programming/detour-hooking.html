@@ -207,16 +207,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org0f79522">1. What does hooking mean?</a></li>
-<li><a href="#org814a83e">2. Detour hooking</a></li>
-<li><a href="#org08ba251">3. Hooking from C</a></li>
-<li><a href="#org8f8f9fa">4. Detour hooking library</a></li>
+<li><a href="#orgc1213e6">1. What does hooking mean?</a></li>
+<li><a href="#org51bc28b">2. Detour hooking</a></li>
+<li><a href="#org7bc3ad2">3. Hooking from C</a></li>
+<li><a href="#org9e056c3">4. Detour hooking library</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org0f79522" class="outline-2">
-<h2 id="org0f79522"><span class="section-number-2">1.</span> What does hooking mean?</h2>
+<div id="outline-container-orgc1213e6" class="outline-2">
+<h2 id="orgc1213e6"><span class="section-number-2">1.</span> What does hooking mean?</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Hooking consists in intercepting and altering function calls or event passed
@@ -252,8 +252,8 @@ original function, change the behavior, spoof the returned value, etc.
 </div>
 </div>
 
-<div id="outline-container-org814a83e" class="outline-2">
-<h2 id="org814a83e"><span class="section-number-2">2.</span> Detour hooking</h2>
+<div id="outline-container-org51bc28b" class="outline-2">
+<h2 id="org51bc28b"><span class="section-number-2">2.</span> Detour hooking</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Detour hooking is a hooking technique where we overwrite the first bytes of the
@@ -341,8 +341,8 @@ fcn.00001139+<span style="color: #88ca9f;">0x8</span>     f2 <span style="color:
 </div>
 </div>
 
-<div id="outline-container-org08ba251" class="outline-2">
-<h2 id="org08ba251"><span class="section-number-2">3.</span> Hooking from C</h2>
+<div id="outline-container-org7bc3ad2" class="outline-2">
+<h2 id="org7bc3ad2"><span class="section-number-2">3.</span> Hooking from C</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The basic process from C would be:
@@ -370,7 +370,7 @@ declaration depending on the architecture with <code>#ifdef</code>.
 <span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">JMP_BYTES_OFF</span> <span style="color: #88ca9f;">1</span> <span style="color: #989898;">/* </span><span style="color: #989898;">Offset inside the array where the ptr should go</span><span style="color: #989898;"> */</span>
 <span style="color: #ff6740;">#else</span>
 <span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">jmp_bytes</span>[] = { <span style="color: #88ca9f;">0x48</span>, <span style="color: #88ca9f;">0xB8</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>,
-                                   <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0xFF</span>, <span style="color: #88ca9f;">0xE0</span> };
+                               <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0xFF</span>, <span style="color: #88ca9f;">0xE0</span> };
 <span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">JMP_BYTES_OFF</span> <span style="color: #88ca9f;">2</span> <span style="color: #989898;">/* </span><span style="color: #989898;">Offset inside the array where the ptr should go</span><span style="color: #989898;"> */</span>
 <span style="color: #ff6740;">#endif</span>
 </pre>
@@ -508,8 +508,8 @@ result = (<span style="color: #79a8ff;">orig_t</span>)<span style="color: #4ae2f
 </div>
 </div>
 
-<div id="outline-container-org8f8f9fa" class="outline-2">
-<h2 id="org8f8f9fa"><span class="section-number-2">4.</span> Detour hooking library</h2>
+<div id="outline-container-org9e056c3" class="outline-2">
+<h2 id="org9e056c3"><span class="section-number-2">4.</span> Detour hooking library</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 I made a simple detour hooking library in pure C for GNU/Linux. It should be
