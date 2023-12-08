@@ -1,5 +1,9 @@
 /* Used to modify the org-mode HTML export styles. */
 
+body {
+    margin-bottom: 2.5em;
+}
+
 pre.src {
     background:#111111;
     color:white;
