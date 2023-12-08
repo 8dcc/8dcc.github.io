@@ -1,0 +1,260 @@
+#+TITLE: Detour hooking
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: showeverything
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* What does hooking mean?
+
+Hooking consists in intercepting and altering function calls or event passed
+between software components. In this case, we will be focusing on *function
+hooking* for the =x86= and =x86_64= architectures.
+
+Imagine the following =foo= function, called from =main=:
+
+#+begin_src C
+#include <stdio.h>
+
+double foo(double a, double b) {
+    printf("foo: %.1f + %.1f = %.1f\n", a, b, a + b);
+    return a + b;
+}
+
+int main(void) {
+    foo(5.0, 2.0);
+    return 0;
+}
+#+end_src
+
+Imagine this was a very important function that we wanted to intercept of
+modify. The idea is that when =main= calls =foo=, we somehow intercept the call and
+the control is passed to our =hook= function. From there, we could call the
+original function, change the behavior, spoof the returned value, etc.
+
+* Detour hooking
+
+Detour hooking is a hooking technique where we overwrite the first bytes of the
+target function (=foo=) to introduce a jump to our =hook= function.
+
+First, let's have a look at the disassembly of this =foo= function using [[https://rizin.re/][rizin]].
+
+#+begin_src nasm
+; CALL XREF from main @ 0x11b5
+fcn.00001139 ; fcn.00001139(int64_t arg7, int64_t arg8);
+fcn.00001139 ;  arg int64_t arg7 @ xmm0
+fcn.00001139 ;  arg int64_t arg8 @ xmm1
+fcn.00001139 ;  var int64_t var_18h @ stack - 0x18
+fcn.00001139 ;  var int64_t var_10h @ stack - 0x10
+fcn.00001139         55                      push    rbp
+fcn.00001139+0x1     48 89 e5                mov     rbp, rsp
+fcn.00001139+0x4     48 83 ec 10             sub     rsp, 0x10
+fcn.00001139+0x8     f2 0f 11 45 f8          movsd   qword [rbp - 8], xmm0 ; arg7
+fcn.00001139+0xd     f2 0f 11 4d f0          movsd   qword [rbp - 0x10], xmm1 ; arg8
+fcn.00001139+0x12    f2 0f 10 45 f8          movsd   xmm0, qword [rbp - 8]
+fcn.00001139+0x17    66 0f 28 c8             movapd  xmm1, xmm0
+fcn.00001139+0x1b    f2 0f 58 4d f0          addsd   xmm1, qword [rbp - 0x10]
+fcn.00001139+0x20    f2 0f 10 45 f0          movsd   xmm0, qword [rbp - 0x10]
+fcn.00001139+0x25    48 8b 45 f8             mov     rax, qword [rbp - 8]
+fcn.00001139+0x29    66 0f 28 d1             movapd  xmm2, xmm1
+fcn.00001139+0x2d    66 0f 28 c8             movapd  xmm1, xmm0
+fcn.00001139+0x31    66 48 0f 6e c0          movq    xmm0, rax
+fcn.00001139+0x36    48 8d 05 92 0e 00 00    lea     rax, [rip + str.foo]
+fcn.00001139+0x3d    48 89 c7                mov     rdi, rax          ; const char *format
+fcn.00001139+0x40    b8 03 00 00 00          mov     eax, 3
+fcn.00001139+0x45    e8 ad fe ff ff          call    sym.imp.printf    ; sym.imp.printf ; int printf(const char *format)
+fcn.00001139+0x4a    f2 0f 10 45 f8          movsd   xmm0, qword [rbp - 8]
+fcn.00001139+0x4f    f2 0f 58 45 f0          addsd   xmm0, qword [rbp - 0x10]
+fcn.00001139+0x54    66 48 0f 7e c0          movq    rax, xmm0
+fcn.00001139+0x59    66 48 0f 6e c0          movq    xmm0, rax
+fcn.00001139+0x5e    c9                      leave
+fcn.00001139+0x5f    c3                      ret
+#+end_src
+
+At the right of the instructions, you can see their corresponding bytes. The
+idea is to overwrite the first N bytes of the function in memory, so instead of
+those =push= and =mov= instructions, we jump to our function.
+
+Let's see how we can do that from assembly. Note that the byte order of the
+addresses is "reversed" because of [[https://en.wikipedia.org/wiki/Endianness][endianness]].
+
+#+begin_src nasm
+; x86
+mov     eax, 0x11223344          ; b8 44 33 22 11
+jmp     eax                      ; ff e0
+
+; x86_64
+movabs  rax, 0x1122334455667788  ; 48 b8 88 77 66 55 44 33 22 11
+jmp     rax                      ; ff e0
+#+end_src
+
+Now we know that we need to overwrite 7 bytes for 32-bit programs and 12 bytes
+for 64-bit programs.
+
+After overwriting, assuming our =hook= function is at =0xDEADBEEF= our function
+would be:
+
+#+begin_src nasm
+fcn.00001139         48 b8 ef be ad de 00    movabs  rax, 0xDEADBEEF
+fcn.00001139         00 00 00
+fcn.00001139+0x1     ff e0                   jmp     rax
+fcn.00001139+0x4     f8                      clc
+fcn.00001139+0x8     f2 0f 11 4d f0          movsd   qword [rbp - 0x10], xmm1 ; arg8
+; ...
+#+end_src
+
+* Hooking from C
+
+The basic process from C would be:
+
+1. Get the address of the =foo= and =hook= functions.
+2. Store the first N bytes of =foo=, so we can restore them when necessary.
+3. Create the final /jump/ bytes by placing the address of our =hook= function.
+4. Change the permissions of the =foo= function to make sure we can write to them.
+5. Overwrite the first N bytes of =foo= with our /jump/ bytes.
+6. Restore the old permissions for =foo=.
+
+First, we need to declare the placeholder for the /jump/ bytes. We will change the
+declaration depending on the architecture with =#ifdef=.
+
+#+begin_src C
+#include <stdint.h>
+
+#ifdef __i386__
+static uint8_t jmp_bytes[] = { 0xB8, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xE0 };
+#define JMP_BYTES_OFF 1 /* Offset inside the array where the ptr should go */
+#else
+static uint8_t jmp_bytes[] = { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00,
+                                   0x00, 0x00, 0x00, 0x00, 0xFF, 0xE0 };
+#define JMP_BYTES_OFF 2 /* Offset inside the array where the ptr should go */
+#endif
+#+end_src
+
+We will use =JMP_BYTES_OFF= to specify the position inside the =jmp_bytes= array
+where the =hook= address will be.
+
+We will also declare a =protect_addr= function for changing the permission of a
+memory page.
+
+#+begin_src C
+#include <stdint.h>
+#include <stdbool.h>
+#include <unistd.h>   /* getpagesize */
+#include <sys/mman.h> /* mprotect */
+
+#define PAGE_MASK          (~(PAGE_SIZE - 1))
+#define PAGE_ALIGN(X)      (((uintptr_t)(X) + PAGE_SIZE - 1) & PAGE_MASK)
+#define PAGE_ALIGN_DOWN(X) (PAGE_ALIGN(X) - PAGE_SIZE)
+
+static bool protect_addr(void* ptr, int new_flags) {
+    int PAGE_SIZE = getpagesize();
+    void* page    = (void*)PAGE_ALIGN_DOWN(ptr);
+
+    if (mprotect(page, PAGE_SIZE, new_flags) == -1)
+        return false;
+
+    return true;
+}
+#+end_src
+
+Let's declare our sample hook.
+
+#+begin_src C
+double hook(double a, double b) {
+    printf("hook: intercepted %.1f and %.1f\n", a, b);
+    printf("hook: overwriting return value...\n");
+    return 420;
+}
+#+end_src
+
+Now, we need to get the function pointers and store the first N bytes of
+=foo=. This is important since these bytes will be used for unhooking and for
+calling the original function from our hook.
+
+#+begin_src C
+#include <string.h>
+
+void* orig_ptr = &foo;  /* foo(...) */
+void* hook_ptr = &hook; /* hook(...) */
+
+/* Store first N bytes of `foo' into `saved_bytes' */
+#define N sizeof(jmp_bytes)
+static uint8_t saved_bytes[N];
+memcpy(saved_bytes, orig_ptr, N);
+#+end_src
+
+Then, we *place the pointer* of our =hook= into the =jmp_bytes= array. Note that we
+pass =&hook_ptr= instead of =hook_ptr= directly because we want to copy the function
+address, not the first 8 bytes of our hook function.
+
+#+begin_src C
+memcpy(&jmp_bytes[JMP_BYTES_OFF], &hook_ptr, sizeof(void*));
+#+end_src
+
+Now that we are set up, we can actually *hook* our function.
+
+#+begin_src C
+/* Try to add WRITE permissions to `orig_ptr' */
+if (!protect_addr(orig_ptr, PROT_READ | PROT_WRITE | PROT_EXEC))
+    return;
+
+/* Overwrite the first N bytes of `foo' with our jmp instruction */
+memcpy(orig_ptr, jmp_bytes, sizeof(jmp_bytes));
+
+/* Restore old protection, assuming it was r-x */
+if (!protect_addr(orig_ptr, PROT_READ | PROT_EXEC))
+    return;
+#+end_src
+
+And with that, our function is hooked. Every time =foo= gets called, our =hook=
+function will get called instead.
+
+*Unhooking* the function is easy, we just need to restore =saved_bytes=.
+
+#+begin_src C
+if (!protect_addr(orig_ptr, PROT_READ | PROT_WRITE | PROT_EXEC))
+    return;
+
+/* Restore the first N bytes of `foo' */
+memcpy(orig_ptr, saved_bytes, sizeof(saved_bytes));
+
+if (!protect_addr(orig_ptr, PROT_READ | PROT_EXEC))
+    return;
+#+end_src
+
+*Calling the original* function from our hook is as simple as unhooking, calling
+with the intercepted parameters and hooking again.
+
+#+begin_src C
+typedef double (*orig_t)(double, double);
+
+double result;
+
+unhook(orig_ptr, saved_bytes);
+result = (orig_t)orig_ptr(a, b);
+hook(orig_ptr, jmp_bytes);
+#+end_src
+
+* Detour hooking library
+
+I made a simple detour hooking library in pure C for GNU/Linux. It should be
+very easy to port, as the platform-specific thing should be the =protect_addr=
+function.
+
+To use it, you just need to:
+
+1. Use the =DETOUR_DECL_TYPE= to specify the type of your original function.
+2. Declare a /Detour Context/, and initialize it by calling =detour_init= with the
+   original and hook function pointers.
+3. To add the hook, call =detour_add= with the context you just declared.
+4. To call the original function, use the =DETOUR_ORIG_CALL= or =DETOUR_ORIG_GET=
+   macros, depending on if you want to store the returned value.
+5. When you are done, remove the hook by passing the /Detour Context/ to the
+   =detour_del= function.
+
+You can find the code, full usage and an example in the [[https://github.com/8dcc/detour-lib][GitHub repository]].

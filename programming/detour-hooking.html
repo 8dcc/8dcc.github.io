@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Detour hooking</title>
+<meta name="author" content="8dcc" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Detour hooking</h1>
+<p>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
+</p>
+
+<hr />
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org0f79522">1. What does hooking mean?</a></li>
+<li><a href="#org814a83e">2. Detour hooking</a></li>
+<li><a href="#org08ba251">3. Hooking from C</a></li>
+<li><a href="#org8f8f9fa">4. Detour hooking library</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0f79522" class="outline-2">
+<h2 id="org0f79522"><span class="section-number-2">1.</span> What does hooking mean?</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Hooking consists in intercepting and altering function calls or event passed
+between software components. In this case, we will be focusing on <b>function
+hooking</b> for the <code>x86</code> and <code>x86_64</code> architectures.
+</p>
+
+<p>
+Imagine the following <code>foo</code> function, called from <code>main</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+
+<span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">foo</span>(<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">b</span>) {
+    printf(<span style="color: #00d3d0;">"foo: %.1f + %.1f = %.1f\n"</span>, a, b, a + b);
+    <span style="color: #ff6f9f;">return</span> a + b;
+}
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
+    foo(<span style="color: #88ca9f;">5.0</span>, <span style="color: #88ca9f;">2.0</span>);
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+}
+</pre>
+</div>
+
+<p>
+Imagine this was a very important function that we wanted to intercept of
+modify. The idea is that when <code>main</code> calls <code>foo</code>, we somehow intercept the call and
+the control is passed to our <code>hook</code> function. From there, we could call the
+original function, change the behavior, spoof the returned value, etc.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org814a83e" class="outline-2">
+<h2 id="org814a83e"><span class="section-number-2">2.</span> Detour hooking</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Detour hooking is a hooking technique where we overwrite the first bytes of the
+target function (<code>foo</code>) to introduce a jump to our <code>hook</code> function.
+</p>
+
+<p>
+First, let's have a look at the disassembly of this <code>foo</code> function using <a href="https://rizin.re/">rizin</a>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">CALL XREF from main @ 0x11b5</span>
+fcn.00001139 <span style="color: #989898;">; </span><span style="color: #989898;">fcn.00001139(int64_t arg7, int64_t arg8);</span>
+fcn.00001139 <span style="color: #989898;">;  </span><span style="color: #989898;">arg int64_t arg7 @ xmm0</span>
+fcn.00001139 <span style="color: #989898;">;  </span><span style="color: #989898;">arg int64_t arg8 @ xmm1</span>
+fcn.00001139 <span style="color: #989898;">;  </span><span style="color: #989898;">var int64_t var_18h @ stack - 0x18</span>
+fcn.00001139 <span style="color: #989898;">;  </span><span style="color: #989898;">var int64_t var_10h @ stack - 0x10</span>
+fcn.00001139         <span style="color: #88ca9f;">55</span>                      <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>
+fcn.00001139+<span style="color: #88ca9f;">0x1</span>     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> e5                <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>
+fcn.00001139+<span style="color: #88ca9f;">0x4</span>     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">83</span> ec <span style="color: #88ca9f;">10</span>             <span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x10</span>
+fcn.00001139+<span style="color: #88ca9f;">0x8</span>     f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">11</span> <span style="color: #88ca9f;">45</span> f8          <span style="color: #feacd0;">movsd</span>   <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">8</span>], <span style="color: #6ae4b9;">xmm0</span> <span style="color: #989898;">; </span><span style="color: #989898;">arg7</span>
+fcn.00001139+<span style="color: #88ca9f;">0xd</span>     f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">11</span> <span style="color: #88ca9f;">4d</span> f0          <span style="color: #feacd0;">movsd</span>   <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>], <span style="color: #6ae4b9;">xmm1</span> <span style="color: #989898;">; </span><span style="color: #989898;">arg8</span>
+fcn.00001139+<span style="color: #88ca9f;">0x12</span>    f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">10</span> <span style="color: #88ca9f;">45</span> f8          <span style="color: #feacd0;">movsd</span>   <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">8</span>]
+fcn.00001139+<span style="color: #88ca9f;">0x17</span>    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">28</span> c8             <span style="color: #feacd0;">movapd</span>  <span style="color: #6ae4b9;">xmm1</span>, <span style="color: #6ae4b9;">xmm0</span>
+fcn.00001139+<span style="color: #88ca9f;">0x1b</span>    f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">58</span> <span style="color: #88ca9f;">4d</span> f0          <span style="color: #feacd0;">addsd</span>   <span style="color: #6ae4b9;">xmm1</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>]
+fcn.00001139+<span style="color: #88ca9f;">0x20</span>    f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">10</span> <span style="color: #88ca9f;">45</span> f0          <span style="color: #feacd0;">movsd</span>   <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>]
+fcn.00001139+<span style="color: #88ca9f;">0x25</span>    <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8b</span> <span style="color: #88ca9f;">45</span> f8             <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">8</span>]
+fcn.00001139+<span style="color: #88ca9f;">0x29</span>    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">28</span> d1             <span style="color: #feacd0;">movapd</span>  <span style="color: #6ae4b9;">xmm2</span>, <span style="color: #6ae4b9;">xmm1</span>
+fcn.00001139+<span style="color: #88ca9f;">0x2d</span>    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">28</span> c8             <span style="color: #feacd0;">movapd</span>  <span style="color: #6ae4b9;">xmm1</span>, <span style="color: #6ae4b9;">xmm0</span>
+fcn.00001139+<span style="color: #88ca9f;">0x31</span>    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">6e</span> c0          <span style="color: #feacd0;">movq</span>    <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #6ae4b9;">rax</span>
+fcn.00001139+<span style="color: #88ca9f;">0x36</span>    <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> <span style="color: #88ca9f;">92</span> <span style="color: #88ca9f;">0e</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>    <span style="color: #feacd0;">lea</span>     <span style="color: #6ae4b9;">rax</span>, [rip + str.foo]
+fcn.00001139+<span style="color: #88ca9f;">0x3d</span>    <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c7                <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rax</span>          <span style="color: #989898;">; </span><span style="color: #989898;">const char *format</span>
+fcn.00001139+<span style="color: #88ca9f;">0x40</span>    b8 <span style="color: #88ca9f;">03</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>          <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">3</span>
+fcn.00001139+<span style="color: #88ca9f;">0x45</span>    e8 ad fe ff ff          <span style="color: #feacd0;">call</span>    sym.imp.printf    <span style="color: #989898;">; </span><span style="color: #989898;">sym.imp.printf ; int printf(const char *format)</span>
+fcn.00001139+<span style="color: #88ca9f;">0x4a</span>    f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">10</span> <span style="color: #88ca9f;">45</span> f8          <span style="color: #feacd0;">movsd</span>   <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">8</span>]
+fcn.00001139+<span style="color: #88ca9f;">0x4f</span>    f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">58</span> <span style="color: #88ca9f;">45</span> f0          <span style="color: #feacd0;">addsd</span>   <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>]
+fcn.00001139+<span style="color: #88ca9f;">0x54</span>    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">7e</span> c0          <span style="color: #feacd0;">movq</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">xmm0</span>
+fcn.00001139+<span style="color: #88ca9f;">0x59</span>    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">6e</span> c0          <span style="color: #feacd0;">movq</span>    <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #6ae4b9;">rax</span>
+fcn.00001139+<span style="color: #88ca9f;">0x5e</span>    c9                      <span style="color: #feacd0;">leave</span>
+fcn.00001139+<span style="color: #88ca9f;">0x5f</span>    c3                      <span style="color: #feacd0;">ret</span>
+</pre>
+</div>
+
+<p>
+At the right of the instructions, you can see their corresponding bytes. The
+idea is to overwrite the first N bytes of the function in memory, so instead of
+those <code>push</code> and <code>mov</code> instructions, we jump to our function.
+</p>
+
+<p>
+Let's see how we can do that from assembly. Note that the byte order of the
+addresses is "reversed" because of <a href="https://en.wikipedia.org/wiki/Endianness">endianness</a>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">x86</span>
+<span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x11223344</span>          <span style="color: #989898;">; </span><span style="color: #989898;">b8 44 33 22 11</span>
+<span style="color: #feacd0;">jmp</span>     <span style="color: #6ae4b9;">eax</span>                      <span style="color: #989898;">; </span><span style="color: #989898;">ff e0</span>
+
+<span style="color: #989898;">; </span><span style="color: #989898;">x86_64</span>
+movabs  <span style="color: #6ae4b9;">rax</span>, <span style="color: #88ca9f;">0x1122334455667788</span>  <span style="color: #989898;">; </span><span style="color: #989898;">48 b8 88 77 66 55 44 33 22 11</span>
+<span style="color: #feacd0;">jmp</span>     <span style="color: #6ae4b9;">rax</span>                      <span style="color: #989898;">; </span><span style="color: #989898;">ff e0</span>
+</pre>
+</div>
+
+<p>
+Now we know that we need to overwrite 7 bytes for 32-bit programs and 12 bytes
+for 64-bit programs.
+</p>
+
+<p>
+After overwriting, assuming our <code>hook</code> function is at <code>0xDEADBEEF</code> our function
+would be:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm">fcn.00001139         <span style="color: #88ca9f;">48</span> b8 ef be ad de <span style="color: #88ca9f;">00</span>    movabs  <span style="color: #6ae4b9;">rax</span>, <span style="color: #88ca9f;">0xDEADBEEF</span>
+fcn.00001139         <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>
+fcn.00001139+<span style="color: #88ca9f;">0x1</span>     ff e0                   <span style="color: #feacd0;">jmp</span>     <span style="color: #6ae4b9;">rax</span>
+fcn.00001139+<span style="color: #88ca9f;">0x4</span>     f8                      <span style="color: #feacd0;">clc</span>
+fcn.00001139+<span style="color: #88ca9f;">0x8</span>     f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">11</span> <span style="color: #88ca9f;">4d</span> f0          <span style="color: #feacd0;">movsd</span>   <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>], <span style="color: #6ae4b9;">xmm1</span> <span style="color: #989898;">; </span><span style="color: #989898;">arg8</span>
+<span style="color: #989898;">; </span><span style="color: #989898;">...</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org08ba251" class="outline-2">
+<h2 id="org08ba251"><span class="section-number-2">3.</span> Hooking from C</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+The basic process from C would be:
+</p>
+
+<ol class="org-ol">
+<li>Get the address of the <code>foo</code> and <code>hook</code> functions.</li>
+<li>Store the first N bytes of <code>foo</code>, so we can restore them when necessary.</li>
+<li>Create the final <i>jump</i> bytes by placing the address of our <code>hook</code> function.</li>
+<li>Change the permissions of the <code>foo</code> function to make sure we can write to them.</li>
+<li>Overwrite the first N bytes of <code>foo</code> with our <i>jump</i> bytes.</li>
+<li>Restore the old permissions for <code>foo</code>.</li>
+</ol>
+
+<p>
+First, we need to declare the placeholder for the <i>jump</i> bytes. We will change the
+declaration depending on the architecture with <code>#ifdef</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+
+<span style="color: #ff6740;">#ifdef</span> __i386__
+<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">jmp_bytes</span>[] = { <span style="color: #88ca9f;">0xB8</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0xFF</span>, <span style="color: #88ca9f;">0xE0</span> };
+<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">JMP_BYTES_OFF</span> <span style="color: #88ca9f;">1</span> <span style="color: #989898;">/* </span><span style="color: #989898;">Offset inside the array where the ptr should go</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#else</span>
+<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">jmp_bytes</span>[] = { <span style="color: #88ca9f;">0x48</span>, <span style="color: #88ca9f;">0xB8</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>,
+                                   <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0xFF</span>, <span style="color: #88ca9f;">0xE0</span> };
+<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">JMP_BYTES_OFF</span> <span style="color: #88ca9f;">2</span> <span style="color: #989898;">/* </span><span style="color: #989898;">Offset inside the array where the ptr should go</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#endif</span>
+</pre>
+</div>
+
+<p>
+We will use <code>JMP_BYTES_OFF</code> to specify the position inside the <code>jmp_bytes</code> array
+where the <code>hook</code> address will be.
+</p>
+
+<p>
+We will also declare a <code>protect_addr</code> function for changing the permission of a
+memory page.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdbool.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;unistd.h&gt;</span>   <span style="color: #989898;">/* </span><span style="color: #989898;">getpagesize</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/mman.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">mprotect</span><span style="color: #989898;"> */</span>
+
+<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">PAGE_MASK</span>          (~(PAGE_SIZE - <span style="color: #88ca9f;">1</span>))
+<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PAGE_ALIGN</span>(<span style="color: #6ae4b9;">X</span>)      (((<span style="color: #79a8ff;">uintptr_t</span>)(X) + PAGE_SIZE - <span style="color: #88ca9f;">1</span>) &amp; PAGE_MASK)
+<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PAGE_ALIGN_DOWN</span>(<span style="color: #6ae4b9;">X</span>) (PAGE_ALIGN(X) - PAGE_SIZE)
+
+<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">protect_addr</span>(<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">ptr</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">new_flags</span>) {
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">PAGE_SIZE</span> = getpagesize();
+    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">page</span>    = (<span style="color: #79a8ff;">void</span>*)PAGE_ALIGN_DOWN(ptr);
+
+    <span style="color: #ff6f9f;">if</span> (mprotect(page, PAGE_SIZE, new_flags) == -<span style="color: #88ca9f;">1</span>)
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+}
+</pre>
+</div>
+
+<p>
+Let's declare our sample hook.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">hook</span>(<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">b</span>) {
+    printf(<span style="color: #00d3d0;">"hook: intercepted %.1f and %.1f\n"</span>, a, b);
+    printf(<span style="color: #00d3d0;">"hook: overwriting return value...\n"</span>);
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">420</span>;
+}
+</pre>
+</div>
+
+<p>
+Now, we need to get the function pointers and store the first N bytes of
+<code>foo</code>. This is important since these bytes will be used for unhooking and for
+calling the original function from our hook.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;string.h&gt;</span>
+
+<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">orig_ptr</span> = &amp;foo;  <span style="color: #989898;">/* </span><span style="color: #989898;">foo(...)</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">hook_ptr</span> = &amp;hook; <span style="color: #989898;">/* </span><span style="color: #989898;">hook(...)</span><span style="color: #989898;"> */</span>
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Store first N bytes of `foo' into `saved_bytes'</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">N</span> <span style="color: #ff6f9f;">sizeof</span>(jmp_bytes)
+<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">saved_bytes</span>[N];
+<span style="color: #4ae2ff;">memcpy</span>(saved_bytes, orig_ptr, N);
+</pre>
+</div>
+
+<p>
+Then, we <b>place the pointer</b> of our <code>hook</code> into the <code>jmp_bytes</code> array. Note that we
+pass <code>&amp;hook_ptr</code> instead of <code>hook_ptr</code> directly because we want to copy the function
+address, not the first 8 bytes of our hook function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C">memcpy(&amp;jmp_bytes[JMP_BYTES_OFF], &amp;hook_ptr, <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #79a8ff;">void</span>*));
+</pre>
+</div>
+
+<p>
+Now that we are set up, we can actually <b>hook</b> our function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Try to add WRITE permissions to `orig_ptr'</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_WRITE | PROT_EXEC))
+    <span style="color: #ff6f9f;">return</span>;
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Overwrite the first N bytes of `foo' with our jmp instruction</span><span style="color: #989898;"> */</span>
+<span style="color: #4ae2ff;">memcpy</span>(orig_ptr, jmp_bytes, <span style="color: #ff6f9f;">sizeof</span>(jmp_bytes));
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Restore old protection, assuming it was r-x</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_EXEC))
+    <span style="color: #ff6f9f;">return</span>;
+</pre>
+</div>
+
+<p>
+And with that, our function is hooked. Every time <code>foo</code> gets called, our <code>hook</code>
+function will get called instead.
+</p>
+
+<p>
+<b>Unhooking</b> the function is easy, we just need to restore <code>saved_bytes</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_WRITE | PROT_EXEC))
+    <span style="color: #ff6f9f;">return</span>;
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Restore the first N bytes of `foo'</span><span style="color: #989898;"> */</span>
+<span style="color: #4ae2ff;">memcpy</span>(orig_ptr, saved_bytes, <span style="color: #ff6f9f;">sizeof</span>(saved_bytes));
+
+<span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_EXEC))
+    <span style="color: #ff6f9f;">return</span>;
+</pre>
+</div>
+
+<p>
+<b>Calling the original</b> function from our hook is as simple as unhooking, calling
+with the intercepted parameters and hooking again.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">double</span> (*<span style="color: #79a8ff;">orig_t</span>)(<span style="color: #79a8ff;">double</span>, <span style="color: #79a8ff;">double</span>);
+
+<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">result</span>;
+
+<span style="color: #4ae2ff;">unhook</span>(orig_ptr, saved_bytes);
+result = (<span style="color: #79a8ff;">orig_t</span>)<span style="color: #4ae2ff;">orig_ptr</span>(a, b);
+<span style="color: #4ae2ff;">hook</span>(orig_ptr, jmp_bytes);
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8f8f9fa" class="outline-2">
+<h2 id="org8f8f9fa"><span class="section-number-2">4.</span> Detour hooking library</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+I made a simple detour hooking library in pure C for GNU/Linux. It should be
+very easy to port, as the platform-specific thing should be the <code>protect_addr</code>
+function.
+</p>
+
+<p>
+To use it, you just need to:
+</p>
+
+<ol class="org-ol">
+<li>Use the <code>DETOUR_DECL_TYPE</code> to specify the type of your original function.</li>
+<li>Declare a <i>Detour Context</i>, and initialize it by calling <code>detour_init</code> with the
+original and hook function pointers.</li>
+<li>To add the hook, call <code>detour_add</code> with the context you just declared.</li>
+<li>To call the original function, use the <code>DETOUR_ORIG_CALL</code> or <code>DETOUR_ORIG_GET</code>
+macros, depending on if you want to store the returned value.</li>
+<li>When you are done, remove the hook by passing the <i>Detour Context</i> to the
+<code>detour_del</code> function.</li>
+</ol>
+
+<p>
+You can find the code, full usage and an example in the <a href="https://github.com/8dcc/detour-lib">GitHub repository</a>.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>
