@@ -1,0 +1,222 @@
+#+TITLE: Challenge 6
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: showeverything
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Original assembly
+
+Original challenge link: [[https://challenges.re/6/][Click me]].
+
+This challenge had two versions for =x86_64=, an optimized one and a
+non-optimizing one. Let's have a look at the non-optimizing one, size it's
+usually easier to reverse.
+
+#+begin_src nasm
+func:
+   0:             push   rbp
+   1:             mov    rbp,rsp
+   4:             mov    QWORD [rbp - 0x8], rdi
+   8:             mov    QWORD [rbp - 0x10], rsi
+   c:             mov    rax, QWORD [rbp - 0x8]
+  10:             movzx  eax, BYTE [rax]
+  13:             movsx  dx, al
+  17:             mov    rax, QWORD [rbp - 0x10]
+  1b:             mov    WORD [rax], dx
+  1e:             mov    rax, QWORD [rbp - 0x10]
+  22:             movzx  eax, WORD [rax]
+  25:             test   ax, ax
+  28:             jne    2c
+  2a:             jmp    38
+  2c:             add    QWORD [rbp - 0x8], 1
+  31:             add    QWORD [rbp - 0x10], 2
+  36:             jmp    c
+  38:             pop    rbp
+  39:             ret
+#+end_src
+
+After removing the unused labels, and renaming the used ones.
+
+#+begin_src nasm
+func:
+    push   rbp
+    mov    rbp,rsp
+    mov    QWORD [rbp - 0x8], rdi
+    mov    QWORD [rbp - 0x10], rsi
+.loop:
+    mov    rax, QWORD [rbp - 0x8]
+    movzx  eax, BYTE [rax]
+    movsx  dx, al
+    mov    rax, QWORD [rbp - 0x10]
+    mov    WORD [rax], dx
+    mov    rax, QWORD [rbp - 0x10]
+    movzx  eax, WORD [rax]
+    test   ax, ax
+    jne    .continue
+    jmp    .done
+.continue:
+    add    QWORD [rbp - 0x8], 1
+    add    QWORD [rbp - 0x10], 2
+    jmp    .loop
+.done:
+    pop    rbp
+    ret
+#+end_src
+
+* Assembly notes
+
+Important notes for understanding the assembly.
+
+** Local variables
+
+We can see that the function uses local variables because, after preserving the
+stack frame, we store the values of =rdi= and =rsi= (the two function arguments)
+into =[rbp - N]=. Keep in mind that the stack grows downwards, so the stack layout
+(relative to =RBP=) would be the following:
+
+#+begin_example
++-----+-------+------+---------+---------+----------------+-----+
+|     | -0x10 | -0x8 |   RBP   |  +0x8   |     +0x10      |     |
+|-----+-------+------+---------+---------+----------------+-----|
+| ... | RSI   | RDI  | Old RSP | Old RBP | Return address | ... |
++-----+-------+------+---------+---------+----------------+-----+
+#+end_example
+
+** Argument types
+
+Just like in [[file:challenge5.org][challenge 5]], we can conclude that the type of the first argument
+(=rdi=) is a =char*= because of the =BYTE [...]= operations.
+
+We can also asume that the second argument, =rsi= is a =int16_t= pointer because
+after moving it to =[rbp - 0x10]=, and then to =rax=, it's accessing its contents
+with =WORD [...]=.
+
+* C translation
+
+Following the strategy used in [[file:challenge5.org][challenge 5]], I will start by translating the
+assembly into simple C pseudo-code, and trying to improve the code and symbol
+names from there.
+
+#+begin_src C
+int func(char* rdi, int16_t* rsi) {
+    char* var8     = rdi;
+    int16_t* var10 = rsi;
+
+    for (;;) {
+        char* rax0 = var8;
+        int16_t dx = *rax0;
+
+        int16_t* rax1 = var10;
+        *rax          = dx;
+
+        int16_t* rax2 = var10;
+        int16_t ax    = *rax;
+
+        if (ax == 0)
+            break;
+
+        var8++;
+        var10++; /* Incrementing 2 bytes, 1 word */
+    }
+}
+#+end_src
+
+After changing the symbol names, and optimizing.
+
+#+begin_src C
+int func(char* a, int16_t* b) {
+    for (;;) {
+        /* Extend byte to word */
+        ,*b = (int16_t)*a;
+
+        if (*b == 0)
+            break;
+
+        a++;
+        b++;
+    }
+}
+#+end_src
+
+As we can see, it's a function for copying the zero-terminated bytes in a =char*=
+to a =int16_t= array.
+
+We can't put the condition directly in the loop, because according to the
+assembly, it always transfers the byte, before checking if it's zero.
+
+* Optimized version
+
+Now, let's compare it to the optimized version provided in the website. I
+changed the label names again.
+
+#+begin_src nasm
+func:
+    jmp    .loop
+    nop    WORD [rax + rax * 1 + 0x0]
+.continue:
+    add    rdi, 1
+    add    rsi, 2
+.loop:
+    movsx  ax, BYTE [rdi]
+    test   ax , ax
+    mov    WORD [rsi], ax
+    jne    .continue
+    repz   ret
+    xchg   ax,ax
+#+end_src
+
+Note how it doesn't use any local variables in the stack now, and uses the =rdi=
+and =rsi= registers directly.
+
+Some important notes about =nop= and =xchg=:
+
+1. The [[https://www.felixcloutier.com/x86/nop][nop]] instruction performs no operation.
+2. You can also use it with operands, making it a *multi-byte NOP instruction*,
+   which doesn't alter it's behavior, but takes up more bytes.
+3. The [[https://www.felixcloutier.com/x86/xchg][xchg]] instruction exchanges values.
+4. The =nop= instruction is an alias mnemonic for the =xchg (e)ax, (e)ax=
+   instruction. Exchanging something with itself, does nothing.
+
+The first thing the function does is jump to =.loop=, which moves the value at
+=*rdi= to =ax=, the lower 16 bits of =rax=. Then, it checks if =ax= is zero with the
+=test= instruction, but *before* branching, it copies the value into =*rsi=. Then it
+can branch to =.continue= depending on if =ax= was zero or not.
+
+Once =ax= is zero, it will not jump and continue with the next instruction, which
+is =repz ret=.
+
+#+begin_quote
+*REP/REPE/REPZ/REPNE/REPNZ — Repeat String Operation Prefix*
+
+Repeats a string instruction the number of times specified in the count register
+or until the indicated condition of the ZF flag is no longer met.
+#+end_quote
+
+So we are... returning while the counter register (=rcx=) is zero? Of course this
+didn't make sense to me, so I searched around and came across [[https://repzret.org/p/repzret/][repzret.org]], which
+definitely looked interesting. From there, we can read:
+
+#+begin_quote
+A two-byte =ret= has a =rep= instruction inserted before the =ret=, which produces the
+functional equivalent of the single-byte near-return =ret= instruction.
+
+This form is preferred to the simple =ret= either when it is the target of any
+kind of branch, conditional (=jne/je/...=) or unconditional (=jmp/call/...=), or
+when it directly follows a conditional branch.
+
+Basically, when the next instruction after a branch is a =ret=, whether the branch
+was taken or not, it should have a =rep= prefix.
+
+Why? Because "The processor is unable to apply a branch prediction to the
+single-byte near-return form (opcode =0xC3=) of the =ret= instruction." Thus, "Use
+of a two-byte near-return can improve performance".
+#+end_quote
+
+The article has more information about branch prediction, so I would recommend
+checking it out.
