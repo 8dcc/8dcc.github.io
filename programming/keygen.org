@@ -1,0 +1,181 @@
+#+TITLE: Creating a simple keygen
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: showeverything
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* What is a keygen?
+
+From Wikipedia:
+
+#+begin_quote
+A *key generator* (*key-gen*) is a computer program that generates a product
+licensing key, such as a serial number, necessary to activate for use of a
+software application. Keygens may be legitimately distributed by software
+manufacturers for licensing software [...], or they may be developed and
+distributed illegitimately in circumstances of copyright infringement or
+software piracy.
+#+end_quote
+
+Many programs use the internet to validate the keys, which obviously has some
+advantages, but in our case we are going to validate them locally.
+
+We will make a single keygen function that produces an array of bytes for a
+specified username, and a program that uses that function to validate a user.
+
+** Types of license keys
+
+First of all, I am not an expert on this area, so feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to
+this blog if you have any suggestions. For more information about types of
+licenses, see [[https://keygen.sh/docs/choosing-a-licensing-model/][keygen.sh]].
+
+We could use two main formats for the license keys:
+
+1. *Username is embedded in the key*: The user doesn't need to introduce his user,
+   as it's already embedded in the key. We would need to validate if the key is
+   valid, and extract (decode) the username from it. This is not the case on
+   most commercial products since, as I mentioned, they use the internet to get
+   the user associated to that key from a remote database.
+2. *Log-in with a username*: The user needs to provide his username, and the key
+   will be checked against it. A key is only valid when comparing it against its
+   username.
+
+Depending on the format, we would have two ways of validating the input key. For
+the first one, we would have to *apply the [[https://en.wikipedia.org/wiki/Inverse_function][inverse function]] of the algorithm* to
+the provided key to validate it and get the username.  For the second one, we
+could just *encode the username again* to generate the key, and see if it matches
+with the key provided by the user.
+
+The second validation method I explained is basically what it's used to validate
+passwords against the hashes in a database when a user tries to log-in, but the
+key difference is that, although [[https://en.wikipedia.org/wiki/Cryptographic_hash_function][hashing]] can't be reverted, we are [[https://en.wikipedia.org/wiki/Code][encoding]] the
+username.  The hashing algorithm used to generate a hash is not enough to revert
+it (since it's a one-way algorithm), but *the algorithm used to encode a key is
+the only thing needed to decode it*.
+
+Since the goal here is to keep it simple, we will be using the second method for
+our program, although it's not very secure since the encoding algorithm is
+embedded in the program itself, and it can be easily reversed. We are going to
+make a simple key generation function, and an application that uses it to
+validate an input key from the user.
+
+* Things to avoid when making the function
+
+When generating a program like this, it's a good idea to asume that there is
+going to be someone attempting to reverse our program and figure out how our key
+generation algorithm works.
+
+Here are some things we should try to avoid when making the function.
+
+** Generating similar keys for similar users
+
+Imagine our algorithm just turned each letter of the name to its position in the
+alphabet. The user =abcd= would generate the key =1234=.
+
+If we generated the key for the user =abzd=, only the third character would
+change, which would tell the person trying to reverse our algorithm that there
+is a direct relationship between each character in the input and each character
+in the key.
+
+His problem transforms from "how did this string turn into this other string"
+into "how did this character turn into this other character", which is obviously
+easier to find.
+
+** Making the user and the key lengths proportional
+
+Imagine we had the algorithm from the last example. The user is also able to
+tell that the lengths of the strings are proportional, for example:
+
+#+begin_example
+abcd  -> 1234
+abcde -> 12345
+ab    -> 12
+#+end_example
+
+This is not ideal, since it gives even more information to the person trying to
+reverse our program.
+
+Our key should have a fixed number of characters, independently of the length of
+the user. Here are some examples on what to avoid, assuming our key length is
+9:
+
+#+begin_example
+abcd       -> 123400000 (Same as previous example)
+abcd       -> 123412341 (Repetition is easy to tell)
+abcdefghij -> 123456789 (Last character is ignored, produces same output as abcdefghi)
+#+end_example
+
+** Collisions
+
+In cryptography, a [[https://en.wikipedia.org/wiki/Collision_resistance][collision]] is produced when two different inputs produce the
+same output. This is a problem when hashing, since one of the basic properties
+of hashes is that they should produce unique outputs.
+
+In our case, we should try to avoid collisions as much as possible, but I won't
+be focusing on this too much on this article.
+
+* The key generation function
+
+TODO
+
+We scramble the bit pairs and bits just like in [[file:../reversing/challenge2.org][challenge 2]].
+
+#+begin_src C
+static void generate_key(const char* user, uint8_t* out) {
+    const int user_len = strlen(user);
+    int user_pos       = 0;
+
+    for (int i = 0; i < KEY_LEN; i++) {
+        unsigned char c = user[user_pos];
+
+        /* Swap every bit pair with the adjactent pair */
+        c = ((c & 0x33333333) << 2) | ((c & 0xCCCCCCCC) >> 2);
+
+        /* Swap every bit with the adjactent one */
+        c = ((c & 0x55555555) << 1) | ((c & 0xAAAAAAAA) >> 1);
+
+        /* XOR the first character by 0x33, and the rest by the previous one */
+        c ^= (i == 0) ? 0x33 : out[i - 1];
+
+        /* Write the char to the current position */
+        out[i] = c;
+
+        /* If there are no chars left in the input, go to the begining again */
+        user_pos++;
+        if (user[user_pos] == '\0')
+            user_pos = 0;
+    }
+
+    /* XOR the output with the key N-1 times more */
+    int key_pos = 0;
+    for (int i = 0; i < user_len - 1; i++) {
+        user_pos = 0;
+        while (user[user_pos] != '\0') {
+            out[key_pos] ^= user[user_pos];
+
+            /* Depending on i and the length of the input, change the output */
+            if (user_pos % 2 == 0)
+                out[key_pos] ^= user_len & 0xFF;
+
+            user_pos++;
+            key_pos++;
+
+            /* Don't overflow the key if the user is bigger than KEY_LEN*2 */
+            if (key_pos >= KEY_LEN)
+                key_pos = 0;
+        }
+    }
+}
+#+end_src
+
+
+* Other resources
+
+- [[https://en.wikipedia.org/wiki/Keygen][Keygen wikipedia page]]
+- [[https://github.com/bitcookies/winrar-keygen/blob/master/README.HOW_DOES_IT_WORK.md][WinRAR key generation algorithm explained]].
