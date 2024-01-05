@@ -122,51 +122,47 @@ be focusing on this too much on this article.
 
 * The key generation function
 
-TODO
+This is a simple keygen function I came up with, but it's far from perfect so
+feel free to contribute with a better version, as I said above.
 
 We scramble the bit pairs and bits just like in [[file:../reversing/challenge2.org][challenge 2]].
+
+#+begin_comment
+TODO: More explanation
+#+end_comment
 
 #+begin_src C
 static void generate_key(const char* user, uint8_t* out) {
     const int user_len = strlen(user);
-    int user_pos       = 0;
 
-    for (int i = 0; i < KEY_LEN; i++) {
-        unsigned char c = user[user_pos];
+    int key_pos          = 0;
+    unsigned char last_c = 0;
 
-        /* Swap every bit pair with the adjactent pair */
-        c = ((c & 0x33333333) << 2) | ((c & 0xCCCCCCCC) >> 2);
+    /* Iterate the user KEY_LEN+1 times */
+    for (int iter = 0; iter < KEY_LEN + 1; iter++) {
+        /* Iterate the user */
+        for (int user_pos = 0; user[user_pos] != '\0'; user_pos++) {
+            unsigned char c = user[user_pos];
 
-        /* Swap every bit with the adjactent one */
-        c = ((c & 0x55555555) << 1) | ((c & 0xAAAAAAAA) >> 1);
+            /* Swap every bit pair with the adjactent pair */
+            c = ((c & 0x33333333) << 2) | ((c & 0xCCCCCCCC) >> 2);
 
-        /* XOR the first character by 0x33, and the rest by the previous one */
-        c ^= (i == 0) ? 0x33 : out[i - 1];
+            /* Swap every bit with the adjactent one */
+            c = ((c & 0x55555555) << 1) | ((c & 0xAAAAAAAA) >> 1);
 
-        /* Write the char to the current position */
-        out[i] = c;
+            /* XOR by the previous char */
+            c ^= (last_c * iter) & 0xFF;
 
-        /* If there are no chars left in the input, go to the begining again */
-        user_pos++;
-        if (user[user_pos] == '\0')
-            user_pos = 0;
-    }
+            /* Depending on the length of the input, change the output */
+            c ^= user_len & 0xFF;
 
-    /* XOR the output with the key N-1 times more */
-    int key_pos = 0;
-    for (int i = 0; i < user_len - 1; i++) {
-        user_pos = 0;
-        while (user[user_pos] != '\0') {
-            out[key_pos] ^= user[user_pos];
+            /* Save current character for next iteration */
+            last_c = c;
 
-            /* Depending on i and the length of the input, change the output */
-            if (user_pos % 2 == 0)
-                out[key_pos] ^= user_len & 0xFF;
+            /* Write the char to the current position */
+            out[key_pos++] = c;
 
-            user_pos++;
-            key_pos++;
-
-            /* Don't overflow the key if the user is bigger than KEY_LEN*2 */
+            /* Don't overflow the key */
             if (key_pos >= KEY_LEN)
                 key_pos = 0;
         }
