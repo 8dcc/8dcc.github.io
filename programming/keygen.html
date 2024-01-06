@@ -207,26 +207,26 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgbc62000">1. What is a keygen?</a>
+<li><a href="#orge702892">1. What is a keygen?</a>
 <ul>
-<li><a href="#orgb576a55">1.1. Types of license keys</a></li>
+<li><a href="#org7065d7f">1.1. Types of license keys</a></li>
 </ul>
 </li>
-<li><a href="#org1f94f37">2. Things to avoid when making the function</a>
+<li><a href="#org41d8cd2">2. Things to avoid when making the function</a>
 <ul>
-<li><a href="#orgb3bf92d">2.1. Generating similar keys for similar users</a></li>
-<li><a href="#org995fe11">2.2. Making the user and the key lengths proportional</a></li>
-<li><a href="#org1b51458">2.3. Collisions</a></li>
+<li><a href="#orgb09852b">2.1. Generating similar keys for similar users</a></li>
+<li><a href="#org1d846e9">2.2. Making the user and the key lengths proportional</a></li>
+<li><a href="#orgc14e61f">2.3. Collisions</a></li>
 </ul>
 </li>
-<li><a href="#orgee00ed4">3. The key generation function</a></li>
-<li><a href="#org46c56ea">4. Other resources</a></li>
+<li><a href="#orgd430ab9">3. The key generation function</a></li>
+<li><a href="#org06a3abf">4. Other resources</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgbc62000" class="outline-2">
-<h2 id="orgbc62000"><span class="section-number-2">1.</span> What is a keygen?</h2>
+<div id="outline-container-orge702892" class="outline-2">
+<h2 id="orge702892"><span class="section-number-2">1.</span> What is a keygen?</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 From Wikipedia:
@@ -254,8 +254,8 @@ specified username, and a program that uses that function to validate a user.
 </p>
 </div>
 
-<div id="outline-container-orgb576a55" class="outline-3">
-<h3 id="orgb576a55"><span class="section-number-3">1.1.</span> Types of license keys</h3>
+<div id="outline-container-org7065d7f" class="outline-3">
+<h3 id="org7065d7f"><span class="section-number-3">1.1.</span> Types of license keys</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 First of all, I am not an expert on this area, so feel free to <a href="https://github.com/8dcc/8dcc.github.io">contribute</a> to
@@ -306,8 +306,8 @@ validate an input key from the user.
 </div>
 </div>
 
-<div id="outline-container-org1f94f37" class="outline-2">
-<h2 id="org1f94f37"><span class="section-number-2">2.</span> Things to avoid when making the function</h2>
+<div id="outline-container-org41d8cd2" class="outline-2">
+<h2 id="org41d8cd2"><span class="section-number-2">2.</span> Things to avoid when making the function</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 When generating a program like this, it's a good idea to asume that there is
@@ -320,8 +320,8 @@ Here are some things we should try to avoid when making the function.
 </p>
 </div>
 
-<div id="outline-container-orgb3bf92d" class="outline-3">
-<h3 id="orgb3bf92d"><span class="section-number-3">2.1.</span> Generating similar keys for similar users</h3>
+<div id="outline-container-orgb09852b" class="outline-3">
+<h3 id="orgb09852b"><span class="section-number-3">2.1.</span> Generating similar keys for similar users</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 Imagine our algorithm just turned each letter of the name to its position in the
@@ -343,15 +343,15 @@ easier to find.
 </div>
 </div>
 
-<div id="outline-container-org995fe11" class="outline-3">
-<h3 id="org995fe11"><span class="section-number-3">2.2.</span> Making the user and the key lengths proportional</h3>
+<div id="outline-container-org1d846e9" class="outline-3">
+<h3 id="org1d846e9"><span class="section-number-3">2.2.</span> Making the user and the key lengths proportional</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Imagine we had the algorithm from the last example. The user is also able to
 tell that the lengths of the strings are proportional, for example:
 </p>
 
-<pre class="example" id="org88b17a7">
+<pre class="example" id="org1c78b01">
 abcd  -&gt; 1234
 abcde -&gt; 12345
 ab    -&gt; 12
@@ -368,7 +368,7 @@ the user. Here are some examples on what to avoid, assuming our key length is
 9:
 </p>
 
-<pre class="example" id="orgdc64791">
+<pre class="example" id="org1015c0d">
 abcd       -&gt; 123400000 (Same as previous example)
 abcd       -&gt; 123412341 (Repetition is easy to tell)
 abcdefghij -&gt; 123456789 (Last character is ignored, produces same output as abcdefghi)
@@ -376,8 +376,8 @@ abcdefghij -&gt; 123456789 (Last character is ignored, produces same output as a
 </div>
 </div>
 
-<div id="outline-container-org1b51458" class="outline-3">
-<h3 id="org1b51458"><span class="section-number-3">2.3.</span> Collisions</h3>
+<div id="outline-container-orgc14e61f" class="outline-3">
+<h3 id="orgc14e61f"><span class="section-number-3">2.3.</span> Collisions</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 In cryptography, a <a href="https://en.wikipedia.org/wiki/Collision_resistance">collision</a> is produced when two different inputs produce the
@@ -393,8 +393,8 @@ be focusing on this too much on this article.
 </div>
 </div>
 
-<div id="outline-container-orgee00ed4" class="outline-2">
-<h2 id="orgee00ed4"><span class="section-number-2">3.</span> The key generation function</h2>
+<div id="outline-container-orgd430ab9" class="outline-2">
+<h2 id="orgd430ab9"><span class="section-number-2">3.</span> The key generation function</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 This is a simple keygen function I came up with, but it's far from perfect so
@@ -402,11 +402,28 @@ feel free to contribute with a better version, as I said above.
 </p>
 
 <p>
-We scramble the bit pairs and bits just like in <a href="../reversing/challenge2.html">challenge 2</a>.
+The first loop is used to indicate how many times we want to apply the user to
+the key. This is arbitrary, I used <code>KEY_KEN+1</code>, but it should be at least
+<code>ceil(KEY_LEN/user_len)</code>.
+</p>
+
+<p>
+The second loop is used to iterate the user itself. First, it scrambles the bit
+pairs and bits just like in <a href="../reversing/challenge2.html">challenge 2</a>. We then multiply the character in the
+previous position by the current iteration number (of the outer loop), and we
+XOR the current character by that number. Lastly, we XOR the character by the
+length of the user. We do this just to add even more variation to the final
+output. We can then store this character for the next iteration, and write it to
+the <code>out</code> pointer.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">generate_key</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">user</span>, <span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">out</span>) {
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;string.h&gt;</span>
+
+<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">KEY_LEN</span> <span style="color: #88ca9f;">20</span>
+
+<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">generate_key</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">user</span>, <span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">out</span>) {
     <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">user_len</span> = strlen(user);
 
     <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">key_pos</span>          = <span style="color: #88ca9f;">0</span>;
@@ -444,11 +461,39 @@ We scramble the bit pairs and bits just like in <a href="../reversing/challenge2
 }
 </pre>
 </div>
+
+<p>
+This is an example of a simple keygen program:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">argc</span>, <span style="color: #79a8ff;">char</span>** <span style="color: #6ae4b9;">argv</span>) {
+    <span style="color: #ff6f9f;">if</span> (argc &lt; <span style="color: #88ca9f;">2</span>) {
+        fprintf(stderr, <span style="color: #00d3d0;">"Usage: %s &lt;username&gt;\n"</span>, argv[<span style="color: #88ca9f;">0</span>]);
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">1</span>;
+    }
+
+    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">username</span> = argv[<span style="color: #88ca9f;">1</span>];
+    <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">key</span>[KEY_LEN] = { <span style="color: #88ca9f;">0</span> };
+
+    generate_key(username, key);
+
+    printf(<span style="color: #00d3d0;">"%s : "</span>, username);
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; KEY_LEN; i++)
+        printf(<span style="color: #00d3d0;">"%02x"</span>, key[i]);
+    putchar(<span style="color: #00d3d0;">'\n'</span>);
+
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+}
+</pre>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org46c56ea" class="outline-2">
-<h2 id="org46c56ea"><span class="section-number-2">4.</span> Other resources</h2>
+<div id="outline-container-org06a3abf" class="outline-2">
+<h2 id="org06a3abf"><span class="section-number-2">4.</span> Other resources</h2>
 <div class="outline-text-2" id="text-4">
 <ul class="org-ul">
 <li><a href="https://en.wikipedia.org/wiki/Keygen">Keygen wikipedia page</a></li>

@@ -125,7 +125,17 @@ be focusing on this too much on this article.
 This is a simple keygen function I came up with, but it's far from perfect so
 feel free to contribute with a better version, as I said above.
 
-We scramble the bit pairs and bits just like in [[file:../reversing/challenge2.org][challenge 2]].
+The first loop is used to indicate how many times we want to apply the user to
+the key. This is arbitrary, I used =KEY_KEN+1=, but it should be at least
+=ceil(KEY_LEN/user_len)=.
+
+The second loop is used to iterate the user itself. First, it scrambles the bit
+pairs and bits just like in [[file:../reversing/challenge2.org][challenge 2]]. We then multiply the character in the
+previous position by the current iteration number (of the outer loop), and we
+XOR the current character by that number. Lastly, we XOR the character by the
+length of the user. We do this just to add even more variation to the final
+output. We can then store this character for the next iteration, and write it to
+the =out= pointer.
 
 #+begin_comment
 TODO: More explanation
@@ -134,6 +144,11 @@ TODO: Add usage in validation program
 #+end_comment
 
 #+begin_src C
+#include <stdint.h>
+#include <string.h>
+
+#define KEY_LEN 20
+
 static void generate_key(const char* user, uint8_t* out) {
     const int user_len = strlen(user);
 
@@ -169,6 +184,31 @@ static void generate_key(const char* user, uint8_t* out) {
                 key_pos = 0;
         }
     }
+}
+#+end_src
+
+This is an example of a simple keygen program:
+
+#+begin_src C
+#include <stdio.h>
+
+int main(int argc, char** argv) {
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <username>\n", argv[0]);
+        return 1;
+    }
+
+    const char* username = argv[1];
+    uint8_t key[KEY_LEN] = { 0 };
+
+    generate_key(username, key);
+
+    printf("%s : ", username);
+    for (int i = 0; i < KEY_LEN; i++)
+        printf("%02x", key[i]);
+    putchar('\n');
+
+    return 0;
 }
 #+end_src
 
