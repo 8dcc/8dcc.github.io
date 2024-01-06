@@ -12,4 +12,4 @@ List of my posts talking about programming:
 
 - [[file:signature-scanning.org][Signature scanning in C]]
 - [[file:detour-hooking.org][Detour hooking]]
-- [[file:keygen.org][Creating a simple keygen]]
+- [[file:creating-keygen.org][Creating a simple keygen]]
