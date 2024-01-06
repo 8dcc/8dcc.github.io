@@ -8,15 +8,19 @@
 
 -----
 
-* Solved challenges
+* List of articles
 
-List of my posts solving RE challenges:
+List of my articles solving RE challenges:
 
 - [[file:challenge2.org][Challenge 2]]
 - [[file:challenge3.org][Challenge 3]]
 - [[file:challenge4.org][Challenge 4]]
 - [[file:challenge5.org][Challenge 5]]
 - [[file:challenge6.org][Challenge 6]]
+
+My other articles about reverse engineering:
+
+- [[file:reversing-keygen.org][Reversing a simple keygen]]
 
 * External resources
 

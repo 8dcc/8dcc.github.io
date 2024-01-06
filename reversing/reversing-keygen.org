@@ -1,0 +1,14 @@
+
+#+TITLE: Reversing a simple keygen
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: showeverything
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+For more information about keygens, see [[file:../programming/creating-keygen.org][Creating a simple keygen]].
