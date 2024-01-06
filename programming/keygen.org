@@ -212,6 +212,105 @@ int main(int argc, char** argv) {
 }
 #+end_src
 
+* Validating a user login
+
+We could use the previous keygen program to generate a key for each user, and
+use that to log-in. In this case we will be using the same =generate_key= function
+for comparing the real key with the provided one. This is obviously not ideal,
+and we should use *at least* the inverse function of =generate_key=.
+
+I made these two function for reading the key from the user. The first one just
+converts a hexadecimal character to its corresponding [[https://en.wikipedia.org/wiki/Nibble][nibble]] (group of 4 bits).
+
+The second one reads the user input into a local buffer using =scanf=. The maximum
+length of the string should be =KEY_LEN*2+1= since every byte takes up 2
+characters, and we need an extra space for the null terminator. We iterate each
+character of the string and, for each pair, we OR the higher nibble (after
+shifting) with the lower one.
+
+#+begin_src C
+#include <stdio.c>
+
+/* (KEY_LEN * 2) + '\0' */
+#define STR_KEY_LEN 41
+
+/* 'f' -> 15 */
+static inline int8_t char2nibble(char c) {
+    if (c >= '0' && c <= '9')
+        return c - '0';
+    else if (c >= 'a' && c <= 'f')
+        return c - 'a' + 10;
+    else if (c >= 'A' && c <= 'F')
+        return c - 'A' + 10;
+    else
+        return -1;
+}
+
+static void read_key(uint8_t* out) {
+    int out_pos = 0;
+
+    char key[STR_KEY_LEN] = { 0 };
+    scanf("%41s", key);
+
+    /* "3f5d" -> { 0x3f, 0x5d } */
+    for (int i = 0; key[i] != '\0'; i++) {
+        /* First half of the byte: '3' -> 3 */
+        int8_t nibble = char2nibble(key[i]);
+        if (nibble == -1)
+            break;
+        out[out_pos] = nibble;
+
+        i++;
+        if (key[i] == '\0')
+            break;
+
+        /* Move previous bits to higher half of byte */
+        out[out_pos] <<= 4;
+
+        /* Second half of the byte: 'f' -> 15 */
+        nibble = char2nibble(key[i]);
+        if (nibble == -1)
+            break;
+        out[out_pos] |= nibble;
+
+        out_pos++;
+    }
+}
+#+end_src
+
+The =main= function just reads an username with =scanf=, a key with our =read_key=,
+and we generate the real key with =generate_key=. We compare the two with a simple
+loop, and store if they match.
+
+#+begin_src C
+#include <stdbool.h>
+
+int main(void) {
+    printf("Username: ");
+    char user[255] = { 0 };
+    scanf("%255s", user);
+
+    printf("Key: ");
+    uint8_t user_key[KEY_LEN] = { 0 };
+    read_key(user_key);
+
+    uint8_t real_key[KEY_LEN] = { 0 };
+    generate_key(user, real_key);
+
+    bool match = true;
+    for (int i = 0; i < KEY_LEN; i++)
+        if (user_key[i] != real_key[i])
+            match = false;
+
+    if (match)
+        puts("Correct key.");
+    else
+        puts("Invalid key.");
+
+    return 0;
+}
+#+end_src
+
 * Other resources
 
 - [[https://en.wikipedia.org/wiki/Keygen][Keygen wikipedia page]]

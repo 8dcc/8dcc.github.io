@@ -207,26 +207,27 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge702892">1. What is a keygen?</a>
+<li><a href="#org3ddc6ed">1. What is a keygen?</a>
 <ul>
-<li><a href="#org7065d7f">1.1. Types of license keys</a></li>
+<li><a href="#orgf0ded1e">1.1. Types of license keys</a></li>
 </ul>
 </li>
-<li><a href="#org41d8cd2">2. Things to avoid when making the function</a>
+<li><a href="#orga1bab87">2. Things to avoid when making the function</a>
 <ul>
-<li><a href="#orgb09852b">2.1. Generating similar keys for similar users</a></li>
-<li><a href="#org1d846e9">2.2. Making the user and the key lengths proportional</a></li>
-<li><a href="#orgc14e61f">2.3. Collisions</a></li>
+<li><a href="#org8d7336b">2.1. Generating similar keys for similar users</a></li>
+<li><a href="#org99f270b">2.2. Making the user and the key lengths proportional</a></li>
+<li><a href="#org513f413">2.3. Collisions</a></li>
 </ul>
 </li>
-<li><a href="#orgd430ab9">3. The key generation function</a></li>
-<li><a href="#org06a3abf">4. Other resources</a></li>
+<li><a href="#orgb316b11">3. The key generation function</a></li>
+<li><a href="#org5a87a07">4. Validating a user login</a></li>
+<li><a href="#org0a01e87">5. Other resources</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orge702892" class="outline-2">
-<h2 id="orge702892"><span class="section-number-2">1.</span> What is a keygen?</h2>
+<div id="outline-container-org3ddc6ed" class="outline-2">
+<h2 id="org3ddc6ed"><span class="section-number-2">1.</span> What is a keygen?</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 From Wikipedia:
@@ -254,8 +255,8 @@ specified username, and a program that uses that function to validate a user.
 </p>
 </div>
 
-<div id="outline-container-org7065d7f" class="outline-3">
-<h3 id="org7065d7f"><span class="section-number-3">1.1.</span> Types of license keys</h3>
+<div id="outline-container-orgf0ded1e" class="outline-3">
+<h3 id="orgf0ded1e"><span class="section-number-3">1.1.</span> Types of license keys</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 First of all, I am not an expert on this area, so feel free to <a href="https://github.com/8dcc/8dcc.github.io">contribute</a> to
@@ -306,8 +307,8 @@ validate an input key from the user.
 </div>
 </div>
 
-<div id="outline-container-org41d8cd2" class="outline-2">
-<h2 id="org41d8cd2"><span class="section-number-2">2.</span> Things to avoid when making the function</h2>
+<div id="outline-container-orga1bab87" class="outline-2">
+<h2 id="orga1bab87"><span class="section-number-2">2.</span> Things to avoid when making the function</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 When generating a program like this, it's a good idea to asume that there is
@@ -320,8 +321,8 @@ Here are some things we should try to avoid when making the function.
 </p>
 </div>
 
-<div id="outline-container-orgb09852b" class="outline-3">
-<h3 id="orgb09852b"><span class="section-number-3">2.1.</span> Generating similar keys for similar users</h3>
+<div id="outline-container-org8d7336b" class="outline-3">
+<h3 id="org8d7336b"><span class="section-number-3">2.1.</span> Generating similar keys for similar users</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 Imagine our algorithm just turned each letter of the name to its position in the
@@ -343,15 +344,15 @@ easier to find.
 </div>
 </div>
 
-<div id="outline-container-org1d846e9" class="outline-3">
-<h3 id="org1d846e9"><span class="section-number-3">2.2.</span> Making the user and the key lengths proportional</h3>
+<div id="outline-container-org99f270b" class="outline-3">
+<h3 id="org99f270b"><span class="section-number-3">2.2.</span> Making the user and the key lengths proportional</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Imagine we had the algorithm from the last example. The user is also able to
 tell that the lengths of the strings are proportional, for example:
 </p>
 
-<pre class="example" id="org1c78b01">
+<pre class="example" id="org51468fd">
 abcd  -&gt; 1234
 abcde -&gt; 12345
 ab    -&gt; 12
@@ -368,7 +369,7 @@ the user. Here are some examples on what to avoid, assuming our key length is
 9:
 </p>
 
-<pre class="example" id="org1015c0d">
+<pre class="example" id="orgc5e5617">
 abcd       -&gt; 123400000 (Same as previous example)
 abcd       -&gt; 123412341 (Repetition is easy to tell)
 abcdefghij -&gt; 123456789 (Last character is ignored, produces same output as abcdefghi)
@@ -376,8 +377,8 @@ abcdefghij -&gt; 123456789 (Last character is ignored, produces same output as a
 </div>
 </div>
 
-<div id="outline-container-orgc14e61f" class="outline-3">
-<h3 id="orgc14e61f"><span class="section-number-3">2.3.</span> Collisions</h3>
+<div id="outline-container-org513f413" class="outline-3">
+<h3 id="org513f413"><span class="section-number-3">2.3.</span> Collisions</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 In cryptography, a <a href="https://en.wikipedia.org/wiki/Collision_resistance">collision</a> is produced when two different inputs produce the
@@ -393,8 +394,8 @@ be focusing on this too much on this article.
 </div>
 </div>
 
-<div id="outline-container-orgd430ab9" class="outline-2">
-<h2 id="orgd430ab9"><span class="section-number-2">3.</span> The key generation function</h2>
+<div id="outline-container-orgb316b11" class="outline-2">
+<h2 id="orgb316b11"><span class="section-number-2">3.</span> The key generation function</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 This is a simple keygen function I came up with, but it's far from perfect so
@@ -492,9 +493,121 @@ This is an example of a simple keygen program:
 </div>
 </div>
 
-<div id="outline-container-org06a3abf" class="outline-2">
-<h2 id="org06a3abf"><span class="section-number-2">4.</span> Other resources</h2>
+<div id="outline-container-org5a87a07" class="outline-2">
+<h2 id="org5a87a07"><span class="section-number-2">4.</span> Validating a user login</h2>
 <div class="outline-text-2" id="text-4">
+<p>
+We could use the previous keygen program to generate a key for each user, and
+use that to log-in. In this case we will be using the same <code>generate_key</code> function
+for comparing the real key with the provided one. This is obviously not ideal,
+and we should use <b>at least</b> the inverse function of <code>generate_key</code>.
+</p>
+
+<p>
+I made these two function for reading the key from the user. The first one just
+converts a hexadecimal character to its corresponding <a href="https://en.wikipedia.org/wiki/Nibble">nibble</a> (group of 4 bits).
+</p>
+
+<p>
+The second one reads the user input into a local buffer using <code>scanf</code>. The maximum
+length of the string should be <code>KEY_LEN*2+1</code> since every byte takes up 2
+characters, and we need an extra space for the null terminator. We iterate each
+character of the string and, for each pair, we OR the higher nibble (after
+shifting) with the lower one.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.c&gt;</span>
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">(KEY_LEN * 2) + '\0'</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">STR_KEY_LEN</span> <span style="color: #88ca9f;">41</span>
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">'f' -&gt; 15</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6f9f;">static</span> <span style="color: #ff6f9f;">inline</span> <span style="color: #79a8ff;">int8_t</span> <span style="color: #4ae2ff;">char2nibble</span>(<span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span>) {
+    <span style="color: #ff6f9f;">if</span> (c &gt;= <span style="color: #00d3d0;">'0'</span> &amp;&amp; c &lt;= <span style="color: #00d3d0;">'9'</span>)
+        <span style="color: #ff6f9f;">return</span> c - <span style="color: #00d3d0;">'0'</span>;
+    <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (c &gt;= <span style="color: #00d3d0;">'a'</span> &amp;&amp; c &lt;= <span style="color: #00d3d0;">'f'</span>)
+        <span style="color: #ff6f9f;">return</span> c - <span style="color: #00d3d0;">'a'</span> + <span style="color: #88ca9f;">10</span>;
+    <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (c &gt;= <span style="color: #00d3d0;">'A'</span> &amp;&amp; c &lt;= <span style="color: #00d3d0;">'F'</span>)
+        <span style="color: #ff6f9f;">return</span> c - <span style="color: #00d3d0;">'A'</span> + <span style="color: #88ca9f;">10</span>;
+    <span style="color: #ff6f9f;">else</span>
+        <span style="color: #ff6f9f;">return</span> -<span style="color: #88ca9f;">1</span>;
+}
+
+<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">read_key</span>(<span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">out</span>) {
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">out_pos</span> = <span style="color: #88ca9f;">0</span>;
+
+    <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">key</span>[STR_KEY_LEN] = { <span style="color: #88ca9f;">0</span> };
+    scanf(<span style="color: #00d3d0;">"%41s"</span>, key);
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">"3f5d" -&gt; { 0x3f, 0x5d }</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; key[i] != <span style="color: #00d3d0;">'\0'</span>; i++) {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">First half of the byte: '3' -&gt; 3</span><span style="color: #989898;"> */</span>
+        <span style="color: #79a8ff;">int8_t</span> <span style="color: #6ae4b9;">nibble</span> = char2nibble(key[i]);
+        <span style="color: #ff6f9f;">if</span> (nibble == -<span style="color: #88ca9f;">1</span>)
+            <span style="color: #ff6f9f;">break</span>;
+        out[out_pos] = nibble;
+
+        i++;
+        <span style="color: #ff6f9f;">if</span> (key[i] == <span style="color: #00d3d0;">'\0'</span>)
+            <span style="color: #ff6f9f;">break</span>;
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Move previous bits to higher half of byte</span><span style="color: #989898;"> */</span>
+        out[out_pos] &lt;&lt;= <span style="color: #88ca9f;">4</span>;
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Second half of the byte: 'f' -&gt; 15</span><span style="color: #989898;"> */</span>
+        nibble = char2nibble(key[i]);
+        <span style="color: #ff6f9f;">if</span> (nibble == -<span style="color: #88ca9f;">1</span>)
+            <span style="color: #ff6f9f;">break</span>;
+        out[out_pos] |= nibble;
+
+        out_pos++;
+    }
+}
+</pre>
+</div>
+
+<p>
+The <code>main</code> function just reads an username with <code>scanf</code>, a key with our <code>read_key</code>,
+and we generate the real key with <code>generate_key</code>. We compare the two with a simple
+loop, and store if they match.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdbool.h&gt;</span>
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
+    printf(<span style="color: #00d3d0;">"Username: "</span>);
+    <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">user</span>[<span style="color: #88ca9f;">255</span>] = { <span style="color: #88ca9f;">0</span> };
+    scanf(<span style="color: #00d3d0;">"%255s"</span>, user);
+
+    printf(<span style="color: #00d3d0;">"Key: "</span>);
+    <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">user_key</span>[KEY_LEN] = { <span style="color: #88ca9f;">0</span> };
+    read_key(user_key);
+
+    <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">real_key</span>[KEY_LEN] = { <span style="color: #88ca9f;">0</span> };
+    generate_key(user, real_key);
+
+    <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">match</span> = <span style="color: #88ca9f;">true</span>;
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; KEY_LEN; i++)
+        <span style="color: #ff6f9f;">if</span> (user_key[i] != real_key[i])
+            match = <span style="color: #88ca9f;">false</span>;
+
+    <span style="color: #ff6f9f;">if</span> (match)
+        puts(<span style="color: #00d3d0;">"Correct key."</span>);
+    <span style="color: #ff6f9f;">else</span>
+        puts(<span style="color: #00d3d0;">"Invalid key."</span>);
+
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0a01e87" class="outline-2">
+<h2 id="org0a01e87"><span class="section-number-2">5.</span> Other resources</h2>
+<div class="outline-text-2" id="text-5">
 <ul class="org-ul">
 <li><a href="https://en.wikipedia.org/wiki/Keygen">Keygen wikipedia page</a></li>
 <li><a href="https://github.com/bitcookies/winrar-keygen/blob/master/README.HOW_DOES_IT_WORK.md">WinRAR key generation algorithm explained</a>.</li>
