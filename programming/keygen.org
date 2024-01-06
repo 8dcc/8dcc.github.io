@@ -23,11 +23,13 @@ distributed illegitimately in circumstances of copyright infringement or
 software piracy.
 #+end_quote
 
+Note that in this article we are *not* going to reverse an existing keygen, but
+instead create our own program that generates and validates keys for users. If
+you are interested in reversing, I recommend you first read [[file:../reversing/reversing-keygen.org][Reversing a simple
+keygen]].
+
 Many programs use the internet to validate the keys, which obviously has some
 advantages, but in our case we are going to validate them locally.
-
-We will make a single keygen function that produces an array of bytes for a
-specified username, and a program that uses that function to validate a user.
 
 ** Types of license keys
 
@@ -136,12 +138,6 @@ XOR the current character by that number. Lastly, we XOR the character by the
 length of the user. We do this just to add even more variation to the final
 output. We can then store this character for the next iteration, and write it to
 the =out= pointer.
-
-#+begin_comment
-TODO: More explanation
-TODO: Add keygen program
-TODO: Add usage in validation program
-#+end_comment
 
 #+begin_src C
 #include <stdint.h>
