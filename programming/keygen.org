@@ -129,6 +129,8 @@ We scramble the bit pairs and bits just like in [[file:../reversing/challenge2.o
 
 #+begin_comment
 TODO: More explanation
+TODO: Add keygen program
+TODO: Add usage in validation program
 #+end_comment
 
 #+begin_src C
@@ -169,7 +171,6 @@ static void generate_key(const char* user, uint8_t* out) {
     }
 }
 #+end_src
-
 
 * Other resources
 

@@ -198,7 +198,264 @@
 <div id="content" class="content">
 <h1 class="title">Creating a simple keygen</h1>
 <p>
-K</p>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
+</p>
+
+<hr />
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgbc62000">1. What is a keygen?</a>
+<ul>
+<li><a href="#orgb576a55">1.1. Types of license keys</a></li>
+</ul>
+</li>
+<li><a href="#org1f94f37">2. Things to avoid when making the function</a>
+<ul>
+<li><a href="#orgb3bf92d">2.1. Generating similar keys for similar users</a></li>
+<li><a href="#org995fe11">2.2. Making the user and the key lengths proportional</a></li>
+<li><a href="#org1b51458">2.3. Collisions</a></li>
+</ul>
+</li>
+<li><a href="#orgee00ed4">3. The key generation function</a></li>
+<li><a href="#org46c56ea">4. Other resources</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgbc62000" class="outline-2">
+<h2 id="orgbc62000"><span class="section-number-2">1.</span> What is a keygen?</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+From Wikipedia:
+</p>
+
+<blockquote>
+<p>
+A <b>key generator</b> (<b>key-gen</b>) is a computer program that generates a product
+licensing key, such as a serial number, necessary to activate for use of a
+software application. Keygens may be legitimately distributed by software
+manufacturers for licensing software [&#x2026;], or they may be developed and
+distributed illegitimately in circumstances of copyright infringement or
+software piracy.
+</p>
+</blockquote>
+
+<p>
+Many programs use the internet to validate the keys, which obviously has some
+advantages, but in our case we are going to validate them locally.
+</p>
+
+<p>
+We will make a single keygen function that produces an array of bytes for a
+specified username, and a program that uses that function to validate a user.
+</p>
+</div>
+
+<div id="outline-container-orgb576a55" class="outline-3">
+<h3 id="orgb576a55"><span class="section-number-3">1.1.</span> Types of license keys</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+First of all, I am not an expert on this area, so feel free to <a href="https://github.com/8dcc/8dcc.github.io">contribute</a> to
+this blog if you have any suggestions. For more information about types of
+licenses, see <a href="https://keygen.sh/docs/choosing-a-licensing-model/">keygen.sh</a>.
+</p>
+
+<p>
+We could use two main formats for the license keys:
+</p>
+
+<ol class="org-ol">
+<li><b>Username is embedded in the key</b>: The user doesn't need to introduce his user,
+as it's already embedded in the key. We would need to validate if the key is
+valid, and extract (decode) the username from it. This is not the case on
+most commercial products since, as I mentioned, they use the internet to get
+the user associated to that key from a remote database.</li>
+<li><b>Log-in with a username</b>: The user needs to provide his username, and the key
+will be checked against it. A key is only valid when comparing it against its
+username.</li>
+</ol>
+
+<p>
+Depending on the format, we would have two ways of validating the input key. For
+the first one, we would have to <b>apply the <a href="https://en.wikipedia.org/wiki/Inverse_function">inverse function</a> of the algorithm</b> to
+the provided key to validate it and get the username.  For the second one, we
+could just <b>encode the username again</b> to generate the key, and see if it matches
+with the key provided by the user.
+</p>
+
+<p>
+The second validation method I explained is basically what it's used to validate
+passwords against the hashes in a database when a user tries to log-in, but the
+key difference is that, although <a href="https://en.wikipedia.org/wiki/Cryptographic_hash_function">hashing</a> can't be reverted, we are <a href="https://en.wikipedia.org/wiki/Code">encoding</a> the
+username.  The hashing algorithm used to generate a hash is not enough to revert
+it (since it's a one-way algorithm), but <b>the algorithm used to encode a key is
+the only thing needed to decode it</b>.
+</p>
+
+<p>
+Since the goal here is to keep it simple, we will be using the second method for
+our program, although it's not very secure since the encoding algorithm is
+embedded in the program itself, and it can be easily reversed. We are going to
+make a simple key generation function, and an application that uses it to
+validate an input key from the user.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org1f94f37" class="outline-2">
+<h2 id="org1f94f37"><span class="section-number-2">2.</span> Things to avoid when making the function</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+When generating a program like this, it's a good idea to asume that there is
+going to be someone attempting to reverse our program and figure out how our key
+generation algorithm works.
+</p>
+
+<p>
+Here are some things we should try to avoid when making the function.
+</p>
+</div>
+
+<div id="outline-container-orgb3bf92d" class="outline-3">
+<h3 id="orgb3bf92d"><span class="section-number-3">2.1.</span> Generating similar keys for similar users</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Imagine our algorithm just turned each letter of the name to its position in the
+alphabet. The user <code>abcd</code> would generate the key <code>1234</code>.
+</p>
+
+<p>
+If we generated the key for the user <code>abzd</code>, only the third character would
+change, which would tell the person trying to reverse our algorithm that there
+is a direct relationship between each character in the input and each character
+in the key.
+</p>
+
+<p>
+His problem transforms from "how did this string turn into this other string"
+into "how did this character turn into this other character", which is obviously
+easier to find.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org995fe11" class="outline-3">
+<h3 id="org995fe11"><span class="section-number-3">2.2.</span> Making the user and the key lengths proportional</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Imagine we had the algorithm from the last example. The user is also able to
+tell that the lengths of the strings are proportional, for example:
+</p>
+
+<pre class="example" id="org88b17a7">
+abcd  -&gt; 1234
+abcde -&gt; 12345
+ab    -&gt; 12
+</pre>
+
+<p>
+This is not ideal, since it gives even more information to the person trying to
+reverse our program.
+</p>
+
+<p>
+Our key should have a fixed number of characters, independently of the length of
+the user. Here are some examples on what to avoid, assuming our key length is
+9:
+</p>
+
+<pre class="example" id="orgdc64791">
+abcd       -&gt; 123400000 (Same as previous example)
+abcd       -&gt; 123412341 (Repetition is easy to tell)
+abcdefghij -&gt; 123456789 (Last character is ignored, produces same output as abcdefghi)
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org1b51458" class="outline-3">
+<h3 id="org1b51458"><span class="section-number-3">2.3.</span> Collisions</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+In cryptography, a <a href="https://en.wikipedia.org/wiki/Collision_resistance">collision</a> is produced when two different inputs produce the
+same output. This is a problem when hashing, since one of the basic properties
+of hashes is that they should produce unique outputs.
+</p>
+
+<p>
+In our case, we should try to avoid collisions as much as possible, but I won't
+be focusing on this too much on this article.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgee00ed4" class="outline-2">
+<h2 id="orgee00ed4"><span class="section-number-2">3.</span> The key generation function</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+This is a simple keygen function I came up with, but it's far from perfect so
+feel free to contribute with a better version, as I said above.
+</p>
+
+<p>
+We scramble the bit pairs and bits just like in <a href="../reversing/challenge2.html">challenge 2</a>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">generate_key</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">user</span>, <span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">out</span>) {
+    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">user_len</span> = strlen(user);
+
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">key_pos</span>          = <span style="color: #88ca9f;">0</span>;
+    <span style="color: #79a8ff;">unsigned</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">last_c</span> = <span style="color: #88ca9f;">0</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate the user KEY_LEN+1 times</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">iter</span> = <span style="color: #88ca9f;">0</span>; iter &lt; KEY_LEN + <span style="color: #88ca9f;">1</span>; iter++) {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate the user</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">user_pos</span> = <span style="color: #88ca9f;">0</span>; user[user_pos] != <span style="color: #00d3d0;">'\0'</span>; user_pos++) {
+            <span style="color: #79a8ff;">unsigned</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span> = user[user_pos];
+
+            <span style="color: #989898;">/* </span><span style="color: #989898;">Swap every bit pair with the adjactent pair</span><span style="color: #989898;"> */</span>
+            c = ((c &amp; <span style="color: #88ca9f;">0x33333333</span>) &lt;&lt; <span style="color: #88ca9f;">2</span>) | ((c &amp; <span style="color: #88ca9f;">0xCCCCCCCC</span>) &gt;&gt; <span style="color: #88ca9f;">2</span>);
+
+            <span style="color: #989898;">/* </span><span style="color: #989898;">Swap every bit with the adjactent one</span><span style="color: #989898;"> */</span>
+            c = ((c &amp; <span style="color: #88ca9f;">0x55555555</span>) &lt;&lt; <span style="color: #88ca9f;">1</span>) | ((c &amp; <span style="color: #88ca9f;">0xAAAAAAAA</span>) &gt;&gt; <span style="color: #88ca9f;">1</span>);
+
+            <span style="color: #989898;">/* </span><span style="color: #989898;">XOR by the previous char</span><span style="color: #989898;"> */</span>
+            c ^= (last_c * iter) &amp; <span style="color: #88ca9f;">0xFF</span>;
+
+            <span style="color: #989898;">/* </span><span style="color: #989898;">Depending on the length of the input, change the output</span><span style="color: #989898;"> */</span>
+            c ^= user_len &amp; <span style="color: #88ca9f;">0xFF</span>;
+
+            <span style="color: #989898;">/* </span><span style="color: #989898;">Save current character for next iteration</span><span style="color: #989898;"> */</span>
+            last_c = c;
+
+            <span style="color: #989898;">/* </span><span style="color: #989898;">Write the char to the current position</span><span style="color: #989898;"> */</span>
+            out[key_pos++] = c;
+
+            <span style="color: #989898;">/* </span><span style="color: #989898;">Don't overflow the key</span><span style="color: #989898;"> */</span>
+            <span style="color: #ff6f9f;">if</span> (key_pos &gt;= KEY_LEN)
+                key_pos = <span style="color: #88ca9f;">0</span>;
+        }
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org46c56ea" class="outline-2">
+<h2 id="org46c56ea"><span class="section-number-2">4.</span> Other resources</h2>
+<div class="outline-text-2" id="text-4">
+<ul class="org-ul">
+<li><a href="https://en.wikipedia.org/wiki/Keygen">Keygen wikipedia page</a></li>
+<li><a href="https://github.com/bitcookies/winrar-keygen/blob/master/README.HOW_DOES_IT_WORK.md">WinRAR key generation algorithm explained</a>.</li>
+</ul>
+</div>
+</div>
 </div>
 </body>
 </html>
