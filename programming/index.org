@@ -8,7 +8,9 @@
 
 -----
 
-List of my posts talking about programming:
+* List of articles
+
+List of my articles about programming:
 
 - [[file:signature-scanning.org][Signature scanning in C]]
 - [[file:detour-hooking.org][Detour hooking]]
