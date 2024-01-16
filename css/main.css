@@ -29,3 +29,7 @@ blockquote {
 img {
     max-width: 100%;
 }
+
+.figure {
+    padding: 0em 1em;
+}
