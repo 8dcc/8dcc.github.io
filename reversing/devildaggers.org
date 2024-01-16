@@ -1,0 +1,51 @@
+#+TITLE: Reversing Devil Daggers
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: showeverything
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* About the game
+
+[[https://devildaggers.com/][Devil Daggers]] is a very fun and simple first-person shooter with a 1990s visual
+style. The game uses it's own engine, which makes the reversing task very
+interesting. It also uses the [[https://github.com/verse/verse][verse 2.0]] protocol.
+
+I will be using the linux version of the steam game, currently v3.2.
+
+For reversing, I will use [[https://cutter.re/][cutter]].
+
+* Getting general information about the game
+
+If we open the =devildaggers= binary in cutter, and go through the function list,
+we can immediately get some useful information. The game uses [[https://github.com/ocornut/imgui][ImGui]] for the
+menus, and we can see a lot of functions with enemy names inside the =verse2=
+namespace. We also see some =hx2= namespace which contains some utility functions.
+
+Fortunately for us, cutter is able to display a lot of [[https://en.wikipedia.org/wiki/Run-time_type_information][RTTI]] data. We can display
+the "Classes" window from "Windows > Info... > Classes". If we scroll down a
+bit, we can start to see these =verse2= classes:
+
+[[file:../img/devildaggers1.png]]
+
+We can asume that there is going to be some information related to the player
+inside =verse2::hero::*=. Some functions that look interesting are =hero::step()=,
+=hero::take_hit()= and =hero::change_state_dead()=.
+
+* Making a simple godmode with detour hooking
+
+Let's start by getting a pointer to the function we are interested in. Since
+these symbols are exported, we can use =dlsym()= to get a pointer.
+
+First, we need to get a handler to our program. Since these function are inside
+the main program, can get our handle by passing =NULL= to the second parameter of
+=dlopen()=.
+
+#+begin_comment
+TODO
+#+end_comment
