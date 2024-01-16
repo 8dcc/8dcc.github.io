@@ -207,15 +207,20 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgcc82fce">1. About the game</a></li>
-<li><a href="#org8fd39cf">2. Getting general information about the game</a></li>
-<li><a href="#org4a2f9a8">3. Making a simple godmode with detour hooking</a></li>
+<li><a href="#orgca0f35a">1. About the game</a></li>
+<li><a href="#org1687171">2. Getting general information about the game</a></li>
+<li><a href="#orgcb456b0">3. Making a simple godmode with detour hooking</a>
+<ul>
+<li><a href="#org29e64bb">3.1. Getting the function pointer</a></li>
+<li><a href="#org6e4da87">3.2. Hooking <code>verse2::hero::take_hit()</code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgcc82fce" class="outline-2">
-<h2 id="orgcc82fce"><span class="section-number-2">1.</span> About the game</h2>
+<div id="outline-container-orgca0f35a" class="outline-2">
+<h2 id="orgca0f35a"><span class="section-number-2">1.</span> About the game</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 <a href="https://devildaggers.com/">Devil Daggers</a> is a very fun and simple first-person shooter with a 1990s visual
@@ -233,8 +238,8 @@ For reversing, I will use <a href="https://cutter.re/">cutter</a>.
 </div>
 </div>
 
-<div id="outline-container-org8fd39cf" class="outline-2">
-<h2 id="org8fd39cf"><span class="section-number-2">2.</span> Getting general information about the game</h2>
+<div id="outline-container-org1687171" class="outline-2">
+<h2 id="org1687171"><span class="section-number-2">2.</span> Getting general information about the game</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 If we open the <code>devildaggers</code> binary in cutter, and go through the function list,
@@ -250,7 +255,7 @@ bit, we can start to see these <code>verse2</code> classes:
 </p>
 
 
-<div id="org45573a9" class="figure">
+<div id="orgeeeced7" class="figure">
 <p><img src="../img/devildaggers1.png" alt="devildaggers1.png" />
 </p>
 </div>
@@ -263,9 +268,13 @@ inside <code>verse2::hero::*</code>. Some functions that look interesting are <c
 </div>
 </div>
 
-<div id="outline-container-org4a2f9a8" class="outline-2">
-<h2 id="org4a2f9a8"><span class="section-number-2">3.</span> Making a simple godmode with detour hooking</h2>
+<div id="outline-container-orgcb456b0" class="outline-2">
+<h2 id="orgcb456b0"><span class="section-number-2">3.</span> Making a simple godmode with detour hooking</h2>
 <div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org29e64bb" class="outline-3">
+<h3 id="org29e64bb"><span class="section-number-3">3.1.</span> Getting the function pointer</h3>
+<div class="outline-text-3" id="text-3-1">
 <p>
 Let's start by getting a pointer to the function we are interested in. Since
 these symbols are exported, we can use <code>dlsym()</code> to get a pointer.
@@ -273,9 +282,219 @@ these symbols are exported, we can use <code>dlsym()</code> to get a pointer.
 
 <p>
 First, we need to get a handler to our program. Since these function are inside
-the main program, can get our handle by passing <code>NULL</code> to the second parameter of
-<code>dlopen()</code>.
+the main program, can get our handle by passing <code>NULL</code> to <code>dlopen()</code>.
 </p>
+
+<blockquote>
+<p>
+<b>dlopen(3)</b>
+</p>
+
+<p>
+The function <b>dlopen()</b> loads the dynamic shared object (shared library) file
+named by the null-terminated string <span class="underline">filename</span> and returns an opaque "handle" for
+the loaded object. [&#x2026;]
+</p>
+
+<p>
+If <span class="underline">filename</span> is NULL, then the returned handle is for the main program. [&#x2026;]
+</p>
+</blockquote>
+
+<p>
+The first parameter will be <code>RTLD_LAZY | RTLD_NOLOAD</code> because we want lazy binding
+(resolve symbols as the code that references them is executed) and we don't want
+to load the shared object (since it's already loaded).
+</p>
+
+<p>
+To get the pointer to a symbol, we can use <code>dlsym()</code> with the handler we just got
+and the symbol name.
+</p>
+
+<p>
+If we want to avoid dying, <code>verse2::hero::change_state_dead()</code> looks like a good
+place to start. I already had a look at this function, and it's not ideal for
+our purpose, so we will use <code>verse2::hero::take_hit()</code> instead (since a single hit
+kills us anyway).
+</p>
+
+<p>
+To get the real symbol name, we can either search for "<code>take_hit</code>" inside the
+"Symbols" window ("Windows &gt; Info&#x2026; &gt; Symbols") or search using <code>readelf</code> and
+<code>grep</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">readelf --wide --syms devildaggers | grep <span style="color: #00d3d0;">"hero.*take_hit"</span>
+</pre>
+</div>
+
+<p>
+We find that the symbol name is
+"<code>_ZN6verse24hero8take_hitEbN5verse10death_typeEb</code>". In there, we can also see the
+type of the parameters.
+</p>
+
+
+<div id="org1e5b53b" class="figure">
+<p><img src="../img/devildaggers2.png" alt="devildaggers2.png" />
+</p>
+</div>
+
+<p>
+The only thing we are missing is the return type. Since the returned value is
+stored in <code>rax</code> (or <code>eax</code>, for 32-bits) for integer numbers, we have to look at the
+function itself to determine what kind of value is being returned. We can see
+that the value inside the <code>ebp</code> register is always being moved into <code>eax</code> before
+returning.
+</p>
+
+
+<div id="orgb5e1175" class="figure">
+<p><img src="../img/devildaggers3.png" alt="devildaggers3.png" />
+</p>
+</div>
+
+<p>
+If we scroll up a bit, we can see that the <code>ebp</code> register is either set to zero
+just before returning, or it's set to the result of some kind of <code>or</code> operation
+before continuing with the execution.
+</p>
+
+
+<div id="org04a003f" class="figure">
+<p><img src="../img/devildaggers4.png" alt="devildaggers4.png" />
+</p>
+</div>
+
+<p>
+We can safely asume that the function is not only returning a boolean, but also
+returning false when something goes wrong (hit was not valid).
+</p>
+
+<p>
+The final code for finding <code>verse2::hero::take_hit()</code> looks like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">SYM_HERO_TAKE_HIT</span> <span style="color: #00d3d0;">"_ZN6verse24hero8take_hitEbN5verse10death_typeEb"</span>
+
+<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">globals_init</span>(<span style="color: #79a8ff;">void</span>) {
+    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">handle_self</span> = dlopen(<span style="color: #88ca9f;">NULL</span>, RTLD_LAZY | RTLD_NOLOAD);
+    <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>handle_self) {
+        fprintf(stderr, <span style="color: #00d3d0;">"dlopen() returned NULL\n"</span>);
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+    }
+
+    <span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">void</span> (*<span style="color: #79a8ff;">hero_take_hit_t</span>)(<span style="color: #79a8ff;">Hero</span>*, <span style="color: #79a8ff;">bool</span>, <span style="color: #79a8ff;">int</span>, <span style="color: #79a8ff;">bool</span>);
+    <span style="color: #79a8ff;">hero_take_hit_t</span> <span style="color: #6ae4b9;">hero_take_hit</span> = dlsym(handle_self, SYM_HERO_TAKE_HIT);
+    <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>hero_take_hit) {
+        fprintf(stderr, <span style="color: #00d3d0;">"dlsym() returned NULL\n"</span>);
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6e4da87" class="outline-3">
+<h3 id="org6e4da87"><span class="section-number-3">3.2.</span> Hooking <code>verse2::hero::take_hit()</code></h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+We will be using the detour hooking method I explained in
+<a href="../programming/detour-hooking.html">my detour hooking article</a>, specifically we will be using
+<a href="https://github.com/8dcc/detour-lib">my own detour hooking library</a>.
+</p>
+
+<p>
+Hooking using my library is very simple, we just need to declare the function
+type using a macro, declare and initialize the detour context and enable the
+hook.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">"detour.h"</span>
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Make sure these are accesible by the hook and the init function</span><span style="color: #989898;"> */</span>
+<span style="color: #4ae2ff;">DETOUR_DECL_TYPE</span>(<span style="color: #79a8ff;">bool</span>, hero_take_hit, <span style="color: #79a8ff;">Hero</span>*, <span style="color: #79a8ff;">bool</span>, <span style="color: #79a8ff;">int</span>, <span style="color: #79a8ff;">bool</span>);
+<span style="color: #79a8ff;">detour_ctx_t</span> <span style="color: #6ae4b9;">ctx_hero_take_hit</span>;
+
+<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">hook_hero_take_hit</span>(<span style="color: #79a8ff;">Hero</span>* <span style="color: #6ae4b9;">thisptr</span>, <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">rsi</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">death_type</span>, <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">rcx</span>) {
+    <span style="color: #989898;">/* </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Implement our hook</span><span style="color: #989898;"> */</span>
+}
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Call when our shared object is injected</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">hooks_init</span>(<span style="color: #79a8ff;">void</span>) {
+    detour_init(&amp;ctx_hero_take_hit, hero_take_hit, hook_hero_take_hit);
+    detour_add(&amp;ctx_hero_take_hit);
+}
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Call when unloading our shared object</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">hooks_restore</span>(<span style="color: #79a8ff;">void</span>) {
+    detour_del(&amp;ctx_hero_take_hit);
+}
+</pre>
+</div>
+
+<p>
+When the hook is enabled, all the calls to <code>verse2::hero::take_hit()</code> will instead
+call our <code>hook_hero_take_hit()</code> function. From there, we can simply return false
+without doing anything else to create a simple godmode. If we want to disable
+the godmode, we can simply call the original function and return its value:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Toggle this setting from some kind of menu</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">godmode</span> = <span style="color: #88ca9f;">true</span>;
+
+<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">hook_hero_take_hit</span>(<span style="color: #79a8ff;">Hero</span>* <span style="color: #6ae4b9;">thisptr</span>, <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">rsi</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">death_type</span>, <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">rcx</span>) {
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Return false without calling the original</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">if</span> (godmode)
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Call original hero::take_hit(), save the result and return it</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">ret</span>;
+    DETOUR_ORIG_GET(&amp;ctx_hero_take_hit, ret, hero_take_hit, thisptr, rsi,
+                    death_type, rcx);
+    <span style="color: #ff6f9f;">return</span> ret;
+}
+</pre>
+</div>
+
+<p>
+The only thing left is creating our constructor and destructor functions:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">__attribute__</span>((constructor)) <span style="color: #989898;">/* </span><span style="color: #989898;">Entry point when injected</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">load</span>(<span style="color: #79a8ff;">void</span>) {
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Find function address</span><span style="color: #989898;"> */</span>
+    globals_init();
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Hook it</span><span style="color: #989898;"> */</span>
+    hooks_init();
+
+    loaded = <span style="color: #88ca9f;">true</span>;
+}
+
+<span style="color: #ff6f9f;">__attribute__</span>((destructor)) <span style="color: #989898;">/* </span><span style="color: #989898;">Entry point when unloaded</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">unload</span>() {
+    <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>loaded)
+        <span style="color: #ff6f9f;">return</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Unhook it</span><span style="color: #989898;"> */</span>
+    hooks_restore();
+}
+</pre>
+</div>
+
+<p>
+When compiling, remember to link with the <code>detour.c</code> source and to use <code>-fPIC</code> to
+avoid relocation errors.
+</p>
+</div>
 </div>
 </div>
 </div>
