@@ -207,20 +207,27 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgca0f35a">1. About the game</a></li>
-<li><a href="#org1687171">2. Getting general information about the game</a></li>
-<li><a href="#orgcb456b0">3. Making a simple godmode with detour hooking</a>
+<li><a href="#org3184e11">1. About the game</a></li>
+<li><a href="#orgcbe188e">2. Getting general information about the game</a></li>
+<li><a href="#org73f8816">3. Making a simple godmode with detour hooking</a>
 <ul>
-<li><a href="#org29e64bb">3.1. Getting the function pointer</a></li>
-<li><a href="#org6e4da87">3.2. Hooking <code>verse2::hero::take_hit()</code></a></li>
+<li><a href="#org4ee832e">3.1. Getting the function pointer</a></li>
+<li><a href="#orgbff1799">3.2. Hooking <code>verse2::hero::take_hit()</code></a></li>
+</ul>
+</li>
+<li><a href="#org26ebd47">4. Enabling the hidden particle and level editors</a>
+<ul>
+<li><a href="#org092da7f">4.1. Getting a pointer to <code>verse2::globals</code></a></li>
+<li><a href="#org7f49d02">4.2. Declaring a <code>verse_globals_t</code> struct</a></li>
+<li><a href="#org9ba1cc0">4.3. Enabling and disabling the editors</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgca0f35a" class="outline-2">
-<h2 id="orgca0f35a"><span class="section-number-2">1.</span> About the game</h2>
+<div id="outline-container-org3184e11" class="outline-2">
+<h2 id="org3184e11"><span class="section-number-2">1.</span> About the game</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 <a href="https://devildaggers.com/">Devil Daggers</a> is a very fun and simple first-person shooter with a 1990s visual
@@ -238,8 +245,8 @@ For reversing, I will use <a href="https://cutter.re/">cutter</a>.
 </div>
 </div>
 
-<div id="outline-container-org1687171" class="outline-2">
-<h2 id="org1687171"><span class="section-number-2">2.</span> Getting general information about the game</h2>
+<div id="outline-container-orgcbe188e" class="outline-2">
+<h2 id="orgcbe188e"><span class="section-number-2">2.</span> Getting general information about the game</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 If we open the <code>devildaggers</code> binary in cutter, and go through the function list,
@@ -255,7 +262,7 @@ bit, we can start to see these <code>verse2</code> classes:
 </p>
 
 
-<div id="orgeeeced7" class="figure">
+<div id="orgf6fdc4f" class="figure">
 <p><img src="../img/devildaggers1.png" alt="devildaggers1.png" />
 </p>
 </div>
@@ -268,12 +275,12 @@ inside <code>verse2::hero::*</code>. Some functions that look interesting are <c
 </div>
 </div>
 
-<div id="outline-container-orgcb456b0" class="outline-2">
-<h2 id="orgcb456b0"><span class="section-number-2">3.</span> Making a simple godmode with detour hooking</h2>
+<div id="outline-container-org73f8816" class="outline-2">
+<h2 id="org73f8816"><span class="section-number-2">3.</span> Making a simple godmode with detour hooking</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org29e64bb" class="outline-3">
-<h3 id="org29e64bb"><span class="section-number-3">3.1.</span> Getting the function pointer</h3>
+<div id="outline-container-org4ee832e" class="outline-3">
+<h3 id="org4ee832e"><span class="section-number-3">3.1.</span> Getting the function pointer</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Let's start by getting a pointer to the function we are interested in. Since
@@ -337,7 +344,7 @@ type of the parameters.
 </p>
 
 
-<div id="org1e5b53b" class="figure">
+<div id="org329ba7c" class="figure">
 <p><img src="../img/devildaggers2.png" alt="devildaggers2.png" />
 </p>
 </div>
@@ -351,7 +358,7 @@ returning.
 </p>
 
 
-<div id="orgb5e1175" class="figure">
+<div id="org19c98c5" class="figure">
 <p><img src="../img/devildaggers3.png" alt="devildaggers3.png" />
 </p>
 </div>
@@ -363,7 +370,7 @@ before continuing with the execution.
 </p>
 
 
-<div id="org04a003f" class="figure">
+<div id="org41491dd" class="figure">
 <p><img src="../img/devildaggers4.png" alt="devildaggers4.png" />
 </p>
 </div>
@@ -399,8 +406,8 @@ The final code for finding <code>verse2::hero::take_hit()</code> looks like this
 </div>
 </div>
 
-<div id="outline-container-org6e4da87" class="outline-3">
-<h3 id="org6e4da87"><span class="section-number-3">3.2.</span> Hooking <code>verse2::hero::take_hit()</code></h3>
+<div id="outline-container-orgbff1799" class="outline-3">
+<h3 id="orgbff1799"><span class="section-number-3">3.2.</span> Hooking <code>verse2::hero::take_hit()</code></h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 We will be using the detour hooking method I explained in
@@ -493,6 +500,218 @@ The only thing left is creating our constructor and destructor functions:
 <p>
 When compiling, remember to link with the <code>detour.c</code> source and to use <code>-fPIC</code> to
 avoid relocation errors.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org26ebd47" class="outline-2">
+<h2 id="org26ebd47"><span class="section-number-2">4.</span> Enabling the hidden particle and level editors</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+While searching for some strings (specifically "Score submitted", which appears
+when you die), I found a <code>verse2::VERSE::step_ui()</code> function which seems to be
+used for rendering most of the menus. In there, I found some interesting code
+related to some "PARTICLES" and "PROGRESSION" windows.
+</p>
+
+
+<div id="org72acc61" class="figure">
+<p><img src="../img/devildaggers5.png" alt="devildaggers5.png" />
+</p>
+</div>
+
+<p>
+The only thing that stops the program from rendering these menus is some value
+located at <code>[rax + 0x488]</code> and <code>[rax + 0x489]</code>. We can see that the value that was
+loaded into <code>rax</code> is <code>verse2::globals</code>.
+</p>
+
+
+<div id="orga4bdf96" class="figure">
+<p><img src="../img/devildaggers6.png" alt="devildaggers6.png" />
+</p>
+</div>
+</div>
+
+<div id="outline-container-org092da7f" class="outline-3">
+<h3 id="org092da7f"><span class="section-number-3">4.1.</span> Getting a pointer to <code>verse2::globals</code></h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+At this point, I already hooked another function called <code>verse2::hero::step()</code>,
+which is useful since it's executed every tick and contains a pointer to the
+hero. That might be a good place to enable and disable these
+<code>verse2::globals[0x488]</code> values.
+</p>
+
+<p>
+To get the pointer, I had to use a different method than usual. I looked at the
+functions I was using, and I saw that <code>hero::step()</code> also uses <code>verse2::globals</code>
+internally.
+</p>
+
+
+<div id="orgde08fbb" class="figure">
+<p><img src="../img/devildaggers7.png" alt="devildaggers7.png" />
+</p>
+</div>
+
+<p>
+Before trying to understand the next part, it's important to note that
+<code>verse2::globals</code> is not the data structure itself, but <b>a pointer to that
+structure</b>. Therefore we are not interested in the address of <code>verse2::globals</code>,
+but <b>the address of the structure that <code>verse2::globals</code> is pointing to</b>. We will
+obviously need to get the address of the <code>verse2::globals</code> pointer before
+accessing its contents.
+</p>
+
+<p>
+As you can see, the address of <code>verse2::globals</code> is <b>relative to the instruction</b>
+(to <code>rip</code>). To get the absolute address, we need to:
+</p>
+
+<ol class="org-ol">
+<li>Get the <code>verse2::globals</code> offset. We are interested in the last 4 bytes of the
+highlighted instruction (<code>0x003A7BE3</code>).
+<ul class="org-ul">
+<li>Get the offset of these 4 bytes relative to the function start. We can
+skip the first 3 bytes of the instruction to get the last 4, and since the
+instruction is at <code>func_start+0x3E</code>, we know that the final offset is <code>0x41</code>.</li>
+<li>Add the offset to the function pointer. Since we have a pointer to the
+start of <code>hero::step()</code>, we can simply add <code>0x41</code> to get the address of these
+4 bytes.</li>
+<li>Dereference this pointer to get the 4 bytes we want.</li>
+</ul></li>
+<li>Get the address of the next instruction. Since the relative offset we just
+got is 32 bits, we just need to add 4 (<code>sizeof(uint32_t)</code>) to the pointer from
+the previous step.</li>
+<li>Add the relative <code>verse2::globals</code> offset (<code>0x003A7BE3</code>) to the address of this
+next instruction, to get the absolute <b>address</b> of <code>verse2::globals</code>.</li>
+</ol>
+
+<p>
+As I said earlier, this is the address of <code>verse2::globals</code>, not the address of
+the structure it's pointing to. To get the address of the structure, we simply
+dereference this pointer once more. Now we have a "clone" of <code>verse2::globals</code>
+that can be used to access the actual structure.
+</p>
+
+<p>
+From the code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Add 0x41 to the function start. Point to 0x003A7BE3</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">uint32_t</span>* <span style="color: #6ae4b9;">relative_offset_address</span> = (<span style="color: #79a8ff;">uintptr_t</span>)hero_step + <span style="color: #88ca9f;">0x41</span>;
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Dereference to get 0x003A7BE3</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">verse_globals_relative</span> = *offset_address;
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Store address of the next instruction (func_start+0x45)</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">next_instruction</span> = (<span style="color: #79a8ff;">void</span>*)offset_address + <span style="color: #ff6f9f;">sizeof</span>(uint32_t);
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Calculate pointer TO verse2::globals</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">verse_globals_absolute</span> = next_instruction + verse_globals_relative;
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Dereference once to get the value stored in verse2::globals</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">verse_globals</span> = *(<span style="color: #79a8ff;">void</span>**)verse_globals_absolute;
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Now we can access the members</span><span style="color: #989898;"> */</span>
+verse_globals-&gt;my_member = <span style="color: #88ca9f;">true</span>;
+</pre>
+</div>
+
+<p>
+Or in a more compact way using a <code>RELATIVE2ABSOLUTE()</code> macro:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Location of address + Size of offset + Offset</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">RELATIVE2ABSOLUTE</span>(<span style="color: #6ae4b9;">ADDR</span>) (<span style="color: #79a8ff;">void</span>*)((<span style="color: #79a8ff;">void</span>*)(ADDR) + <span style="color: #88ca9f;">4</span> + *(<span style="color: #79a8ff;">uint32_t</span>*)(ADDR))
+
+<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">verse_globals</span> = *(<span style="color: #79a8ff;">void</span>**)<span style="color: #4ae2ff;">RELATIVE2ABSOLUTE</span>((<span style="color: #79a8ff;">uintptr_t</span>)hero_step + <span style="color: #88ca9f;">0x41</span>);
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7f49d02" class="outline-3">
+<h3 id="org7f49d02"><span class="section-number-3">4.2.</span> Declaring a <code>verse_globals_t</code> struct</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+Since we want to change two booleans for the level and particle editors, we
+should declare our own <code>verse_globals_t</code> structure with the offsets we got before
+(<code>0x488</code> and <code>0x489</code>):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">verse_globals_t</span> <span style="color: #79a8ff;">verse_globals_t</span>;
+<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">verse_globals_t</span> {
+    <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">pad</span>[<span style="color: #88ca9f;">0x488</span>];
+    <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">particle_editor</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">0x488</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">level_editor</span>;    <span style="color: #989898;">/* </span><span style="color: #989898;">0x489</span><span style="color: #989898;"> */</span>
+} <span style="color: #ff6f9f;">__attribute__</span>((packed));
+</pre>
+</div>
+
+<p>
+It's not a bad idea to use <code>__attribute__((packed))</code> since paddings in more
+complex structures with different data types can be counter-intuitive, since gcc
+itself adds paddings to smaller types.
+</p>
+
+<p>
+We just need to change the declaration of <code>verse_globals</code> to match our new
+structure:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">verse_globals_t</span>* <span style="color: #6ae4b9;">verse_globals</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9ba1cc0" class="outline-3">
+<h3 id="org9ba1cc0"><span class="section-number-3">4.3.</span> Enabling and disabling the editors</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+Now we can simply set these two members to true, if the user wants to enable
+the editors. I set them inside my <code>verse2::hero::step()</code> hook:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">hook_hero_step</span>(<span style="color: #79a8ff;">Hero</span>* <span style="color: #6ae4b9;">thisptr</span>, <span style="color: #79a8ff;">float</span> <span style="color: #6ae4b9;">rsi</span>) {
+    <span style="color: #ff6f9f;">if</span> (LEVEL_EDITOR)
+        verse_globals-&gt;level_editor = <span style="color: #88ca9f;">true</span>;
+    <span style="color: #ff6f9f;">if</span> (PARTICLE_EDITOR)
+        verse_globals-&gt;particle_editor = <span style="color: #88ca9f;">true</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+}
+</pre>
+</div>
+
+<p>
+Note that the game detects if they are enabled, and will mark your score as
+invalid. This could be easily bypassed, but I am not going to do it here (Hint:
+have a look at <code>verse2::VERSE::step_ui()</code>)
+</p>
+
+
+<div id="org7e2282d" class="figure">
+<p><img src="../img/devildaggers8.png" alt="devildaggers8.png" />
+</p>
+</div>
+
+
+<div id="orgff2f32b" class="figure">
+<p><img src="../img/devildaggers9.png" alt="devildaggers9.png" />
+</p>
+</div>
+
+<p>
+Don't forget to set them to false when unloading the library (in <code>unload()</code>).
 </p>
 </div>
 </div>

@@ -202,3 +202,144 @@ void unload() {
 
 When compiling, remember to link with the =detour.c= source and to use =-fPIC= to
 avoid relocation errors.
+
+* Enabling the hidden particle and level editors
+
+While searching for some strings (specifically "Score submitted", which appears
+when you die), I found a =verse2::VERSE::step_ui()= function which seems to be
+used for rendering most of the menus. In there, I found some interesting code
+related to some "PARTICLES" and "PROGRESSION" windows.
+
+[[file:../img/devildaggers5.png]]
+
+The only thing that stops the program from rendering these menus is some value
+located at =[rax + 0x488]= and =[rax + 0x489]=. We can see that the value that was
+loaded into =rax= is =verse2::globals=.
+
+[[file:../img/devildaggers6.png]]
+
+** Getting a pointer to =verse2::globals=
+
+At this point, I already hooked another function called =verse2::hero::step()=,
+which is useful since it's executed every tick and contains a pointer to the
+hero. That might be a good place to enable and disable these
+=verse2::globals[0x488]= values.
+
+To get the pointer, I had to use a different method than usual. I looked at the
+functions I was using, and I saw that =hero::step()= also uses =verse2::globals=
+internally.
+
+[[file:../img/devildaggers7.png]]
+
+Before trying to understand the next part, it's important to note that
+=verse2::globals= is not the data structure itself, but *a pointer to that
+structure*. Therefore we are not interested in the address of =verse2::globals=,
+but *the address of the structure that =verse2::globals= is pointing to*. We will
+obviously need to get the address of the =verse2::globals= pointer before
+accessing its contents.
+
+As you can see, the address of =verse2::globals= is *relative to the instruction*
+(to =rip=). To get the absolute address, we need to:
+
+1. Get the =verse2::globals= offset. We are interested in the last 4 bytes of the
+   highlighted instruction (=0x003A7BE3=).
+    - Get the offset of these 4 bytes relative to the function start. We can
+      skip the first 3 bytes of the instruction to get the last 4, and since the
+      instruction is at =func_start+0x3E=, we know that the final offset is =0x41=.
+    - Add the offset to the function pointer. Since we have a pointer to the
+      start of =hero::step()=, we can simply add =0x41= to get the address of these
+      4 bytes.
+    - Dereference this pointer to get the 4 bytes we want.
+2. Get the address of the next instruction. Since the relative offset we just
+   got is 32 bits, we just need to add 4 (=sizeof(uint32_t)=) to the pointer from
+   the previous step.
+3. Add the relative =verse2::globals= offset (=0x003A7BE3=) to the address of this
+   next instruction, to get the absolute *address* of =verse2::globals=.
+
+As I said earlier, this is the address of =verse2::globals=, not the address of
+the structure it's pointing to. To get the address of the structure, we simply
+dereference this pointer once more. Now we have a "clone" of =verse2::globals=
+that can be used to access the actual structure.
+
+From the code:
+
+#+begin_src C
+/* Add 0x41 to the function start. Point to 0x003A7BE3 */
+uint32_t* relative_offset_address = (uintptr_t)hero_step + 0x41;
+
+/* Dereference to get 0x003A7BE3 */
+uint32_t verse_globals_relative = *offset_address;
+
+/* Store address of the next instruction (func_start+0x45) */
+void* next_instruction = (void*)offset_address + sizeof(uint32_t);
+
+/* Calculate pointer TO verse2::globals */
+void* verse_globals_absolute = next_instruction + verse_globals_relative;
+
+/* Dereference once to get the value stored in verse2::globals */
+void* verse_globals = *(void**)verse_globals_absolute;
+
+/* Now we can access the members */
+verse_globals->my_member = true;
+#+end_src
+
+Or in a more compact way using a =RELATIVE2ABSOLUTE()= macro:
+
+#+begin_src C
+/* Location of address + Size of offset + Offset */
+#define RELATIVE2ABSOLUTE(ADDR) (void*)((void*)(ADDR) + 4 + *(uint32_t*)(ADDR))
+
+void* verse_globals = *(void**)RELATIVE2ABSOLUTE((uintptr_t)hero_step + 0x41);
+#+end_src
+
+** Declaring a =verse_globals_t= struct
+
+Since we want to change two booleans for the level and particle editors, we
+should declare our own =verse_globals_t= structure with the offsets we got before
+(=0x488= and =0x489=):
+
+#+begin_src C
+typedef struct verse_globals_t verse_globals_t;
+struct verse_globals_t {
+    uint8_t pad[0x488];
+    bool particle_editor; /* 0x488 */
+    bool level_editor;    /* 0x489 */
+} __attribute__((packed));
+#+end_src
+
+It's not a bad idea to use =__attribute__((packed))= since paddings in more
+complex structures with different data types can be counter-intuitive, since gcc
+itself adds paddings to smaller types.
+
+We just need to change the declaration of =verse_globals= to match our new
+structure:
+
+#+begin_src C
+verse_globals_t* verse_globals;
+#+end_src
+
+** Enabling and disabling the editors
+
+Now we can simply set these two members to true, if the user wants to enable
+the editors. I set them inside my =verse2::hero::step()= hook:
+
+#+begin_src C
+static bool hook_hero_step(Hero* thisptr, float rsi) {
+    if (LEVEL_EDITOR)
+        verse_globals->level_editor = true;
+    if (PARTICLE_EDITOR)
+        verse_globals->particle_editor = true;
+
+    /* ... */
+}
+#+end_src
+
+Note that the game detects if they are enabled, and will mark your score as
+invalid. This could be easily bypassed, but I am not going to do it here (Hint:
+have a look at =verse2::VERSE::step_ui()=)
+
+[[file:../img/devildaggers8.png]]
+
+[[file:../img/devildaggers9.png]]
+
+Don't forget to set them to false when unloading the library (in =unload()=).
