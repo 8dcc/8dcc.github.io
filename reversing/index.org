@@ -20,6 +20,7 @@ List of my articles solving RE challenges:
 
 My other articles about reverse engineering:
 
+- [[file:devildaggers.org][Reversing Devil Daggers]]
 - [[file:reversing-keygen.org][Reversing a simple keygen]]
 
 * External resources
