@@ -343,3 +343,39 @@ have a look at =verse2::VERSE::step_ui()=)
 [[file:../img/devildaggers9.png]]
 
 Don't forget to set them to false when unloading the library (in =unload()=).
+
+* Enabling the top-down camera outside of replays
+
+There is a top-down camera mode available when watching a replay, so I thought
+it would be interesting to enable it while playing.
+
+To get the offset of this boolean, I simply scanned the process using
+[[https://github.com/scanmem/scanmem][GameConqueror]] to find that there were two values being set to zero when the
+top-down camera was disabled, and to one when it was enabled (in a
+replay). These two values correspond to the members of the =verse2::hero= and
+=verse2::globals= structures. I decided to get the offset inside the globals by
+subtracting the address I got in GameConqueror by the base address of
+=verse2::globals=.
+
+The final offset was =0x2BC=, so I simply updated my =verse_globals_t= struct:
+
+#+begin_src C
+typedef struct verse_globals_t verse_globals_t;
+struct verse_globals_t {
+    uint8_t pad0[0x2BC];
+    bool top_down_cam;    /* 0x2BC */
+    uint8_t pad1[0x1CB];
+    bool particle_editor; /* 0x488 */
+    bool level_editor;    /* 0x489 */
+} __attribute__((packed));
+#+end_src
+
+I am not sure where this value is set from the game's code, but if you have a
+suggestion feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this article.
+
+[[file:../img/devildaggers10.png]]
+
+* Complete source code
+
+The complete source code with some extra features can be found in
+[[https://github.com/8dcc/devildaggers-re][8dcc/devildaggers-re]].
