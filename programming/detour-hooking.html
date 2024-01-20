@@ -207,16 +207,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgc1213e6">1. What does hooking mean?</a></li>
-<li><a href="#org51bc28b">2. Detour hooking</a></li>
-<li><a href="#org7bc3ad2">3. Hooking from C</a></li>
-<li><a href="#org9e056c3">4. Detour hooking library</a></li>
+<li><a href="#org1078865">1. What does hooking mean?</a></li>
+<li><a href="#org8bc9586">2. Detour hooking</a></li>
+<li><a href="#org32fbea2">3. Hooking from C</a></li>
+<li><a href="#orgfa4e588">4. Detour hooking library</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgc1213e6" class="outline-2">
-<h2 id="orgc1213e6"><span class="section-number-2">1.</span> What does hooking mean?</h2>
+<div id="outline-container-org1078865" class="outline-2">
+<h2 id="org1078865"><span class="section-number-2">1.</span> What does hooking mean?</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Hooking consists in intercepting and altering function calls or event passed
@@ -252,8 +252,8 @@ original function, change the behavior, spoof the returned value, etc.
 </div>
 </div>
 
-<div id="outline-container-org51bc28b" class="outline-2">
-<h2 id="org51bc28b"><span class="section-number-2">2.</span> Detour hooking</h2>
+<div id="outline-container-org8bc9586" class="outline-2">
+<h2 id="org8bc9586"><span class="section-number-2">2.</span> Detour hooking</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Detour hooking is a hooking technique where we overwrite the first bytes of the
@@ -341,8 +341,8 @@ fcn.00001139+<span style="color: #88ca9f;">0x8</span>     f2 <span style="color:
 </div>
 </div>
 
-<div id="outline-container-org7bc3ad2" class="outline-2">
-<h2 id="org7bc3ad2"><span class="section-number-2">3.</span> Hooking from C</h2>
+<div id="outline-container-org32fbea2" class="outline-2">
+<h2 id="org32fbea2"><span class="section-number-2">3.</span> Hooking from C</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The basic process from C would be:
@@ -508,8 +508,8 @@ result = (<span style="color: #79a8ff;">orig_t</span>)<span style="color: #4ae2f
 </div>
 </div>
 
-<div id="outline-container-org9e056c3" class="outline-2">
-<h2 id="org9e056c3"><span class="section-number-2">4.</span> Detour hooking library</h2>
+<div id="outline-container-orgfa4e588" class="outline-2">
+<h2 id="orgfa4e588"><span class="section-number-2">4.</span> Detour hooking library</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 I made a simple detour hooking library in pure C for GNU/Linux. It should be
@@ -533,7 +533,7 @@ macros, depending on if you want to store the returned value.</li>
 </ol>
 
 <p>
-You can find the code, full usage and an example in the <a href="https://github.com/8dcc/detour-lib">GitHub repository</a>.
+You can find the code, full usage and an example in the <a href="https://github.com/8dcc/libdetour">GitHub repository</a>.
 </p>
 </div>
 </div>

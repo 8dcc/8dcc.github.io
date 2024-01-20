@@ -125,7 +125,7 @@ bool globals_init(void) {
 
 We will be using the detour hooking method I explained in
 [[file:../programming/detour-hooking.org][my detour hooking article]], specifically we will be using
-[[https://github.com/8dcc/detour-lib][my own detour hooking library]].
+[[https://github.com/8dcc/libdetour][my own detour hooking library]].
 
 Hooking using my library is very simple, we just need to declare the function
 type using a macro, declare and initialize the detour context and enable the

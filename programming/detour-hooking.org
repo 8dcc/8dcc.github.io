@@ -257,4 +257,4 @@ To use it, you just need to:
 5. When you are done, remove the hook by passing the /Detour Context/ to the
    =detour_del= function.
 
-You can find the code, full usage and an example in the [[https://github.com/8dcc/detour-lib][GitHub repository]].
+You can find the code, full usage and an example in the [[https://github.com/8dcc/libdetour][GitHub repository]].
