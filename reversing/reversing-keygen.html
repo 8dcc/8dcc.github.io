@@ -207,17 +207,27 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org5551d34">1. Introduction</a></li>
-<li><a href="#org2d0ec27">2. Trying out the program</a></li>
-<li><a href="#org764be65">3. Disassembling the main function</a></li>
-<li><a href="#orgc3d74c3">4. Disassembling the key generator</a></li>
-<li><a href="#org430d48a">5. Decompiling with ghidra</a></li>
+<li><a href="#org3cdb5e1">1. Introduction</a></li>
+<li><a href="#org1de97e4">2. Trying out the program</a></li>
+<li><a href="#orgf8524d7">3. The main function</a>
+<ul>
+<li><a href="#org1a85c9a">3.1. Finding the main function</a></li>
+<li><a href="#org31ed883">3.2. Disassembling the main function</a></li>
+</ul>
+</li>
+<li><a href="#org4e95567">4. Disassembling the key generator</a></li>
+<li><a href="#org87d87b5">5. Alternative: Decompiling with IDA or ghidra</a>
+<ul>
+<li><a href="#orga4e213b">5.1. IDA Pro</a></li>
+<li><a href="#org2859a44">5.2. Rizin's version of ghidra</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org5551d34" class="outline-2">
-<h2 id="org5551d34"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org3cdb5e1" class="outline-2">
+<h2 id="org3cdb5e1"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 I created a simple keygen program that takes a user and a key, and prints a
@@ -229,14 +239,14 @@ in case you are interested.
 </div>
 </div>
 
-<div id="outline-container-org2d0ec27" class="outline-2">
-<h2 id="org2d0ec27"><span class="section-number-2">2.</span> Trying out the program</h2>
+<div id="outline-container-org1de97e4" class="outline-2">
+<h2 id="org1de97e4"><span class="section-number-2">2.</span> Trying out the program</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First, let's try running the program to see what it's asking.
 </p>
 
-<pre class="example" id="org494ac19">
+<pre class="example" id="orged3363b">
 Username: test
 Key: test
 Invalid key.
@@ -256,14 +266,18 @@ From this, we can at least expect:
 </div>
 </div>
 
-<div id="outline-container-org764be65" class="outline-2">
-<h2 id="org764be65"><span class="section-number-2">3.</span> Disassembling the main function</h2>
+<div id="outline-container-orgf8524d7" class="outline-2">
+<h2 id="orgf8524d7"><span class="section-number-2">3.</span> The main function</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Let's start by having a look at the main function with <a href="https://rizin.re/">rizin</a> 0.6.3 (you can also
 use <a href="https://cutter.re">cutter</a> or <a href="https://hex-rays.com/ida-pro/">IDA</a>, if you prefer a GUI program).
 </p>
+</div>
 
+<div id="outline-container-org1a85c9a" class="outline-3">
+<h3 id="org1a85c9a"><span class="section-number-3">3.1.</span> Finding the main function</h3>
+<div class="outline-text-3" id="text-3-1">
 <p>
 We start by running the <code>aaa</code> rizin command, which is used to "Analyze all calls,
 references, emulation and apply signatures".
@@ -336,7 +350,12 @@ could also use <code>s location</code> (seek) and then <code>command</code>.
 [<span style="color: #88ca9f;">0x000010a0</span>]&gt;
 </pre>
 </div>
+</div>
+</div>
 
+<div id="outline-container-org31ed883" class="outline-3">
+<h3 id="org31ed883"><span class="section-number-3">3.2.</span> Disassembling the main function</h3>
+<div class="outline-text-3" id="text-3-2">
 <p>
 The address being loaded into <code>rdi</code> at <code>entry0+0x14</code> should be our main function. Let's have a look.
 </p>
@@ -441,12 +460,14 @@ executed when the key is correct.
 </p>
 </div>
 </div>
+</div>
 
-<div id="outline-container-orgc3d74c3" class="outline-2">
-<h2 id="orgc3d74c3"><span class="section-number-2">4.</span> Disassembling the key generator</h2>
+<div id="outline-container-org4e95567" class="outline-2">
+<h2 id="org4e95567"><span class="section-number-2">4.</span> Disassembling the key generator</h2>
 <div class="outline-text-2" id="text-4">
 <p>
-TODO
+Now that we understand the main logic, let's have a look at the <code>generate_key()</code>
+function at <code>0x1185</code>.
 </p>
 
 <div class="org-src-container">
@@ -530,15 +551,131 @@ TODO
 &#9492;         fcn.00001185+<span style="color: #88ca9f;">0xd2</span>                     c3                          <span style="color: #feacd0;">ret</span>
 </pre>
 </div>
-</div>
-</div>
 
-<div id="outline-container-org430d48a" class="outline-2">
-<h2 id="org430d48a"><span class="section-number-2">5.</span> Decompiling with ghidra</h2>
-<div class="outline-text-2" id="text-5">
 <p>
 TODO
 </p>
+</div>
+</div>
+
+<div id="outline-container-org87d87b5" class="outline-2">
+<h2 id="org87d87b5"><span class="section-number-2">5.</span> Alternative: Decompiling with IDA or ghidra</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+This option is not always reliable or not always available, so it's important to
+understand how the actual assembly works before jumping into the decompiler.
+</p>
+
+<p>
+There are various decompilers, and everyone has different opinions about which
+one is the best. For me, even though I rather use free and open-source tools, I
+find that the best decompiler is the IDA Pro one. Rizin (and therefore cutter)
+has <a href="https://github.com/rizinorg/rz-ghidra">its own ghidra</a> plugin made in C++.
+</p>
+
+<p>
+I will show a comparison between these two decompilers, but keep in mind that
+decompiling a single program doesn't provide nearly enough data to judge the two
+decompilers.
+</p>
+
+<blockquote>
+<p>
+<b>Note:</b> I formatted both outputs with <a href="https://github.com/8dcc/linux-dotfiles/blob/c5b5bcef1ea79397ae93accd7713616c9d6bd1ae/dotfiles/clang-format/clang-format">my clang-format</a> to make the outputs look as
+similar as possible.
+</p>
+</blockquote>
+</div>
+
+<div id="outline-container-orga4e213b" class="outline-3">
+<h3 id="orga4e213b"><span class="section-number-3">5.1.</span> IDA Pro</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+This is the generated C code by <i>IDA Pro Version 7.7.220118 Windows x64</i> (<i>x64
+Decompiler Hex-Rays SA 7.7.0.220118</i>).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">size_t</span> <span style="color: #989898;">/* </span><span style="color: #989898;">__fastcall</span><span style="color: #989898;"> */</span> <span style="color: #4ae2ff;">sub_1185</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">a1</span>, <span style="color: #79a8ff;">__int64</span> <span style="color: #6ae4b9;">a2</span>) {
+    <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">result</span>;    <span style="color: #989898;">// </span><span style="color: #989898;">rax</span>
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">v3</span>;           <span style="color: #989898;">// </span><span style="color: #989898;">eax</span>
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">v4</span>;           <span style="color: #989898;">// </span><span style="color: #989898;">[rsp+20h] [rbp-10h]</span>
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span>;            <span style="color: #989898;">// </span><span style="color: #989898;">[rsp+24h] [rbp-Ch]</span>
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">j</span>;            <span style="color: #989898;">// </span><span style="color: #989898;">[rsp+28h] [rbp-8h]</span>
+    <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">v7</span>;          <span style="color: #989898;">// </span><span style="color: #989898;">[rsp+2Ch] [rbp-4h]</span>
+
+    result = strlen(a1);
+    v7     = result;
+    v4     = <span style="color: #88ca9f;">0</span>;
+    <span style="color: #ff6f9f;">for</span> (i = <span style="color: #88ca9f;">0</span>; i &lt;= <span style="color: #88ca9f;">4</span>; ++i) {
+        <span style="color: #ff6f9f;">for</span> (j = <span style="color: #88ca9f;">0</span>;; ++j) {
+            result = a1[j];
+            <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>result)
+                <span style="color: #ff6f9f;">break</span>;
+
+            v3 = v4++;
+            , *(a2 + v3) = v7 ^ i ^ ((<span style="color: #88ca9f;">16</span> * a1[j]) | (a1[j] &gt;&gt; <span style="color: #88ca9f;">4</span>));
+            <span style="color: #ff6f9f;">if</span> (v4 &gt; <span style="color: #88ca9f;">19</span>)
+                v4 = <span style="color: #88ca9f;">0</span>;
+        }
+    }
+
+    <span style="color: #ff6f9f;">return</span> result;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2859a44" class="outline-3">
+<h3 id="org2859a44"><span class="section-number-3">5.2.</span> Rizin's version of ghidra</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+This is the generated C code by <i>rizin 0.6.1 @ linux-x86-64</i>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C">[<span style="color: #88ca9f;">0x00001090</span>]&gt; pdg @ fcn.<span style="color: #88ca9f;">00001189</span>
+
+<span style="color: #989898;">// </span><span style="color: #989898;">WARNING: Variable defined which should be unmapped: var_ch</span>
+<span style="color: #989898;">// </span><span style="color: #989898;">WARNING: Could not reconcile some variable overlaps</span>
+<span style="color: #989898;">// </span><span style="color: #989898;">WARNING: [rz-ghidra] Detected overlap for variable var_14h</span>
+<span style="color: #989898;">// </span><span style="color: #989898;">WARNING: [rz-ghidra] Detected overlap for variable var_10h</span>
+<span style="color: #989898;">// </span><span style="color: #989898;">WARNING: [rz-ghidra] Detected overlap for variable var_19h</span>
+
+<span style="color: #79a8ff;">void</span> fcn .<span style="color: #88ca9f;">00001189</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">arg1</span>, int64_t arg2) {
+    <span style="color: #79a8ff;">int32_t</span> <span style="color: #6ae4b9;">iVar1</span>;
+    <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">uVar2</span>;
+    <span style="color: #79a8ff;">int64_t</span> <span style="color: #6ae4b9;">var_38h</span>;
+    <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">s</span>;
+    <span style="color: #79a8ff;">int64_t</span> <span style="color: #6ae4b9;">var_18h</span>;
+    <span style="color: #79a8ff;">int32_t</span> <span style="color: #6ae4b9;">var_10h</span>;
+    <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">var_ch</span>;
+
+    uVar2         = sym.imp.strlen(arg1);
+    var_18h._0_4_ = <span style="color: #88ca9f;">0</span>;
+    <span style="color: #ff6f9f;">for</span> (var_18h._4_4_ = <span style="color: #88ca9f;">0</span>; var_18h._4_4_ &lt; <span style="color: #88ca9f;">5</span>;
+         var_18h._4_4_ = var_18h._4_4_ + <span style="color: #88ca9f;">1</span>) {
+        <span style="color: #ff6f9f;">for</span> (var_10h = <span style="color: #88ca9f;">0</span>; arg1[var_10h] != <span style="color: #00d3d0;">'\0'</span>; var_10h = var_10h + <span style="color: #88ca9f;">1</span>) {
+            iVar1 = var_18h + <span style="color: #88ca9f;">1</span>;
+            *(var_18h + arg2) =
+              (arg1[var_10h] &gt;&gt; <span style="color: #88ca9f;">4</span> | arg1[var_10h] &lt;&lt; <span style="color: #88ca9f;">4</span>) ^ var_18h._4_4_ ^ uVar2;
+            var_18h._0_4_ = iVar1;
+            <span style="color: #ff6f9f;">if</span> (<span style="color: #88ca9f;">0x13</span> &lt; iVar1) {
+                var_18h._0_4_ = <span style="color: #88ca9f;">0</span>;
+            }
+        }
+    }
+    <span style="color: #ff6f9f;">return</span>;
+}
+</pre>
+</div>
+
+<p>
+I manually removed the type casts from rizin's output since I disabled them for
+IDA.
+</p>
+</div>
 </div>
 </div>
 </div>
