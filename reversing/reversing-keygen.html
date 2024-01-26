@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reversing a simple keygen</title>
+<title>Reversing a simple keygen with rizin</title>
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -196,16 +196,354 @@
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">Reversing a simple keygen</h1>
+<h1 class="title">Reversing a simple keygen with rizin</h1>
 <p>
 <a href="../index.html">Index</a> | <a href="index.html">Up</a>
 </p>
 
 <hr />
 
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org0a37c33">1. Introduction</a></li>
+<li><a href="#org65bb5a6">2. Trying out the program</a></li>
+<li><a href="#org343ae85">3. Disassembling the main function</a></li>
+<li><a href="#org62a8bb8">4. Disassembling the key generator</a></li>
+<li><a href="#org67c9a65">5. Decompiling with ghidra</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0a37c33" class="outline-2">
+<h2 id="org0a37c33"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
 <p>
-For more information about keygens, see <a href="../programming/creating-keygen.html">Creating a simple keygen</a>.
+I created a simple keygen program that takes a user and a key, and prints a
+message if the key is valid. Let's try to figure out how to make a keygen for
+it. I made an article explaining how keygens work, and how to make your own. I
+will not be using the same code, but feel free to check <a href="../programming/creating-keygen.html">Creating a simple keygen</a>
+in case you are interested.
 </p>
+</div>
+</div>
+
+<div id="outline-container-org65bb5a6" class="outline-2">
+<h2 id="org65bb5a6"><span class="section-number-2">2.</span> Trying out the program</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+First, let's try running the program to see what it's asking.
+</p>
+
+<pre class="example" id="org25c7cb7">
+Username: test
+Key: test
+Invalid key.
+</pre>
+
+<p>
+From this, we can at least expect:
+</p>
+<ul class="org-ul">
+<li>A call to something like <code>printf()</code> with <code>"Username:"</code> in the arguments.</li>
+<li>Some call for scanning the username, perhaps <code>getchar()</code>, <code>gets()</code> or <code>scanf()</code>.</li>
+<li>Another call to <code>printf()</code> with <code>"Key:"</code> in the arguments.</li>
+<li>Another call for scanning the key.</li>
+<li>Some kind of key validation.</li>
+<li>Depending on the result, a last call to <code>printf()</code> with the text <code>"Invalid key."</code>.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org343ae85" class="outline-2">
+<h2 id="org343ae85"><span class="section-number-2">3.</span> Disassembling the main function</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Let's start by having a look at the main function with <a href="https://rizin.re/">rizin</a> 0.6.3 (you can also
+use <a href="https://cutter.re">cutter</a> or <a href="https://hex-rays.com/ida-pro/">IDA</a>, if you prefer a GUI program).
+</p>
+
+<p>
+We start by running the <code>aaa</code> rizin command, which is used to "Analyze all calls,
+references, emulation and apply signatures".
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm">$ rizin ./my_keygen
+[<span style="color: #88ca9f;">0x000010a0</span>]&gt; <span style="color: #feacd0;">aaa</span>
+[x] Analyze all flags starting with sym. <span style="color: #feacd0;">and</span> entry0 (aa)
+[x] Analyze function calls
+[x] Analyze len bytes of instructions for references
+[x] Check for classes
+[x] Analyze local variables <span style="color: #feacd0;">and</span> arguments
+[x] Type matching analysis for all functions
+[x] Applied <span style="color: #88ca9f;">0</span> FLIRT signatures via sigdb
+[x] Propagate noreturn information
+[x] Resolve pointers <span style="color: #79a8ff;">to</span> data sections
+[x] Use -AA <span style="color: #feacd0;">or</span> aaaa <span style="color: #79a8ff;">to</span> perform additional experimental analysis.
+</pre>
+</div>
+
+<p>
+We can list the symbols (flags) with <code>fl</code>. In this case, rizin couldn't find the
+<code>main</code> function.
+</p>
+
+<blockquote>
+<p>
+<b>Note:</b> With <code>command~text</code>, we can filter rizin's output.
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-nasm">[<span style="color: #88ca9f;">0x000010a0</span>]&gt; fl~main
+<span style="color: #88ca9f;">0x00003fc0</span> <span style="color: #88ca9f;">8</span> reloc.__libc_start_main
+<span style="color: #88ca9f;">0x00004080</span> <span style="color: #88ca9f;">8</span> reloc.target.__libc_start_main
+</pre>
+</div>
+
+<p>
+This is not a problem, though, since we can just print the entry point of the
+program with <code>pdf</code> (print disassembly of function) to determine where our main
+function is.
+</p>
+
+<blockquote>
+<p>
+<b>Note:</b> Using <code>command@location</code> executes the command at that position. In this
+case, rizin has placed us into <code>entry0</code> already, so this is not necessary. We
+could also use <code>s location</code> (seek) and then <code>command</code>.
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-nasm">[<span style="color: #88ca9f;">0x000010a0</span>]&gt; pdf @ entry0
+&#9474;         entry0                      <span style="color: #989898;">;</span><span style="color: #989898;">-- section..text:</span>
+&#9484;         entry0                     entry0(int64_t arg3)<span style="color: #989898;">;</span>
+&#9474;         entry0                     <span style="color: #989898;">; </span><span style="color: #989898;">arg int64_t arg3 @ rdx</span>
+&#9474;         entry0                          <span style="color: #88ca9f;">31</span> ed                       <span style="color: #feacd0;">xor</span>   <span style="color: #6ae4b9;">ebp</span>, <span style="color: #6ae4b9;">ebp</span>                <span style="color: #989898;">; </span><span style="color: #989898;">[13] -r-x section size 1492 named .text</span>
+&#9474;         entry0+<span style="color: #88ca9f;">0x2</span>                      <span style="color: #88ca9f;">49</span> <span style="color: #88ca9f;">89</span> d1                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">r9</span>, <span style="color: #6ae4b9;">rdx</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">arg3</span>
+&#9474;         entry0+<span style="color: #88ca9f;">0x5</span>                      <span style="color: #88ca9f;">5e</span>                          <span style="color: #feacd0;">pop</span>   <span style="color: #6ae4b9;">rsi</span>
+&#9474;         entry0+<span style="color: #88ca9f;">0x6</span>                      <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> e2                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rdx</span>, <span style="color: #6ae4b9;">rsp</span>
+&#9474;         entry0+<span style="color: #88ca9f;">0x9</span>                      <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">83</span> e4 f0                 <span style="color: #feacd0;">and</span>   <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0xfffffffffffffff0</span>
+&#9474;         entry0+<span style="color: #88ca9f;">0xd</span>                      <span style="color: #88ca9f;">50</span>                          <span style="color: #feacd0;">push</span>  <span style="color: #6ae4b9;">rax</span>
+&#9474;         entry0+<span style="color: #88ca9f;">0xe</span>                      <span style="color: #88ca9f;">54</span>                          <span style="color: #feacd0;">push</span>  <span style="color: #6ae4b9;">rsp</span>
+&#9474;         entry0+<span style="color: #88ca9f;">0xf</span>                      <span style="color: #88ca9f;">45</span> <span style="color: #88ca9f;">31</span> c0                    <span style="color: #feacd0;">xor</span>   <span style="color: #6ae4b9;">r8d</span>, <span style="color: #6ae4b9;">r8d</span>
+&#9474;         entry0+<span style="color: #88ca9f;">0x12</span>                     <span style="color: #88ca9f;">31</span> c9                       <span style="color: #feacd0;">xor</span>   <span style="color: #6ae4b9;">ecx</span>, <span style="color: #6ae4b9;">ecx</span>
+&#9474;         entry0+<span style="color: #88ca9f;">0x14</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">3d</span> <span style="color: #88ca9f;">4e</span> <span style="color: #88ca9f;">03</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rdi</span>, data.00001409      <span style="color: #989898;">; </span><span style="color: #989898;">0x1409</span>
+&#9492;         entry0+<span style="color: #88ca9f;">0x1b</span>                     ff <span style="color: #88ca9f;">15</span> ff <span style="color: #88ca9f;">2e</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>           <span style="color: #feacd0;">call</span>  <span style="color: #79a8ff;">qword</span> reloc.__libc_start_main <span style="color: #989898;">; </span><span style="color: #989898;">[reloc.__libc_start_main:8]=0x4080 reloc.target.__libc_start_main</span>
+[<span style="color: #88ca9f;">0x000010a0</span>]&gt;
+</pre>
+</div>
+
+<p>
+The address being loaded into <code>rdi</code> at <code>entry0+0x14</code> should be our main function. Let's have a look.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm">[<span style="color: #88ca9f;">0x000010a0</span>]&gt; pd <span style="color: #88ca9f;">60</span> @ data.00001409
+          <span style="color: #989898;">; </span><span style="color: #989898;">DATA XREF from entry0 @ 0x10b4</span>
+          main                      <span style="color: #989898;">;</span><span style="color: #989898;">-- data.00001409:</span>
+          main                      <span style="color: #989898;">;</span><span style="color: #989898;">-- main:</span>
+          main                          <span style="color: #88ca9f;">55</span>                          <span style="color: #feacd0;">push</span>  <span style="color: #6ae4b9;">rbp</span>
+          main+<span style="color: #88ca9f;">0x1</span>                      <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> e5                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>
+          main+<span style="color: #88ca9f;">0x4</span>                      <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">83</span> ec <span style="color: #88ca9f;">10</span>                 <span style="color: #feacd0;">sub</span>   <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x10</span>
+          main+<span style="color: #88ca9f;">0x8</span>                      <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> f1 <span style="color: #88ca9f;">0b</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rax</span>, str.Username:        <span style="color: #989898;">; </span><span style="color: #989898;">0x2009 ; "Username: "</span>
+          main+<span style="color: #88ca9f;">0xf</span>                      <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c7                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rax</span>
+          main+<span style="color: #88ca9f;">0x12</span>                     b8 <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>              <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0</span>
+          main+<span style="color: #88ca9f;">0x17</span>                     e8 <span style="color: #88ca9f;">3b</span> fc ff ff              <span style="color: #feacd0;">call</span>  sym.imp.printf            <span style="color: #989898;">; </span><span style="color: #989898;">sym.imp.printf ; int printf(const char *format)</span>
+          main+<span style="color: #88ca9f;">0x1c</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> <span style="color: #88ca9f;">34</span> <span style="color: #88ca9f;">2c</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rax</span>, [<span style="color: #88ca9f;">0x00004060</span>]
+          main+<span style="color: #88ca9f;">0x23</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c6                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rsi</span>, <span style="color: #6ae4b9;">rax</span>
+          main+<span style="color: #88ca9f;">0x26</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> de <span style="color: #88ca9f;">0b</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rax</span>, str.255s             <span style="color: #989898;">; </span><span style="color: #989898;">0x2014 ; "%255s"</span>
+          main+<span style="color: #88ca9f;">0x2d</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c7                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rax</span>
+          main+<span style="color: #88ca9f;">0x30</span>                     b8 <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>              <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0</span>
+          main+<span style="color: #88ca9f;">0x35</span>                     e8 <span style="color: #88ca9f;">3d</span> fc ff ff              <span style="color: #feacd0;">call</span>  sym.imp.__isoc99_scanf    <span style="color: #989898;">; </span><span style="color: #989898;">sym.imp.__isoc99_scanf ; int scanf(const char *format)</span>
+          main+<span style="color: #88ca9f;">0x3a</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> d0 <span style="color: #88ca9f;">0b</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rax</span>, str.Key:             <span style="color: #989898;">; </span><span style="color: #989898;">0x201a ; "Key: "</span>
+          main+<span style="color: #88ca9f;">0x41</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c7                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rax</span>
+          main+<span style="color: #88ca9f;">0x44</span>                     b8 <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>              <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0</span>
+          main+<span style="color: #88ca9f;">0x49</span>                     e8 <span style="color: #88ca9f;">09</span> fc ff ff              <span style="color: #feacd0;">call</span>  sym.imp.printf            <span style="color: #989898;">; </span><span style="color: #989898;">sym.imp.printf ; int printf(const char *format)</span>
+          main+<span style="color: #88ca9f;">0x4e</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> <span style="color: #88ca9f;">02</span> <span style="color: #88ca9f;">2d</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rax</span>, [<span style="color: #88ca9f;">0x00004160</span>]
+          main+<span style="color: #88ca9f;">0x55</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c7                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rax</span>
+          main+<span style="color: #88ca9f;">0x58</span>                     e8 <span style="color: #88ca9f;">41</span> fe ff ff              <span style="color: #feacd0;">call</span>  fcn.000012a7              <span style="color: #989898;">; </span><span style="color: #989898;">fcn.000012a7</span>
+          main+<span style="color: #88ca9f;">0x5d</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> <span style="color: #88ca9f;">13</span> <span style="color: #88ca9f;">2d</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rax</span>, [<span style="color: #88ca9f;">0x00004180</span>]
+          main+<span style="color: #88ca9f;">0x64</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c6                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rsi</span>, <span style="color: #6ae4b9;">rax</span>
+          main+<span style="color: #88ca9f;">0x67</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> e9 <span style="color: #88ca9f;">2b</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rax</span>, [<span style="color: #88ca9f;">0x00004060</span>]
+          main+<span style="color: #88ca9f;">0x6e</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c7                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rax</span>
+          main+<span style="color: #88ca9f;">0x71</span>                     e8 <span style="color: #88ca9f;">06</span> fd ff ff              <span style="color: #feacd0;">call</span>  fcn.00001185              <span style="color: #989898;">; </span><span style="color: #989898;">fcn.00001185</span>
+          main+<span style="color: #88ca9f;">0x76</span>                     ba <span style="color: #88ca9f;">14</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>              <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0x14</span>
+          main+<span style="color: #88ca9f;">0x7b</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> f5 <span style="color: #88ca9f;">2c</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rax</span>, [<span style="color: #88ca9f;">0x00004180</span>]
+          main+<span style="color: #88ca9f;">0x82</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c6                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rsi</span>, <span style="color: #6ae4b9;">rax</span>
+          main+<span style="color: #88ca9f;">0x85</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> cb <span style="color: #88ca9f;">2c</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rax</span>, [<span style="color: #88ca9f;">0x00004160</span>]
+          main+<span style="color: #88ca9f;">0x8c</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c7                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rax</span>
+          main+<span style="color: #88ca9f;">0x8f</span>                     e8 d3 fb ff ff              <span style="color: #feacd0;">call</span>  sym.imp.memcmp            <span style="color: #989898;">; </span><span style="color: #989898;">sym.imp.memcmp ; int memcmp(const void *s1, const void *s2, size_t n)</span>
+          main+<span style="color: #88ca9f;">0x94</span>                     <span style="color: #88ca9f;">85</span> c0                       <span style="color: #feacd0;">test</span>  <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
+          main+<span style="color: #88ca9f;">0x96</span>                     <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">94</span> c0                    <span style="color: #feacd0;">sete</span>  <span style="color: #6ae4b9;">al</span>
+          main+<span style="color: #88ca9f;">0x99</span>                     <span style="color: #88ca9f;">88</span> <span style="color: #88ca9f;">45</span> ff                    <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">1</span>], <span style="color: #6ae4b9;">al</span>
+          main+<span style="color: #88ca9f;">0x9c</span>                     <span style="color: #88ca9f;">80</span> <span style="color: #88ca9f;">7d</span> ff <span style="color: #88ca9f;">00</span>                 <span style="color: #feacd0;">cmp</span>   <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">1</span>], <span style="color: #88ca9f;">0</span>
+      &#9484;&#9472;&lt; main+<span style="color: #88ca9f;">0xa0</span>                     <span style="color: #88ca9f;">74</span> <span style="color: #88ca9f;">11</span>                       <span style="color: #feacd0;">je</span>    <span style="color: #88ca9f;">0x14bc</span>
+      &#9474;   main+<span style="color: #88ca9f;">0xa2</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> <span style="color: #88ca9f;">6e</span> <span style="color: #88ca9f;">0b</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rax</span>, str.Correct_key.     <span style="color: #989898;">; </span><span style="color: #989898;">0x2020 ; "Correct key."</span>
+      &#9474;   main+<span style="color: #88ca9f;">0xa9</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c7                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rax</span>
+      &#9474;   main+<span style="color: #88ca9f;">0xac</span>                     e8 <span style="color: #88ca9f;">76</span> fb ff ff              <span style="color: #feacd0;">call</span>  sym.imp.puts              <span style="color: #989898;">; </span><span style="color: #989898;">sym.imp.puts ; int puts(const char *s)</span>
+     &#9484;&#9472;&#9472;&lt; main+<span style="color: #88ca9f;">0xb1</span>                     eb <span style="color: #88ca9f;">0f</span>                       <span style="color: #feacd0;">jmp</span>   <span style="color: #88ca9f;">0x14cb</span>
+     &#9474;&#9492;&#9472;&gt; main+<span style="color: #88ca9f;">0xb3</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> <span style="color: #88ca9f;">6a</span> <span style="color: #88ca9f;">0b</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">rax</span>, str.Invalid_key.     <span style="color: #989898;">; </span><span style="color: #989898;">0x202d ; "Invalid key."</span>
+     &#9474;    main+<span style="color: #88ca9f;">0xba</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c7                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rax</span>
+     &#9474;    main+<span style="color: #88ca9f;">0xbd</span>                     e8 <span style="color: #88ca9f;">65</span> fb ff ff              <span style="color: #feacd0;">call</span>  sym.imp.puts              <span style="color: #989898;">; </span><span style="color: #989898;">sym.imp.puts ; int puts(const char *s)</span>
+     &#9474;    <span style="color: #989898;">; </span><span style="color: #989898;">CODE XREF from data.00001409 @ +0xb1</span>
+     &#9492;&#9472;&#9472;&gt; main+<span style="color: #88ca9f;">0xc2</span>                     b8 <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>              <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0</span>
+          main+<span style="color: #88ca9f;">0xc7</span>                     c9                          <span style="color: #feacd0;">leave</span>
+          main+<span style="color: #88ca9f;">0xc8</span>                     c3                          <span style="color: #feacd0;">ret</span>
+</pre>
+</div>
+
+<blockquote>
+<p>
+<b>Note:</b> I renamed this function to "main" with <code>f+ main 0x9c @ data.00001409</code>.
+</p>
+</blockquote>
+
+<p>
+In here, we can see that it matches the pattern we saw when running the program:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Address range</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>main</code> to <code>main+0x4</code></td>
+<td class="org-left">Store stack frame</td>
+</tr>
+
+<tr>
+<td class="org-left">TODO</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+This is obviously an ideal enviroment, since the main function is the one
+responsible for validating the key. Since this is not normally the case, we
+could try to look for those success and fail messages in the program's string
+list, and checking the xrefs to find the key validation function. In this
+specific program, we could also just patch the bytes responsible for the
+conditional jump, so it always jumps to the code that gets executed when the key
+is correct.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org62a8bb8" class="outline-2">
+<h2 id="org62a8bb8"><span class="section-number-2">4.</span> Disassembling the key generator</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+TODO
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm">[<span style="color: #88ca9f;">0x000010a0</span>]&gt; pdf @ fcn.00001185
+          <span style="color: #989898;">; </span><span style="color: #989898;">CALL XREF from data.00001409 @ +0x71</span>
+&#9474;         fcn.00001185                      <span style="color: #989898;">;</span><span style="color: #989898;">-- keygen:</span>
+&#9484;         fcn.00001185                     fcn.00001185(const char *arg1, int64_t arg2)<span style="color: #989898;">;</span>
+&#9474;         fcn.00001185                     <span style="color: #989898;">; </span><span style="color: #989898;">arg const char *arg1 @ rdi</span>
+&#9474;         fcn.00001185                     <span style="color: #989898;">; </span><span style="color: #989898;">arg int64_t arg2 @ rsi</span>
+&#9474;         fcn.00001185                     <span style="color: #989898;">; </span><span style="color: #989898;">var int64_t var_38h @ stack - 0x38</span>
+&#9474;         fcn.00001185                     <span style="color: #989898;">; </span><span style="color: #989898;">var const char *s @ stack - 0x30</span>
+&#9474;         fcn.00001185                     <span style="color: #989898;">; </span><span style="color: #989898;">var int64_t var_19h @ stack - 0x19</span>
+&#9474;         fcn.00001185                     <span style="color: #989898;">; </span><span style="color: #989898;">var int64_t var_18h @ stack - 0x18</span>
+&#9474;         fcn.00001185                     <span style="color: #989898;">; </span><span style="color: #989898;">var int64_t var_14h @ stack - 0x14</span>
+&#9474;         fcn.00001185                     <span style="color: #989898;">; </span><span style="color: #989898;">var int64_t var_10h @ stack - 0x10</span>
+&#9474;         fcn.00001185                     <span style="color: #989898;">; </span><span style="color: #989898;">var size_t var_ch @ stack - 0xc</span>
+&#9474;         fcn.00001185                          <span style="color: #88ca9f;">55</span>                          <span style="color: #feacd0;">push</span>  <span style="color: #6ae4b9;">rbp</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0x1</span>                      <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> e5                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0x4</span>                      <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">83</span> ec <span style="color: #88ca9f;">30</span>                 <span style="color: #feacd0;">sub</span>   <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x30</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0x8</span>                      <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> <span style="color: #88ca9f;">7d</span> d8                 <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - s], <span style="color: #6ae4b9;">rdi</span> <span style="color: #989898;">; </span><span style="color: #989898;">arg1</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0xc</span>                      <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> <span style="color: #88ca9f;">75</span> d0                 <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">38h</span>], <span style="color: #6ae4b9;">rsi</span> <span style="color: #989898;">; </span><span style="color: #989898;">arg2</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0x10</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8b</span> <span style="color: #88ca9f;">45</span> d8                 <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - s]
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0x14</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c7                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rax</span>          <span style="color: #989898;">; </span><span style="color: #989898;">const char *s</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0x17</span>                     e8 <span style="color: #88ca9f;">9f</span> fe ff ff              <span style="color: #feacd0;">call</span>  sym.imp.strlen    <span style="color: #989898;">; </span><span style="color: #989898;">sym.imp.strlen ; size_t strlen(const char *s)</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0x1c</span>                     <span style="color: #88ca9f;">89</span> <span style="color: #88ca9f;">45</span> fc                    <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_ch], <span style="color: #6ae4b9;">eax</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0x1f</span>                     c7 <span style="color: #88ca9f;">45</span> f0 <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">18h</span>], <span style="color: #88ca9f;">0</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0x26</span>                     c7 <span style="color: #88ca9f;">45</span> f4 <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">14h</span>], <span style="color: #88ca9f;">0</span>
+&#9474;     &#9484;&#9472;&lt; fcn.00001185+<span style="color: #88ca9f;">0x2d</span>                     e9 <span style="color: #88ca9f;">93</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>              <span style="color: #feacd0;">jmp</span>   <span style="color: #88ca9f;">0x124a</span>
+&#9474;    &#9484;&#9472;&#9472;&gt; fcn.00001185+<span style="color: #88ca9f;">0x32</span>                     c7 <span style="color: #88ca9f;">45</span> f8 <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">10h</span>], <span style="color: #88ca9f;">0</span>
+&#9474;   &#9484;&#9472;&#9472;&#9472;&lt; fcn.00001185+<span style="color: #88ca9f;">0x39</span>                     eb <span style="color: #88ca9f;">6e</span>                       <span style="color: #feacd0;">jmp</span>   <span style="color: #88ca9f;">0x122e</span>
+&#9474;  &#9484;&#9472;&#9472;&#9472;&#9472;&gt; fcn.00001185+<span style="color: #88ca9f;">0x3b</span>                     <span style="color: #88ca9f;">8b</span> <span style="color: #88ca9f;">45</span> f8                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">10h</span>]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x3e</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">63</span> d0                    <span style="color: #feacd0;">movsxd</span> <span style="color: #6ae4b9;">rdx</span>, <span style="color: #6ae4b9;">eax</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x41</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8b</span> <span style="color: #88ca9f;">45</span> d8                 <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - s]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x45</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">01</span> d0                    <span style="color: #feacd0;">add</span>   <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rdx</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x48</span>                     <span style="color: #88ca9f;">0f</span> b6 <span style="color: #88ca9f;">00</span>                    <span style="color: #feacd0;">movzx</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rax</span>]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x4b</span>                     <span style="color: #88ca9f;">88</span> <span style="color: #88ca9f;">45</span> ef                    <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">19h</span>], <span style="color: #6ae4b9;">al</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x4e</span>                     <span style="color: #88ca9f;">0f</span> b6 <span style="color: #88ca9f;">45</span> ef                 <span style="color: #feacd0;">movzx</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">19h</span>]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x52</span>                     c1 e0 <span style="color: #88ca9f;">04</span>                    <span style="color: #feacd0;">shl</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">4</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x55</span>                     <span style="color: #88ca9f;">89</span> c2                       <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x57</span>                     <span style="color: #88ca9f;">0f</span> b6 <span style="color: #88ca9f;">45</span> ef                 <span style="color: #feacd0;">movzx</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">19h</span>]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x5b</span>                     c0 e8 <span style="color: #88ca9f;">04</span>                    <span style="color: #feacd0;">shr</span>   <span style="color: #6ae4b9;">al</span>, <span style="color: #88ca9f;">4</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x5e</span>                     <span style="color: #88ca9f;">09</span> d0                       <span style="color: #feacd0;">or</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x60</span>                     <span style="color: #88ca9f;">88</span> <span style="color: #88ca9f;">45</span> ef                    <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">19h</span>], <span style="color: #6ae4b9;">al</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x63</span>                     <span style="color: #88ca9f;">8b</span> <span style="color: #88ca9f;">45</span> f4                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">14h</span>]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x66</span>                     <span style="color: #88ca9f;">89</span> c2                       <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x68</span>                     <span style="color: #88ca9f;">0f</span> b6 <span style="color: #88ca9f;">45</span> ef                 <span style="color: #feacd0;">movzx</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">19h</span>]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x6c</span>                     <span style="color: #88ca9f;">31</span> d0                       <span style="color: #feacd0;">xor</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x6e</span>                     <span style="color: #88ca9f;">88</span> <span style="color: #88ca9f;">45</span> ef                    <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">19h</span>], <span style="color: #6ae4b9;">al</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x71</span>                     <span style="color: #88ca9f;">8b</span> <span style="color: #88ca9f;">45</span> fc                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_ch]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x74</span>                     <span style="color: #88ca9f;">89</span> c2                       <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x76</span>                     <span style="color: #88ca9f;">0f</span> b6 <span style="color: #88ca9f;">45</span> ef                 <span style="color: #feacd0;">movzx</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">19h</span>]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x7a</span>                     <span style="color: #88ca9f;">31</span> d0                       <span style="color: #feacd0;">xor</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x7c</span>                     <span style="color: #88ca9f;">88</span> <span style="color: #88ca9f;">45</span> ef                    <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">19h</span>], <span style="color: #6ae4b9;">al</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x7f</span>                     <span style="color: #88ca9f;">8b</span> <span style="color: #88ca9f;">45</span> f0                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">18h</span>]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x82</span>                     <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">50</span> <span style="color: #88ca9f;">01</span>                    <span style="color: #feacd0;">lea</span>   <span style="color: #6ae4b9;">edx</span>, [<span style="color: #6ae4b9;">rax</span> + <span style="color: #88ca9f;">1</span>]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x85</span>                     <span style="color: #88ca9f;">89</span> <span style="color: #88ca9f;">55</span> f0                    <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">18h</span>], <span style="color: #6ae4b9;">edx</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x88</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">63</span> d0                    <span style="color: #feacd0;">movsxd</span> <span style="color: #6ae4b9;">rdx</span>, <span style="color: #6ae4b9;">eax</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x8b</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8b</span> <span style="color: #88ca9f;">45</span> d0                 <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">38h</span>]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x8f</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">01</span> c2                    <span style="color: #feacd0;">add</span>   <span style="color: #6ae4b9;">rdx</span>, <span style="color: #6ae4b9;">rax</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x92</span>                     <span style="color: #88ca9f;">0f</span> b6 <span style="color: #88ca9f;">45</span> ef                 <span style="color: #feacd0;">movzx</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">19h</span>]
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x96</span>                     <span style="color: #88ca9f;">88</span> <span style="color: #88ca9f;">02</span>                       <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rdx</span>], <span style="color: #6ae4b9;">al</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x98</span>                     <span style="color: #88ca9f;">83</span> <span style="color: #88ca9f;">7d</span> f0 <span style="color: #88ca9f;">13</span>                 <span style="color: #feacd0;">cmp</span>   <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">18h</span>], <span style="color: #88ca9f;">0x13</span>
+&#9474; &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&lt; fcn.00001185+<span style="color: #88ca9f;">0x9c</span>                     <span style="color: #88ca9f;">7e</span> <span style="color: #88ca9f;">07</span>                       <span style="color: #feacd0;">jle</span>   <span style="color: #88ca9f;">0x122a</span>
+&#9474; &#9474;&#9550;&#9474;&#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0x9e</span>                     c7 <span style="color: #88ca9f;">45</span> f0 <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>        <span style="color: #feacd0;">mov</span>   <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">18h</span>], <span style="color: #88ca9f;">0</span>
+&#9474; &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&gt; fcn.00001185+<span style="color: #88ca9f;">0xa5</span>                     <span style="color: #88ca9f;">83</span> <span style="color: #88ca9f;">45</span> f8 <span style="color: #88ca9f;">01</span>                 <span style="color: #feacd0;">add</span>   <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">10h</span>], <span style="color: #88ca9f;">1</span>
+&#9474;  &#9550;&#9474;&#9550;&#9474;   <span style="color: #989898;">; </span><span style="color: #989898;">CODE XREF from fcn.00001185 @ 0x11be</span>
+&#9474;  &#9550;&#9492;&#9472;&#9472;&#9472;&gt; fcn.00001185+<span style="color: #88ca9f;">0xa9</span>                     <span style="color: #88ca9f;">8b</span> <span style="color: #88ca9f;">45</span> f8                    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">10h</span>]
+&#9474;  &#9550; &#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0xac</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">63</span> d0                    <span style="color: #feacd0;">movsxd</span> <span style="color: #6ae4b9;">rdx</span>, <span style="color: #6ae4b9;">eax</span>
+&#9474;  &#9550; &#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0xaf</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8b</span> <span style="color: #88ca9f;">45</span> d8                 <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - s]
+&#9474;  &#9550; &#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0xb3</span>                     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">01</span> d0                    <span style="color: #feacd0;">add</span>   <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rdx</span>
+&#9474;  &#9550; &#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0xb6</span>                     <span style="color: #88ca9f;">0f</span> b6 <span style="color: #88ca9f;">00</span>                    <span style="color: #feacd0;">movzx</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rax</span>]
+&#9474;  &#9550; &#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0xb9</span>                     <span style="color: #88ca9f;">84</span> c0                       <span style="color: #feacd0;">test</span>  <span style="color: #6ae4b9;">al</span>, <span style="color: #6ae4b9;">al</span>
+&#9474;  &#9492;&#9472;&#9472;&#9472;&#9472;&lt; fcn.00001185+<span style="color: #88ca9f;">0xbb</span>                     <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">85</span> <span style="color: #88ca9f;">7a</span> ff ff ff           <span style="color: #feacd0;">jne</span>   <span style="color: #88ca9f;">0x11c0</span>
+&#9474;    &#9550;&#9474;   fcn.00001185+<span style="color: #88ca9f;">0xc1</span>                     <span style="color: #88ca9f;">83</span> <span style="color: #88ca9f;">45</span> f4 <span style="color: #88ca9f;">01</span>                 <span style="color: #feacd0;">add</span>   <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">14h</span>], <span style="color: #88ca9f;">1</span>
+&#9474;    &#9550;&#9474;   <span style="color: #989898;">; </span><span style="color: #989898;">CODE XREF from fcn.00001185 @ 0x11b2</span>
+&#9474;    &#9550;&#9492;&#9472;&gt; fcn.00001185+<span style="color: #88ca9f;">0xc5</span>                     <span style="color: #88ca9f;">83</span> <span style="color: #88ca9f;">7d</span> f4 <span style="color: #88ca9f;">04</span>                 <span style="color: #feacd0;">cmp</span>   <span style="color: #79a8ff;">dword</span> [<span style="color: #6ae4b9;">rbp</span> - var_<span style="color: #88ca9f;">14h</span>], <span style="color: #88ca9f;">4</span>
+&#9474;    &#9492;&#9472;&#9472;&lt; fcn.00001185+<span style="color: #88ca9f;">0xc9</span>                     <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">8e</span> <span style="color: #88ca9f;">63</span> ff ff ff           <span style="color: #feacd0;">jle</span>   <span style="color: #88ca9f;">0x11b7</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0xcf</span>                     <span style="color: #88ca9f;">90</span>                          <span style="color: #feacd0;">nop</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0xd0</span>                     <span style="color: #88ca9f;">90</span>                          <span style="color: #feacd0;">nop</span>
+&#9474;         fcn.00001185+<span style="color: #88ca9f;">0xd1</span>                     c9                          <span style="color: #feacd0;">leave</span>
+&#9492;         fcn.00001185+<span style="color: #88ca9f;">0xd2</span>                     c3                          <span style="color: #feacd0;">ret</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org67c9a65" class="outline-2">
+<h2 id="org67c9a65"><span class="section-number-2">5.</span> Decompiling with ghidra</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+TODO
+</p>
+</div>
+</div>
 </div>
 </body>
 </html>
