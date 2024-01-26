@@ -166,20 +166,33 @@ TODO: (pdf @ data.00001409) Doesn't recognize it as a function, you have to use
 *Note:* I renamed this function to "main" with =f+ main 0x9c @ data.00001409=.
 #+end_quote
 
-In here, we can see that it matches the pattern we saw when running the program:
+In here, we can see that it matches the pattern we saw when running the program.
+From =main+0x8= to =main+0x17=, it calls =printf("Username: ")=, and from =main+0x1c= to
+=main+0x35= it uses =scanf("%255s", user)= to read the user, where /user/ is at
+address =0x4060=.
 
-| Address range    | Description       |
-|------------------+-------------------|
-| =main= to =main+0x4= | Store stack frame |
-| TODO             |                   |
+Similarly, from =main+0x3a= to =main+0x49= it calls =printf("Key: ")=, but instead of
+calling =scanf()=, from =main+0x4e= to =main+0x58= it calls an unknown function at
+=0x12a7= with =0x4160= as argument. We can safely asume that it scans for the user
+key, so we will rename the function to =get_key()=, and the parameter =user_key=.
 
-This is obviously an ideal enviroment, since the main function is the one
+From =main+0x5d= to =main+0x71=, it calls an unknown function at =0x1185= with the
+=user= we got from =scanf()= and =0x4180= as arguments. This looks very promising,
+since it will compare this =0x4180= value with =user_key= right bellow. For this
+reason, we will call this function =generate_key()= and the second parameter at
+=0x4180=, =real_key=.
+
+From =main+0x76= to =main+0xbd= it calls =memcmp(user_key, real_key, 0x14)= and prints
+"Correct key." or "Invalid key." depending on the returned value by =memcmp=. From
+this call we also know that the key size should be 0x14 (20).
+
+This is obviously an ideal environment, since the main function is the one
 responsible for validating the key. Since this is not normally the case, we
 could try to look for those success and fail messages in the program's string
 list, and checking the xrefs to find the key validation function. In this
-specific program, we could also just patch the bytes responsible for the
-conditional jump, so it always jumps to the code that gets executed when the key
-is correct.
+specific program, we could also just patch the bytes to either show us the real
+key, or change the conditional jump so it always jumps to the code that gets
+executed when the key is correct.
 
 * Disassembling the key generator
 
