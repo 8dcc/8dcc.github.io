@@ -1,4 +1,4 @@
-#+TITLE: Signature scanning
+#+TITLE: Signature scanning in C
 #+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
@@ -172,7 +172,7 @@ uint8_t hex_to_byte(const char* hex) {
 }
 #+end_src
 
-** =sigscan= function
+** The =sigscan= function
 
 And with that, we can make our =sigscan= function:
 
