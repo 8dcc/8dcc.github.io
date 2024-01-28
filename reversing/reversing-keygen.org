@@ -48,7 +48,7 @@ references, emulation and apply signatures".
 
 #+begin_src nasm
 $ rizin ./my_keygen
-[0x000010a0]> aaa
+[0x00001090]> aaa
 [x] Analyze all flags starting with sym. and entry0 (aa)
 [x] Analyze function calls
 [x] Analyze len bytes of instructions for references
@@ -61,31 +61,31 @@ $ rizin ./my_keygen
 [x] Use -AA or aaaa to perform additional experimental analysis.
 #+end_src
 
-We can list the symbols (flags) with =fl=. In this case, rizin couldn't find the
-=main= function.
+We can list the symbols (flags) with =fl=.
 
 #+begin_quote
 *Note:* With =command~text=, we can filter rizin's output.
 #+end_quote
 
 #+begin_src nasm
-[0x000010a0]> fl~main
-0x00003fc0 8 reloc.__libc_start_main
-0x00004080 8 reloc.target.__libc_start_main
+[0x00001090]> fl~main
+0x0000140d 201 main
+0x00003fc0 8 __libc_start_main
+0x000041d0 8 __libc_start_main
 #+end_src
 
-This is not a problem, though, since we can just print the entry point of the
-program with =pdf= (print disassembly of function) to determine where our main
-function is.
+Normally, rizin is able to find the =main= function. If this was not the case, we
+would have to look at the address being loaded into =rdi= from =entry0=. To print
+the disassembly of =entry0=, we can use the =pdf= command.
 
 #+begin_quote
-*Note:* Using =command@location= executes the command at that position. In this
-case, rizin has placed us into =entry0= already, so this is not necessary. We
+*Note:* Using =command@location= executes the command at the specified position. In
+this case, rizin has placed us into =entry0= already, so this is not necessary. We
 could also use =s location= (seek) and then =command=.
 #+end_quote
 
 #+begin_src nasm
-[0x000010a0]> pdf @ entry0
+[0x00001090]> pdf @ entry0
 │         entry0                      ;-- section..text:
 ┌         entry0                     entry0(int64_t arg3);
 │         entry0                     ; arg int64_t arg3 @ rdx
@@ -98,77 +98,76 @@ could also use =s location= (seek) and then =command=.
 │         entry0+0xe                      54                          push  rsp
 │         entry0+0xf                      45 31 c0                    xor   r8d, r8d
 │         entry0+0x12                     31 c9                       xor   ecx, ecx
-│         entry0+0x14                     48 8d 3d 4e 03 00 00        lea   rdi, data.00001409      ; 0x1409
-└         entry0+0x1b                     ff 15 ff 2e 00 00           call  qword reloc.__libc_start_main ; [reloc.__libc_start_main:8]=0x4080 reloc.target.__libc_start_main
-[0x000010a0]>
+│         entry0+0x14                     48 8d 3d 4e 03 00 00        lea   rdi, data.0000140d      ; 0x140d
+└         entry0+0x1f                     ff 15 0b 2f 00 00           call  qword [rip + __libc_start_main] ; [reloc.__libc_start_main:8]=0x41d0 reloc.target.__libc_start_main
 #+end_src
+
+The address being loaded into =rdi= at =entry0+0x14= should be our main function
+(=0x140d=).  Then, you could rename the function to "main" with
+=f+ main 0xc8 @ 0x140d=.
 
 ** Disassembling the main function
 
-The address being loaded into =rdi= at =entry0+0x14= should be our main function. Let's have a look.
-
-#+begin_comment
-TODO: (pdf @ data.00001409) Doesn't recognize it as a function, you have to use
-      (pd 100 @ data.00001409) instead.
-#+end_comment
-
-#+begin_src nasm
-[0x000010a0]> pd 60 @ data.00001409
-          ; DATA XREF from entry0 @ 0x10b4
-          main                      ;-- data.00001409:
-          main                      ;-- main:
-          main                          55                          push  rbp
-          main+0x1                      48 89 e5                    mov   rbp, rsp
-          main+0x4                      48 83 ec 10                 sub   rsp, 0x10
-          main+0x8                      48 8d 05 f1 0b 00 00        lea   rax, str.Username:        ; 0x2009 ; "Username: "
-          main+0xf                      48 89 c7                    mov   rdi, rax
-          main+0x12                     b8 00 00 00 00              mov   eax, 0
-          main+0x17                     e8 3b fc ff ff              call  sym.imp.printf            ; sym.imp.printf ; int printf(const char *format)
-          main+0x1c                     48 8d 05 34 2c 00 00        lea   rax, [0x00004060]
-          main+0x23                     48 89 c6                    mov   rsi, rax
-          main+0x26                     48 8d 05 de 0b 00 00        lea   rax, str.255s             ; 0x2014 ; "%255s"
-          main+0x2d                     48 89 c7                    mov   rdi, rax
-          main+0x30                     b8 00 00 00 00              mov   eax, 0
-          main+0x35                     e8 3d fc ff ff              call  sym.imp.__isoc99_scanf    ; sym.imp.__isoc99_scanf ; int scanf(const char *format)
-          main+0x3a                     48 8d 05 d0 0b 00 00        lea   rax, str.Key:             ; 0x201a ; "Key: "
-          main+0x41                     48 89 c7                    mov   rdi, rax
-          main+0x44                     b8 00 00 00 00              mov   eax, 0
-          main+0x49                     e8 09 fc ff ff              call  sym.imp.printf            ; sym.imp.printf ; int printf(const char *format)
-          main+0x4e                     48 8d 05 02 2d 00 00        lea   rax, [0x00004160]
-          main+0x55                     48 89 c7                    mov   rdi, rax
-          main+0x58                     e8 41 fe ff ff              call  fcn.000012a7              ; fcn.000012a7
-          main+0x5d                     48 8d 05 13 2d 00 00        lea   rax, [0x00004180]
-          main+0x64                     48 89 c6                    mov   rsi, rax
-          main+0x67                     48 8d 05 e9 2b 00 00        lea   rax, [0x00004060]
-          main+0x6e                     48 89 c7                    mov   rdi, rax
-          main+0x71                     e8 06 fd ff ff              call  fcn.00001185              ; fcn.00001185
-          main+0x76                     ba 14 00 00 00              mov   edx, 0x14
-          main+0x7b                     48 8d 05 f5 2c 00 00        lea   rax, [0x00004180]
-          main+0x82                     48 89 c6                    mov   rsi, rax
-          main+0x85                     48 8d 05 cb 2c 00 00        lea   rax, [0x00004160]
-          main+0x8c                     48 89 c7                    mov   rdi, rax
-          main+0x8f                     e8 d3 fb ff ff              call  sym.imp.memcmp            ; sym.imp.memcmp ; int memcmp(const void *s1, const void *s2, size_t n)
-          main+0x94                     85 c0                       test  eax, eax
-          main+0x96                     0f 94 c0                    sete  al
-          main+0x99                     88 45 ff                    mov   byte [rbp - 1], al
-          main+0x9c                     80 7d ff 00                 cmp   byte [rbp - 1], 0
-      ┌─< main+0xa0                     74 11                       je    0x14bc
-      │   main+0xa2                     48 8d 05 6e 0b 00 00        lea   rax, str.Correct_key.     ; 0x2020 ; "Correct key."
-      │   main+0xa9                     48 89 c7                    mov   rdi, rax
-      │   main+0xac                     e8 76 fb ff ff              call  sym.imp.puts              ; sym.imp.puts ; int puts(const char *s)
-     ┌──< main+0xb1                     eb 0f                       jmp   0x14cb
-     │└─> main+0xb3                     48 8d 05 6a 0b 00 00        lea   rax, str.Invalid_key.     ; 0x202d ; "Invalid key."
-     │    main+0xba                     48 89 c7                    mov   rdi, rax
-     │    main+0xbd                     e8 65 fb ff ff              call  sym.imp.puts              ; sym.imp.puts ; int puts(const char *s)
-     │    ; CODE XREF from data.00001409 @ +0xb1
-     └──> main+0xc2                     b8 00 00 00 00              mov   eax, 0
-          main+0xc7                     c9                          leave
-          main+0xc8                     c3                          ret
-#+end_src
+Let's have a look at the disassembly of the main function.
 
 #+begin_quote
-*Note:* I renamed this function to "main" with =f+ main 0x9c @ data.00001409=.
+*Note:* If for some reason =main= is not recognized as a function, you would need to
+use =pd 100 @ location= instead, where 100 is the number of bytes to disassemble.
 #+end_quote
+
+#+begin_src nasm
+[0x00001090]> pdf @ main
+          ; DATA XREF from entry0 @ 0x10a8
+┌         main                     int main(int argc, char **argv, char **envp);
+│         main                     ; var uint64_t var_9h @ stack - 0x9
+│         main                          55                          push    rbp
+│         main+0x1                      48 89 e5                    mov     rbp, rsp
+│         main+0x4                      48 83 ec 10                 sub     rsp, 0x10
+│         main+0x8                      48 8d 05 f1 0b 00 00        lea     rax, [rip + str.Username:] ; 0x2009
+│         main+0xf                      48 89 c7                    mov     rdi, rax ; const char *format
+│         main+0x12                     b8 00 00 00 00              mov     eax, 0
+│         main+0x17                     e8 3b fc ff ff              call    printf ; sym.imp.printf ; int printf(const char *format)
+│         main+0x1c                     48 8d 05 34 2c 00 00        lea     rax, [rip + data.00004060] ; 0x4060
+│         main+0x23                     48 89 c6                    mov     rsi, rax
+│         main+0x26                     48 8d 05 de 0b 00 00        lea     rax, [rip + str.255s] ; 0x2014
+│         main+0x2d                     48 89 c7                    mov     rdi, rax ; const char *format
+│         main+0x30                     b8 00 00 00 00              mov     eax, 0
+│         main+0x35                     e8 3d fc ff ff              call    __isoc99_scanf ; sym.imp.__isoc99_scanf ; int scanf(const char *format)
+│         main+0x3a                     48 8d 05 d0 0b 00 00        lea     rax, [rip + str.Key:] ; 0x201a
+│         main+0x41                     48 89 c7                    mov     rdi, rax ; const char *format
+│         main+0x44                     b8 00 00 00 00              mov     eax, 0
+│         main+0x49                     e8 09 fc ff ff              call    printf ; sym.imp.printf ; int printf(const char *format)
+│         main+0x4e                     48 8d 05 02 2d 00 00        lea     rax, [rip + data.00004160] ; 0x4160
+│         main+0x55                     48 89 c7                    mov     rdi, rax ; int64_t arg1
+│         main+0x58                     e8 41 fe ff ff              call    fcn.000012a7 ; fcn.000012a7
+│         main+0x5d                     48 8d 05 13 2d 00 00        lea     rax, [rip + data.00004180] ; 0x4180
+│         main+0x64                     48 89 c6                    mov     rsi, rax ; int64_t arg2
+│         main+0x67                     48 8d 05 e9 2b 00 00        lea     rax, [rip + data.00004060] ; 0x4060
+│         main+0x6e                     48 89 c7                    mov     rdi, rax ; const char *arg1
+│         main+0x71                     e8 0a fd ff ff              call    fcn.00001189 ; fcn.00001189
+│         main+0x76                     ba 14 00 00 00              mov     edx, 0x14 ; size_t n
+│         main+0x7b                     48 8d 05 f5 2c 00 00        lea     rax, [rip + data.00004180] ; 0x4180
+│         main+0x82                     48 89 c6                    mov     rsi, rax ; const void *s2
+│         main+0x85                     48 8d 05 cb 2c 00 00        lea     rax, [rip + data.00004160] ; 0x4160
+│         main+0x8c                     48 89 c7                    mov     rdi, rax ; const void *s1
+│         main+0x8f                     e8 d3 fb ff ff              call    memcmp ; sym.imp.memcmp ; int memcmp(const void *s1, const void *s2, size_t n)
+│         main+0x94                     85 c0                       test    eax, eax
+│         main+0x96                     0f 94 c0                    sete    al
+│         main+0x99                     88 45 ff                    mov     byte [rbp - 1], al
+│         main+0x9c                     80 7d ff 00                 cmp     byte [rbp - 1], 0
+│     ┌─< main+0xa0                     74 11                       je      0x14bc
+│     │   main+0xa2                     48 8d 05 6e 0b 00 00        lea     rax, [rip + str.Correct_key.] ; 0x2020
+│     │   main+0xa9                     48 89 c7                    mov     rdi, rax ; const char *s
+│     │   main+0xac                     e8 76 fb ff ff              call    puts ; sym.imp.puts ; int puts(const char *s)
+│    ┌──< main+0xb1                     eb 0f                       jmp     0x14cb
+│    │└─> main+0xb3                     48 8d 05 6a 0b 00 00        lea     rax, [rip + str.Invalid_key.] ; 0x202d
+│    │    main+0xba                     48 89 c7                    mov     rdi, rax ; const char *s
+│    │    main+0xbd                     e8 65 fb ff ff              call    puts ; sym.imp.puts ; int puts(const char *s)
+│    │    ; CODE XREF from main @ 0x14ba
+│    └──> main+0xc2                     b8 00 00 00 00              mov     eax, 0
+│         main+0xc7                     c9                          leave
+└         main+0xc8                     c3                          ret
+#+end_src
 
 In here, we can see that it matches the pattern we saw when running the program.
 From =main+0x8= to =main+0x17=, it calls =printf("Username: ")=, and from =main+0x1c= to
@@ -180,7 +179,7 @@ calling =scanf()=, from =main+0x4e= to =main+0x58= it calls an unknown function 
 =0x12a7= with =0x4160= as argument. We can safely asume that it scans for the user
 key, so we will rename the function to =get_key()=, and the parameter =user_key=.
 
-From =main+0x5d= to =main+0x71=, it calls an unknown function at =0x1185= with the
+From =main+0x5d= to =main+0x71=, it calls an unknown function at =0x1189= with the
 =user= we got from =scanf()= and =0x4180= as arguments. This looks very promising,
 since it will compare this =0x4180= value with =user_key= right bellow. For this
 reason, we will call this function =generate_key()= and the second parameter at
@@ -201,90 +200,123 @@ executed when the key is correct.
 * Disassembling the key generator
 
 Now that we understand the main logic, let's have a look at the =generate_key()=
-function at =0x1185=.
+function at =0x1189=.
 
 #+begin_src nasm
-[0x000010a0]> pdf @ fcn.00001185
-          ; CALL XREF from data.00001409 @ +0x71
-│         fcn.00001185                      ;-- keygen:
-┌         fcn.00001185                     fcn.00001185(const char *arg1, int64_t arg2);
-│         fcn.00001185                     ; arg const char *arg1 @ rdi
-│         fcn.00001185                     ; arg int64_t arg2 @ rsi
-│         fcn.00001185                     ; var int64_t var_38h @ stack - 0x38
-│         fcn.00001185                     ; var const char *s @ stack - 0x30
-│         fcn.00001185                     ; var int64_t var_19h @ stack - 0x19
-│         fcn.00001185                     ; var int64_t var_18h @ stack - 0x18
-│         fcn.00001185                     ; var int64_t var_14h @ stack - 0x14
-│         fcn.00001185                     ; var int64_t var_10h @ stack - 0x10
-│         fcn.00001185                     ; var size_t var_ch @ stack - 0xc
-│         fcn.00001185                          55                          push  rbp
-│         fcn.00001185+0x1                      48 89 e5                    mov   rbp, rsp
-│         fcn.00001185+0x4                      48 83 ec 30                 sub   rsp, 0x30
-│         fcn.00001185+0x8                      48 89 7d d8                 mov   qword [rbp - s], rdi ; arg1
-│         fcn.00001185+0xc                      48 89 75 d0                 mov   qword [rbp - var_38h], rsi ; arg2
-│         fcn.00001185+0x10                     48 8b 45 d8                 mov   rax, qword [rbp - s]
-│         fcn.00001185+0x14                     48 89 c7                    mov   rdi, rax          ; const char *s
-│         fcn.00001185+0x17                     e8 9f fe ff ff              call  sym.imp.strlen    ; sym.imp.strlen ; size_t strlen(const char *s)
-│         fcn.00001185+0x1c                     89 45 fc                    mov   dword [rbp - var_ch], eax
-│         fcn.00001185+0x1f                     c7 45 f0 00 00 00 00        mov   dword [rbp - var_18h], 0
-│         fcn.00001185+0x26                     c7 45 f4 00 00 00 00        mov   dword [rbp - var_14h], 0
-│     ┌─< fcn.00001185+0x2d                     e9 93 00 00 00              jmp   0x124a
-│    ┌──> fcn.00001185+0x32                     c7 45 f8 00 00 00 00        mov   dword [rbp - var_10h], 0
-│   ┌───< fcn.00001185+0x39                     eb 6e                       jmp   0x122e
-│  ┌────> fcn.00001185+0x3b                     8b 45 f8                    mov   eax, dword [rbp - var_10h]
-│  ╎│╎│   fcn.00001185+0x3e                     48 63 d0                    movsxd rdx, eax
-│  ╎│╎│   fcn.00001185+0x41                     48 8b 45 d8                 mov   rax, qword [rbp - s]
-│  ╎│╎│   fcn.00001185+0x45                     48 01 d0                    add   rax, rdx
-│  ╎│╎│   fcn.00001185+0x48                     0f b6 00                    movzx eax, byte [rax]
-│  ╎│╎│   fcn.00001185+0x4b                     88 45 ef                    mov   byte [rbp - var_19h], al
-│  ╎│╎│   fcn.00001185+0x4e                     0f b6 45 ef                 movzx eax, byte [rbp - var_19h]
-│  ╎│╎│   fcn.00001185+0x52                     c1 e0 04                    shl   eax, 4
-│  ╎│╎│   fcn.00001185+0x55                     89 c2                       mov   edx, eax
-│  ╎│╎│   fcn.00001185+0x57                     0f b6 45 ef                 movzx eax, byte [rbp - var_19h]
-│  ╎│╎│   fcn.00001185+0x5b                     c0 e8 04                    shr   al, 4
-│  ╎│╎│   fcn.00001185+0x5e                     09 d0                       or    eax, edx
-│  ╎│╎│   fcn.00001185+0x60                     88 45 ef                    mov   byte [rbp - var_19h], al
-│  ╎│╎│   fcn.00001185+0x63                     8b 45 f4                    mov   eax, dword [rbp - var_14h]
-│  ╎│╎│   fcn.00001185+0x66                     89 c2                       mov   edx, eax
-│  ╎│╎│   fcn.00001185+0x68                     0f b6 45 ef                 movzx eax, byte [rbp - var_19h]
-│  ╎│╎│   fcn.00001185+0x6c                     31 d0                       xor   eax, edx
-│  ╎│╎│   fcn.00001185+0x6e                     88 45 ef                    mov   byte [rbp - var_19h], al
-│  ╎│╎│   fcn.00001185+0x71                     8b 45 fc                    mov   eax, dword [rbp - var_ch]
-│  ╎│╎│   fcn.00001185+0x74                     89 c2                       mov   edx, eax
-│  ╎│╎│   fcn.00001185+0x76                     0f b6 45 ef                 movzx eax, byte [rbp - var_19h]
-│  ╎│╎│   fcn.00001185+0x7a                     31 d0                       xor   eax, edx
-│  ╎│╎│   fcn.00001185+0x7c                     88 45 ef                    mov   byte [rbp - var_19h], al
-│  ╎│╎│   fcn.00001185+0x7f                     8b 45 f0                    mov   eax, dword [rbp - var_18h]
-│  ╎│╎│   fcn.00001185+0x82                     8d 50 01                    lea   edx, [rax + 1]
-│  ╎│╎│   fcn.00001185+0x85                     89 55 f0                    mov   dword [rbp - var_18h], edx
-│  ╎│╎│   fcn.00001185+0x88                     48 63 d0                    movsxd rdx, eax
-│  ╎│╎│   fcn.00001185+0x8b                     48 8b 45 d0                 mov   rax, qword [rbp - var_38h]
-│  ╎│╎│   fcn.00001185+0x8f                     48 01 c2                    add   rdx, rax
-│  ╎│╎│   fcn.00001185+0x92                     0f b6 45 ef                 movzx eax, byte [rbp - var_19h]
-│  ╎│╎│   fcn.00001185+0x96                     88 02                       mov   byte [rdx], al
-│  ╎│╎│   fcn.00001185+0x98                     83 7d f0 13                 cmp   dword [rbp - var_18h], 0x13
-│ ┌─────< fcn.00001185+0x9c                     7e 07                       jle   0x122a
-│ │╎│╎│   fcn.00001185+0x9e                     c7 45 f0 00 00 00 00        mov   dword [rbp - var_18h], 0
-│ └─────> fcn.00001185+0xa5                     83 45 f8 01                 add   dword [rbp - var_10h], 1
-│  ╎│╎│   ; CODE XREF from fcn.00001185 @ 0x11be
-│  ╎└───> fcn.00001185+0xa9                     8b 45 f8                    mov   eax, dword [rbp - var_10h]
-│  ╎ ╎│   fcn.00001185+0xac                     48 63 d0                    movsxd rdx, eax
-│  ╎ ╎│   fcn.00001185+0xaf                     48 8b 45 d8                 mov   rax, qword [rbp - s]
-│  ╎ ╎│   fcn.00001185+0xb3                     48 01 d0                    add   rax, rdx
-│  ╎ ╎│   fcn.00001185+0xb6                     0f b6 00                    movzx eax, byte [rax]
-│  ╎ ╎│   fcn.00001185+0xb9                     84 c0                       test  al, al
-│  └────< fcn.00001185+0xbb                     0f 85 7a ff ff ff           jne   0x11c0
-│    ╎│   fcn.00001185+0xc1                     83 45 f4 01                 add   dword [rbp - var_14h], 1
-│    ╎│   ; CODE XREF from fcn.00001185 @ 0x11b2
-│    ╎└─> fcn.00001185+0xc5                     83 7d f4 04                 cmp   dword [rbp - var_14h], 4
-│    └──< fcn.00001185+0xc9                     0f 8e 63 ff ff ff           jle   0x11b7
-│         fcn.00001185+0xcf                     90                          nop
-│         fcn.00001185+0xd0                     90                          nop
-│         fcn.00001185+0xd1                     c9                          leave
-└         fcn.00001185+0xd2                     c3                          ret
+[0x00001090]> pdf @ fcn.00001189
+          ; CALL XREF from main @ 0x147a
+┌         fcn.00001189                     fcn.00001189(const char *arg1, int64_t arg2);
+│         fcn.00001189                     ; arg const char *arg1 @ rdi
+│         fcn.00001189                     ; arg int64_t arg2 @ rsi
+│         fcn.00001189                     ; var int64_t var_28h @ stack - 0x28
+│         fcn.00001189                     ; var const char *s @ stack - 0x20
+│         fcn.00001189                     ; var int64_t var_15h @ stack - 0x15
+│         fcn.00001189                     ; var int64_t var_14h @ stack - 0x14
+│         fcn.00001189                     ; var int64_t var_10h @ stack - 0x10
+│         fcn.00001189                     ; var int64_t var_ch @ stack - 0xc
+│         fcn.00001189                          55                          push    rbp
+│         fcn.00001189+0x1                      48 89 e5                    mov     rbp, rsp
+│         fcn.00001189+0x4                      48 83 ec 20                 sub     rsp, 0x20
+│         fcn.00001189+0x8                      48 89 7d e8                 mov     qword [rbp - 0x18], rdi ; arg1
+│         fcn.00001189+0xc                      48 89 75 e0                 mov     qword [rbp - 0x20], rsi ; arg2
+│         fcn.00001189+0x10                     48 8b 45 e8                 mov     rax, qword [rbp - 0x18]
+│         fcn.00001189+0x14                     48 89 c7                    mov     rdi, rax ; const char *s
+│         fcn.00001189+0x17                     e8 9b fe ff ff              call    strlen ; sym.imp.strlen ; size_t strlen(const char *s)
+│         fcn.00001189+0x1c                     89 45 fc                    mov     dword [rbp - 4], eax
+│         fcn.00001189+0x1f                     c7 45 f4 00 00 00 00        mov     dword [rbp - 0xc], 0
+│         fcn.00001189+0x26                     c7 45 f8 00 00 00 00        mov     dword [rbp - 8], 0
+│     ┌─< fcn.00001189+0x2d                     e9 8f 00 00 00              jmp     0x124a
+│    ┌──> fcn.00001189+0x32                     8b 45 f4                    mov     eax, dword [rbp - 0xc]
+│    ╎│   fcn.00001189+0x35                     48 63 d0                    movsxd  rdx, eax
+│    ╎│   fcn.00001189+0x38                     48 8b 45 e8                 mov     rax, qword [rbp - 0x18]
+│    ╎│   fcn.00001189+0x3c                     48 01 d0                    add     rax, rdx
+│    ╎│   fcn.00001189+0x3f                     0f b6 00                    movzx   eax, byte [rax]
+│    ╎│   fcn.00001189+0x42                     88 45 f3                    mov     byte [rbp - 0xd], al
+│    ╎│   fcn.00001189+0x45                     0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
+│    ╎│   fcn.00001189+0x49                     c1 e0 04                    shl     eax, 4
+│    ╎│   fcn.00001189+0x4c                     89 c2                       mov     edx, eax
+│    ╎│   fcn.00001189+0x4e                     0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
+│    ╎│   fcn.00001189+0x52                     c0 e8 04                    shr     al, 4
+│    ╎│   fcn.00001189+0x55                     09 d0                       or      eax, edx
+│    ╎│   fcn.00001189+0x57                     88 45 f3                    mov     byte [rbp - 0xd], al
+│    ╎│   fcn.00001189+0x5a                     8b 45 f8                    mov     eax, dword [rbp - 8]
+│    ╎│   fcn.00001189+0x5d                     0f af 45 f4                 imul    eax, dword [rbp - 0xc]
+│    ╎│   fcn.00001189+0x61                     48 63 d0                    movsxd  rdx, eax
+│    ╎│   fcn.00001189+0x64                     48 69 d2 81 80 80 80        imul    rdx, rdx, 0xffffffff80808081
+│    ╎│   fcn.00001189+0x6b                     48 c1 ea 20                 shr     rdx, 0x20
+│    ╎│   fcn.00001189+0x6f                     01 c2                       add     edx, eax
+│    ╎│   fcn.00001189+0x71                     89 d1                       mov     ecx, edx
+│    ╎│   fcn.00001189+0x73                     c1 f9 07                    sar     ecx, 7
+│    ╎│   fcn.00001189+0x76                     99                          cdq
+│    ╎│   fcn.00001189+0x77                     29 d1                       sub     ecx, edx
+│    ╎│   fcn.00001189+0x79                     89 ca                       mov     edx, ecx
+│    ╎│   fcn.00001189+0x7b                     c1 e2 08                    shl     edx, 8
+│    ╎│   fcn.00001189+0x7e                     29 ca                       sub     edx, ecx
+│    ╎│   fcn.00001189+0x80                     29 d0                       sub     eax, edx
+│    ╎│   fcn.00001189+0x82                     89 c1                       mov     ecx, eax
+│    ╎│   fcn.00001189+0x84                     89 c8                       mov     eax, ecx
+│    ╎│   fcn.00001189+0x86                     00 45 f3                    add     byte [rbp - 0xd], al
+│    ╎│   fcn.00001189+0x89                     8b 45 fc                    mov     eax, dword [rbp - 4]
+│    ╎│   fcn.00001189+0x8c                     89 c2                       mov     edx, eax
+│    ╎│   fcn.00001189+0x8e                     0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
+│    ╎│   fcn.00001189+0x92                     31 d0                       xor     eax, edx
+│    ╎│   fcn.00001189+0x94                     88 45 f3                    mov     byte [rbp - 0xd], al
+│    ╎│   fcn.00001189+0x97                     8b 45 f8                    mov     eax, dword [rbp - 8]
+│    ╎│   fcn.00001189+0x9a                     48 63 d0                    movsxd  rdx, eax
+│    ╎│   fcn.00001189+0x9d                     48 8b 45 e0                 mov     rax, qword [rbp - 0x20]
+│    ╎│   fcn.00001189+0xa1                     48 01 c2                    add     rdx, rax
+│    ╎│   fcn.00001189+0xa4                     0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
+│    ╎│   fcn.00001189+0xa8                     88 02                       mov     byte [rdx], al
+│    ╎│   fcn.00001189+0xaa                     83 45 f4 01                 add     dword [rbp - 0xc], 1
+│    ╎│   fcn.00001189+0xae                     8b 45 f4                    mov     eax, dword [rbp - 0xc]
+│    ╎│   fcn.00001189+0xb1                     3b 45 fc                    cmp     eax, dword [rbp - 4]
+│   ┌───< fcn.00001189+0xb4                     7c 07                       jl      0x1246
+│   │╎│   fcn.00001189+0xb6                     c7 45 f4 00 00 00 00        mov     dword [rbp - 0xc], 0
+│   └───> fcn.00001189+0xbd                     83 45 f8 01                 add     dword [rbp - 8], 1
+│    ╎│   ; CODE XREF from fcn.00001189 @ 0x11b6
+│    ╎└─> fcn.00001189+0xc1                     83 7d f8 13                 cmp     dword [rbp - 8], 0x13
+│    └──< fcn.00001189+0xc5                     0f 8e 67 ff ff ff           jle     0x11bb
+│         fcn.00001189+0xcb                     90                          nop
+│         fcn.00001189+0xcc                     90                          nop
+│         fcn.00001189+0xcd                     c9                          leave
+└         fcn.00001189+0xce                     c3                          ret
 #+end_src
 
-TODO
+Since we saw how it was called, we can determine the number of parameters and
+the types. We also know that the first argument is the user, and that it's
+calculating the string length once at =f+0x17=.
+
+We also know that the second parameter is a =char*= because we store =rsi= in
+=[rbp - 0x20]=, and from =f+0x9d= to =f+0xa8= we move that value to =rax=, we add =rdx=
+(probably using it as index) and finally we access its contents with =byte [rdx]=.
+
+We can also identify a =for= loop, since at =f+0x26= we set =[rbp - 8]= to 0, right
+before jumping to =f+0xc1=, where we check if this value is less or equal than
+=0x13= (19) and jump back to the top. Right before this conditional jump, we can
+see that the value at =[rbp - 8]= is increased by one.
+
+We see some local variable being initialized at 0 in =f+0x1f=, that will be
+incremented by one in =f+0xaa=, and if it's greater or equal to the user length,
+it will set it to 0 (=f+0xb6=). We can determine that this is some kind of index
+being used for the =user= string, that will be incremented each iteration unless
+it's out of bounds, in which case it will be set back to 0.
+
+From this, we can identify a basic structure:
+
+#+begin_src C
+void func(const char* user, const char* real_key) {
+    int user_len = strlen(user);    // [rbp - 4]
+    int user_pos = 0;               // [rbp - 0xc]
+
+    for (int i = 0; i < 20; i++) {
+        // TODO
+
+        user_pos++;
+        if (user_pos >= user_len)
+            user_pos = 0;
+    }
+}
+#+end_src
 
 * Alternative: Decompiling with IDA or ghidra
 
@@ -311,28 +343,20 @@ This is the generated C code by /IDA Pro Version 7.7.220118 Windows x64/ (/x64
 Decompiler Hex-Rays SA 7.7.0.220118/).
 
 #+begin_src C
-size_t /* __fastcall */ sub_1185(const char* a1, __int64 a2) {
+size_t /* __fastcall */ sub_1189(const char* a1, __int64 a2) {
     size_t result;    // rax
-    int v3;           // eax
-    int v4;           // [rsp+20h] [rbp-10h]
-    int i;            // [rsp+24h] [rbp-Ch]
-    int j;            // [rsp+28h] [rbp-8h]
-    char v7;          // [rsp+2Ch] [rbp-4h]
+    int v3;           // [rsp+14h] [rbp-Ch]
+    int i;            // [rsp+18h] [rbp-8h]
+    int v5;           // [rsp+1Ch] [rbp-4h]
 
     result = strlen(a1);
-    v7     = result;
-    v4     = 0;
-    for (i = 0; i <= 4; ++i) {
-        for (j = 0;; ++j) {
-            result = a1[j];
-            if (!result)
-                break;
-
-            v3 = v4++;
-            , *(a2 + v3) = v7 ^ i ^ ((16 * a1[j]) | (a1[j] >> 4));
-            if (v4 > 19)
-                v4 = 0;
-        }
+    v5     = result;
+    v3     = 0;
+    for (i = 0; i <= 19; ++i) {
+        *(a2 + i) = v5 ^ (v3 * i % 255 + ((16 * a1[v3]) | (a1[v3] >> 4)));
+        result    = ++v3;
+        if (v3 >= v5)
+            v3 = 0;
     }
 
     return result;
@@ -348,31 +372,27 @@ This is the generated C code by /rizin 0.6.1 @ linux-x86-64/.
 
 // WARNING: Variable defined which should be unmapped: var_ch
 // WARNING: Could not reconcile some variable overlaps
-// WARNING: [rz-ghidra] Detected overlap for variable var_14h
 // WARNING: [rz-ghidra] Detected overlap for variable var_10h
-// WARNING: [rz-ghidra] Detected overlap for variable var_19h
+// WARNING: [rz-ghidra] Detected overlap for variable var_15h
 
-void fcn .00001189(char* arg1, int64_t arg2) {
+void fcn.00001189(char* arg1, int64_t arg2) {
     int32_t iVar1;
-    uint8_t uVar2;
-    int64_t var_38h;
+    int64_t var_28h;
     char* s;
-    int64_t var_18h;
-    int32_t var_10h;
-    size_t var_ch;
+    int64_t var_14h;
+    int64_t var_ch;
 
-    uVar2         = sym.imp.strlen(arg1);
-    var_18h._0_4_ = 0;
-    for (var_18h._4_4_ = 0; var_18h._4_4_ < 5;
-         var_18h._4_4_ = var_18h._4_4_ + 1) {
-        for (var_10h = 0; arg1[var_10h] != '\0'; var_10h = var_10h + 1) {
-            iVar1 = var_18h + 1;
-            *(var_18h + arg2) =
-              (arg1[var_10h] >> 4 | arg1[var_10h] << 4) ^ var_18h._4_4_ ^ uVar2;
-            var_18h._0_4_ = iVar1;
-            if (0x13 < iVar1) {
-                var_18h._0_4_ = 0;
-            }
+    iVar1         = strlen(arg1);
+    var_14h._0_4_ = 0;
+    for (var_14h._4_4_ = 0; var_14h._4_4_ < 0x14;
+         var_14h._4_4_ = var_14h._4_4_ + 1) {
+        *(var_14h._4_4_ + arg2) = (arg1[var_14h] >> 4 | arg1[var_14h] << 4) +
+                                    (var_14h._4_4_ * var_14h) +
+                                    ((var_14h._4_4_ * var_14h) / 0xff) ^
+                                  iVar1;
+        var_14h._0_4_ = var_14h + 1;
+        if (iVar1 <= var_14h) {
+            var_14h._0_4_ = 0;
         }
     }
     return;
