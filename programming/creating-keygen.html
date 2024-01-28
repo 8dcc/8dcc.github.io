@@ -207,27 +207,27 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgf724675">1. What is a keygen?</a>
+<li><a href="#org01e0103">1. What is a keygen?</a>
 <ul>
-<li><a href="#orgb7f802c">1.1. Types of license keys</a></li>
+<li><a href="#org22a1d8c">1.1. Types of license keys</a></li>
 </ul>
 </li>
-<li><a href="#org6d475fe">2. Things to avoid when making the function</a>
+<li><a href="#org8edf0e9">2. Things to avoid when making the function</a>
 <ul>
-<li><a href="#org12d8c97">2.1. Generating similar keys for similar users</a></li>
-<li><a href="#orgb70a268">2.2. Making the user and the key lengths proportional</a></li>
-<li><a href="#org3265ba9">2.3. Collisions</a></li>
+<li><a href="#orgbf912fc">2.1. Generating similar keys for similar users</a></li>
+<li><a href="#org7f436e7">2.2. Making the user and the key lengths proportional</a></li>
+<li><a href="#orgff6e1b9">2.3. Collisions</a></li>
 </ul>
 </li>
-<li><a href="#org7090669">3. The key generation function</a></li>
-<li><a href="#org86b00b1">4. Validating a user login</a></li>
-<li><a href="#org4d0aa64">5. Other resources</a></li>
+<li><a href="#org908eef8">3. The key generation function</a></li>
+<li><a href="#org0ede1eb">4. Validating a user login</a></li>
+<li><a href="#org1c69c72">5. Other resources</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgf724675" class="outline-2">
-<h2 id="orgf724675"><span class="section-number-2">1.</span> What is a keygen?</h2>
+<div id="outline-container-org01e0103" class="outline-2">
+<h2 id="org01e0103"><span class="section-number-2">1.</span> What is a keygen?</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 From Wikipedia:
@@ -257,8 +257,8 @@ advantages, but in our case we are going to validate them locally.
 </p>
 </div>
 
-<div id="outline-container-orgb7f802c" class="outline-3">
-<h3 id="orgb7f802c"><span class="section-number-3">1.1.</span> Types of license keys</h3>
+<div id="outline-container-org22a1d8c" class="outline-3">
+<h3 id="org22a1d8c"><span class="section-number-3">1.1.</span> Types of license keys</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 First of all, I am not an expert on this area, so feel free to <a href="https://github.com/8dcc/8dcc.github.io">contribute</a> to
@@ -309,8 +309,8 @@ validate an input key from the user.
 </div>
 </div>
 
-<div id="outline-container-org6d475fe" class="outline-2">
-<h2 id="org6d475fe"><span class="section-number-2">2.</span> Things to avoid when making the function</h2>
+<div id="outline-container-org8edf0e9" class="outline-2">
+<h2 id="org8edf0e9"><span class="section-number-2">2.</span> Things to avoid when making the function</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 When generating a program like this, it's a good idea to asume that there is
@@ -323,8 +323,8 @@ Here are some things we should try to avoid when making the function.
 </p>
 </div>
 
-<div id="outline-container-org12d8c97" class="outline-3">
-<h3 id="org12d8c97"><span class="section-number-3">2.1.</span> Generating similar keys for similar users</h3>
+<div id="outline-container-orgbf912fc" class="outline-3">
+<h3 id="orgbf912fc"><span class="section-number-3">2.1.</span> Generating similar keys for similar users</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 Imagine our algorithm just turned each letter of the name to its position in the
@@ -346,15 +346,15 @@ easier to find.
 </div>
 </div>
 
-<div id="outline-container-orgb70a268" class="outline-3">
-<h3 id="orgb70a268"><span class="section-number-3">2.2.</span> Making the user and the key lengths proportional</h3>
+<div id="outline-container-org7f436e7" class="outline-3">
+<h3 id="org7f436e7"><span class="section-number-3">2.2.</span> Making the user and the key lengths proportional</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Imagine we had the algorithm from the last example. The user is also able to
 tell that the lengths of the strings are proportional, for example:
 </p>
 
-<pre class="example" id="orga7098b9">
+<pre class="example" id="orgad812d8">
 abcd  -&gt; 1234
 abcde -&gt; 12345
 ab    -&gt; 12
@@ -371,7 +371,7 @@ the user. Here are some examples on what to avoid, assuming our key length is
 9:
 </p>
 
-<pre class="example" id="orga62d1d3">
+<pre class="example" id="org71036a2">
 abcd       -&gt; 123400000 (Same as previous example)
 abcd       -&gt; 123412341 (Repetition is easy to tell)
 abcdefghij -&gt; 123456789 (Last character is ignored, produces same output as abcdefghi)
@@ -379,8 +379,8 @@ abcdefghij -&gt; 123456789 (Last character is ignored, produces same output as a
 </div>
 </div>
 
-<div id="outline-container-org3265ba9" class="outline-3">
-<h3 id="org3265ba9"><span class="section-number-3">2.3.</span> Collisions</h3>
+<div id="outline-container-orgff6e1b9" class="outline-3">
+<h3 id="orgff6e1b9"><span class="section-number-3">2.3.</span> Collisions</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 In cryptography, a <a href="https://en.wikipedia.org/wiki/Collision_resistance">collision</a> is produced when two different inputs produce the
@@ -396,8 +396,8 @@ be focusing on this too much on this article.
 </div>
 </div>
 
-<div id="outline-container-org7090669" class="outline-2">
-<h2 id="org7090669"><span class="section-number-2">3.</span> The key generation function</h2>
+<div id="outline-container-org908eef8" class="outline-2">
+<h2 id="org908eef8"><span class="section-number-2">3.</span> The key generation function</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 This is a simple keygen function I came up with, but it's far from perfect so
@@ -444,8 +444,8 @@ the <code>out</code> pointer.
             <span style="color: #989898;">/* </span><span style="color: #989898;">Swap every bit with the adjactent one</span><span style="color: #989898;"> */</span>
             c = ((c &amp; <span style="color: #88ca9f;">0x55555555</span>) &lt;&lt; <span style="color: #88ca9f;">1</span>) | ((c &amp; <span style="color: #88ca9f;">0xAAAAAAAA</span>) &gt;&gt; <span style="color: #88ca9f;">1</span>);
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">XOR by the previous char</span><span style="color: #989898;"> */</span>
-            c ^= (last_c * iter) &amp; <span style="color: #88ca9f;">0xFF</span>;
+            <span style="color: #989898;">/* </span><span style="color: #989898;">Also change depending on previous char and iteration</span><span style="color: #989898;"> */</span>
+            c ^= (last_c * iter) % <span style="color: #88ca9f;">0xFF</span>;
 
             <span style="color: #989898;">/* </span><span style="color: #989898;">Depending on the length of the input, change the output</span><span style="color: #989898;"> */</span>
             c ^= user_len &amp; <span style="color: #88ca9f;">0xFF</span>;
@@ -495,8 +495,8 @@ This is an example of a simple keygen program:
 </div>
 </div>
 
-<div id="outline-container-org86b00b1" class="outline-2">
-<h2 id="org86b00b1"><span class="section-number-2">4.</span> Validating a user login</h2>
+<div id="outline-container-org0ede1eb" class="outline-2">
+<h2 id="org0ede1eb"><span class="section-number-2">4.</span> Validating a user login</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 We could use the previous keygen program to generate a key for each user, and
@@ -607,8 +607,8 @@ loop, and store if they match.
 </div>
 </div>
 
-<div id="outline-container-org4d0aa64" class="outline-2">
-<h2 id="org4d0aa64"><span class="section-number-2">5.</span> Other resources</h2>
+<div id="outline-container-org1c69c72" class="outline-2">
+<h2 id="org1c69c72"><span class="section-number-2">5.</span> Other resources</h2>
 <div class="outline-text-2" id="text-5">
 <ul class="org-ul">
 <li><a href="https://en.wikipedia.org/wiki/Keygen">Keygen wikipedia page</a></li>
