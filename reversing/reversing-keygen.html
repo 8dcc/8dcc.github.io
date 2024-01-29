@@ -207,27 +207,27 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge521d7c">1. Introduction</a></li>
-<li><a href="#orge93f437">2. Trying out the program</a></li>
-<li><a href="#orga9dfd12">3. The main function</a>
+<li><a href="#org9bd02ad">1. Introduction</a></li>
+<li><a href="#org4eba455">2. Trying out the program</a></li>
+<li><a href="#org0bad061">3. The main function</a>
 <ul>
-<li><a href="#org624fdef">3.1. Finding the main function</a></li>
-<li><a href="#orge189686">3.2. Disassembling the main function</a></li>
+<li><a href="#org301a960">3.1. Finding the main function</a></li>
+<li><a href="#org63d1265">3.2. Disassembling the main function</a></li>
 </ul>
 </li>
-<li><a href="#org2d2c601">4. Disassembling the key generator</a></li>
-<li><a href="#org5336853">5. Alternative: Decompiling with IDA or ghidra</a>
+<li><a href="#orgf61a70f">4. Disassembling the key generator</a></li>
+<li><a href="#org3161867">5. Alternative: Decompiling with IDA or ghidra</a>
 <ul>
-<li><a href="#org91a430d">5.1. IDA Pro</a></li>
-<li><a href="#org297e056">5.2. Rizin's version of ghidra</a></li>
+<li><a href="#org72876f3">5.1. IDA Pro</a></li>
+<li><a href="#org6e8b3e5">5.2. Rizin's version of ghidra</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orge521d7c" class="outline-2">
-<h2 id="orge521d7c"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org9bd02ad" class="outline-2">
+<h2 id="org9bd02ad"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 I created a simple keygen program that takes a user and a key, and prints a
@@ -239,14 +239,14 @@ in case you are interested.
 </div>
 </div>
 
-<div id="outline-container-orge93f437" class="outline-2">
-<h2 id="orge93f437"><span class="section-number-2">2.</span> Trying out the program</h2>
+<div id="outline-container-org4eba455" class="outline-2">
+<h2 id="org4eba455"><span class="section-number-2">2.</span> Trying out the program</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First, let's try running the program to see what it's asking.
 </p>
 
-<pre class="example" id="org6463d77">
+<pre class="example" id="org6a8d503">
 Username: test
 Key: test
 Invalid key.
@@ -266,8 +266,8 @@ From this, we can at least expect:
 </div>
 </div>
 
-<div id="outline-container-orga9dfd12" class="outline-2">
-<h2 id="orga9dfd12"><span class="section-number-2">3.</span> The main function</h2>
+<div id="outline-container-org0bad061" class="outline-2">
+<h2 id="org0bad061"><span class="section-number-2">3.</span> The main function</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Let's start by having a look at the main function with <a href="https://rizin.re/">rizin</a> 0.6.3 (you can also
@@ -275,8 +275,8 @@ use <a href="https://cutter.re">cutter</a> or <a href="https://hex-rays.com/ida-
 </p>
 </div>
 
-<div id="outline-container-org624fdef" class="outline-3">
-<h3 id="org624fdef"><span class="section-number-3">3.1.</span> Finding the main function</h3>
+<div id="outline-container-org301a960" class="outline-3">
+<h3 id="org301a960"><span class="section-number-3">3.1.</span> Finding the main function</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 We start by running the <code>aaa</code> rizin command, which is used to "Analyze all calls,
@@ -358,8 +358,8 @@ The address being loaded into <code>rdi</code> at <code>entry0+0x14</code> shoul
 </div>
 </div>
 
-<div id="outline-container-orge189686" class="outline-3">
-<h3 id="orge189686"><span class="section-number-3">3.2.</span> Disassembling the main function</h3>
+<div id="outline-container-org63d1265" class="outline-3">
+<h3 id="org63d1265"><span class="section-number-3">3.2.</span> Disassembling the main function</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Let's have a look at the disassembly of the main function.
@@ -459,17 +459,17 @@ this call we also know that the key size should be 0x14 (20).
 This is obviously an ideal environment, since the main function is the one
 responsible for validating the key. Since this is not normally the case, we
 could try to look for those success and fail messages in the program's string
-list, and checking the xrefs to find the key validation function. In this
-specific program, we could also just patch the bytes to either show us the real
-key, or change the conditional jump so it always jumps to the code that gets
-executed when the key is correct.
+list, and check the xrefs to find the key validation function. In this specific
+program, we could also just patch the bytes to either show us the real key, or
+change the conditional jump so it always jumps to the code that gets executed
+when the key is correct.
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org2d2c601" class="outline-2">
-<h2 id="org2d2c601"><span class="section-number-2">4.</span> Disassembling the key generator</h2>
+<div id="outline-container-orgf61a70f" class="outline-2">
+<h2 id="orgf61a70f"><span class="section-number-2">4.</span> Disassembling the key generator</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Now that we understand the main logic, let's have a look at the <code>generate_key()</code>
@@ -565,23 +565,26 @@ calculating the string length once at <code>f+0x17</code>.
 
 <p>
 We also know that the second parameter is a <code>char*</code> because we store <code>rsi</code> in
-<code>[rbp - 0x20]</code>, and from <code>f+0x9d</code> to <code>f+0xa8</code> we move that value to <code>rax</code>, we add <code>rdx</code>
-(probably using it as index) and finally we access its contents with <code>byte [rdx]</code>.
+<code>[rbp - 0x20]</code>, and from <code>f+0x9d</code> to <code>f+0xa8</code> we move that value to <code>rax</code>, we add it to
+<code>rdx</code> (probably using <code>rdx</code> as an index) and finally we access its contents with
+<code>byte [rdx]</code>.
 </p>
 
 <p>
 We can also identify a <code>for</code> loop, since at <code>f+0x26</code> we set <code>[rbp - 8]</code> to 0, right
 before jumping to <code>f+0xc1</code>, where we check if this value is less or equal than
 <code>0x13</code> (19) and jump back to the top. Right before this conditional jump, we can
-see that the value at <code>[rbp - 8]</code> is increased by one.
+see that the value at <code>[rbp - 8]</code> is increased by one. Note how the value in the
+loop's condition is the same as the one we saw being used as the <i>size</i> parameter
+when calling <code>memcmp</code> from <code>main</code> (Since <code>i&lt;=19</code> is the same as <code>i&lt;20</code>).
 </p>
 
 <p>
-We see some local variable being initialized at 0 in <code>f+0x1f</code>, that will be
-incremented by one in <code>f+0xaa</code>, and if it's greater or equal to the user length,
-it will set it to 0 (<code>f+0xb6</code>). We can determine that this is some kind of index
-being used for the <code>user</code> string, that will be incremented each iteration unless
-it's out of bounds, in which case it will be set back to 0.
+We see some local variable being initialized to 0 in <code>f+0x1f</code>, that will be
+incremented by one in <code>f+0xaa</code>, and that will be set to zero if it's greater or
+equal than the user length (<code>f+0xaa</code> to <code>f+0xb6</code>). We can determine that this is
+some kind of index being used for the <code>user</code> string, that will be incremented each
+iteration unless it's out of bounds, in which case it will be set back to 0.
 </p>
 
 <p>
@@ -603,11 +606,15 @@ From this, we can identify a basic structure:
 }
 </pre>
 </div>
+
+<p>
+TODO
+</p>
 </div>
 </div>
 
-<div id="outline-container-org5336853" class="outline-2">
-<h2 id="org5336853"><span class="section-number-2">5.</span> Alternative: Decompiling with IDA or ghidra</h2>
+<div id="outline-container-org3161867" class="outline-2">
+<h2 id="org3161867"><span class="section-number-2">5.</span> Alternative: Decompiling with IDA or ghidra</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 This option is not always reliable or not always available, so it's important to
@@ -635,8 +642,8 @@ similar as possible.
 </blockquote>
 </div>
 
-<div id="outline-container-org91a430d" class="outline-3">
-<h3 id="org91a430d"><span class="section-number-3">5.1.</span> IDA Pro</h3>
+<div id="outline-container-org72876f3" class="outline-3">
+<h3 id="org72876f3"><span class="section-number-3">5.1.</span> IDA Pro</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 This is the generated C code by <i>IDA Pro Version 7.7.220118 Windows x64</i> (<i>x64
@@ -664,11 +671,16 @@ Decompiler Hex-Rays SA 7.7.0.220118</i>).
 }
 </pre>
 </div>
+
+<p>
+Note how IDA decides to translate <code>(x &lt;&lt; 4)</code> to <code>(x * 16)</code>, since they are
+equivalent and the second is more likely to be used.
+</p>
 </div>
 </div>
 
-<div id="outline-container-org297e056" class="outline-3">
-<h3 id="org297e056"><span class="section-number-3">5.2.</span> Rizin's version of ghidra</h3>
+<div id="outline-container-org6e8b3e5" class="outline-3">
+<h3 id="org6e8b3e5"><span class="section-number-3">5.2.</span> Rizin's version of ghidra</h3>
 <div class="outline-text-3" id="text-5-2">
 <p>
 This is the generated C code by <i>rizin 0.6.1 @ linux-x86-64</i>.
@@ -706,6 +718,11 @@ This is the generated C code by <i>rizin 0.6.1 @ linux-x86-64</i>.
 }
 </pre>
 </div>
+
+<p>
+I am not sure why it's throwing all those warnings, and why it's using <code>var_14h</code>
+all the time instead of using <code>var_ch</code>, for example.
+</p>
 
 <p>
 I manually removed the type casts from rizin's output since I disabled them for

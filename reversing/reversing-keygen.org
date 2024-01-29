@@ -192,10 +192,10 @@ this call we also know that the key size should be 0x14 (20).
 This is obviously an ideal environment, since the main function is the one
 responsible for validating the key. Since this is not normally the case, we
 could try to look for those success and fail messages in the program's string
-list, and checking the xrefs to find the key validation function. In this
-specific program, we could also just patch the bytes to either show us the real
-key, or change the conditional jump so it always jumps to the code that gets
-executed when the key is correct.
+list, and check the xrefs to find the key validation function. In this specific
+program, we could also just patch the bytes to either show us the real key, or
+change the conditional jump so it always jumps to the code that gets executed
+when the key is correct.
 
 * Disassembling the key generator
 
@@ -287,19 +287,22 @@ the types. We also know that the first argument is the user, and that it's
 calculating the string length once at =f+0x17=.
 
 We also know that the second parameter is a =char*= because we store =rsi= in
-=[rbp - 0x20]=, and from =f+0x9d= to =f+0xa8= we move that value to =rax=, we add =rdx=
-(probably using it as index) and finally we access its contents with =byte [rdx]=.
+=[rbp - 0x20]=, and from =f+0x9d= to =f+0xa8= we move that value to =rax=, we add it to
+=rdx= (probably using =rdx= as an index) and finally we access its contents with
+=byte [rdx]=.
 
 We can also identify a =for= loop, since at =f+0x26= we set =[rbp - 8]= to 0, right
 before jumping to =f+0xc1=, where we check if this value is less or equal than
 =0x13= (19) and jump back to the top. Right before this conditional jump, we can
-see that the value at =[rbp - 8]= is increased by one.
+see that the value at =[rbp - 8]= is increased by one. Note how the value in the
+loop's condition is the same as the one we saw being used as the /size/ parameter
+when calling =memcmp= from =main= (Since =i<=19= is the same as =i<20=).
 
-We see some local variable being initialized at 0 in =f+0x1f=, that will be
-incremented by one in =f+0xaa=, and if it's greater or equal to the user length,
-it will set it to 0 (=f+0xb6=). We can determine that this is some kind of index
-being used for the =user= string, that will be incremented each iteration unless
-it's out of bounds, in which case it will be set back to 0.
+We see some local variable being initialized to 0 in =f+0x1f=, that will be
+incremented by one in =f+0xaa=, and that will be set to zero if it's greater or
+equal than the user length (=f+0xaa= to =f+0xb6=). We can determine that this is
+some kind of index being used for the =user= string, that will be incremented each
+iteration unless it's out of bounds, in which case it will be set back to 0.
 
 From this, we can identify a basic structure:
 
@@ -317,6 +320,8 @@ void func(const char* user, const char* real_key) {
     }
 }
 #+end_src
+
+TODO
 
 * Alternative: Decompiling with IDA or ghidra
 
@@ -363,6 +368,9 @@ size_t /* __fastcall */ sub_1189(const char* a1, __int64 a2) {
 }
 #+end_src
 
+Note how IDA decides to translate =(x << 4)= to =(x * 16)=, since they are
+equivalent and the second is more likely to be used.
+
 ** Rizin's version of ghidra
 
 This is the generated C code by /rizin 0.6.1 @ linux-x86-64/.
@@ -398,6 +406,9 @@ void fcn.00001189(char* arg1, int64_t arg2) {
     return;
 }
 #+end_src
+
+I am not sure why it's throwing all those warnings, and why it's using =var_14h=
+all the time instead of using =var_ch=, for example.
 
 I manually removed the type casts from rizin's output since I disabled them for
 IDA.
