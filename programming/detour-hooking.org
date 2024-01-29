@@ -138,8 +138,8 @@ static uint8_t jmp_bytes[] = { 0x48, 0xB8, 0x00, 0x00, 0x00, 0x00,
 We will use =JMP_BYTES_OFF= to specify the position inside the =jmp_bytes= array
 where the =hook= address will be.
 
-We will also declare a =protect_addr= function for changing the permission of a
-memory page.
+We will also declare a =protect_addr= function for changing the permission of the
+memory page where the =ptr= is.
 
 #+begin_src C
 #include <stdint.h>
@@ -147,20 +147,35 @@ memory page.
 #include <unistd.h>   /* getpagesize */
 #include <sys/mman.h> /* mprotect */
 
-#define PAGE_MASK          (~(PAGE_SIZE - 1))
-#define PAGE_ALIGN(X)      (((uintptr_t)(X) + PAGE_SIZE - 1) & PAGE_MASK)
-#define PAGE_ALIGN_DOWN(X) (PAGE_ALIGN(X) - PAGE_SIZE)
-
 static bool protect_addr(void* ptr, int new_flags) {
-    int PAGE_SIZE = getpagesize();
-    void* page    = (void*)PAGE_ALIGN_DOWN(ptr);
+    long page_size      = sysconf(_SC_PAGESIZE);
+    long page_mask      = ~(page_size - 1);
+    uintptr_t next_page = ((uintptr_t)ptr + page_size - 1) & page_mask;
+    uintptr_t prev_page = next_page - page_size;
+    void* page          = (void*)prev_page;
 
-    if (mprotect(page, PAGE_SIZE, new_flags) == -1)
+    if (mprotect(page, page_size, new_flags) == -1)
         return false;
 
     return true;
 }
 #+end_src
+
+First, we get the next page by masking the address plus the page size minus one
+with =~(page_size - 1)=. We need to add the page size minus one to make sure we
+don't align an already aligned address. Then we subtract the page size to get
+the address of the previous page. For more information see [[https://stackoverflow.com/a/22971450/11715554][this StackOverflow
+answer]].
+
+#+begin_example
+Ptr:                 0x12345    0b10010001101000101
+Page size:           0x01000    0b00001000000000000
+Page size - 1:       0x00FFF    0b00000111111111111
+After NOT (Mask):    0xFF000    0b11111000000000000
+After adding to ptr: 0x13344    0b10011001101000100
+Ptr & Mask:          0x13000    0b10011000000000000
+Minus page size:     0x12000    0b10010000000000000
+#+end_example
 
 Let's declare our sample hook.
 

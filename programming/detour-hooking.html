@@ -207,16 +207,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org1078865">1. What does hooking mean?</a></li>
-<li><a href="#org8bc9586">2. Detour hooking</a></li>
-<li><a href="#org32fbea2">3. Hooking from C</a></li>
-<li><a href="#orgfa4e588">4. Detour hooking library</a></li>
+<li><a href="#org0b504de">1. What does hooking mean?</a></li>
+<li><a href="#orgd11f390">2. Detour hooking</a></li>
+<li><a href="#orgc71ce54">3. Hooking from C</a></li>
+<li><a href="#org2d59d4f">4. Detour hooking library</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org1078865" class="outline-2">
-<h2 id="org1078865"><span class="section-number-2">1.</span> What does hooking mean?</h2>
+<div id="outline-container-org0b504de" class="outline-2">
+<h2 id="org0b504de"><span class="section-number-2">1.</span> What does hooking mean?</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Hooking consists in intercepting and altering function calls or event passed
@@ -252,8 +252,8 @@ original function, change the behavior, spoof the returned value, etc.
 </div>
 </div>
 
-<div id="outline-container-org8bc9586" class="outline-2">
-<h2 id="org8bc9586"><span class="section-number-2">2.</span> Detour hooking</h2>
+<div id="outline-container-orgd11f390" class="outline-2">
+<h2 id="orgd11f390"><span class="section-number-2">2.</span> Detour hooking</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Detour hooking is a hooking technique where we overwrite the first bytes of the
@@ -341,8 +341,8 @@ fcn.00001139+<span style="color: #88ca9f;">0x8</span>     f2 <span style="color:
 </div>
 </div>
 
-<div id="outline-container-org32fbea2" class="outline-2">
-<h2 id="org32fbea2"><span class="section-number-2">3.</span> Hooking from C</h2>
+<div id="outline-container-orgc71ce54" class="outline-2">
+<h2 id="orgc71ce54"><span class="section-number-2">3.</span> Hooking from C</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The basic process from C would be:
@@ -382,8 +382,8 @@ where the <code>hook</code> address will be.
 </p>
 
 <p>
-We will also declare a <code>protect_addr</code> function for changing the permission of a
-memory page.
+We will also declare a <code>protect_addr</code> function for changing the permission of the
+memory page where the <code>ptr</code> is.
 </p>
 
 <div class="org-src-container">
@@ -392,21 +392,38 @@ memory page.
 <span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;unistd.h&gt;</span>   <span style="color: #989898;">/* </span><span style="color: #989898;">getpagesize</span><span style="color: #989898;"> */</span>
 <span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/mman.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">mprotect</span><span style="color: #989898;"> */</span>
 
-<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">PAGE_MASK</span>          (~(PAGE_SIZE - <span style="color: #88ca9f;">1</span>))
-<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PAGE_ALIGN</span>(<span style="color: #6ae4b9;">X</span>)      (((<span style="color: #79a8ff;">uintptr_t</span>)(X) + PAGE_SIZE - <span style="color: #88ca9f;">1</span>) &amp; PAGE_MASK)
-<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PAGE_ALIGN_DOWN</span>(<span style="color: #6ae4b9;">X</span>) (PAGE_ALIGN(X) - PAGE_SIZE)
-
 <span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">protect_addr</span>(<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">ptr</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">new_flags</span>) {
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">PAGE_SIZE</span> = getpagesize();
-    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">page</span>    = (<span style="color: #79a8ff;">void</span>*)PAGE_ALIGN_DOWN(ptr);
+    <span style="color: #79a8ff;">long</span> <span style="color: #6ae4b9;">page_size</span>      = sysconf(_SC_PAGESIZE);
+    <span style="color: #79a8ff;">long</span> <span style="color: #6ae4b9;">page_mask</span>      = ~(page_size - <span style="color: #88ca9f;">1</span>);
+    <span style="color: #79a8ff;">uintptr_t</span> <span style="color: #6ae4b9;">next_page</span> = ((<span style="color: #79a8ff;">uintptr_t</span>)ptr + page_size - <span style="color: #88ca9f;">1</span>) &amp; page_mask;
+    <span style="color: #79a8ff;">uintptr_t</span> <span style="color: #6ae4b9;">prev_page</span> = next_page - page_size;
+    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">page</span>          = (<span style="color: #79a8ff;">void</span>*)prev_page;
 
-    <span style="color: #ff6f9f;">if</span> (mprotect(page, PAGE_SIZE, new_flags) == -<span style="color: #88ca9f;">1</span>)
+    <span style="color: #ff6f9f;">if</span> (mprotect(page, page_size, new_flags) == -<span style="color: #88ca9f;">1</span>)
         <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
 
     <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
 }
 </pre>
 </div>
+
+<p>
+First, we get the next page by masking the address plus the page size minus one
+with <code>~(page_size - 1)</code>. We need to add the page size minus one to make sure we
+don't align an already aligned address. Then we subtract the page size to get
+the address of the previous page. For more information see <a href="https://stackoverflow.com/a/22971450/11715554">this StackOverflow
+answer</a>.
+</p>
+
+<pre class="example" id="org594eaa7">
+Ptr:                 0x12345    0b10010001101000101
+Page size:           0x01000    0b00001000000000000
+Page size - 1:       0x00FFF    0b00000111111111111
+After NOT (Mask):    0xFF000    0b11111000000000000
+After adding to ptr: 0x13344    0b10011001101000100
+Ptr &amp; Mask:          0x13000    0b10011000000000000
+Minus page size:     0x12000    0b10010000000000000
+</pre>
 
 <p>
 Let's declare our sample hook.
@@ -508,8 +525,8 @@ result = (<span style="color: #79a8ff;">orig_t</span>)<span style="color: #4ae2f
 </div>
 </div>
 
-<div id="outline-container-orgfa4e588" class="outline-2">
-<h2 id="orgfa4e588"><span class="section-number-2">4.</span> Detour hooking library</h2>
+<div id="outline-container-org2d59d4f" class="outline-2">
+<h2 id="org2d59d4f"><span class="section-number-2">4.</span> Detour hooking library</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 I made a simple detour hooking library in pure C for GNU/Linux. It should be
