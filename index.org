@@ -1,26 +1,34 @@
 #+TITLE: 8dcc's blog
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
+#+OPTIONS: toc:nil num:nil
 #+STARTUP: showeverything
 
 I will use this blog to post information in a more centralized way, instead of
 spreading it across the wikis of the different projects.
 
-Current sections:
+* Current sections
 
 - [[file:reversing/index.org][Reverse engineering]]
 - [[file:programming/index.org][Programming]]
+
+* External documentations
 
 I will probably end up moving other documentations I have written for my
 projects here, but until then, make sure you also check out:
 
 - The [[https://github.com/fs-os/fs-os/wiki][fs-os wiki]], explaining the details of [[https://github.com/fs-os/fs-os][my operating system]].
+- [[https://github.com/8dcc/bms-cheat/wiki/Hooking-CreateMove][Hooking CreateMove]] in [[https://en.wikipedia.org/wiki/Source_(game_engine)][source]] games.
+- Finding the offsets and [[https://github.com/8dcc/tf2-cheat/wiki/Getting-SDL-offsets][hooking SDL functions]].
 
-My external links:
+* External links
+
+External links you might find interesting:
 
 - [[https://github.com/8dcc][GitHub]]
 - [[https://github.com/stars/8dcc/lists/my-dope-shit][List of my best repositories]]
 - [[https://www.codewars.com/users/8dcc][Codewars profile]]
+
+* Contributing
 
 Feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this blog if you find any errors or if you have any
 suggestions.
