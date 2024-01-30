@@ -207,27 +207,27 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org9bd02ad">1. Introduction</a></li>
-<li><a href="#org4eba455">2. Trying out the program</a></li>
-<li><a href="#org0bad061">3. The main function</a>
+<li><a href="#org50216b8">1. Introduction</a></li>
+<li><a href="#org007933d">2. Trying out the program</a></li>
+<li><a href="#org3828998">3. The main function</a>
 <ul>
-<li><a href="#org301a960">3.1. Finding the main function</a></li>
-<li><a href="#org63d1265">3.2. Disassembling the main function</a></li>
+<li><a href="#org2d0c371">3.1. Finding the main function</a></li>
+<li><a href="#orgeb84e53">3.2. Disassembling the main function</a></li>
 </ul>
 </li>
-<li><a href="#orgf61a70f">4. Disassembling the key generator</a></li>
-<li><a href="#org3161867">5. Alternative: Decompiling with IDA or ghidra</a>
+<li><a href="#org1266dab">4. Disassembling the key generator</a></li>
+<li><a href="#orgeeb2cbc">5. Alternative: Decompiling with IDA or ghidra</a>
 <ul>
-<li><a href="#org72876f3">5.1. IDA Pro</a></li>
-<li><a href="#org6e8b3e5">5.2. Rizin's version of ghidra</a></li>
+<li><a href="#orgc4769bd">5.1. IDA Pro</a></li>
+<li><a href="#org77d168a">5.2. Rizin's version of ghidra</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org9bd02ad" class="outline-2">
-<h2 id="org9bd02ad"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org50216b8" class="outline-2">
+<h2 id="org50216b8"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 I created a simple keygen program that takes a user and a key, and prints a
@@ -239,14 +239,14 @@ in case you are interested.
 </div>
 </div>
 
-<div id="outline-container-org4eba455" class="outline-2">
-<h2 id="org4eba455"><span class="section-number-2">2.</span> Trying out the program</h2>
+<div id="outline-container-org007933d" class="outline-2">
+<h2 id="org007933d"><span class="section-number-2">2.</span> Trying out the program</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First, let's try running the program to see what it's asking.
 </p>
 
-<pre class="example" id="org6a8d503">
+<pre class="example" id="org03c0ad9">
 Username: test
 Key: test
 Invalid key.
@@ -266,8 +266,8 @@ From this, we can at least expect:
 </div>
 </div>
 
-<div id="outline-container-org0bad061" class="outline-2">
-<h2 id="org0bad061"><span class="section-number-2">3.</span> The main function</h2>
+<div id="outline-container-org3828998" class="outline-2">
+<h2 id="org3828998"><span class="section-number-2">3.</span> The main function</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Let's start by having a look at the main function with <a href="https://rizin.re/">rizin</a> 0.6.3 (you can also
@@ -275,8 +275,8 @@ use <a href="https://cutter.re">cutter</a> or <a href="https://hex-rays.com/ida-
 </p>
 </div>
 
-<div id="outline-container-org301a960" class="outline-3">
-<h3 id="org301a960"><span class="section-number-3">3.1.</span> Finding the main function</h3>
+<div id="outline-container-org2d0c371" class="outline-3">
+<h3 id="org2d0c371"><span class="section-number-3">3.1.</span> Finding the main function</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 We start by running the <code>aaa</code> rizin command, which is used to "Analyze all calls,
@@ -358,8 +358,8 @@ The address being loaded into <code>rdi</code> at <code>entry0+0x14</code> shoul
 </div>
 </div>
 
-<div id="outline-container-org63d1265" class="outline-3">
-<h3 id="org63d1265"><span class="section-number-3">3.2.</span> Disassembling the main function</h3>
+<div id="outline-container-orgeb84e53" class="outline-3">
+<h3 id="orgeb84e53"><span class="section-number-3">3.2.</span> Disassembling the main function</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Let's have a look at the disassembly of the main function.
@@ -468,8 +468,8 @@ when the key is correct.
 </div>
 </div>
 
-<div id="outline-container-orgf61a70f" class="outline-2">
-<h2 id="orgf61a70f"><span class="section-number-2">4.</span> Disassembling the key generator</h2>
+<div id="outline-container-org1266dab" class="outline-2">
+<h2 id="org1266dab"><span class="section-number-2">4.</span> Disassembling the key generator</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Now that we understand the main logic, let's have a look at the <code>generate_key()</code>
@@ -580,11 +580,12 @@ when calling <code>memcmp</code> from <code>main</code> (Since <code>i&lt;=19</c
 </p>
 
 <p>
-We see some local variable being initialized to 0 in <code>f+0x1f</code>, that will be
-incremented by one in <code>f+0xaa</code>, and that will be set to zero if it's greater or
-equal than the user length (<code>f+0xaa</code> to <code>f+0xb6</code>). We can determine that this is
-some kind of index being used for the <code>user</code> string, that will be incremented each
-iteration unless it's out of bounds, in which case it will be set back to 0.
+We see some local variable (<code>[rbp - 0xc]</code>) being initialized to 0 in <code>f+0x1f</code>, that
+will be incremented by one in <code>f+0xaa</code>, and that will be set to zero if it's
+greater or equal than the user length (<code>f+0xaa</code> to <code>f+0xb6</code>). We can determine that
+this is some kind of index being used for the <code>user</code> string, that will be
+incremented each iteration unless it's out of bounds, in which case it will be
+set back to 0.
 </p>
 
 <p>
@@ -595,8 +596,9 @@ From this, we can identify a basic structure:
 <pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">user</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">real_key</span>) {
     <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">user_len</span> = strlen(user);    <span style="color: #989898;">// </span><span style="color: #989898;">[rbp - 4]</span>
     <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">user_pos</span> = <span style="color: #88ca9f;">0</span>;               <span style="color: #989898;">// </span><span style="color: #989898;">[rbp - 0xc]</span>
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span>;                          <span style="color: #989898;">// </span><span style="color: #989898;">[rbp - 8]</span>
 
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; <span style="color: #88ca9f;">20</span>; i++) {
+    <span style="color: #ff6f9f;">for</span> (i = <span style="color: #88ca9f;">0</span>; i &lt; <span style="color: #88ca9f;">20</span>; i++) {
         <span style="color: #989898;">// </span><span style="color: #cabf00; font-weight: bold;">TODO</span>
 
         user_pos++;
@@ -608,13 +610,149 @@ From this, we can identify a basic structure:
 </div>
 
 <p>
-TODO
+Let's take a look at the body of the loop. We can see how we are loading the
+<code>user_pos</code> into <code>rdx</code>, and the first argument into <code>rax</code>, before adding them together
+and dereferencing the address into <code>[rbp - 0xd]</code>.
 </p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/*</span>
+<span style="color: #989898;"> * fcn.00001189+0x32     mov     eax, dword [rbp - 0xc]</span>
+<span style="color: #989898;"> * fcn.00001189+0x35     movsxd  rdx, eax</span>
+<span style="color: #989898;"> * fcn.00001189+0x38     mov     rax, qword [rbp - 0x18]</span>
+<span style="color: #989898;"> * fcn.00001189+0x3c     add     rax, rdx</span>
+<span style="color: #989898;"> * fcn.00001189+0x3f     movzx   eax, byte [rax]</span>
+<span style="color: #989898;"> * fcn.00001189+0x42     mov     byte [rbp - 0xd], al</span>
+<span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span> = user[user_pos];    <span style="color: #989898;">// </span><span style="color: #989898;">[rbp - 0xd]</span>
+</pre>
+</div>
+
+<p>
+Then, it shifts that value 4 bits to the left, saves the result in <code>edx</code>, shifts
+the original value 4 bits to the right and ORs them back together. In other
+words, it exchanges the high and low nibbles.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/*</span>
+<span style="color: #989898;"> * fcn.00001189+0x45     movzx   eax, byte [rbp - 0xd]</span>
+<span style="color: #989898;"> * fcn.00001189+0x49     shl     eax, 4</span>
+<span style="color: #989898;"> * fcn.00001189+0x4c     mov     edx, eax</span>
+<span style="color: #989898;"> * fcn.00001189+0x4e     movzx   eax, byte [rbp - 0xd]</span>
+<span style="color: #989898;"> * fcn.00001189+0x52     shr     al, 4</span>
+<span style="color: #989898;"> * fcn.00001189+0x55     or      eax, edx</span>
+<span style="color: #989898;"> * fcn.00001189+0x57     mov     byte [rbp - 0xd], al</span>
+<span style="color: #989898;"> */</span>
+c = (c &lt;&lt; <span style="color: #88ca9f;">4</span>) | (c &gt;&gt; <span style="color: #88ca9f;">4</span>);
+</pre>
+</div>
+
+<p>
+Next, it multiplies <code>i</code> by <code>user_pos</code>, and saves it in <code>rdx</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/*</span>
+<span style="color: #989898;"> * fcn.00001189+0x5a     mov     eax, dword [rbp - 8]</span>
+<span style="color: #989898;"> * fcn.00001189+0x5d     imul    eax, dword [rbp - 0xc]</span>
+<span style="color: #989898;"> * fcn.00001189+0x61     movsxd  rdx, eax</span>
+<span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">tmp</span> = i * user_pos;
+</pre>
+</div>
+
+<p>
+The next part is a bit messy because of compiler optimizations, so you will just
+have to trust me. It performs a modulus operation with <code>tmp</code> and <code>0xFF</code>, and then
+adds it back to <code>c</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/*</span>
+<span style="color: #989898;"> * fcn.00001189+0x64     imul    rdx, rdx, 0xffffffff80808081</span>
+<span style="color: #989898;"> * fcn.00001189+0x6b     shr     rdx, 0x20</span>
+<span style="color: #989898;"> * fcn.00001189+0x6f     add     edx, eax</span>
+<span style="color: #989898;"> * fcn.00001189+0x71     mov     ecx, edx</span>
+<span style="color: #989898;"> * fcn.00001189+0x73     sar     ecx, 7</span>
+<span style="color: #989898;"> * fcn.00001189+0x76     cdq</span>
+<span style="color: #989898;"> * fcn.00001189+0x77     sub     ecx, edx</span>
+<span style="color: #989898;"> * fcn.00001189+0x79     mov     edx, ecx</span>
+<span style="color: #989898;"> * fcn.00001189+0x7b     shl     edx, 8</span>
+<span style="color: #989898;"> * fcn.00001189+0x7e     sub     edx, ecx</span>
+<span style="color: #989898;"> * fcn.00001189+0x80     sub     eax, edx</span>
+<span style="color: #989898;"> * fcn.00001189+0x82     mov     ecx, eax</span>
+<span style="color: #989898;"> * fcn.00001189+0x84     mov     eax, ecx</span>
+<span style="color: #989898;"> * fcn.00001189+0x86     add     byte [rbp - 0xd], al</span>
+<span style="color: #989898;"> */</span>
+c += tmp % <span style="color: #88ca9f;">255</span>;
+</pre>
+</div>
+
+<p>
+Finally, it XORs the length of the user string with <code>c</code>, and writes it to the
+second parameter.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/*</span>
+<span style="color: #989898;"> * fcn.00001189+0x89     mov     eax, dword [rbp - 4]</span>
+<span style="color: #989898;"> * fcn.00001189+0x8c     mov     edx, eax</span>
+<span style="color: #989898;"> * fcn.00001189+0x8e     movzx   eax, byte [rbp - 0xd]</span>
+<span style="color: #989898;"> * fcn.00001189+0x92     xor     eax, edx</span>
+<span style="color: #989898;"> * fcn.00001189+0x94     mov     byte [rbp - 0xd], al</span>
+<span style="color: #989898;"> */</span>
+c ^= user_len;
+
+<span style="color: #989898;">/*</span>
+<span style="color: #989898;"> * fcn.00001189+0x97     mov     eax, dword [rbp - 8]</span>
+<span style="color: #989898;"> * fcn.00001189+0x9a     movsxd  rdx, eax</span>
+<span style="color: #989898;"> * fcn.00001189+0x9d     mov     rax, qword [rbp - 0x20]</span>
+<span style="color: #989898;"> * fcn.00001189+0xa1     add     rdx, rax</span>
+<span style="color: #989898;"> * fcn.00001189+0xa4     movzx   eax, byte [rbp - 0xd]</span>
+<span style="color: #989898;"> * fcn.00001189+0xa8     mov     byte [rdx], al</span>
+<span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">real_key</span>[i] = c;
+</pre>
+</div>
+
+<p>
+We already know the rest, incrementing <code>user_pos</code>, making sure we are not writing
+outside of <code>user</code>, incrementing <code>i</code> and looping until we are done with all
+characters of <code>real_key</code>.
+</p>
+
+<p>
+This is the final key generation function:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">user</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">real_key</span>) {
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">user_len</span> = strlen(user);    <span style="color: #989898;">// </span><span style="color: #989898;">[rbp - 4]</span>
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">user_pos</span> = <span style="color: #88ca9f;">0</span>;               <span style="color: #989898;">// </span><span style="color: #989898;">[rbp - 0xc]</span>
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span>;                          <span style="color: #989898;">// </span><span style="color: #989898;">[rbp - 8]</span>
+
+    <span style="color: #ff6f9f;">for</span> (i = <span style="color: #88ca9f;">0</span>; i &lt; <span style="color: #88ca9f;">20</span>; i++) {
+        <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span> = user[user_pos];    <span style="color: #989898;">// </span><span style="color: #989898;">[rbp - 0xd]</span>
+
+        c = (c &lt;&lt; <span style="color: #88ca9f;">4</span>) | (c &gt;&gt; <span style="color: #88ca9f;">4</span>);
+        c += (i * user_pos) % <span style="color: #88ca9f;">0xFF</span>;
+        c ^= user_len;
+
+        real_key[i] = c;
+
+        user_pos++;
+        <span style="color: #ff6f9f;">if</span> (user_pos &gt;= user_len)
+            user_pos = <span style="color: #88ca9f;">0</span>;
+    }
+}
+</pre>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org3161867" class="outline-2">
-<h2 id="org3161867"><span class="section-number-2">5.</span> Alternative: Decompiling with IDA or ghidra</h2>
+<div id="outline-container-orgeeb2cbc" class="outline-2">
+<h2 id="orgeeb2cbc"><span class="section-number-2">5.</span> Alternative: Decompiling with IDA or ghidra</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 This option is not always reliable or not always available, so it's important to
@@ -642,8 +780,8 @@ similar as possible.
 </blockquote>
 </div>
 
-<div id="outline-container-org72876f3" class="outline-3">
-<h3 id="org72876f3"><span class="section-number-3">5.1.</span> IDA Pro</h3>
+<div id="outline-container-orgc4769bd" class="outline-3">
+<h3 id="orgc4769bd"><span class="section-number-3">5.1.</span> IDA Pro</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 This is the generated C code by <i>IDA Pro Version 7.7.220118 Windows x64</i> (<i>x64
@@ -679,8 +817,8 @@ equivalent and the second is more likely to be used.
 </div>
 </div>
 
-<div id="outline-container-org6e8b3e5" class="outline-3">
-<h3 id="org6e8b3e5"><span class="section-number-3">5.2.</span> Rizin's version of ghidra</h3>
+<div id="outline-container-org77d168a" class="outline-3">
+<h3 id="org77d168a"><span class="section-number-3">5.2.</span> Rizin's version of ghidra</h3>
 <div class="outline-text-3" id="text-5-2">
 <p>
 This is the generated C code by <i>rizin 0.6.1 @ linux-x86-64</i>.

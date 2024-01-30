@@ -298,11 +298,12 @@ see that the value at =[rbp - 8]= is increased by one. Note how the value in the
 loop's condition is the same as the one we saw being used as the /size/ parameter
 when calling =memcmp= from =main= (Since =i<=19= is the same as =i<20=).
 
-We see some local variable being initialized to 0 in =f+0x1f=, that will be
-incremented by one in =f+0xaa=, and that will be set to zero if it's greater or
-equal than the user length (=f+0xaa= to =f+0xb6=). We can determine that this is
-some kind of index being used for the =user= string, that will be incremented each
-iteration unless it's out of bounds, in which case it will be set back to 0.
+We see some local variable (=[rbp - 0xc]=) being initialized to 0 in =f+0x1f=, that
+will be incremented by one in =f+0xaa=, and that will be set to zero if it's
+greater or equal than the user length (=f+0xaa= to =f+0xb6=). We can determine that
+this is some kind of index being used for the =user= string, that will be
+incremented each iteration unless it's out of bounds, in which case it will be
+set back to 0.
 
 From this, we can identify a basic structure:
 
@@ -310,8 +311,9 @@ From this, we can identify a basic structure:
 void func(const char* user, const char* real_key) {
     int user_len = strlen(user);    // [rbp - 4]
     int user_pos = 0;               // [rbp - 0xc]
+    int i;                          // [rbp - 8]
 
-    for (int i = 0; i < 20; i++) {
+    for (i = 0; i < 20; i++) {
         // TODO
 
         user_pos++;
@@ -321,7 +323,129 @@ void func(const char* user, const char* real_key) {
 }
 #+end_src
 
-TODO
+Let's take a look at the body of the loop. We can see how we are loading the
+=user_pos= into =rdx=, and the first argument into =rax=, before adding them together
+and dereferencing the address into =[rbp - 0xd]=.
+
+#+begin_src C
+/*
+ ,* fcn.00001189+0x32     mov     eax, dword [rbp - 0xc]
+ ,* fcn.00001189+0x35     movsxd  rdx, eax
+ ,* fcn.00001189+0x38     mov     rax, qword [rbp - 0x18]
+ ,* fcn.00001189+0x3c     add     rax, rdx
+ ,* fcn.00001189+0x3f     movzx   eax, byte [rax]
+ ,* fcn.00001189+0x42     mov     byte [rbp - 0xd], al
+ ,*/
+char c = user[user_pos];    // [rbp - 0xd]
+#+end_src
+
+Then, it shifts that value 4 bits to the left, saves the result in =edx=, shifts
+the original value 4 bits to the right and ORs them back together. In other
+words, it exchanges the high and low nibbles.
+
+#+begin_src C
+/*
+ ,* fcn.00001189+0x45     movzx   eax, byte [rbp - 0xd]
+ ,* fcn.00001189+0x49     shl     eax, 4
+ ,* fcn.00001189+0x4c     mov     edx, eax
+ ,* fcn.00001189+0x4e     movzx   eax, byte [rbp - 0xd]
+ ,* fcn.00001189+0x52     shr     al, 4
+ ,* fcn.00001189+0x55     or      eax, edx
+ ,* fcn.00001189+0x57     mov     byte [rbp - 0xd], al
+ ,*/
+c = (c << 4) | (c >> 4);
+#+end_src
+
+Next, it multiplies =i= by =user_pos=, and saves it in =rdx=.
+
+#+begin_src C
+/*
+ ,* fcn.00001189+0x5a     mov     eax, dword [rbp - 8]
+ ,* fcn.00001189+0x5d     imul    eax, dword [rbp - 0xc]
+ ,* fcn.00001189+0x61     movsxd  rdx, eax
+ ,*/
+int tmp = i * user_pos;
+#+end_src
+
+The next part is a bit messy because of compiler optimizations, so you will just
+have to trust me. It performs a modulus operation with =tmp= and =0xFF=, and then
+adds it back to =c=.
+
+#+begin_comment
+TODO: Extend explanation of why this optimization works.
+#+end_comment
+
+#+begin_src C
+/*
+ ,* fcn.00001189+0x64     imul    rdx, rdx, 0xffffffff80808081
+ ,* fcn.00001189+0x6b     shr     rdx, 0x20
+ ,* fcn.00001189+0x6f     add     edx, eax
+ ,* fcn.00001189+0x71     mov     ecx, edx
+ ,* fcn.00001189+0x73     sar     ecx, 7
+ ,* fcn.00001189+0x76     cdq
+ ,* fcn.00001189+0x77     sub     ecx, edx
+ ,* fcn.00001189+0x79     mov     edx, ecx
+ ,* fcn.00001189+0x7b     shl     edx, 8
+ ,* fcn.00001189+0x7e     sub     edx, ecx
+ ,* fcn.00001189+0x80     sub     eax, edx
+ ,* fcn.00001189+0x82     mov     ecx, eax
+ ,* fcn.00001189+0x84     mov     eax, ecx
+ ,* fcn.00001189+0x86     add     byte [rbp - 0xd], al
+ ,*/
+c += tmp % 255;
+#+end_src
+
+Finally, it XORs the length of the user string with =c=, and writes it to the
+second parameter.
+
+#+begin_src C
+/*
+ ,* fcn.00001189+0x89     mov     eax, dword [rbp - 4]
+ ,* fcn.00001189+0x8c     mov     edx, eax
+ ,* fcn.00001189+0x8e     movzx   eax, byte [rbp - 0xd]
+ ,* fcn.00001189+0x92     xor     eax, edx
+ ,* fcn.00001189+0x94     mov     byte [rbp - 0xd], al
+ ,*/
+c ^= user_len;
+
+/*
+ ,* fcn.00001189+0x97     mov     eax, dword [rbp - 8]
+ ,* fcn.00001189+0x9a     movsxd  rdx, eax
+ ,* fcn.00001189+0x9d     mov     rax, qword [rbp - 0x20]
+ ,* fcn.00001189+0xa1     add     rdx, rax
+ ,* fcn.00001189+0xa4     movzx   eax, byte [rbp - 0xd]
+ ,* fcn.00001189+0xa8     mov     byte [rdx], al
+ ,*/
+real_key[i] = c;
+#+end_src
+
+We already know the rest, incrementing =user_pos=, making sure we are not writing
+outside of =user=, incrementing =i= and looping until we are done with all
+characters of =real_key=.
+
+This is the final key generation function:
+
+#+begin_src C
+void func(const char* user, const char* real_key) {
+    int user_len = strlen(user);    // [rbp - 4]
+    int user_pos = 0;               // [rbp - 0xc]
+    int i;                          // [rbp - 8]
+
+    for (i = 0; i < 20; i++) {
+        char c = user[user_pos];    // [rbp - 0xd]
+
+        c = (c << 4) | (c >> 4);
+        c += (i * user_pos) % 0xFF;
+        c ^= user_len;
+
+        real_key[i] = c;
+
+        user_pos++;
+        if (user_pos >= user_len)
+            user_pos = 0;
+    }
+}
+#+end_src
 
 * Alternative: Decompiling with IDA or ghidra
 
