@@ -207,16 +207,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org0b504de">1. What does hooking mean?</a></li>
-<li><a href="#orgd11f390">2. Detour hooking</a></li>
-<li><a href="#orgc71ce54">3. Hooking from C</a></li>
-<li><a href="#org2d59d4f">4. Detour hooking library</a></li>
+<li><a href="#org071cd12">1. What does hooking mean?</a></li>
+<li><a href="#org9354584">2. Detour hooking</a></li>
+<li><a href="#org7e1cb73">3. Hooking from C</a></li>
+<li><a href="#orga7dcfdf">4. Detour hooking library</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org0b504de" class="outline-2">
-<h2 id="org0b504de"><span class="section-number-2">1.</span> What does hooking mean?</h2>
+<div id="outline-container-org071cd12" class="outline-2">
+<h2 id="org071cd12"><span class="section-number-2">1.</span> What does hooking mean?</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Hooking consists in intercepting and altering function calls or event passed
@@ -252,8 +252,8 @@ original function, change the behavior, spoof the returned value, etc.
 </div>
 </div>
 
-<div id="outline-container-orgd11f390" class="outline-2">
-<h2 id="orgd11f390"><span class="section-number-2">2.</span> Detour hooking</h2>
+<div id="outline-container-org9354584" class="outline-2">
+<h2 id="org9354584"><span class="section-number-2">2.</span> Detour hooking</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Detour hooking is a hooking technique where we overwrite the first bytes of the
@@ -341,8 +341,8 @@ fcn.00001139+<span style="color: #88ca9f;">0x8</span>     f2 <span style="color:
 </div>
 </div>
 
-<div id="outline-container-orgc71ce54" class="outline-2">
-<h2 id="orgc71ce54"><span class="section-number-2">3.</span> Hooking from C</h2>
+<div id="outline-container-org7e1cb73" class="outline-2">
+<h2 id="org7e1cb73"><span class="section-number-2">3.</span> Hooking from C</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The basic process from C would be:
@@ -383,7 +383,8 @@ where the <code>hook</code> address will be.
 
 <p>
 We will also declare a <code>protect_addr</code> function for changing the permission of the
-memory page where the <code>ptr</code> is.
+memory page where the <code>ptr</code> is. Since I am on linux, I will use <code>mprotect</code>, but if
+you are on windows you should use something like <code>VirtualProtect</code> (<a href="https://github.com/8dcc/libdetour/blob/a0f774be08b8f548913a07d48db2633c1a52494c/src/libdetour.c#L60-L66">Link</a>).
 </p>
 
 <div class="org-src-container">
@@ -415,7 +416,7 @@ the address of the previous page. For more information see <a href="https://stac
 answer</a>.
 </p>
 
-<pre class="example" id="org594eaa7">
+<pre class="example" id="org0dc562a">
 Ptr:                 0x12345    0b10010001101000101
 Page size:           0x01000    0b00001000000000000
 Page size - 1:       0x00FFF    0b00000111111111111
@@ -525,13 +526,12 @@ result = (<span style="color: #79a8ff;">orig_t</span>)<span style="color: #4ae2f
 </div>
 </div>
 
-<div id="outline-container-org2d59d4f" class="outline-2">
-<h2 id="org2d59d4f"><span class="section-number-2">4.</span> Detour hooking library</h2>
+<div id="outline-container-orga7dcfdf" class="outline-2">
+<h2 id="orga7dcfdf"><span class="section-number-2">4.</span> Detour hooking library</h2>
 <div class="outline-text-2" id="text-4">
 <p>
-I made a simple detour hooking library in pure C for GNU/Linux. It should be
-very easy to port, as the platform-specific thing should be the <code>protect_addr</code>
-function.
+I made a simple detour hooking library in pure C for both GNU/Linux and
+Windows. The platform-specific function is <code>protect_addr()</code>.
 </p>
 
 <p>

@@ -139,7 +139,8 @@ We will use =JMP_BYTES_OFF= to specify the position inside the =jmp_bytes= array
 where the =hook= address will be.
 
 We will also declare a =protect_addr= function for changing the permission of the
-memory page where the =ptr= is.
+memory page where the =ptr= is. Since I am on linux, I will use =mprotect=, but if
+you are on windows you should use something like =VirtualProtect= ([[https://github.com/8dcc/libdetour/blob/a0f774be08b8f548913a07d48db2633c1a52494c/src/libdetour.c#L60-L66][Link]]).
 
 #+begin_src C
 #include <stdint.h>
@@ -257,9 +258,8 @@ hook(orig_ptr, jmp_bytes);
 
 * Detour hooking library
 
-I made a simple detour hooking library in pure C for GNU/Linux. It should be
-very easy to port, as the platform-specific thing should be the =protect_addr=
-function.
+I made a simple detour hooking library in pure C for both GNU/Linux and
+Windows. The platform-specific function is =protect_addr()=.
 
 To use it, you just need to:
 
