@@ -286,14 +286,14 @@ Since we saw how it was called, we can determine the number of parameters and
 the types. We also know that the first argument is the user, and that it's
 calculating the string length once at =f+0x17=.
 
-We also know that the second parameter is a =char*= because we store =rsi= in
-=[rbp - 0x20]=, and from =f+0x9d= to =f+0xa8= we move that value to =rax=, we add it to
-=rdx= (probably using =rdx= as an index) and finally we access its contents with
+We also know that the second parameter is a =char*= because it's storing =rsi= in
+=[rbp - 0x20]=, and from =f+0x9d= to =f+0xa8= it moves that value to =rax=, adds it to
+=rdx= (probably using =rdx= as an index) and finally it access its contents with
 =byte [rdx]=.
 
-We can also identify a =for= loop, since at =f+0x26= we set =[rbp - 8]= to 0, right
-before jumping to =f+0xc1=, where we check if this value is less or equal than
-=0x13= (19) and jump back to the top. Right before this conditional jump, we can
+We can also identify a =for= loop, since at =f+0x26= it sets =[rbp - 8]= to 0, right
+before jumping to =f+0xc1=, where it checks if this value is less or equal than
+=0x13= (19) and jumps back to the top. Right before this conditional jump, we can
 see that the value at =[rbp - 8]= is increased by one. Note how the value in the
 loop's condition is the same as the one we saw being used as the /size/ parameter
 when calling =memcmp= from =main= (Since =i<=19= is the same as =i<20=).
@@ -323,7 +323,7 @@ void func(const char* user, const char* real_key) {
 }
 #+end_src
 
-Let's take a look at the body of the loop. We can see how we are loading the
+Let's take a look at the body of the loop. We can see how it's loading the
 =user_pos= into =rdx=, and the first argument into =rax=, before adding them together
 and dereferencing the address into =[rbp - 0xd]=.
 
