@@ -8,7 +8,7 @@
 
 -----
 
-#+TOC: headlines 2
+#+TOC: headlines 3
 
 * What is signature scanning?
 
@@ -139,7 +139,8 @@ it is:
 #+begin_src C
 #include <stdint.h>
 
-/* "E0" -> 224 */
+/* Used for getting the bytes from IDA patterns.
+ * Converts: "E0" -> 224 */
 uint8_t hex_to_byte(const char* hex) {
     int ret = 0;
 
@@ -172,28 +173,35 @@ uint8_t hex_to_byte(const char* hex) {
 }
 #+end_src
 
-** The =sigscan= function
+** The =do_scan= function
 
-And with that, we can make our =sigscan= function:
+And with that, we can make our =do_scan= function:
 
 #+begin_src C
 #include <stdint.h>
 
-void* sigscan(void* start, void* end, const char* pattern) {
+/* Search for `pattern' from `start' to `end'. */
+void* do_scan(void* start, void* end, const char* pattern) {
+    if (!start || !end)
+        return NULL;
+
     /* Skip preceding spaces from pattern, if any */
     while (*pattern == ' ')
         pattern++;
 
     /* Current position in memory and current position in pattern */
-    uint8_t* mem_ptr = start;
-    char* pat_ptr    = pattern;
+    uint8_t* mem_ptr    = start;
+    const char* pat_ptr = pattern;
 
     /* Iterate until we reach the end of the memory or the end of the pattern */
     while ((void*)mem_ptr < end && *pat_ptr != '\0') {
         /* Wildcard, always match */
         if (*pat_ptr == '?') {
             mem_ptr++;
-            pat_ptr++;
+
+            /* "A1 ?? ?? B2" -> "A1 ? ? B2" */
+            while (*pat_ptr == '?')
+                pat_ptr++;
 
             /* Remove trailing spaces after '?'
              ,* NOTE: I reused this code, but you could use `goto` */
@@ -203,7 +211,10 @@ void* sigscan(void* start, void* end, const char* pattern) {
             continue;
         }
 
-        /* "E0" -> 224 */
+        /* Convert "E0" into 224.
+         ,* TODO: Would be better to only do this once at the start of the
+         ,* function with some kind of ida2bytes function (We would need a mask
+         ,* for the '?' vs. 0x3F). */
         uint8_t cur_byte = hex_to_byte(pat_ptr);
 
         if (*mem_ptr == cur_byte) {
@@ -232,6 +243,11 @@ void* sigscan(void* start, void* end, const char* pattern) {
 #+end_src
 
 ** Getting the bounds of a loaded module
+
+To get the =start= and =end= addresses, we need to find where the binary was loaded
+in memory. I am going to show 2 methods of getting this information.
+
+*** The unreliable method
 
 On linux, we could use =dlopen()= to get the start and end addresses of a loaded
 module if we were, for example, injecting our own shared object.
@@ -262,21 +278,19 @@ struct our_link_map {
     const ElfW(Phdr) * phdr;
 };
 
-void* find_sig(const char* module, const char* pattern) {
+void* sigscan(const char* module, const char* pattern) {
     struct our_link_map* link = dlopen(module, RTLD_NOLOAD | RTLD_NOW);
     if (!link) {
         fprintf(stderr, "Can't open module \"%s\"", module);
         return NULL;
     }
 
-    /* TODO: The size of the binary is not right when passing NULL to
-     ,* dlopen() */
     uint8_t* start = (uint8_t*)link->l_addr;
     uint8_t* end   = start + link->phdr[0].p_memsz;
 
     dlclose(link);
 
-    return sigscan(start, end, pattern);
+    return do_scan(start, end, pattern);
 }
 #+end_src
 
@@ -284,8 +298,8 @@ As far as I know, the windows equivalent of =dlopen= would be [[https://learn.mi
 [[https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress][=GetProcAddress=]]. If you have more information on how this is done on windows,
 feel free to [[https://github.com/8dcc/8dcc.github.io/pulls][contribute]].
 
-If we wanted to get the bounds of the main binary, we could use =NULL= as
-parameter to =find_sig=, so it gets passed to =dlopen=.
+In theory, if we wanted to get the bounds of the main binary, we could pass =NULL=
+as the first parameter to =sigscan=, so it gets passed to =dlopen=.
 
 #+begin_quote
 *dlopen(3)*
@@ -295,14 +309,226 @@ filename contains a slash ("/"), then it is interpreted as a (relative or
 absolute) pathname.
 #+end_quote
 
-#+begin_comment
-TODO: Add note about this being unreliable and add =/proc/self/maps= method.
-#+end_comment
+I say /in theory/ because in my experience, this is not the case. Usually
+=link->phdr= is =NULL=, so the program crashes. That's why I am going to show a more
+reliable way.
 
-* Using our =find_sig= function
+*** Parsing =/proc/self/maps=
+
+The =/proc/<pid>/= folder contains many useful files, one of them being =maps=. The
+=maps= file shows information about the currently mapped memory regions and their
+access permissions in the following format (without the column names):
+
+#+begin_example
+address           perms offset  dev   inode       pathname
+----------------------------------------------------------------------
+00400000-00452000 r-xp 00000000 08:02 173521      /usr/bin/dbus-daemon
+00651000-00652000 r--p 00051000 08:02 173521      /usr/bin/dbus-daemon
+00652000-00655000 rw-p 00052000 08:02 173521      /usr/bin/dbus-daemon
+00e03000-00e24000 rw-p 00000000 00:00 0           [heap]
+00e24000-011f7000 rw-p 00000000 00:00 0           [heap]
+...
+35b1800000-35b1820000 r-xp 00000000 08:02 135522  /usr/lib64/ld-2.15.so
+#+end_example
+
+For more information, see =proc_pid_maps(5)=.
+
+We can access the =maps= file of our process using the =/proc/self/= folder, which
+resolves to the PID of the current process. See also =proc(5)=.
+
+Of course, now comes the tedious part, parsing it. Fortunately for you, I made a
+function that returns a linked list of all these regions. It's a pretty long
+function but since it's well commented, I won't dive into too much detail.
+
+#+begin_src C
+#include <stdbool.h>
+#include <stdio.h>  /* fopen(), FILE* */
+#include <stdlib.h> /* strtoull() */
+
+typedef struct ModuleBounds {
+    void* start;
+    void* end;
+    struct ModuleBounds* next;
+} ModuleBounds;
+
+ModuleBounds* get_module_bounds(const char* module_name) {
+    FILE* fd = fopen("/proc/self/maps", "r");
+    if (!fd)
+        return NULL;
+
+    /* For converting to uint64_t using strtoull() */
+    static char addr_buf[] = "FFFFFFFFFFFFFFFF";
+    int addr_buf_pos;
+
+    /* For the first module. Start `ret' as NULL in case no module is valid. */
+    ModuleBounds* ret = NULL;
+    ModuleBounds* cur = ret;
+
+    int c;
+    while ((c = fgetc(fd)) != EOF) {
+        /* Read first address of the line */
+        addr_buf_pos = 0;
+        do {
+            addr_buf[addr_buf_pos++] = c;
+        } while ((c = fgetc(fd)) != '-');
+        addr_buf[addr_buf_pos] = '\0';
+
+        void* start_addr = (void*)strtoull(addr_buf, NULL, 16);
+
+        /* Read second address of the line */
+        addr_buf_pos = 0;
+        while ((c = fgetc(fd)) != ' ')
+            addr_buf[addr_buf_pos++] = c;
+        addr_buf[addr_buf_pos] = '\0';
+
+        void* end_addr = (void*)strtoull(addr_buf, NULL, 16);
+
+        /* Parse "rwxp". For now we only care about read permissions. */
+        bool is_readable = ((c = fgetc(fd)) == 'r');
+
+        /* Skip permissions and single space */
+        while ((c = fgetc(fd)) != ' ')
+            ;
+
+        /* Skip 3rd column and single space */
+        while ((c = fgetc(fd)) != ' ')
+            ;
+
+        /* Skip 4th column and single space */
+        while ((c = fgetc(fd)) != ' ')
+            ;
+
+        /* Skip 5th column */
+        while ((c = fgetc(fd)) != ' ')
+            ;
+
+        /* Skip spacing until the module name. First char of module name
+         ,* will be saved in `c' after this loop. */
+        while ((c = fgetc(fd)) == ' ')
+            ;
+
+        bool name_matches = true;
+        if (module_name == NULL) {
+            /* We don't want to filter the module name, just make sure it
+             ,* doesn't start with '[' and skip to the end of the line. */
+            if (c == '[')
+                name_matches = false;
+
+            while (c != '\n' && c != EOF)
+                c = fgetc(fd);
+        } else {
+            /* Compare module name. Note that the output of maps has absolute
+             ,* paths. */
+            int i = 0;
+            do {
+                /* A character did not match the module name, ignore this line.
+                 ,* We can't break out of the `for' because we have to get to the
+                 ,* newline anyway. */
+                if (name_matches && module_name[i] != '\0') {
+                    if (c != module_name[i])
+                        name_matches = false;
+
+                    i++;
+                }
+
+                /* This check is needed so we don't skip over the '\n' on lines
+                 ,* with no module name. */
+                if (c != '\n')
+                    c = fgetc(fd);
+            } while (c != '\n' && c != EOF);
+        }
+
+        /* We can read it, and it's the module we are looking for. */
+        if (is_readable && name_matches) {
+            if (cur == NULL) {
+                /* Allocate the first bounds struct */
+                cur = malloc(sizeof(ModuleBounds));
+
+                /* This one will be returned */
+                ret = cur;
+
+                /* Save the addresses from this line of maps */
+                cur->start = start_addr;
+                cur->end   = end_addr;
+            } else if (cur->end == start_addr && cur->end < end_addr) {
+                /* If the end address of the last struct is the start of this
+                 ,* one, just merge them. */
+                cur->end = end_addr;
+            } else {
+                /* There was a gap between the end of the last block and the
+                 ,* start of this one, allocate new struct. */
+                cur->next = malloc(sizeof(ModuleBounds));
+
+                /* Set as current */
+                cur = cur->next;
+
+                /* Save the addresses from this line of maps */
+                cur->start = start_addr;
+                cur->end   = end_addr;
+            }
+
+            /* Indicate the end of the linked list */
+            cur->next = NULL;
+        }
+    }
+
+    fclose(fd);
+    return ret;
+}
+#+end_src
+
+This function returns a linked list of =ModuleList= structures, which contain the
+start and end addresses of the readable modules that match the provided
+name. You can also pass =NULL= to return all readable sections (except the ones
+whose name start with =[=, like =[heap]=, =[stack]=, etc.).
+
+Of course, we would need to free the =ModuleBounds= structures allocated by
+=get_module_bounds= after we are done with them.
+
+#+begin_src C
+/* Free a linked list of ModuleBounds structures */
+void free_module_bounds(ModuleBounds* bounds) {
+    ModuleBounds* cur = bounds;
+    while (cur != NULL) {
+        ModuleBounds* next = cur->next;
+        free(cur);
+        cur = next;
+    }
+}
+#+end_src
+
+Finally, we can just call =get_module_bounds= and, while iterating those regions,
+scan them using our =do_scan= function.
+
+#+begin_src C
+/* Search for `ida_pattern' in the specified `module'. */
+void* sigscan(const char* module, const char* ida_pattern) {
+    /* Get a linked list of ModuleBounds, containing the start and end addresses
+     ,* of all the regions that match `module'. */
+    ModuleBounds* bounds = get_module_bounds(module);
+
+    /* Iterate them, and scan each one until we find a match. */
+    void* ret = NULL;
+    for (ModuleBounds* cur = bounds; cur != NULL; cur = cur->next) {
+        void* cur_result = do_scan(cur->start, cur->end, ida_pattern);
+
+        if (cur_result != NULL) {
+            ret = cur_result;
+            break;
+        }
+    }
+
+    /* Free the ModuleBounds linked list */
+    free_module_bounds(bounds);
+
+    return ret;
+}
+#+end_src
+
+* Using our =sigscan= function
 
 Now that we have the signature and our function for scanning, we just have to
-create a library we can inject into a running process.
+create a shared object that we can inject into a running process.
 
 #+begin_src C
 #include <stdio.h>
@@ -317,7 +543,7 @@ typedef int (*func_ptr_t)(int, int);
 __attribute__((constructor)) void load(void) {
     puts("Library loaded.");
 
-    func_ptr_t found_func = find_sig(NULL, MY_SIG);
+    func_ptr_t found_func = sigscan(NULL, MY_SIG);
     if (found_func == NULL) {
         fprintf(stderr, "my_lib: Could not find function.\n");
         return;
@@ -387,3 +613,16 @@ my_lib.so: my_lib.c
 inject: my_lib.so
 	bash ./inject.sh
 #+end_src
+
+* Signature scanning library
+
+If you just want something that works, I made a lightweight single-header
+signature scanning library in pure C for GNU/Linux.
+
+Since it's a simple single-header library, you just need to copy the
+=libsigscan.h= file to your project and =#include= it on your sources.
+
+The library consists of just 2 functions: =sigscan_module()= and =sigscan()=. The
+first scans the specified IDA signature in the specified module. The second is
+just a wrapper for passing =NULL= to the first one, therefore scanning all loaded
+modules.

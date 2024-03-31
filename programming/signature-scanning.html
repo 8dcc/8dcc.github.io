@@ -207,24 +207,30 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orga29eef0">1. What is signature scanning?</a></li>
-<li><a href="#org9463a76">2. Finding the function inside the binary</a></li>
-<li><a href="#org15de191">3. Getting the signature</a></li>
-<li><a href="#org815cabb">4. Signature scanning function</a>
+<li><a href="#orgb8153de">1. What is signature scanning?</a></li>
+<li><a href="#orge1c47a9">2. Finding the function inside the binary</a></li>
+<li><a href="#orga824783">3. Getting the signature</a></li>
+<li><a href="#org58357a5">4. Signature scanning function</a>
 <ul>
-<li><a href="#org2a6449a">4.1. Parsing the IDA pattern string</a></li>
-<li><a href="#org6b7c071">4.2. The <code>sigscan</code> function</a></li>
-<li><a href="#org6fce48d">4.3. Getting the bounds of a loaded module</a></li>
+<li><a href="#orgaddc8e1">4.1. Parsing the IDA pattern string</a></li>
+<li><a href="#orgeeca7a9">4.2. The <code>do_scan</code> function</a></li>
+<li><a href="#org7f8a65d">4.3. Getting the bounds of a loaded module</a>
+<ul>
+<li><a href="#org02b4010">4.3.1. The unreliable method</a></li>
+<li><a href="#orgd47343d">4.3.2. Parsing <code>/proc/self/maps</code></a></li>
 </ul>
 </li>
-<li><a href="#org6aeb945">5. Using our <code>find_sig</code> function</a></li>
-<li><a href="#org97e7f70">6. Injecting script and final Makefile</a></li>
+</ul>
+</li>
+<li><a href="#orgb8c7206">5. Using our <code>sigscan</code> function</a></li>
+<li><a href="#org505e8ac">6. Injecting script and final Makefile</a></li>
+<li><a href="#org3e30851">7. Signature scanning library</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orga29eef0" class="outline-2">
-<h2 id="orga29eef0"><span class="section-number-2">1.</span> What is signature scanning?</h2>
+<div id="outline-container-orgb8153de" class="outline-2">
+<h2 id="orgb8153de"><span class="section-number-2">1.</span> What is signature scanning?</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 First, let's have a look at a sample program:
@@ -272,8 +278,8 @@ In our case, we would want to look for the bytes of the binary corresponding to
 </div>
 </div>
 
-<div id="outline-container-org9463a76" class="outline-2">
-<h2 id="org9463a76"><span class="section-number-2">2.</span> Finding the function inside the binary</h2>
+<div id="outline-container-orge1c47a9" class="outline-2">
+<h2 id="orge1c47a9"><span class="section-number-2">2.</span> Finding the function inside the binary</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 I will compile the previous source with <code>gcc 13.2.1</code>. We need to use <code>-O0</code> so the
@@ -317,7 +323,7 @@ This is the disassembly of the main function:
 </p>
 
 
-<div id="orga0d5a94" class="figure">
+<div id="org98746da" class="figure">
 <p><img src="../img/signature-scanning1.png" alt="signature-scanning1.png" />
 </p>
 </div>
@@ -330,7 +336,7 @@ calling <code>my_func</code>. Let's double-click it to have a look at the assemb
 </p>
 
 
-<div id="org6d273f4" class="figure">
+<div id="orgc724411" class="figure">
 <p><img src="../img/signature-scanning2.png" alt="signature-scanning2.png" />
 </p>
 </div>
@@ -341,8 +347,8 @@ Yeah, that looks like our function.
 </div>
 </div>
 
-<div id="outline-container-org15de191" class="outline-2">
-<h2 id="org15de191"><span class="section-number-2">3.</span> Getting the signature</h2>
+<div id="outline-container-orga824783" class="outline-2">
+<h2 id="orga824783"><span class="section-number-2">3.</span> Getting the signature</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The signature is going to be an arbitrary number of bytes from the target
@@ -363,7 +369,7 @@ disassembler.
 </p>
 
 
-<div id="orgc555127" class="figure">
+<div id="orga43a1fd" class="figure">
 <p><img src="../img/signature-scanning3.png" alt="signature-scanning3.png" />
 </p>
 </div>
@@ -374,7 +380,7 @@ the function/variable we are looking for. Here is a signature of the whole
 function, but in practice, we shouldn't need more than 10 instructions.
 </p>
 
-<pre class="example" id="orgb471f46">
+<pre class="example" id="org3b2729e">
 55 48 89 E5 48 83 EC 10 89 7D FC 89 75 F8 8B 45 F8 3B 45 FC 7F 0C 83 7D F8 00 78
 06 83 7D F8 20 7E 07 B8 ? ? ? ? EB 1F 48 8D 05 ? ? ? ? 48 89 C7 E8 ? ? ? ? 8B 45
 F8 8B 55 FC 89 C1 D3 FA 89 D0 01 C0 01 D0 C9 C3
@@ -390,8 +396,8 @@ signature scanning function a bit larger.
 </div>
 </div>
 
-<div id="outline-container-org815cabb" class="outline-2">
-<h2 id="org815cabb"><span class="section-number-2">4.</span> Signature scanning function</h2>
+<div id="outline-container-org58357a5" class="outline-2">
+<h2 id="org58357a5"><span class="section-number-2">4.</span> Signature scanning function</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 This is a simple function that scans a memory area from <code>start</code> to <code>end</code> and
@@ -399,8 +405,8 @@ searches for a <code>pattern</code> in IDA format.
 </p>
 </div>
 
-<div id="outline-container-org2a6449a" class="outline-3">
-<h3 id="org2a6449a"><span class="section-number-3">4.1.</span> Parsing the IDA pattern string</h3>
+<div id="outline-container-orgaddc8e1" class="outline-3">
+<h3 id="orgaddc8e1"><span class="section-number-3">4.1.</span> Parsing the IDA pattern string</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 First, we would need a function to convert those <code>"E5 "</code> strings into <code>0xE5</code>. Here
@@ -410,7 +416,8 @@ it is:
 <div class="org-src-container">
 <pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">"E0" -&gt; 224</span><span style="color: #989898;"> */</span>
+<span style="color: #989898;">/* </span><span style="color: #989898;">Used for getting the bytes from IDA patterns.</span>
+<span style="color: #989898;"> * Converts: "E0" -&gt; 224</span><span style="color: #989898;"> */</span>
 <span style="color: #79a8ff;">uint8_t</span> <span style="color: #4ae2ff;">hex_to_byte</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">hex</span>) {
     <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ret</span> = <span style="color: #88ca9f;">0</span>;
 
@@ -446,31 +453,38 @@ it is:
 </div>
 </div>
 
-<div id="outline-container-org6b7c071" class="outline-3">
-<h3 id="org6b7c071"><span class="section-number-3">4.2.</span> The <code>sigscan</code> function</h3>
+<div id="outline-container-orgeeca7a9" class="outline-3">
+<h3 id="orgeeca7a9"><span class="section-number-3">4.2.</span> The <code>do_scan</code> function</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
-And with that, we can make our <code>sigscan</code> function:
+And with that, we can make our <code>do_scan</code> function:
 </p>
 
 <div class="org-src-container">
 <pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
 
-<span style="color: #79a8ff;">void</span>* <span style="color: #4ae2ff;">sigscan</span>(<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">start</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">end</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">pattern</span>) {
+<span style="color: #989898;">/* </span><span style="color: #989898;">Search for `pattern' from `start' to `end'.</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">void</span>* <span style="color: #4ae2ff;">do_scan</span>(<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">start</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">end</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">pattern</span>) {
+    <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>start || <span style="color: #ff6740; font-weight: bold;">!</span>end)
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+
     <span style="color: #989898;">/* </span><span style="color: #989898;">Skip preceding spaces from pattern, if any</span><span style="color: #989898;"> */</span>
     <span style="color: #ff6f9f;">while</span> (*pattern == <span style="color: #00d3d0;">' '</span>)
         pattern++;
 
     <span style="color: #989898;">/* </span><span style="color: #989898;">Current position in memory and current position in pattern</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">mem_ptr</span> = start;
-    <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">pat_ptr</span>    = pattern;
+    <span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">mem_ptr</span>    = start;
+    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">pat_ptr</span> = pattern;
 
     <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate until we reach the end of the memory or the end of the pattern</span><span style="color: #989898;"> */</span>
     <span style="color: #ff6f9f;">while</span> ((<span style="color: #79a8ff;">void</span>*)mem_ptr &lt; end &amp;&amp; *pat_ptr != <span style="color: #00d3d0;">'\0'</span>) {
         <span style="color: #989898;">/* </span><span style="color: #989898;">Wildcard, always match</span><span style="color: #989898;"> */</span>
         <span style="color: #ff6f9f;">if</span> (*pat_ptr == <span style="color: #00d3d0;">'?'</span>) {
             mem_ptr++;
-            pat_ptr++;
+
+            <span style="color: #989898;">/* </span><span style="color: #989898;">"A1 ?? ?? B2" -&gt; "A1 ? ? B2"</span><span style="color: #989898;"> */</span>
+            <span style="color: #ff6f9f;">while</span> (*pat_ptr == <span style="color: #00d3d0;">'?'</span>)
+                pat_ptr++;
 
             <span style="color: #989898;">/* </span><span style="color: #989898;">Remove trailing spaces after '?'</span>
 <span style="color: #989898;">             * </span><span style="color: #44bc44; font-weight: bold;">NOTE:</span><span style="color: #989898;"> I reused this code, but you could use `goto`</span><span style="color: #989898;"> */</span>
@@ -480,7 +494,10 @@ And with that, we can make our <code>sigscan</code> function:
             <span style="color: #ff6f9f;">continue</span>;
         }
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">"E0" -&gt; 224</span><span style="color: #989898;"> */</span>
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Convert "E0" into 224.</span>
+<span style="color: #989898;">         * </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Would be better to only do this once at the start of the</span>
+<span style="color: #989898;">         * function with some kind of ida2bytes function (We would need a mask</span>
+<span style="color: #989898;">         * for the '?' vs. 0x3F).</span><span style="color: #989898;"> */</span>
         <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">cur_byte</span> = hex_to_byte(pat_ptr);
 
         <span style="color: #ff6f9f;">if</span> (*mem_ptr == cur_byte) {
@@ -511,9 +528,18 @@ And with that, we can make our <code>sigscan</code> function:
 </div>
 </div>
 
-<div id="outline-container-org6fce48d" class="outline-3">
-<h3 id="org6fce48d"><span class="section-number-3">4.3.</span> Getting the bounds of a loaded module</h3>
+<div id="outline-container-org7f8a65d" class="outline-3">
+<h3 id="org7f8a65d"><span class="section-number-3">4.3.</span> Getting the bounds of a loaded module</h3>
 <div class="outline-text-3" id="text-4-3">
+<p>
+To get the <code>start</code> and <code>end</code> addresses, we need to find where the binary was loaded
+in memory. I am going to show 2 methods of getting this information.
+</p>
+</div>
+
+<div id="outline-container-org02b4010" class="outline-4">
+<h4 id="org02b4010"><span class="section-number-4">4.3.1.</span> The unreliable method</h4>
+<div class="outline-text-4" id="text-4-3-1">
 <p>
 On linux, we could use <code>dlopen()</code> to get the start and end addresses of a loaded
 module if we were, for example, injecting our own shared object.
@@ -547,21 +573,19 @@ get the size of the loaded module).
     <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">ElfW</span>(<span style="color: #6ae4b9;">Phdr</span>) * phdr;
 };
 
-<span style="color: #79a8ff;">void</span>* <span style="color: #4ae2ff;">find_sig</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">module</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">pattern</span>) {
+<span style="color: #79a8ff;">void</span>* <span style="color: #4ae2ff;">sigscan</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">module</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">pattern</span>) {
     <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">our_link_map</span>* <span style="color: #6ae4b9;">link</span> = dlopen(module, RTLD_NOLOAD | RTLD_NOW);
     <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>link) {
         fprintf(stderr, <span style="color: #00d3d0;">"Can't open module \"%s\""</span>, module);
         <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
     }
 
-    <span style="color: #989898;">/* </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> The size of the binary is not right when passing NULL to</span>
-<span style="color: #989898;">     * dlopen()</span><span style="color: #989898;"> */</span>
     <span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">start</span> = (<span style="color: #79a8ff;">uint8_t</span>*)link-&gt;l_addr;
     <span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">end</span>   = start + link-&gt;phdr[<span style="color: #88ca9f;">0</span>].p_memsz;
 
     dlclose(link);
 
-    <span style="color: #ff6f9f;">return</span> sigscan(start, end, pattern);
+    <span style="color: #ff6f9f;">return</span> do_scan(start, end, pattern);
 }
 </pre>
 </div>
@@ -573,8 +597,8 @@ feel free to <a href="https://github.com/8dcc/8dcc.github.io/pulls">contribute</
 </p>
 
 <p>
-If we wanted to get the bounds of the main binary, we could use <code>NULL</code> as
-parameter to <code>find_sig</code>, so it gets passed to <code>dlopen</code>.
+In theory, if we wanted to get the bounds of the main binary, we could pass <code>NULL</code>
+as the first parameter to <code>sigscan</code>, so it gets passed to <code>dlopen</code>.
 </p>
 
 <blockquote>
@@ -588,16 +612,255 @@ filename contains a slash ("/"), then it is interpreted as a (relative or
 absolute) pathname.
 </p>
 </blockquote>
+
+<p>
+I say <i>in theory</i> because in my experience, this is not the case. Usually
+<code>link-&gt;phdr</code> is <code>NULL</code>, so the program crashes. That's why I am going to show a more
+reliable way.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd47343d" class="outline-4">
+<h4 id="orgd47343d"><span class="section-number-4">4.3.2.</span> Parsing <code>/proc/self/maps</code></h4>
+<div class="outline-text-4" id="text-4-3-2">
+<p>
+The <code>/proc/&lt;pid&gt;/</code> folder contains many useful files, one of them being <code>maps</code>. The
+<code>maps</code> file shows information about the currently mapped memory regions and their
+access permissions in the following format (without the column names):
+</p>
+
+<pre class="example" id="orgc55330d">
+address           perms offset  dev   inode       pathname
+----------------------------------------------------------------------
+00400000-00452000 r-xp 00000000 08:02 173521      /usr/bin/dbus-daemon
+00651000-00652000 r--p 00051000 08:02 173521      /usr/bin/dbus-daemon
+00652000-00655000 rw-p 00052000 08:02 173521      /usr/bin/dbus-daemon
+00e03000-00e24000 rw-p 00000000 00:00 0           [heap]
+00e24000-011f7000 rw-p 00000000 00:00 0           [heap]
+...
+35b1800000-35b1820000 r-xp 00000000 08:02 135522  /usr/lib64/ld-2.15.so
+</pre>
+
+<p>
+For more information, see <code>proc_pid_maps(5)</code>.
+</p>
+
+<p>
+We can access the <code>maps</code> file of our process using the <code>/proc/self/</code> folder, which
+resolves to the PID of the current process. See also <code>proc(5)</code>.
+</p>
+
+<p>
+Of course, now comes the tedious part, parsing it. Fortunately for you, I made a
+function that returns a linked list of all these regions. It's a pretty long
+function but since it's well commented, I won't dive into too much detail.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdbool.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">fopen(), FILE*</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdlib.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">strtoull()</span><span style="color: #989898;"> */</span>
+
+<span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">ModuleBounds</span> {
+    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">start</span>;
+    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">end</span>;
+    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">next</span>;
+} <span style="color: #79a8ff;">ModuleBounds</span>;
+
+<span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #4ae2ff;">get_module_bounds</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">module_name</span>) {
+    <span style="color: #79a8ff;">FILE</span>* <span style="color: #6ae4b9;">fd</span> = fopen(<span style="color: #00d3d0;">"/proc/self/maps"</span>, <span style="color: #00d3d0;">"r"</span>);
+    <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>fd)
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">For converting to uint64_t using strtoull()</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">addr_buf</span>[] = <span style="color: #00d3d0;">"FFFFFFFFFFFFFFFF"</span>;
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">addr_buf_pos</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">For the first module. Start `ret' as NULL in case no module is valid.</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">ret</span> = <span style="color: #88ca9f;">NULL</span>;
+    <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">cur</span> = ret;
+
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">c</span>;
+    <span style="color: #ff6f9f;">while</span> ((c = fgetc(fd)) != EOF) {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Read first address of the line</span><span style="color: #989898;"> */</span>
+        addr_buf_pos = <span style="color: #88ca9f;">0</span>;
+        <span style="color: #ff6f9f;">do</span> {
+            addr_buf[addr_buf_pos++] = c;
+        } <span style="color: #ff6f9f;">while</span> ((c = fgetc(fd)) != <span style="color: #00d3d0;">'-'</span>);
+        addr_buf[addr_buf_pos] = <span style="color: #00d3d0;">'\0'</span>;
+
+        <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">start_addr</span> = (<span style="color: #79a8ff;">void</span>*)strtoull(addr_buf, <span style="color: #88ca9f;">NULL</span>, <span style="color: #88ca9f;">16</span>);
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Read second address of the line</span><span style="color: #989898;"> */</span>
+        addr_buf_pos = <span style="color: #88ca9f;">0</span>;
+        <span style="color: #ff6f9f;">while</span> ((c = fgetc(fd)) != <span style="color: #00d3d0;">' '</span>)
+            addr_buf[addr_buf_pos++] = c;
+        addr_buf[addr_buf_pos] = <span style="color: #00d3d0;">'\0'</span>;
+
+        <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">end_addr</span> = (<span style="color: #79a8ff;">void</span>*)strtoull(addr_buf, <span style="color: #88ca9f;">NULL</span>, <span style="color: #88ca9f;">16</span>);
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Parse "rwxp". For now we only care about read permissions.</span><span style="color: #989898;"> */</span>
+        <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">is_readable</span> = ((c = fgetc(fd)) == <span style="color: #00d3d0;">'r'</span>);
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Skip permissions and single space</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">while</span> ((c = fgetc(fd)) != <span style="color: #00d3d0;">' '</span>)
+            ;
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Skip 3rd column and single space</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">while</span> ((c = fgetc(fd)) != <span style="color: #00d3d0;">' '</span>)
+            ;
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Skip 4th column and single space</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">while</span> ((c = fgetc(fd)) != <span style="color: #00d3d0;">' '</span>)
+            ;
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Skip 5th column</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">while</span> ((c = fgetc(fd)) != <span style="color: #00d3d0;">' '</span>)
+            ;
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Skip spacing until the module name. First char of module name</span>
+<span style="color: #989898;">         * will be saved in `c' after this loop.</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">while</span> ((c = fgetc(fd)) == <span style="color: #00d3d0;">' '</span>)
+            ;
+
+        <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">name_matches</span> = <span style="color: #88ca9f;">true</span>;
+        <span style="color: #ff6f9f;">if</span> (module_name == <span style="color: #88ca9f;">NULL</span>) {
+            <span style="color: #989898;">/* </span><span style="color: #989898;">We don't want to filter the module name, just make sure it</span>
+<span style="color: #989898;">             * doesn't start with '[' and skip to the end of the line.</span><span style="color: #989898;"> */</span>
+            <span style="color: #ff6f9f;">if</span> (c == <span style="color: #00d3d0;">'['</span>)
+                name_matches = <span style="color: #88ca9f;">false</span>;
+
+            <span style="color: #ff6f9f;">while</span> (c != <span style="color: #00d3d0;">'\n'</span> &amp;&amp; c != EOF)
+                c = fgetc(fd);
+        } <span style="color: #ff6f9f;">else</span> {
+            <span style="color: #989898;">/* </span><span style="color: #989898;">Compare module name. Note that the output of maps has absolute</span>
+<span style="color: #989898;">             * paths.</span><span style="color: #989898;"> */</span>
+            <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>;
+            <span style="color: #ff6f9f;">do</span> {
+                <span style="color: #989898;">/* </span><span style="color: #989898;">A character did not match the module name, ignore this line.</span>
+<span style="color: #989898;">                 * We can't break out of the `for' because we have to get to the</span>
+<span style="color: #989898;">                 * newline anyway.</span><span style="color: #989898;"> */</span>
+                <span style="color: #ff6f9f;">if</span> (name_matches &amp;&amp; module_name[i] != <span style="color: #00d3d0;">'\0'</span>) {
+                    <span style="color: #ff6f9f;">if</span> (c != module_name[i])
+                        name_matches = <span style="color: #88ca9f;">false</span>;
+
+                    i++;
+                }
+
+                <span style="color: #989898;">/* </span><span style="color: #989898;">This check is needed so we don't skip over the '\n' on lines</span>
+<span style="color: #989898;">                 * with no module name.</span><span style="color: #989898;"> */</span>
+                <span style="color: #ff6f9f;">if</span> (c != <span style="color: #00d3d0;">'\n'</span>)
+                    c = fgetc(fd);
+            } <span style="color: #ff6f9f;">while</span> (c != <span style="color: #00d3d0;">'\n'</span> &amp;&amp; c != EOF);
+        }
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">We can read it, and it's the module we are looking for.</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">if</span> (is_readable &amp;&amp; name_matches) {
+            <span style="color: #ff6f9f;">if</span> (cur == <span style="color: #88ca9f;">NULL</span>) {
+                <span style="color: #989898;">/* </span><span style="color: #989898;">Allocate the first bounds struct</span><span style="color: #989898;"> */</span>
+                cur = malloc(<span style="color: #ff6f9f;">sizeof</span>(ModuleBounds));
+
+                <span style="color: #989898;">/* </span><span style="color: #989898;">This one will be returned</span><span style="color: #989898;"> */</span>
+                ret = cur;
+
+                <span style="color: #989898;">/* </span><span style="color: #989898;">Save the addresses from this line of maps</span><span style="color: #989898;"> */</span>
+                cur-&gt;start = start_addr;
+                cur-&gt;end   = end_addr;
+            } <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (cur-&gt;end == start_addr &amp;&amp; cur-&gt;end &lt; end_addr) {
+                <span style="color: #989898;">/* </span><span style="color: #989898;">If the end address of the last struct is the start of this</span>
+<span style="color: #989898;">                 * one, just merge them.</span><span style="color: #989898;"> */</span>
+                cur-&gt;end = end_addr;
+            } <span style="color: #ff6f9f;">else</span> {
+                <span style="color: #989898;">/* </span><span style="color: #989898;">There was a gap between the end of the last block and the</span>
+<span style="color: #989898;">                 * start of this one, allocate new struct.</span><span style="color: #989898;"> */</span>
+                cur-&gt;next = malloc(<span style="color: #ff6f9f;">sizeof</span>(ModuleBounds));
+
+                <span style="color: #989898;">/* </span><span style="color: #989898;">Set as current</span><span style="color: #989898;"> */</span>
+                cur = cur-&gt;next;
+
+                <span style="color: #989898;">/* </span><span style="color: #989898;">Save the addresses from this line of maps</span><span style="color: #989898;"> */</span>
+                cur-&gt;start = start_addr;
+                cur-&gt;end   = end_addr;
+            }
+
+            <span style="color: #989898;">/* </span><span style="color: #989898;">Indicate the end of the linked list</span><span style="color: #989898;"> */</span>
+            cur-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+        }
+    }
+
+    fclose(fd);
+    <span style="color: #ff6f9f;">return</span> ret;
+}
+</pre>
+</div>
+
+<p>
+This function returns a linked list of <code>ModuleList</code> structures, which contain the
+start and end addresses of the readable modules that match the provided
+name. You can also pass <code>NULL</code> to return all readable sections (except the ones
+whose name start with <code>[</code>, like <code>[heap]</code>, <code>[stack]</code>, etc.).
+</p>
+
+<p>
+Of course, we would need to free the <code>ModuleBounds</code> structures allocated by
+<code>get_module_bounds</code> after we are done with them.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Free a linked list of ModuleBounds structures</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">free_module_bounds</span>(<span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">bounds</span>) {
+    <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">cur</span> = bounds;
+    <span style="color: #ff6f9f;">while</span> (cur != <span style="color: #88ca9f;">NULL</span>) {
+        <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">next</span> = cur-&gt;next;
+        free(cur);
+        cur = next;
+    }
+}
+</pre>
+</div>
+
+<p>
+Finally, we can just call <code>get_module_bounds</code> and, while iterating those regions,
+scan them using our <code>do_scan</code> function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Search for `ida_pattern' in the specified `module'.</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">void</span>* <span style="color: #4ae2ff;">sigscan</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">module</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">ida_pattern</span>) {
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Get a linked list of ModuleBounds, containing the start and end addresses</span>
+<span style="color: #989898;">     * of all the regions that match `module'.</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">bounds</span> = get_module_bounds(module);
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate them, and scan each one until we find a match.</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">ret</span> = <span style="color: #88ca9f;">NULL</span>;
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">cur</span> = bounds; cur != <span style="color: #88ca9f;">NULL</span>; cur = cur-&gt;next) {
+        <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">cur_result</span> = do_scan(cur-&gt;start, cur-&gt;end, ida_pattern);
+
+        <span style="color: #ff6f9f;">if</span> (cur_result != <span style="color: #88ca9f;">NULL</span>) {
+            ret = cur_result;
+            <span style="color: #ff6f9f;">break</span>;
+        }
+    }
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Free the ModuleBounds linked list</span><span style="color: #989898;"> */</span>
+    free_module_bounds(bounds);
+
+    <span style="color: #ff6f9f;">return</span> ret;
+}
+</pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org6aeb945" class="outline-2">
-<h2 id="org6aeb945"><span class="section-number-2">5.</span> Using our <code>find_sig</code> function</h2>
+<div id="outline-container-orgb8c7206" class="outline-2">
+<h2 id="orgb8c7206"><span class="section-number-2">5.</span> Using our <code>sigscan</code> function</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 Now that we have the signature and our function for scanning, we just have to
-create a library we can inject into a running process.
+create a shared object that we can inject into a running process.
 </p>
 
 <div class="org-src-container">
@@ -613,7 +876,7 @@ create a library we can inject into a running process.
 <span style="color: #ff6f9f;">__attribute__</span>((constructor)) <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">load</span>(<span style="color: #79a8ff;">void</span>) {
     puts(<span style="color: #00d3d0;">"Library loaded."</span>);
 
-    <span style="color: #79a8ff;">func_ptr_t</span> <span style="color: #6ae4b9;">found_func</span> = find_sig(<span style="color: #88ca9f;">NULL</span>, MY_SIG);
+    <span style="color: #79a8ff;">func_ptr_t</span> <span style="color: #6ae4b9;">found_func</span> = sigscan(<span style="color: #88ca9f;">NULL</span>, MY_SIG);
     <span style="color: #ff6f9f;">if</span> (found_func == <span style="color: #88ca9f;">NULL</span>) {
         fprintf(stderr, <span style="color: #00d3d0;">"my_lib: Could not find function.\n"</span>);
         <span style="color: #ff6f9f;">return</span>;
@@ -638,8 +901,8 @@ create a library we can inject into a running process.
 </div>
 </div>
 
-<div id="outline-container-org97e7f70" class="outline-2">
-<h2 id="org97e7f70"><span class="section-number-2">6.</span> Injecting script and final Makefile</h2>
+<div id="outline-container-org505e8ac" class="outline-2">
+<h2 id="org505e8ac"><span class="section-number-2">6.</span> Injecting script and final Makefile</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 We can inject our library into the binary the <a href="https://www.sourceware.org/gdb/">GNU Debugger</a>.
@@ -695,6 +958,28 @@ injecting:
     bash ./inject.sh
 </pre>
 </div>
+</div>
+</div>
+
+<div id="outline-container-org3e30851" class="outline-2">
+<h2 id="org3e30851"><span class="section-number-2">7.</span> Signature scanning library</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+If you just want something that works, I made a lightweight single-header
+signature scanning library in pure C for GNU/Linux.
+</p>
+
+<p>
+Since it's a simple single-header library, you just need to copy the
+<code>libsigscan.h</code> file to your project and <code>#include</code> it on your sources.
+</p>
+
+<p>
+The library consists of just 2 functions: <code>sigscan_module()</code> and <code>sigscan()</code>. The
+first scans the specified IDA signature in the specified module. The second is
+just a wrapper for passing <code>NULL</code> to the first one, therefore scanning all loaded
+modules.
+</p>
 </div>
 </div>
 </div>
