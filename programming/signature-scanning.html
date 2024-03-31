@@ -207,30 +207,30 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgb8153de">1. What is signature scanning?</a></li>
-<li><a href="#orge1c47a9">2. Finding the function inside the binary</a></li>
-<li><a href="#orga824783">3. Getting the signature</a></li>
-<li><a href="#org58357a5">4. Signature scanning function</a>
+<li><a href="#org2082530">1. What is signature scanning?</a></li>
+<li><a href="#orgbbcfc21">2. Finding the function inside the binary</a></li>
+<li><a href="#org47f9978">3. Getting the signature</a></li>
+<li><a href="#orgafe5807">4. Signature scanning function</a>
 <ul>
-<li><a href="#orgaddc8e1">4.1. Parsing the IDA pattern string</a></li>
-<li><a href="#orgeeca7a9">4.2. The <code>do_scan</code> function</a></li>
-<li><a href="#org7f8a65d">4.3. Getting the bounds of a loaded module</a>
+<li><a href="#orgca47e57">4.1. Parsing the IDA pattern string</a></li>
+<li><a href="#org42e7d10">4.2. The <code>do_scan</code> function</a></li>
+<li><a href="#orgecea689">4.3. Getting the bounds of a loaded module</a>
 <ul>
-<li><a href="#org02b4010">4.3.1. The unreliable method</a></li>
-<li><a href="#orgd47343d">4.3.2. Parsing <code>/proc/self/maps</code></a></li>
+<li><a href="#org516fbe3">4.3.1. The unreliable method</a></li>
+<li><a href="#org42ca298">4.3.2. Parsing <code>/proc/self/maps</code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgb8c7206">5. Using our <code>sigscan</code> function</a></li>
-<li><a href="#org505e8ac">6. Injecting script and final Makefile</a></li>
-<li><a href="#org3e30851">7. Signature scanning library</a></li>
+<li><a href="#orge6ec450">5. Using our <code>sigscan</code> function</a></li>
+<li><a href="#orgaba5044">6. Injecting script and final Makefile</a></li>
+<li><a href="#orgfd8cbb4">7. Signature scanning library</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgb8153de" class="outline-2">
-<h2 id="orgb8153de"><span class="section-number-2">1.</span> What is signature scanning?</h2>
+<div id="outline-container-org2082530" class="outline-2">
+<h2 id="org2082530"><span class="section-number-2">1.</span> What is signature scanning?</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 First, let's have a look at a sample program:
@@ -278,8 +278,8 @@ In our case, we would want to look for the bytes of the binary corresponding to
 </div>
 </div>
 
-<div id="outline-container-orge1c47a9" class="outline-2">
-<h2 id="orge1c47a9"><span class="section-number-2">2.</span> Finding the function inside the binary</h2>
+<div id="outline-container-orgbbcfc21" class="outline-2">
+<h2 id="orgbbcfc21"><span class="section-number-2">2.</span> Finding the function inside the binary</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 I will compile the previous source with <code>gcc 13.2.1</code>. We need to use <code>-O0</code> so the
@@ -323,7 +323,7 @@ This is the disassembly of the main function:
 </p>
 
 
-<div id="org98746da" class="figure">
+<div id="org78b4a5a" class="figure">
 <p><img src="../img/signature-scanning1.png" alt="signature-scanning1.png" />
 </p>
 </div>
@@ -336,7 +336,7 @@ calling <code>my_func</code>. Let's double-click it to have a look at the assemb
 </p>
 
 
-<div id="orgc724411" class="figure">
+<div id="orgd6a60d8" class="figure">
 <p><img src="../img/signature-scanning2.png" alt="signature-scanning2.png" />
 </p>
 </div>
@@ -347,8 +347,8 @@ Yeah, that looks like our function.
 </div>
 </div>
 
-<div id="outline-container-orga824783" class="outline-2">
-<h2 id="orga824783"><span class="section-number-2">3.</span> Getting the signature</h2>
+<div id="outline-container-org47f9978" class="outline-2">
+<h2 id="org47f9978"><span class="section-number-2">3.</span> Getting the signature</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The signature is going to be an arbitrary number of bytes from the target
@@ -369,7 +369,7 @@ disassembler.
 </p>
 
 
-<div id="orga43a1fd" class="figure">
+<div id="org49578fb" class="figure">
 <p><img src="../img/signature-scanning3.png" alt="signature-scanning3.png" />
 </p>
 </div>
@@ -380,7 +380,7 @@ the function/variable we are looking for. Here is a signature of the whole
 function, but in practice, we shouldn't need more than 10 instructions.
 </p>
 
-<pre class="example" id="org3b2729e">
+<pre class="example" id="org97f4335">
 55 48 89 E5 48 83 EC 10 89 7D FC 89 75 F8 8B 45 F8 3B 45 FC 7F 0C 83 7D F8 00 78
 06 83 7D F8 20 7E 07 B8 ? ? ? ? EB 1F 48 8D 05 ? ? ? ? 48 89 C7 E8 ? ? ? ? 8B 45
 F8 8B 55 FC 89 C1 D3 FA 89 D0 01 C0 01 D0 C9 C3
@@ -396,8 +396,8 @@ signature scanning function a bit larger.
 </div>
 </div>
 
-<div id="outline-container-org58357a5" class="outline-2">
-<h2 id="org58357a5"><span class="section-number-2">4.</span> Signature scanning function</h2>
+<div id="outline-container-orgafe5807" class="outline-2">
+<h2 id="orgafe5807"><span class="section-number-2">4.</span> Signature scanning function</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 This is a simple function that scans a memory area from <code>start</code> to <code>end</code> and
@@ -405,8 +405,8 @@ searches for a <code>pattern</code> in IDA format.
 </p>
 </div>
 
-<div id="outline-container-orgaddc8e1" class="outline-3">
-<h3 id="orgaddc8e1"><span class="section-number-3">4.1.</span> Parsing the IDA pattern string</h3>
+<div id="outline-container-orgca47e57" class="outline-3">
+<h3 id="orgca47e57"><span class="section-number-3">4.1.</span> Parsing the IDA pattern string</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 First, we would need a function to convert those <code>"E5 "</code> strings into <code>0xE5</code>. Here
@@ -453,8 +453,8 @@ it is:
 </div>
 </div>
 
-<div id="outline-container-orgeeca7a9" class="outline-3">
-<h3 id="orgeeca7a9"><span class="section-number-3">4.2.</span> The <code>do_scan</code> function</h3>
+<div id="outline-container-org42e7d10" class="outline-3">
+<h3 id="org42e7d10"><span class="section-number-3">4.2.</span> The <code>do_scan</code> function</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 And with that, we can make our <code>do_scan</code> function:
@@ -528,8 +528,8 @@ And with that, we can make our <code>do_scan</code> function:
 </div>
 </div>
 
-<div id="outline-container-org7f8a65d" class="outline-3">
-<h3 id="org7f8a65d"><span class="section-number-3">4.3.</span> Getting the bounds of a loaded module</h3>
+<div id="outline-container-orgecea689" class="outline-3">
+<h3 id="orgecea689"><span class="section-number-3">4.3.</span> Getting the bounds of a loaded module</h3>
 <div class="outline-text-3" id="text-4-3">
 <p>
 To get the <code>start</code> and <code>end</code> addresses, we need to find where the binary was loaded
@@ -537,8 +537,8 @@ in memory. I am going to show 2 methods of getting this information.
 </p>
 </div>
 
-<div id="outline-container-org02b4010" class="outline-4">
-<h4 id="org02b4010"><span class="section-number-4">4.3.1.</span> The unreliable method</h4>
+<div id="outline-container-org516fbe3" class="outline-4">
+<h4 id="org516fbe3"><span class="section-number-4">4.3.1.</span> The unreliable method</h4>
 <div class="outline-text-4" id="text-4-3-1">
 <p>
 On linux, we could use <code>dlopen()</code> to get the start and end addresses of a loaded
@@ -621,8 +621,8 @@ reliable way.
 </div>
 </div>
 
-<div id="outline-container-orgd47343d" class="outline-4">
-<h4 id="orgd47343d"><span class="section-number-4">4.3.2.</span> Parsing <code>/proc/self/maps</code></h4>
+<div id="outline-container-org42ca298" class="outline-4">
+<h4 id="org42ca298"><span class="section-number-4">4.3.2.</span> Parsing <code>/proc/self/maps</code></h4>
 <div class="outline-text-4" id="text-4-3-2">
 <p>
 The <code>/proc/&lt;pid&gt;/</code> folder contains many useful files, one of them being <code>maps</code>. The
@@ -630,7 +630,7 @@ The <code>/proc/&lt;pid&gt;/</code> folder contains many useful files, one of th
 access permissions in the following format (without the column names):
 </p>
 
-<pre class="example" id="orgc55330d">
+<pre class="example" id="org434b665">
 address           perms offset  dev   inode       pathname
 ----------------------------------------------------------------------
 00400000-00452000 r-xp 00000000 08:02 173521      /usr/bin/dbus-daemon
@@ -855,8 +855,8 @@ scan them using our <code>do_scan</code> function.
 </div>
 </div>
 
-<div id="outline-container-orgb8c7206" class="outline-2">
-<h2 id="orgb8c7206"><span class="section-number-2">5.</span> Using our <code>sigscan</code> function</h2>
+<div id="outline-container-orge6ec450" class="outline-2">
+<h2 id="orge6ec450"><span class="section-number-2">5.</span> Using our <code>sigscan</code> function</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 Now that we have the signature and our function for scanning, we just have to
@@ -901,8 +901,8 @@ create a shared object that we can inject into a running process.
 </div>
 </div>
 
-<div id="outline-container-org505e8ac" class="outline-2">
-<h2 id="org505e8ac"><span class="section-number-2">6.</span> Injecting script and final Makefile</h2>
+<div id="outline-container-orgaba5044" class="outline-2">
+<h2 id="orgaba5044"><span class="section-number-2">6.</span> Injecting script and final Makefile</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 We can inject our library into the binary the <a href="https://www.sourceware.org/gdb/">GNU Debugger</a>.
@@ -961,12 +961,12 @@ injecting:
 </div>
 </div>
 
-<div id="outline-container-org3e30851" class="outline-2">
-<h2 id="org3e30851"><span class="section-number-2">7.</span> Signature scanning library</h2>
+<div id="outline-container-orgfd8cbb4" class="outline-2">
+<h2 id="orgfd8cbb4"><span class="section-number-2">7.</span> Signature scanning library</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 If you just want something that works, I made a lightweight single-header
-signature scanning library in pure C for GNU/Linux.
+signature scanning library in pure C for GNU/Linux. This is the <a href="https://github.com/8dcc/libsigscan">link</a>.
 </p>
 
 <p>

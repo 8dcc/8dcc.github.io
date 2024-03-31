@@ -617,7 +617,7 @@ inject: my_lib.so
 * Signature scanning library
 
 If you just want something that works, I made a lightweight single-header
-signature scanning library in pure C for GNU/Linux.
+signature scanning library in pure C for GNU/Linux. This is the [[https://github.com/8dcc/libsigscan][link]].
 
 Since it's a simple single-header library, you just need to copy the
 =libsigscan.h= file to your project and =#include= it on your sources.
