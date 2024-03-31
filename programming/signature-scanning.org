@@ -295,6 +295,10 @@ filename contains a slash ("/"), then it is interpreted as a (relative or
 absolute) pathname.
 #+end_quote
 
+#+begin_comment
+TODO: Add note about this being unreliable and add =/proc/self/maps= method.
+#+end_comment
+
 * Using our =find_sig= function
 
 Now that we have the signature and our function for scanning, we just have to
@@ -368,17 +372,16 @@ injecting:
 #+begin_src makefile
 CC=gcc
 CFLAGS=-Wall -Wextra -O0 -fPIC
-LDFLAGS=
 
 .PHONY: all inject
 
 all: example.out my_lib.so
 
 example.out: example.c
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $<
 
 my_lib.so: my_lib.c
-	$(CC) $(CFLAGS) -shared -o $@ $< $(LDFLAGS)
+	$(CC) $(CFLAGS) -shared -o $@ $<
 
 # NOTE: Make sure example.out is running
 inject: my_lib.so

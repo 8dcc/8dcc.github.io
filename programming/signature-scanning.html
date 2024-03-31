@@ -207,24 +207,24 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org77bf901">1. What is signature scanning?</a></li>
-<li><a href="#orgd535e9c">2. Finding the function inside the binary</a></li>
-<li><a href="#orgcac9eda">3. Getting the signature</a></li>
-<li><a href="#org959355a">4. Signature scanning function</a>
+<li><a href="#orga29eef0">1. What is signature scanning?</a></li>
+<li><a href="#org9463a76">2. Finding the function inside the binary</a></li>
+<li><a href="#org15de191">3. Getting the signature</a></li>
+<li><a href="#org815cabb">4. Signature scanning function</a>
 <ul>
-<li><a href="#org6c97235">4.1. Parsing the IDA pattern string</a></li>
-<li><a href="#org4164b69">4.2. The <code>sigscan</code> function</a></li>
-<li><a href="#org1b1560b">4.3. Getting the bounds of a loaded module</a></li>
+<li><a href="#org2a6449a">4.1. Parsing the IDA pattern string</a></li>
+<li><a href="#org6b7c071">4.2. The <code>sigscan</code> function</a></li>
+<li><a href="#org6fce48d">4.3. Getting the bounds of a loaded module</a></li>
 </ul>
 </li>
-<li><a href="#org9d5610c">5. Using our <code>find_sig</code> function</a></li>
-<li><a href="#orgdce3abb">6. Injecting script and final Makefile</a></li>
+<li><a href="#org6aeb945">5. Using our <code>find_sig</code> function</a></li>
+<li><a href="#org97e7f70">6. Injecting script and final Makefile</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org77bf901" class="outline-2">
-<h2 id="org77bf901"><span class="section-number-2">1.</span> What is signature scanning?</h2>
+<div id="outline-container-orga29eef0" class="outline-2">
+<h2 id="orga29eef0"><span class="section-number-2">1.</span> What is signature scanning?</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 First, let's have a look at a sample program:
@@ -272,8 +272,8 @@ In our case, we would want to look for the bytes of the binary corresponding to
 </div>
 </div>
 
-<div id="outline-container-orgd535e9c" class="outline-2">
-<h2 id="orgd535e9c"><span class="section-number-2">2.</span> Finding the function inside the binary</h2>
+<div id="outline-container-org9463a76" class="outline-2">
+<h2 id="org9463a76"><span class="section-number-2">2.</span> Finding the function inside the binary</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 I will compile the previous source with <code>gcc 13.2.1</code>. We need to use <code>-O0</code> so the
@@ -317,7 +317,7 @@ This is the disassembly of the main function:
 </p>
 
 
-<div id="orgfd31c91" class="figure">
+<div id="orga0d5a94" class="figure">
 <p><img src="../img/signature-scanning1.png" alt="signature-scanning1.png" />
 </p>
 </div>
@@ -330,7 +330,7 @@ calling <code>my_func</code>. Let's double-click it to have a look at the assemb
 </p>
 
 
-<div id="org5005214" class="figure">
+<div id="org6d273f4" class="figure">
 <p><img src="../img/signature-scanning2.png" alt="signature-scanning2.png" />
 </p>
 </div>
@@ -341,8 +341,8 @@ Yeah, that looks like our function.
 </div>
 </div>
 
-<div id="outline-container-orgcac9eda" class="outline-2">
-<h2 id="orgcac9eda"><span class="section-number-2">3.</span> Getting the signature</h2>
+<div id="outline-container-org15de191" class="outline-2">
+<h2 id="org15de191"><span class="section-number-2">3.</span> Getting the signature</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The signature is going to be an arbitrary number of bytes from the target
@@ -363,7 +363,7 @@ disassembler.
 </p>
 
 
-<div id="orgf51412f" class="figure">
+<div id="orgc555127" class="figure">
 <p><img src="../img/signature-scanning3.png" alt="signature-scanning3.png" />
 </p>
 </div>
@@ -374,7 +374,7 @@ the function/variable we are looking for. Here is a signature of the whole
 function, but in practice, we shouldn't need more than 10 instructions.
 </p>
 
-<pre class="example" id="orgc1be048">
+<pre class="example" id="orgb471f46">
 55 48 89 E5 48 83 EC 10 89 7D FC 89 75 F8 8B 45 F8 3B 45 FC 7F 0C 83 7D F8 00 78
 06 83 7D F8 20 7E 07 B8 ? ? ? ? EB 1F 48 8D 05 ? ? ? ? 48 89 C7 E8 ? ? ? ? 8B 45
 F8 8B 55 FC 89 C1 D3 FA 89 D0 01 C0 01 D0 C9 C3
@@ -390,8 +390,8 @@ signature scanning function a bit larger.
 </div>
 </div>
 
-<div id="outline-container-org959355a" class="outline-2">
-<h2 id="org959355a"><span class="section-number-2">4.</span> Signature scanning function</h2>
+<div id="outline-container-org815cabb" class="outline-2">
+<h2 id="org815cabb"><span class="section-number-2">4.</span> Signature scanning function</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 This is a simple function that scans a memory area from <code>start</code> to <code>end</code> and
@@ -399,8 +399,8 @@ searches for a <code>pattern</code> in IDA format.
 </p>
 </div>
 
-<div id="outline-container-org6c97235" class="outline-3">
-<h3 id="org6c97235"><span class="section-number-3">4.1.</span> Parsing the IDA pattern string</h3>
+<div id="outline-container-org2a6449a" class="outline-3">
+<h3 id="org2a6449a"><span class="section-number-3">4.1.</span> Parsing the IDA pattern string</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 First, we would need a function to convert those <code>"E5 "</code> strings into <code>0xE5</code>. Here
@@ -446,8 +446,8 @@ it is:
 </div>
 </div>
 
-<div id="outline-container-org4164b69" class="outline-3">
-<h3 id="org4164b69"><span class="section-number-3">4.2.</span> The <code>sigscan</code> function</h3>
+<div id="outline-container-org6b7c071" class="outline-3">
+<h3 id="org6b7c071"><span class="section-number-3">4.2.</span> The <code>sigscan</code> function</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 And with that, we can make our <code>sigscan</code> function:
@@ -511,8 +511,8 @@ And with that, we can make our <code>sigscan</code> function:
 </div>
 </div>
 
-<div id="outline-container-org1b1560b" class="outline-3">
-<h3 id="org1b1560b"><span class="section-number-3">4.3.</span> Getting the bounds of a loaded module</h3>
+<div id="outline-container-org6fce48d" class="outline-3">
+<h3 id="org6fce48d"><span class="section-number-3">4.3.</span> Getting the bounds of a loaded module</h3>
 <div class="outline-text-3" id="text-4-3">
 <p>
 On linux, we could use <code>dlopen()</code> to get the start and end addresses of a loaded
@@ -592,8 +592,8 @@ absolute) pathname.
 </div>
 </div>
 
-<div id="outline-container-org9d5610c" class="outline-2">
-<h2 id="org9d5610c"><span class="section-number-2">5.</span> Using our <code>find_sig</code> function</h2>
+<div id="outline-container-org6aeb945" class="outline-2">
+<h2 id="org6aeb945"><span class="section-number-2">5.</span> Using our <code>find_sig</code> function</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 Now that we have the signature and our function for scanning, we just have to
@@ -638,8 +638,8 @@ create a library we can inject into a running process.
 </div>
 </div>
 
-<div id="outline-container-orgdce3abb" class="outline-2">
-<h2 id="orgdce3abb"><span class="section-number-2">6.</span> Injecting script and final Makefile</h2>
+<div id="outline-container-org97e7f70" class="outline-2">
+<h2 id="org97e7f70"><span class="section-number-2">6.</span> Injecting script and final Makefile</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 We can inject our library into the binary the <a href="https://www.sourceware.org/gdb/">GNU Debugger</a>.
@@ -679,17 +679,16 @@ injecting:
 <div class="org-src-container">
 <pre class="src src-makefile"><span style="color: #6ae4b9;">CC</span>=gcc
 <span style="color: #6ae4b9;">CFLAGS</span>=-Wall -Wextra -O0 -fPIC
-<span style="color: #6ae4b9;">LDFLAGS</span>=
 
 <span style="color: #4ae2ff;">.PHONY</span>: all inject
 
 <span style="color: #4ae2ff;">all</span>: example.out my_lib.so
 
 <span style="color: #4ae2ff;">example.out</span>: example.c
-    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span> $(<span style="color: #6ae4b9;">LDFLAGS</span>)
+    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span>
 
 <span style="color: #4ae2ff;">my_lib.so</span>: my_lib.c
-    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -shared -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span> $(<span style="color: #6ae4b9;">LDFLAGS</span>)
+    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -shared -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span>
 
 <span style="color: #989898;"># </span><span style="color: #44bc44; font-weight: bold;">NOTE:</span><span style="color: #989898;"> Make sure example.out is running</span>
 <span style="color: #4ae2ff;">inject</span>: my_lib.so
