@@ -623,6 +623,12 @@ Since it's a simple single-header library, you just need to copy the
 =libsigscan.h= file to your project and =#include= it on your sources.
 
 The library consists of just 2 functions: =sigscan_module()= and =sigscan()=. The
-first scans the specified IDA signature in the specified module. The second is
-just a wrapper for passing =NULL= to the first one, therefore scanning all loaded
-modules.
+first scans the specified IDA signature in all the modules matching the
+specified /regex/ pattern. Note that it uses the [[https://www.gnu.org/software/sed/manual/html_node/ERE-syntax.html][Extended Regular Expression]] (ERE)
+syntax, so keep that in mind before escaping certain characters like =+= and
+=?=. See also [[https://www.gnu.org/software/sed/manual/html_node/BRE-vs-ERE.html][BRE vs. ERE]].
+
+The second function is just a wrapper for passing =NULL= to the first one,
+therefore searching in all loaded modules. Depending on the memory being used by
+the process, calling this function might take a few seconds, so it's better to
+filter the module name with =sigscan_module()= whenever possible.
