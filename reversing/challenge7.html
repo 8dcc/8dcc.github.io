@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Challenge 7</title>
+<meta name="author" content="8dcc" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="../css/main.css" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Challenge 7</h1>
+<p>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
+</p>
+
+<hr />
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgbc03163">1. Original assembly</a></li>
+<li><a href="#org7a2eeb9">2. Assembly notes</a>
+<ul>
+<li><a href="#org11be24f">2.1. Function parameters</a></li>
+<li><a href="#org4f6a476">2.2. Single <code>while</code> loop</a></li>
+<li><a href="#orgaa7e996">2.3. Using <code>lea</code> without a pointer</a></li>
+<li><a href="#org7fef2b2">2.4. Understanding <code>0x41</code></a></li>
+<li><a href="#org0125c0e">2.5. The <code>SIL</code> register</a></li>
+<li><a href="#orgfb39567">2.6. Using <code>repz</code> along with <code>ret</code></a></li>
+</ul>
+</li>
+<li><a href="#org3c5e181">3. C translation</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgbc03163" class="outline-2">
+<h2 id="orgbc03163"><span class="section-number-2">1.</span> Original assembly</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Original challenge link: <a href="https://challenges.re/7/">Click me</a>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
+   <span style="color: #88ca9f;">0</span>:                <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> PTR [<span style="color: #6ae4b9;">rdi</span>]
+   <span style="color: #88ca9f;">3</span>:                <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rdi</span>
+   <span style="color: #88ca9f;">6</span>:                <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #6ae4b9;">rdi</span>
+   <span style="color: #88ca9f;">9</span>:                <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">dl</span>, <span style="color: #6ae4b9;">dl</span>
+   <span style="color: #4ae2ff;">b</span>:                <span style="color: #feacd0;">je</span>     <span style="color: #88ca9f;">29</span>
+   <span style="color: #4ae2ff;">d</span>:                <span style="color: #feacd0;">nop</span>    <span style="color: #79a8ff;">DWORD</span> PTR [<span style="color: #6ae4b9;">rax</span>]
+  <span style="color: #88ca9f;">10</span>:                <span style="color: #feacd0;">lea</span>    <span style="color: #6ae4b9;">esi</span>, [<span style="color: #6ae4b9;">rdx</span> - <span style="color: #88ca9f;">0x41</span>]
+  <span style="color: #88ca9f;">13</span>:                <span style="color: #feacd0;">cmp</span>    <span style="color: #6ae4b9;">sil</span>, <span style="color: #88ca9f;">0x19</span>
+  <span style="color: #88ca9f;">17</span>:                <span style="color: #feacd0;">ja</span>     <span style="color: #88ca9f;">1e</span>
+  <span style="color: #88ca9f;">19</span>:                <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0x20</span>
+  <span style="color: #88ca9f;">1c</span>:                <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">BYTE</span> PTR [<span style="color: #6ae4b9;">rcx</span>], <span style="color: #6ae4b9;">dl</span>
+  <span style="color: #88ca9f;">1e</span>:                <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #88ca9f;">0x1</span>
+  <span style="color: #88ca9f;">22</span>:                <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> PTR [<span style="color: #6ae4b9;">rcx</span>]
+  <span style="color: #88ca9f;">25</span>:                <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">dl</span>, <span style="color: #6ae4b9;">dl</span>
+  <span style="color: #88ca9f;">27</span>:                <span style="color: #feacd0;">jne</span>    <span style="color: #88ca9f;">10</span>
+  <span style="color: #88ca9f;">29</span>:                <span style="color: #feacd0;">repz</span> <span style="color: #feacd0;">ret</span>
+</pre>
+</div>
+
+<p>
+After removing the unused labels, and renaming the used ones.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
+    <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rdi</span>]
+    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rdi</span>
+    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #6ae4b9;">rdi</span>
+    <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">dl</span>, <span style="color: #6ae4b9;">dl</span>
+    <span style="color: #feacd0;">je</span>     .done
+    <span style="color: #feacd0;">nop</span>    <span style="color: #79a8ff;">DWORD</span> [<span style="color: #6ae4b9;">rax</span>]
+<span style="color: #4ae2ff;">.loop</span>:
+    <span style="color: #feacd0;">lea</span>    <span style="color: #6ae4b9;">esi</span>, [<span style="color: #6ae4b9;">rdx</span> - <span style="color: #88ca9f;">0x41</span>]
+    <span style="color: #feacd0;">cmp</span>    <span style="color: #6ae4b9;">sil</span>, <span style="color: #88ca9f;">0x19</span>
+    <span style="color: #feacd0;">ja</span>     .bigger_val
+    <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0x20</span>
+    <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rcx</span>], <span style="color: #6ae4b9;">dl</span>
+<span style="color: #4ae2ff;">.bigger_val</span>:
+    <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #88ca9f;">0x1</span>
+    <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rcx</span>]
+    <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">dl</span>, <span style="color: #6ae4b9;">dl</span>
+    <span style="color: #feacd0;">jne</span>    .loop
+<span style="color: #4ae2ff;">.done</span>:
+    <span style="color: #feacd0;">repz</span> <span style="color: #feacd0;">ret</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7a2eeb9" class="outline-2">
+<h2 id="org7a2eeb9"><span class="section-number-2">2.</span> Assembly notes</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Here are notes I considered important when translating the assembly into C code.
+</p>
+</div>
+
+<div id="outline-container-org11be24f" class="outline-3">
+<h3 id="org11be24f"><span class="section-number-3">2.1.</span> Function parameters</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+We can asume the first parameter of the function is a <code>char*</code> because it's always
+using <code>BYTE [ptr]</code> when reading and writing values.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org4f6a476" class="outline-3">
+<h3 id="org4f6a476"><span class="section-number-3">2.2.</span> Single <code>while</code> loop</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+If we start translating to C code literally, we can see it technically checks if
+<code>*ptr</code> is zero once, and then does a <code>do { ... } while();</code> loop. This is likely an
+optimization made by the compiler, so we can simplify this into a simple
+<code>while () { ... }</code> loop.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgaa7e996" class="outline-3">
+<h3 id="orgaa7e996"><span class="section-number-3">2.3.</span> Using <code>lea</code> without a pointer</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+After the <code>.loop</code> label, we load the effective address of <code>[rdx - 0x41]</code>. Keep in
+mind that <code>rdx</code> is not holding the pointer, but the dereferenced value at this
+point. This is a trick used by commonly used by compilers for performing simple
+operations on values.
+</p>
+
+<p>
+The translation of this instruction would be something like this: If <code>rdx</code> was an
+address, and we subtracted <code>0x41</code>, at what address would be located the
+<i>dereferenced</i> value?
+</p>
+
+<p>
+Or in simpler words: If I am at <code>rdx</code>, and I move back <code>0x41</code> bytes, where am I?
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7fef2b2" class="outline-3">
+<h3 id="org7fef2b2"><span class="section-number-3">2.4.</span> Understanding <code>0x41</code></h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+At first, <code>0x41</code> doesn't look particularly special. First, we should convert it to
+decimal to see if it rings any bell. 65 doesn't give much clue, but since we
+know we are dealing with a <code>char*</code>, and we are subtracting this from each
+character, we should look up what this number represents in the <a href="https://theasciicode.com.ar/">ASCII table</a>.
+</p>
+
+<p>
+We can see that it's the letter <code>A</code>, which already looks interesting since we are
+subtracting the first capital letter from the input.
+</p>
+
+<p>
+We can do the same with other hex values. Keep in mind that the comparison
+against <code>0x19</code> is made <b>after</b> subtracting <code>0x41</code>, so we should look for the character
+at <code>0x5A</code>, which is <code>Z</code>. We are basically checking if the character is between <code>A</code> and
+<code>Z</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org0125c0e" class="outline-3">
+<h3 id="org0125c0e"><span class="section-number-3">2.5.</span> The <code>SIL</code> register</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+Although the <code>SIL</code> register is not commonly used, it's used to access the <b>lower 8
+bits of the <code>ESI</code> register</b>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfb39567" class="outline-3">
+<h3 id="orgfb39567"><span class="section-number-3">2.6.</span> Using <code>repz</code> along with <code>ret</code></h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+For more information about why <code>repz</code> is used with <code>ret</code>, see <a href="challenge6.html">Challenge 6</a>.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3c5e181" class="outline-2">
+<h2 id="org3c5e181"><span class="section-number-2">3.</span> C translation</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+The first version uses register names and is a more direct translation.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">rcx</span>) {
+    <span style="color: #ff6f9f;">if</span> (*rcx == <span style="color: #88ca9f;">0</span>)
+        <span style="color: #ff6f9f;">return</span>;
+
+    <span style="color: #ff6f9f;">do</span> {
+        <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">esi</span> = *rcx - <span style="color: #88ca9f;">0x41</span>;
+
+        <span style="color: #ff6f9f;">if</span> (esi &lt;= <span style="color: #88ca9f;">0x19</span>) {
+            *rcx += <span style="color: #88ca9f;">0x20</span>;
+        }
+
+        rcx++;
+    } <span style="color: #ff6f9f;">while</span> (*rcx != <span style="color: #88ca9f;">0</span>);
+}
+</pre>
+</div>
+
+<p>
+If we look at the assembly, we can also see that the functions return the
+initial parameter (<code>rdi</code>), since it gets loaded into <code>rax</code> at the start. I didn't
+add it to the C translations because I feel like it's a detail that can just be
+mentioned, keeping the C code cleaner.
+</p>
+
+<p>
+This is the final function after optimizing the loops and renaming the
+variables.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">ptr</span>) {
+    <span style="color: #ff6f9f;">while</span> (*ptr != <span style="color: #00d3d0;">'\0'</span>) {
+        <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span> = *ptr - <span style="color: #00d3d0;">'A'</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">esi</span><span style="color: #989898;"> */</span>
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Between 'A' and 'Z'</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">if</span> (c &lt;= <span style="color: #88ca9f;">25</span>) {
+            <span style="color: #989898;">/* </span><span style="color: #989898;">Convert from 'A' (0x41) to 'a' (0x61)</span><span style="color: #989898;"> */</span>
+            *ptr += <span style="color: #88ca9f;">32</span>;
+        }
+
+        ptr++;
+    }
+}
+</pre>
+</div>
+
+<p>
+After looking at the code, we can determine that the function is used to convert
+all uppercase letters of a string into lowercase.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

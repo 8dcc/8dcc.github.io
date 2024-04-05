@@ -1,0 +1,161 @@
+#+TITLE: Challenge 7
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: showeverything
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Original assembly
+
+Original challenge link: [[https://challenges.re/7/][Click me]].
+
+#+begin_src nasm
+func:
+   0:                movzx  edx, BYTE PTR [rdi]
+   3:                mov    rax, rdi
+   6:                mov    rcx, rdi
+   9:                test   dl, dl
+   b:                je     29
+   d:                nop    DWORD PTR [rax]
+  10:                lea    esi, [rdx - 0x41]
+  13:                cmp    sil, 0x19
+  17:                ja     1e
+  19:                add    edx, 0x20
+  1c:                mov    BYTE PTR [rcx], dl
+  1e:                add    rcx, 0x1
+  22:                movzx  edx, BYTE PTR [rcx]
+  25:                test   dl, dl
+  27:                jne    10
+  29:                repz ret
+#+end_src
+
+After removing the unused labels, and renaming the used ones.
+
+#+begin_src nasm
+func:
+    movzx  edx, BYTE [rdi]
+    mov    rax, rdi
+    mov    rcx, rdi
+    test   dl, dl
+    je     .done
+    nop    DWORD [rax]
+.loop:
+    lea    esi, [rdx - 0x41]
+    cmp    sil, 0x19
+    ja     .bigger_val
+    add    edx, 0x20
+    mov    BYTE [rcx], dl
+.bigger_val:
+    add    rcx, 0x1
+    movzx  edx, BYTE [rcx]
+    test   dl, dl
+    jne    .loop
+.done:
+    repz ret
+#+end_src
+
+* Assembly notes
+
+Here are notes I considered important when translating the assembly into C code.
+
+** Function parameters
+
+We can asume the first parameter of the function is a =char*= because it's always
+using =BYTE [ptr]= when reading and writing values.
+
+** Single =while= loop
+
+If we start translating to C code literally, we can see it technically checks if
+=*ptr= is zero once, and then does a =do { ... } while();= loop. This is likely an
+optimization made by the compiler, so we can simplify this into a simple
+=while () { ... }= loop.
+
+** Using =lea= without a pointer
+
+After the =.loop= label, we load the effective address of =[rdx - 0x41]=. Keep in
+mind that =rdx= is not holding the pointer, but the dereferenced value at this
+point. This is a trick used by commonly used by compilers for performing simple
+operations on values.
+
+The translation of this instruction would be something like this: If =rdx= was an
+address, and we subtracted =0x41=, at what address would be located the
+/dereferenced/ value?
+
+Or in simpler words: If I am at =rdx=, and I move back =0x41= bytes, where am I?
+
+** Understanding =0x41=
+
+At first, =0x41= doesn't look particularly special. First, we should convert it to
+decimal to see if it rings any bell. 65 doesn't give much clue, but since we
+know we are dealing with a =char*=, and we are subtracting this from each
+character, we should look up what this number represents in the [[https://theasciicode.com.ar/][ASCII table]].
+
+We can see that it's the letter =A=, which already looks interesting since we are
+subtracting the first capital letter from the input.
+
+We can do the same with other hex values. Keep in mind that the comparison
+against =0x19= is made *after* subtracting =0x41=, so we should look for the character
+at =0x5A=, which is =Z=. We are basically checking if the character is between =A= and
+=Z=.
+
+** The =SIL= register
+
+Although the =SIL= register is not commonly used, it's used to access the *lower 8
+bits of the =ESI= register*.
+
+** Using =repz= along with =ret=
+
+For more information about why =repz= is used with =ret=, see [[file:challenge6.org][Challenge 6]].
+
+* C translation
+
+The first version uses register names and is a more direct translation.
+
+#+begin_src C
+void func(char* rcx) {
+    if (*rcx == 0)
+        return;
+
+    do {
+        char esi = *rcx - 0x41;
+
+        if (esi <= 0x19) {
+            ,*rcx += 0x20;
+        }
+
+        rcx++;
+    } while (*rcx != 0);
+}
+#+end_src
+
+If we look at the assembly, we can also see that the functions return the
+initial parameter (=rdi=), since it gets loaded into =rax= at the start. I didn't
+add it to the C translations because I feel like it's a detail that can just be
+mentioned, keeping the C code cleaner.
+
+This is the final function after optimizing the loops and renaming the
+variables.
+
+#+begin_src C
+void func(char* ptr) {
+    while (*ptr != '\0') {
+        char c = *ptr - 'A'; /* esi */
+
+        /* Between 'A' and 'Z' */
+        if (c <= 25) {
+            /* Convert from 'A' (0x41) to 'a' (0x61) */
+            ,*ptr += 32;
+        }
+
+        ptr++;
+    }
+}
+#+end_src
+
+After looking at the code, we can determine that the function is used to convert
+all uppercase letters of a string into lowercase.

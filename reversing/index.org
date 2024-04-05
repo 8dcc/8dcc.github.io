@@ -17,6 +17,7 @@ List of my articles solving RE challenges:
 - [[file:challenge4.org][Challenge 4]]
 - [[file:challenge5.org][Challenge 5]]
 - [[file:challenge6.org][Challenge 6]]
+- [[file:challenge7.org][Challenge 7]]
 
 My other articles about reverse engineering:
 
