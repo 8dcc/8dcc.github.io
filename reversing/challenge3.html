@@ -192,7 +192,8 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { }
 </style>
-<link rel="stylesheet" type="text/css" href="../css/main.css" />
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
 </head>
 <body>
 <div id="content" class="content">
@@ -207,16 +208,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgbf6716f">1. Original assembly</a></li>
-<li><a href="#org8011d35">2. Analysis</a></li>
-<li><a href="#org25cb11b">3. C version</a></li>
-<li><a href="#org1c937f3">4. More information</a></li>
+<li><a href="#org05a3fe5">1. Original assembly</a></li>
+<li><a href="#orgd57644a">2. Analysis</a></li>
+<li><a href="#org9e72428">3. C version</a></li>
+<li><a href="#org26576ee">4. More information</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgbf6716f" class="outline-2">
-<h2 id="orgbf6716f"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org05a3fe5" class="outline-2">
+<h2 id="org05a3fe5"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/3/">Click me</a>.
@@ -264,8 +265,8 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </div>
 </div>
 
-<div id="outline-container-org8011d35" class="outline-2">
-<h2 id="org8011d35"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-orgd57644a" class="outline-2">
+<h2 id="orgd57644a"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First of all, it loads the function argument into <code>edx</code>.
@@ -413,7 +414,7 @@ every bit from there will be set.
 </p>
 
 
-<div id="orged84266" class="figure">
+<div id="org6e576e2" class="figure">
 <p><img src="../img/slomo.gif" alt="slomo.gif" />
 </p>
 </div>
@@ -482,7 +483,7 @@ So, what's the item at position 62 in our array? Turns out it's zero.
 Let's try to use another number to see how it changes:
 </p>
 
-<pre class="example" id="orge18f3f2">
+<pre class="example" id="org4ad495f">
 Initial number:            0x000F0055  0b00000000000011110000000001010101
 After shifting and ORing:  0x000FFFFF  0b00000000000011111111111111111111
 After the multiplication:  0xEC1520F3  0b11101100000101010010000011110011
@@ -505,13 +506,13 @@ so there are <b>12 spaces left</b>.
 
 <p>
 Finally, we could say that this is an algorithm for <b>counting the leading zero
-bits of a double word</b>. See <a href="#org1c937f3">More information</a>.
+bits of a double word</b>. See <a href="#org26576ee">More information</a>.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org25cb11b" class="outline-2">
-<h2 id="org25cb11b"><span class="section-number-2">3.</span> C version</h2>
+<div id="outline-container-org9e72428" class="outline-2">
+<h2 id="org9e72428"><span class="section-number-2">3.</span> C version</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 I made a similar version, but it's not exactly a <i>translation</i> since I am using a
@@ -554,8 +555,8 @@ I made a similar version, but it's not exactly a <i>translation</i> since I am u
 </div>
 </div>
 
-<div id="outline-container-org1c937f3" class="outline-2">
-<h2 id="org1c937f3"><span class="section-number-2">4.</span> More information</h2>
+<div id="outline-container-org26576ee" class="outline-2">
+<h2 id="org26576ee"><span class="section-number-2">4.</span> More information</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 After emailing Dennis Yurichev, the owner of the <a href="https://challenges.re/">challenges.re</a> website, I

@@ -192,7 +192,8 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { }
 </style>
-<link rel="stylesheet" type="text/css" href="../css/main.css" />
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
 </head>
 <body>
 <div id="content" class="content">
@@ -207,18 +208,18 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge8c5dfa">1. Original assembly</a></li>
-<li><a href="#org278ba47">2. Analysis</a></li>
-<li><a href="#org0fe4c7d">3. Why does this work?</a></li>
-<li><a href="#orgb0dc4c9">4. Why do some versions use the <code>0x01010101</code> constant?</a></li>
-<li><a href="#orgdfc3016">5. C translation</a></li>
-<li><a href="#orgea2653b">6. Iterative C version</a></li>
+<li><a href="#org6278fb2">1. Original assembly</a></li>
+<li><a href="#orga7fbcc9">2. Analysis</a></li>
+<li><a href="#org41af1ab">3. Why does this work?</a></li>
+<li><a href="#orgb251946">4. Why do some versions use the <code>0x01010101</code> constant?</a></li>
+<li><a href="#org5a373eb">5. C translation</a></li>
+<li><a href="#org328e364">6. Iterative C version</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orge8c5dfa" class="outline-2">
-<h2 id="orge8c5dfa"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org6278fb2" class="outline-2">
+<h2 id="org6278fb2"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/4/">Click me</a>.
@@ -254,8 +255,8 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </div>
 </div>
 
-<div id="outline-container-org278ba47" class="outline-2">
-<h2 id="org278ba47"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-orga7fbcc9" class="outline-2">
+<h2 id="orga7fbcc9"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First of all, it loads the function argument into <code>edx</code>, and shifts it one bit to
@@ -397,8 +398,8 @@ our input.
 </div>
 </div>
 
-<div id="outline-container-org0fe4c7d" class="outline-2">
-<h2 id="org0fe4c7d"><span class="section-number-2">3.</span> Why does this work?</h2>
+<div id="outline-container-org41af1ab" class="outline-2">
+<h2 id="org41af1ab"><span class="section-number-2">3.</span> Why does this work?</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 After discovering what this functions does, I decided to look a bit more into
@@ -487,8 +488,8 @@ I still can't fully understand how this works, though.
 </div>
 </div>
 
-<div id="outline-container-orgb0dc4c9" class="outline-2">
-<h2 id="orgb0dc4c9"><span class="section-number-2">4.</span> Why do some versions use the <code>0x01010101</code> constant?</h2>
+<div id="outline-container-orgb251946" class="outline-2">
+<h2 id="orgb251946"><span class="section-number-2">4.</span> Why do some versions use the <code>0x01010101</code> constant?</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 In the assembly code, the value was used for multiplication, right before
@@ -505,7 +506,7 @@ Multiplying small values (less or equal than <code>0xFF</code>) by <code>0x01010
 to the remaining 3 bytes of the <code>DWORD</code>. For example:
 </p>
 
-<pre class="example" id="org6fcef92">
+<pre class="example" id="org873e326">
       0xAB                          0b10101011
 0x01010101  0b00000001000000010000000100000001
 ---------------------------------------------- (MUL)
@@ -586,7 +587,7 @@ see that these two shifts from ARM are doing the same as the <code>0x01010101</c
 multiplication:
 </p>
 
-<pre class="example" id="org6d04fef">
+<pre class="example" id="org0c360ad">
 Base:               0x000000AB
 After first shift:  0x00AB0000
                     ---------- (ADD)
@@ -608,8 +609,8 @@ other ones, right before returning the upper one?</b>
 </div>
 </div>
 
-<div id="outline-container-orgdfc3016" class="outline-2">
-<h2 id="orgdfc3016"><span class="section-number-2">5.</span> C translation</h2>
+<div id="outline-container-org5a373eb" class="outline-2">
+<h2 id="org5a373eb"><span class="section-number-2">5.</span> C translation</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 These are two C translation of the x86 assembly code, one uses multiplication
@@ -651,8 +652,8 @@ printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits_shifting(<span st
 </div>
 </div>
 
-<div id="outline-container-orgea2653b" class="outline-2">
-<h2 id="orgea2653b"><span class="section-number-2">6.</span> Iterative C version</h2>
+<div id="outline-container-org328e364" class="outline-2">
+<h2 id="org328e364"><span class="section-number-2">6.</span> Iterative C version</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 A simpler (but probably slower) way of doing it with a <code>for</code> loop:

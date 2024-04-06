@@ -192,7 +192,8 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { }
 </style>
-<link rel="stylesheet" type="text/css" href="../css/main.css" />
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
 </head>
 <body>
 <div id="content" class="content">
@@ -207,23 +208,23 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgbc92b85">1. Original assembly</a></li>
-<li><a href="#org2125400">2. Assembly notes</a>
+<li><a href="#org2aa6611">1. Original assembly</a></li>
+<li><a href="#org1e40aae">2. Assembly notes</a>
 <ul>
-<li><a href="#org2b58b0e">2.1. First checks</a></li>
-<li><a href="#orgca93310">2.2. Function parameters</a></li>
-<li><a href="#org6ab03d9">2.3. Function return type</a></li>
-<li><a href="#org2a7f9ec">2.4. Constructing the <code>for</code> loops</a></li>
-<li><a href="#org3d31225">2.5. Conditional move</a></li>
+<li><a href="#orgb497c09">2.1. First checks</a></li>
+<li><a href="#org5481db3">2.2. Function parameters</a></li>
+<li><a href="#org8be415c">2.3. Function return type</a></li>
+<li><a href="#org53f3a56">2.4. Constructing the <code>for</code> loops</a></li>
+<li><a href="#orgc5bed7d">2.5. Conditional move</a></li>
 </ul>
 </li>
-<li><a href="#org9faec9d">3. C translation</a></li>
+<li><a href="#orgb029978">3. C translation</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgbc92b85" class="outline-2">
-<h2 id="orgbc92b85"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org2aa6611" class="outline-2">
+<h2 id="org2aa6611"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/5/">Click me</a>.
@@ -277,8 +278,8 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </div>
 </div>
 
-<div id="outline-container-org2125400" class="outline-2">
-<h2 id="org2125400"><span class="section-number-2">2.</span> Assembly notes</h2>
+<div id="outline-container-org1e40aae" class="outline-2">
+<h2 id="org1e40aae"><span class="section-number-2">2.</span> Assembly notes</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Here are some important notes before converting the code to a higher level
@@ -286,8 +287,8 @@ language.
 </p>
 </div>
 
-<div id="outline-container-org2b58b0e" class="outline-3">
-<h3 id="org2b58b0e"><span class="section-number-3">2.1.</span> First checks</h3>
+<div id="outline-container-orgb497c09" class="outline-3">
+<h3 id="orgb497c09"><span class="section-number-3">2.1.</span> First checks</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 As you can see, the first thing the function does is check if <code>rcx</code> is greater
@@ -314,8 +315,8 @@ other words, if <code>rcx</code> is equal to <code>rsi+1</code>. If it is, it re
 </div>
 </div>
 
-<div id="outline-container-orgca93310" class="outline-3">
-<h3 id="orgca93310"><span class="section-number-3">2.2.</span> Function parameters</h3>
+<div id="outline-container-org5481db3" class="outline-3">
+<h3 id="org5481db3"><span class="section-number-3">2.2.</span> Function parameters</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 We can see that the function has 4 parameters because registers <code>rdi</code>, <code>rsi</code>, <code>rdx</code>
@@ -339,8 +340,8 @@ not hard to see that these are <code>char*</code>.</li>
 </div>
 </div>
 
-<div id="outline-container-org6ab03d9" class="outline-3">
-<h3 id="org6ab03d9"><span class="section-number-3">2.3.</span> Function return type</h3>
+<div id="outline-container-org8be415c" class="outline-3">
+<h3 id="org8be415c"><span class="section-number-3">2.3.</span> Function return type</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 We can tell that the function returns a <code>char*</code> because at line 31 of the assembly
@@ -356,8 +357,8 @@ first parameter, which as we know is a <code>char*</code>.
 </div>
 </div>
 
-<div id="outline-container-org2a7f9ec" class="outline-3">
-<h3 id="org2a7f9ec"><span class="section-number-3">2.4.</span> Constructing the <code>for</code> loops</h3>
+<div id="outline-container-org53f3a56" class="outline-3">
+<h3 id="org53f3a56"><span class="section-number-3">2.4.</span> Constructing the <code>for</code> loops</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 We can see that the labels <code>.L4</code> and <code>.L8</code> are being used as loops because of the
@@ -417,8 +418,8 @@ meaning/usage of the registers change.
 </div>
 </div>
 
-<div id="outline-container-org3d31225" class="outline-3">
-<h3 id="org3d31225"><span class="section-number-3">2.5.</span> Conditional move</h3>
+<div id="outline-container-orgc5bed7d" class="outline-3">
+<h3 id="orgc5bed7d"><span class="section-number-3">2.5.</span> Conditional move</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 After <code>.L8</code>, on line 25, it compares <code>rax[rsi]</code> with <code>rdx[rsi]</code>, and moves <code>r9d</code> to <code>r8d</code>
@@ -445,8 +446,8 @@ execution continues with the instruction following the <code>CMOVcc</code> instr
 </div>
 </div>
 
-<div id="outline-container-org9faec9d" class="outline-2">
-<h2 id="org9faec9d"><span class="section-number-2">3.</span> C translation</h2>
+<div id="outline-container-orgb029978" class="outline-2">
+<h2 id="orgb029978"><span class="section-number-2">3.</span> C translation</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 From the <a href="challenge4.html">previous challenge</a>, I learned that it's a good approach to first

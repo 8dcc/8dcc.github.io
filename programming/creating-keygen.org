@@ -2,7 +2,8 @@
 #+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
 
 [[file:../index.org][Index]] | [[file:index.org][Up]]
 
@@ -50,14 +51,14 @@ We could use two main formats for the license keys:
 
 Depending on the format, we would have two ways of validating the input key. For
 the first one, we would have to *apply the [[https://en.wikipedia.org/wiki/Inverse_function][inverse function]] of the algorithm* to
-the provided key to validate it and get the username.  For the second one, we
+the provided key to validate it and get the username. For the second one, we
 could just *encode the username again* to generate the key, and see if it matches
 with the key provided by the user.
 
 The second validation method I explained is basically what it's used to validate
 passwords against the hashes in a database when a user tries to log-in, but the
 key difference is that, although [[https://en.wikipedia.org/wiki/Cryptographic_hash_function][hashing]] can't be reverted, we are [[https://en.wikipedia.org/wiki/Code][encoding]] the
-username.  The hashing algorithm used to generate a hash is not enough to revert
+username. The hashing algorithm used to generate a hash is not enough to revert
 it (since it's a one-way algorithm), but *the algorithm used to encode a key is
 the only thing needed to decode it*.
 

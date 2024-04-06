@@ -2,7 +2,8 @@
 #+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: showeverything
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
 
 [[file:../index.org][Index]] | [[file:index.org][Up]]
 
@@ -103,7 +104,7 @@ could also use =s location= (seek) and then =command=.
 #+end_src
 
 The address being loaded into =rdi= at =entry0+0x14= should be our main function
-(=0x140d=).  Then, you could rename the function to "main" with
+(=0x140d=). Then, you could rename the function to "main" with
 =f+ main 0xc8 @ 0x140d=.
 
 ** Disassembling the main function

@@ -192,7 +192,8 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { }
 </style>
-<link rel="stylesheet" type="text/css" href="../css/main.css" />
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
 </head>
 <body>
 <div id="content" class="content">
@@ -207,27 +208,27 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgf1e3263">1. Introduction</a></li>
-<li><a href="#orgf7f141a">2. Trying out the program</a></li>
-<li><a href="#org6f76f97">3. The main function</a>
+<li><a href="#org0eccd2a">1. Introduction</a></li>
+<li><a href="#org068bc14">2. Trying out the program</a></li>
+<li><a href="#org6a017e4">3. The main function</a>
 <ul>
-<li><a href="#org1a73f0c">3.1. Finding the main function</a></li>
-<li><a href="#orgbd913ea">3.2. Disassembling the main function</a></li>
+<li><a href="#org6644615">3.1. Finding the main function</a></li>
+<li><a href="#org3c21bd2">3.2. Disassembling the main function</a></li>
 </ul>
 </li>
-<li><a href="#orgb880962">4. Disassembling the key generator</a></li>
-<li><a href="#orgdfa583a">5. Alternative: Decompiling with IDA or ghidra</a>
+<li><a href="#org3399389">4. Disassembling the key generator</a></li>
+<li><a href="#org5c336cf">5. Alternative: Decompiling with IDA or ghidra</a>
 <ul>
-<li><a href="#org47a123a">5.1. IDA Pro</a></li>
-<li><a href="#org5bec109">5.2. Rizin's version of ghidra</a></li>
+<li><a href="#org067cef5">5.1. IDA Pro</a></li>
+<li><a href="#org1707e66">5.2. Rizin's version of ghidra</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgf1e3263" class="outline-2">
-<h2 id="orgf1e3263"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org0eccd2a" class="outline-2">
+<h2 id="org0eccd2a"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 I created a simple keygen program that takes a user and a key, and prints a
@@ -239,14 +240,14 @@ in case you are interested.
 </div>
 </div>
 
-<div id="outline-container-orgf7f141a" class="outline-2">
-<h2 id="orgf7f141a"><span class="section-number-2">2.</span> Trying out the program</h2>
+<div id="outline-container-org068bc14" class="outline-2">
+<h2 id="org068bc14"><span class="section-number-2">2.</span> Trying out the program</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 First, let's try running the program to see what it's asking.
 </p>
 
-<pre class="example" id="org0f40679">
+<pre class="example" id="org7dfc0ae">
 Username: test
 Key: test
 Invalid key.
@@ -266,8 +267,8 @@ From this, we can at least expect:
 </div>
 </div>
 
-<div id="outline-container-org6f76f97" class="outline-2">
-<h2 id="org6f76f97"><span class="section-number-2">3.</span> The main function</h2>
+<div id="outline-container-org6a017e4" class="outline-2">
+<h2 id="org6a017e4"><span class="section-number-2">3.</span> The main function</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Let's start by having a look at the main function with <a href="https://rizin.re/">rizin</a> 0.6.3 (you can also
@@ -275,8 +276,8 @@ use <a href="https://cutter.re">cutter</a> or <a href="https://hex-rays.com/ida-
 </p>
 </div>
 
-<div id="outline-container-org1a73f0c" class="outline-3">
-<h3 id="org1a73f0c"><span class="section-number-3">3.1.</span> Finding the main function</h3>
+<div id="outline-container-org6644615" class="outline-3">
+<h3 id="org6644615"><span class="section-number-3">3.1.</span> Finding the main function</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 We start by running the <code>aaa</code> rizin command, which is used to "Analyze all calls,
@@ -352,14 +353,14 @@ could also use <code>s location</code> (seek) and then <code>command</code>.
 
 <p>
 The address being loaded into <code>rdi</code> at <code>entry0+0x14</code> should be our main function
-(<code>0x140d</code>).  Then, you could rename the function to "main" with
+(<code>0x140d</code>). Then, you could rename the function to "main" with
 <code>f+ main 0xc8 @ 0x140d</code>.
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgbd913ea" class="outline-3">
-<h3 id="orgbd913ea"><span class="section-number-3">3.2.</span> Disassembling the main function</h3>
+<div id="outline-container-org3c21bd2" class="outline-3">
+<h3 id="org3c21bd2"><span class="section-number-3">3.2.</span> Disassembling the main function</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Let's have a look at the disassembly of the main function.
@@ -468,8 +469,8 @@ when the key is correct.
 </div>
 </div>
 
-<div id="outline-container-orgb880962" class="outline-2">
-<h2 id="orgb880962"><span class="section-number-2">4.</span> Disassembling the key generator</h2>
+<div id="outline-container-org3399389" class="outline-2">
+<h2 id="org3399389"><span class="section-number-2">4.</span> Disassembling the key generator</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Now that we understand the main logic, let's have a look at the <code>generate_key()</code>
@@ -751,8 +752,8 @@ This is the final key generation function:
 </div>
 </div>
 
-<div id="outline-container-orgdfa583a" class="outline-2">
-<h2 id="orgdfa583a"><span class="section-number-2">5.</span> Alternative: Decompiling with IDA or ghidra</h2>
+<div id="outline-container-org5c336cf" class="outline-2">
+<h2 id="org5c336cf"><span class="section-number-2">5.</span> Alternative: Decompiling with IDA or ghidra</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 This option is not always reliable or not always available, so it's important to
@@ -780,8 +781,8 @@ similar as possible.
 </blockquote>
 </div>
 
-<div id="outline-container-org47a123a" class="outline-3">
-<h3 id="org47a123a"><span class="section-number-3">5.1.</span> IDA Pro</h3>
+<div id="outline-container-org067cef5" class="outline-3">
+<h3 id="org067cef5"><span class="section-number-3">5.1.</span> IDA Pro</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 This is the generated C code by <i>IDA Pro Version 7.7.220118 Windows x64</i> (<i>x64
@@ -817,8 +818,8 @@ equivalent and the second is more likely to be used.
 </div>
 </div>
 
-<div id="outline-container-org5bec109" class="outline-3">
-<h3 id="org5bec109"><span class="section-number-3">5.2.</span> Rizin's version of ghidra</h3>
+<div id="outline-container-org1707e66" class="outline-3">
+<h3 id="org1707e66"><span class="section-number-3">5.2.</span> Rizin's version of ghidra</h3>
 <div class="outline-text-3" id="text-5-2">
 <p>
 This is the generated C code by <i>rizin 0.6.1 @ linux-x86-64</i>.

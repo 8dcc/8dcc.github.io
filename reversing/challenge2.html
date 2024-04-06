@@ -192,7 +192,8 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { }
 </style>
-<link rel="stylesheet" type="text/css" href="../css/main.css" />
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
 </head>
 <body>
 <div id="content" class="content">
@@ -207,16 +208,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org97ae778">1. Original assembly</a></li>
-<li><a href="#org14c38e7">2. Analysis</a></li>
-<li><a href="#orgc98c2d9">3. C translation</a></li>
-<li><a href="#org64b81ad">4. Inverse function</a></li>
+<li><a href="#org2d15cf1">1. Original assembly</a></li>
+<li><a href="#orge6c1617">2. Analysis</a></li>
+<li><a href="#orgf5e43f4">3. C translation</a></li>
+<li><a href="#orgfa02fbb">4. Inverse function</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org97ae778" class="outline-2">
-<h2 id="org97ae778"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org2d15cf1" class="outline-2">
+<h2 id="org2d15cf1"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/2/">Click me</a>.
@@ -255,8 +256,8 @@ bit to fit the <a href="https://www.nasm.us/">nasm</a> syntax.
 </div>
 </div>
 
-<div id="outline-container-org14c38e7" class="outline-2">
-<h2 id="org14c38e7"><span class="section-number-2">2.</span> Analysis</h2>
+<div id="outline-container-orge6c1617" class="outline-2">
+<h2 id="orge6c1617"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Let's try to figure this out step by step.
@@ -363,7 +364,7 @@ them back together.
 Let's try to visualize these last steps with an example:
 </p>
 
-<pre class="example" id="orge663395">
+<pre class="example" id="org8b2f974">
 Base number:    0xDEADBEEF  0b11011110101011011011111011101111
 
 After masking:  0x0E0D0E0F  0b00001110000011010000111000001111 (eax)
@@ -441,8 +442,8 @@ The final OR'd result will be saved to <code>eax</code> and returned.
 </div>
 </div>
 
-<div id="outline-container-orgc98c2d9" class="outline-2">
-<h2 id="orgc98c2d9"><span class="section-number-2">3.</span> C translation</h2>
+<div id="outline-container-orgf5e43f4" class="outline-2">
+<h2 id="orgf5e43f4"><span class="section-number-2">3.</span> C translation</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 This is a simple C translation of the assembly:
@@ -473,8 +474,8 @@ This is a simple C translation of the assembly:
 </div>
 </div>
 
-<div id="outline-container-org64b81ad" class="outline-2">
-<h2 id="org64b81ad"><span class="section-number-2">4.</span> Inverse function</h2>
+<div id="outline-container-orgfa02fbb" class="outline-2">
+<h2 id="orgfa02fbb"><span class="section-number-2">4.</span> Inverse function</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 I made my own inverse function before realizing that the original swapping

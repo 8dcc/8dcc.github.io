@@ -192,7 +192,8 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { }
 </style>
-<link rel="stylesheet" type="text/css" href="../css/main.css" />
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
 </head>
 <body>
 <div id="content" class="content">
@@ -207,29 +208,29 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgf56dcb4">1. About the game</a></li>
-<li><a href="#orgebc0c9d">2. Getting general information about the game</a></li>
-<li><a href="#orge588cb7">3. Making a simple godmode with detour hooking</a>
+<li><a href="#org8338bc5">1. About the game</a></li>
+<li><a href="#org2875962">2. Getting general information about the game</a></li>
+<li><a href="#orgb67d4a6">3. Making a simple godmode with detour hooking</a>
 <ul>
-<li><a href="#orgc319981">3.1. Getting the function pointer</a></li>
-<li><a href="#org26a091b">3.2. Hooking <code>verse2::hero::take_hit()</code></a></li>
+<li><a href="#org7972230">3.1. Getting the function pointer</a></li>
+<li><a href="#org63725a7">3.2. Hooking <code>verse2::hero::take_hit()</code></a></li>
 </ul>
 </li>
-<li><a href="#org4093a09">4. Enabling the hidden particle and level editors</a>
+<li><a href="#org9d95ce4">4. Enabling the hidden particle and level editors</a>
 <ul>
-<li><a href="#orgb365b3a">4.1. Getting a pointer to <code>verse2::globals</code></a></li>
-<li><a href="#org6826331">4.2. Declaring a <code>verse_globals_t</code> struct</a></li>
-<li><a href="#org8540f88">4.3. Enabling and disabling the editors</a></li>
+<li><a href="#orgee4804c">4.1. Getting a pointer to <code>verse2::globals</code></a></li>
+<li><a href="#org8cb6519">4.2. Declaring a <code>verse_globals_t</code> struct</a></li>
+<li><a href="#org046f843">4.3. Enabling and disabling the editors</a></li>
 </ul>
 </li>
-<li><a href="#org2b13828">5. Enabling the top-down camera outside of replays</a></li>
-<li><a href="#orgb49a6dc">6. Complete source code</a></li>
+<li><a href="#org0dd1a10">5. Enabling the top-down camera outside of replays</a></li>
+<li><a href="#orgd211622">6. Complete source code</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgf56dcb4" class="outline-2">
-<h2 id="orgf56dcb4"><span class="section-number-2">1.</span> About the game</h2>
+<div id="outline-container-org8338bc5" class="outline-2">
+<h2 id="org8338bc5"><span class="section-number-2">1.</span> About the game</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 <a href="https://devildaggers.com/">Devil Daggers</a> is a very fun and simple first-person shooter with a 1990s visual
@@ -247,8 +248,8 @@ For reversing, I will use <a href="https://cutter.re/">cutter</a>.
 </div>
 </div>
 
-<div id="outline-container-orgebc0c9d" class="outline-2">
-<h2 id="orgebc0c9d"><span class="section-number-2">2.</span> Getting general information about the game</h2>
+<div id="outline-container-org2875962" class="outline-2">
+<h2 id="org2875962"><span class="section-number-2">2.</span> Getting general information about the game</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 If we open the <code>devildaggers</code> binary in cutter, and go through the function list,
@@ -264,7 +265,7 @@ bit, we can start to see these <code>verse2</code> classes:
 </p>
 
 
-<div id="org36a2ce1" class="figure">
+<div id="org765550f" class="figure">
 <p><img src="../img/devildaggers1.png" alt="devildaggers1.png" />
 </p>
 </div>
@@ -277,12 +278,12 @@ inside <code>verse2::hero::*</code>. Some functions that look interesting are <c
 </div>
 </div>
 
-<div id="outline-container-orge588cb7" class="outline-2">
-<h2 id="orge588cb7"><span class="section-number-2">3.</span> Making a simple godmode with detour hooking</h2>
+<div id="outline-container-orgb67d4a6" class="outline-2">
+<h2 id="orgb67d4a6"><span class="section-number-2">3.</span> Making a simple godmode with detour hooking</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgc319981" class="outline-3">
-<h3 id="orgc319981"><span class="section-number-3">3.1.</span> Getting the function pointer</h3>
+<div id="outline-container-org7972230" class="outline-3">
+<h3 id="org7972230"><span class="section-number-3">3.1.</span> Getting the function pointer</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Let's start by getting a pointer to the function we are interested in. Since
@@ -346,7 +347,7 @@ type of the parameters.
 </p>
 
 
-<div id="orgd6ffffe" class="figure">
+<div id="org429bca3" class="figure">
 <p><img src="../img/devildaggers2.png" alt="devildaggers2.png" />
 </p>
 </div>
@@ -360,7 +361,7 @@ returning.
 </p>
 
 
-<div id="org4c20825" class="figure">
+<div id="orge4dd51a" class="figure">
 <p><img src="../img/devildaggers3.png" alt="devildaggers3.png" />
 </p>
 </div>
@@ -372,7 +373,7 @@ before continuing with the execution.
 </p>
 
 
-<div id="org0f2eaa2" class="figure">
+<div id="orgd90f469" class="figure">
 <p><img src="../img/devildaggers4.png" alt="devildaggers4.png" />
 </p>
 </div>
@@ -408,8 +409,8 @@ The final code for finding <code>verse2::hero::take_hit()</code> looks like this
 </div>
 </div>
 
-<div id="outline-container-org26a091b" class="outline-3">
-<h3 id="org26a091b"><span class="section-number-3">3.2.</span> Hooking <code>verse2::hero::take_hit()</code></h3>
+<div id="outline-container-org63725a7" class="outline-3">
+<h3 id="org63725a7"><span class="section-number-3">3.2.</span> Hooking <code>verse2::hero::take_hit()</code></h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 We will be using the detour hooking method I explained in
@@ -507,8 +508,8 @@ avoid relocation errors.
 </div>
 </div>
 
-<div id="outline-container-org4093a09" class="outline-2">
-<h2 id="org4093a09"><span class="section-number-2">4.</span> Enabling the hidden particle and level editors</h2>
+<div id="outline-container-org9d95ce4" class="outline-2">
+<h2 id="org9d95ce4"><span class="section-number-2">4.</span> Enabling the hidden particle and level editors</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 While searching for some strings (specifically "Score submitted", which appears
@@ -518,7 +519,7 @@ related to some "PARTICLES" and "PROGRESSION" windows.
 </p>
 
 
-<div id="orgcf47579" class="figure">
+<div id="org614a618" class="figure">
 <p><img src="../img/devildaggers5.png" alt="devildaggers5.png" />
 </p>
 </div>
@@ -530,14 +531,14 @@ loaded into <code>rax</code> is <code>verse2::globals</code>.
 </p>
 
 
-<div id="org6789f82" class="figure">
+<div id="org1b6fbe3" class="figure">
 <p><img src="../img/devildaggers6.png" alt="devildaggers6.png" />
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgb365b3a" class="outline-3">
-<h3 id="orgb365b3a"><span class="section-number-3">4.1.</span> Getting a pointer to <code>verse2::globals</code></h3>
+<div id="outline-container-orgee4804c" class="outline-3">
+<h3 id="orgee4804c"><span class="section-number-3">4.1.</span> Getting a pointer to <code>verse2::globals</code></h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 At this point, I already hooked another function called <code>verse2::hero::step()</code>,
@@ -553,7 +554,7 @@ internally.
 </p>
 
 
-<div id="orgfb9996e" class="figure">
+<div id="orgef56fca" class="figure">
 <p><img src="../img/devildaggers7.png" alt="devildaggers7.png" />
 </p>
 </div>
@@ -637,8 +638,8 @@ Or in a more compact way using a <code>RELATIVE2ABSOLUTE()</code> macro:
 </div>
 </div>
 
-<div id="outline-container-org6826331" class="outline-3">
-<h3 id="org6826331"><span class="section-number-3">4.2.</span> Declaring a <code>verse_globals_t</code> struct</h3>
+<div id="outline-container-org8cb6519" class="outline-3">
+<h3 id="org8cb6519"><span class="section-number-3">4.2.</span> Declaring a <code>verse_globals_t</code> struct</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 Since we want to change two booleans for the level and particle editors, we
@@ -674,8 +675,8 @@ structure:
 </div>
 </div>
 
-<div id="outline-container-org8540f88" class="outline-3">
-<h3 id="org8540f88"><span class="section-number-3">4.3.</span> Enabling and disabling the editors</h3>
+<div id="outline-container-org046f843" class="outline-3">
+<h3 id="org046f843"><span class="section-number-3">4.3.</span> Enabling and disabling the editors</h3>
 <div class="outline-text-3" id="text-4-3">
 <p>
 Now we can simply set these two members to true, if the user wants to enable
@@ -701,13 +702,13 @@ have a look at <code>verse2::VERSE::step_ui()</code>)
 </p>
 
 
-<div id="org1c5524d" class="figure">
+<div id="org1f1b4eb" class="figure">
 <p><img src="../img/devildaggers8.png" alt="devildaggers8.png" />
 </p>
 </div>
 
 
-<div id="orge54fa69" class="figure">
+<div id="org49b01b1" class="figure">
 <p><img src="../img/devildaggers9.png" alt="devildaggers9.png" />
 </p>
 </div>
@@ -719,8 +720,8 @@ Don't forget to set them to false when unloading the library (in <code>unload()<
 </div>
 </div>
 
-<div id="outline-container-org2b13828" class="outline-2">
-<h2 id="org2b13828"><span class="section-number-2">5.</span> Enabling the top-down camera outside of replays</h2>
+<div id="outline-container-org0dd1a10" class="outline-2">
+<h2 id="org0dd1a10"><span class="section-number-2">5.</span> Enabling the top-down camera outside of replays</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 There is a top-down camera mode available when watching a replay, so I thought
@@ -759,15 +760,15 @@ suggestion feel free to <a href="https://github.com/8dcc/8dcc.github.io">contrib
 </p>
 
 
-<div id="org96291f0" class="figure">
+<div id="org829e87a" class="figure">
 <p><img src="../img/devildaggers10.png" alt="devildaggers10.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgb49a6dc" class="outline-2">
-<h2 id="orgb49a6dc"><span class="section-number-2">6.</span> Complete source code</h2>
+<div id="outline-container-orgd211622" class="outline-2">
+<h2 id="orgd211622"><span class="section-number-2">6.</span> Complete source code</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 The complete source code with some extra features can be found in
