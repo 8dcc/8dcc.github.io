@@ -32,3 +32,7 @@ External links you might find interesting:
 
 Feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this blog if you find any errors or if you have any
 suggestions.
+
+#+begin_center
+[[file:img/pepper.png]]
+#+end_center
