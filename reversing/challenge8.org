@@ -1,0 +1,255 @@
+#+TITLE: Challenge 8
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: showeverything
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Original assembly
+
+Original challenge link: [[https://challenges.re/8/][Click me]].
+
+#+begin_src nasm
+func:
+   0:       push   r12
+   2:       test   rsi, rsi
+   5:       mov    r12, rdi
+   8:       push   rbp
+   9:       mov    rbp, rdx
+   c:       push   rbx
+   d:       mov    rbx, rsi
+  10:       je     32
+  12:       nop    WORD [rax + rax * 1 + 0x0]
+  18:       mov    rsi, QWORD [rbx]
+  1b:       mov    rdi, rbp
+  1e:       call   r12
+  21:       test   eax, eax
+  23:       je     56
+  25:       js     40
+  27:       mov    rbx, QWORD [rbx + 0x18]
+  2b:       test   rbx, rbx
+  2e:       xchg   ax, ax
+  30:       jne    18
+  32:       pop    rbx
+  33:       pop    rbp
+  34:       xor    eax, eax
+  36:       pop    r12
+  38:       ret
+  39:       nop    DWORD [rax + 0x0]
+  40:       mov    rbx, QWORD [rbx + 0x10]
+  44:       test   rbx, rbx
+  47:       je     32
+  49:       mov    rsi, QWORD [rbx]
+  4c:       mov    rdi, rbp
+  4f:       call   r12
+  52:       test   eax, eax
+  54:       jne    25
+  56:       mov    rax, rbx
+  59:       pop    rbx
+  5a:       pop    rbp
+  5b:       pop    r12
+  5d:       ret
+#+end_src
+
+After removing the unused labels, and renaming the used ones.
+
+#+begin_src nasm
+func:
+    push   r12
+    test   rsi, rsi
+    mov    r12, rdi
+    push   rbp
+    mov    rbp, rdx
+    push   rbx
+    mov    rbx, rsi
+    je     .return_zero
+    nop
+.unk0:
+    mov    rsi, QWORD [rbx]
+    mov    rdi, rbp
+    call   r12
+    test   eax, eax
+    je     .return_rbx
+.unk1:
+    js     .unk2
+    mov    rbx, QWORD [rbx + 0x18]
+    test   rbx, rbx
+    xchg   ax, ax  ; (nop)
+    jne    .unk0
+.return_zero:
+    pop    rbx
+    pop    rbp
+    xor    eax, eax
+    pop    r12
+    ret
+    nop
+.unk2:
+    mov    rbx, QWORD [rbx + 0x10]
+    test   rbx, rbx
+    je     .return_zero
+    mov    rsi, QWORD [rbx]
+    mov    rdi, rbp
+    call   r12
+    test   eax, eax
+    jne    .unk1
+.return_rbx:
+    mov    rax, rbx
+    pop    rbx
+    pop    rbp
+    pop    r12
+    ret
+#+end_src
+
+* Assembly notes
+
+These are some notes I considered important when translating the assembly into C
+code.
+
+** Second parameter: Array or struct
+
+The second parameter of the function is loaded into =rbx=, and is dereferenced
+throughout the function. By that we can tell that it's a pointer, and all the
+used elements are 64 bits long ([[https://en.wikipedia.org/wiki/Word_(computer_architecture)#Size_families][QWORD]]).
+
+At first, I thought this was an array of pointers, since the value in
+=[rbx + 0x10]= is dereferenced again into =rbx=, so I thought the function traversed
+an array of unknown depth. However, there is no iteration, no pointer being
+increased, and the function only works with =rbx[0]=, =rbx[2]= and =rbx[3]=.
+
+I was talking about this with a friend, and he told me that this might be
+related to linked lists, and that's when I realized that instead of an array, it
+might be accessing a structure, and accessing the pointers at =[rbx + 0x10]= and
+=[rbx + 0x18]= to jump to the previous and next elements in the linked list.
+
+** Getting the return value of the =r12= function
+
+The first argument of our function is moved from =rdi= to =r12=. At some point, we
+call the function at the address in =r12=, so we know the first parameter is a
+pointer to some callback function. We can tell the type of the parameters
+because we pass =rbp= and =rbx=, which at this point hold the 2nd and 3rd parameters
+of our function.
+
+For the return value, we can see that it's signed, and likely 32-bits because we
+not only =test eax=, but we also check if the sign flag (SF) is set with a =js= jump
+(Jump if less than zero). See /Intel SDM, Vol. 1, Chapter 3.4.3.1/ and /Intel SDM,
+Vol.2, Jcc/ (Pg. 3-537).
+
+For the C translation, I will create a =callback_t= typedef so the parameter type
+is more readable.
+
+* C translation
+
+The first version uses register names, treats =rbx= as an array, and is a bit more
+messy when it comes to branching.
+
+Note how the assembly calls the =r12= function in =unk2=, and then checks if it's
+not zero *directly before jumping* to =unk1= with the =jne= instruction (which is
+equivalent to =jnz=). This is the same check that is made at the bottom of =unk0=,
+and overlooking this =jne= detail was making me think that it was *unconditionally*
+jumping to =unk1= instead of =unk0= *specifically* because it wanted to skip this zero
+check.
+
+#+begin_src C
+typedef int (*callback_t)(uint64_t, uint64_t*);
+
+uint64_t* func(callback_t r12, uint64_t* rbx, uint64_t rbp) {
+    if (rbx == NULL)
+        return 0;
+
+    for (;;) {
+        /* unk0 */
+        int eax = r12(rbp, rbx[0]);
+        if (eax == 0)
+            return rbx;
+
+        /* unk1 */
+        if (eax >= 0) {
+            rbx = rbx[3];
+            if (rbx == NULL)
+                return 0;
+
+            continue; /* goto unk0 */
+        } else {
+            /* unk2 */
+            rbx = rbx[2];
+            if (rbx == NULL)
+                return 0;
+
+            continue; /* goto unk0 */
+        }
+    }
+
+    return rbx;
+}
+#+end_src
+
+After analyzing what it does, renaming the parameters, and using a dummy
+structure, I simplified it into this other version. I also returned =NULL= instead
+of zero, since it normally returns =rbx= which is a pointer to a node.
+
+#+begin_src C
+typedef struct MyNode {
+    uint64_t data0;
+    uint64_t data1;
+    struct MyNode* prev;
+    struct MyNode* next;
+} MyNode;
+
+typedef int (*callback_t)(uint64_t, uint64_t);
+
+MyNode* func(callback_t callback, MyNode* node, uint64_t data) {
+    if (node == NULL)
+        return NULL;
+
+    for (;;) {
+        /* unk0 */
+        int result = callback(data, node->data0);
+        if (result == 0)
+            return node;
+
+        if (result >= 0) {
+            /* unk1 */
+            node = node->next;
+        } else {
+            /* unk2 */
+            node = node->prev;
+        }
+
+        if (node == NULL)
+            return 0;
+    }
+
+    /* Not reached */
+    return node;
+}
+#+end_src
+
+As you can see, I also moved the duplicated =NULL= check outside of the =if=
+statement.
+
+* Function purpose
+
+As we can see by the final C code, the function traverses a [[https://en.wikipedia.org/wiki/Doubly_linked_list][doubly linked list]]
+starting at /node/, moving left or right depending on the return value of a
+/callback/ function when checking against the provided /data/.
+
+The =prev= and =next= members of =MyNode= don't have to be in that order, but they are
+traversed like they appear in the function. Note how the first member of =node= is
+passed to =callback=, not the node itself.
+
+However, one thing is still unclear to me. If we read the description of the
+challenge, we can see the following.
+
+#+begin_quote
+This is one of the busiest algorithms under the hood, though, usually hidden
+from programmers. It implements one of the most popular algorithms in computer
+science. *It features recursion* and a callback function.
+#+end_quote
+
+If we look at our code again, there is no recursion.
