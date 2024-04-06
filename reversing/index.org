@@ -18,6 +18,7 @@ List of my articles solving RE challenges:
 - [[file:challenge5.org][Challenge 5]]
 - [[file:challenge6.org][Challenge 6]]
 - [[file:challenge7.org][Challenge 7]]
+- [[file:challenge8.org][Challenge 8]]
 
 My other articles about reverse engineering:
 
@@ -40,7 +41,7 @@ Good resources for learning and practicing reverse engineering:
 
 Throughout this section, you might see some references to the *Intel Software
 Developer Manual*. The manuals on the official website are regularly updated, so you can read and
-download the specific version of the volumes I used for the references  from the
+download the specific version of the volumes I used for the references from the
 following links (See also, [[https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html][Intel download page]]):
 
 - Intel SDM, Volume 1: [[file:../manuals/intel-sdm-vol-1.pdf][253665-sdm-vol-1.pdf]]
