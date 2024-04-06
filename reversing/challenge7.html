@@ -207,24 +207,24 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgbc03163">1. Original assembly</a></li>
-<li><a href="#org7a2eeb9">2. Assembly notes</a>
+<li><a href="#org808b29b">1. Original assembly</a></li>
+<li><a href="#org882e368">2. Assembly notes</a>
 <ul>
-<li><a href="#org11be24f">2.1. Function parameters</a></li>
-<li><a href="#org4f6a476">2.2. Single <code>while</code> loop</a></li>
-<li><a href="#orgaa7e996">2.3. Using <code>lea</code> without a pointer</a></li>
-<li><a href="#org7fef2b2">2.4. Understanding <code>0x41</code></a></li>
-<li><a href="#org0125c0e">2.5. The <code>SIL</code> register</a></li>
-<li><a href="#orgfb39567">2.6. Using <code>repz</code> along with <code>ret</code></a></li>
+<li><a href="#orga0f4ec2">2.1. Function parameters</a></li>
+<li><a href="#orga92816f">2.2. Single <code>while</code> loop</a></li>
+<li><a href="#org39b0194">2.3. Using <code>lea</code> without a pointer</a></li>
+<li><a href="#orgad06066">2.4. Understanding <code>0x41</code></a></li>
+<li><a href="#org616e162">2.5. The <code>SIL</code> register</a></li>
+<li><a href="#orgf6b5df3">2.6. Using <code>repz</code> along with <code>ret</code></a></li>
 </ul>
 </li>
-<li><a href="#org3c5e181">3. C translation</a></li>
+<li><a href="#orgf102100">3. C translation</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgbc03163" class="outline-2">
-<h2 id="orgbc03163"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org808b29b" class="outline-2">
+<h2 id="org808b29b"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/7/">Click me</a>.
@@ -232,19 +232,19 @@ Original challenge link: <a href="https://challenges.re/7/">Click me</a>.
 
 <div class="org-src-container">
 <pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-   <span style="color: #88ca9f;">0</span>:                <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> PTR [<span style="color: #6ae4b9;">rdi</span>]
+   <span style="color: #88ca9f;">0</span>:                <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rdi</span>]
    <span style="color: #88ca9f;">3</span>:                <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rdi</span>
    <span style="color: #88ca9f;">6</span>:                <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #6ae4b9;">rdi</span>
    <span style="color: #88ca9f;">9</span>:                <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">dl</span>, <span style="color: #6ae4b9;">dl</span>
    <span style="color: #4ae2ff;">b</span>:                <span style="color: #feacd0;">je</span>     <span style="color: #88ca9f;">29</span>
-   <span style="color: #4ae2ff;">d</span>:                <span style="color: #feacd0;">nop</span>    <span style="color: #79a8ff;">DWORD</span> PTR [<span style="color: #6ae4b9;">rax</span>]
+   <span style="color: #4ae2ff;">d</span>:                <span style="color: #feacd0;">nop</span>    <span style="color: #79a8ff;">DWORD</span> [<span style="color: #6ae4b9;">rax</span>]
   <span style="color: #88ca9f;">10</span>:                <span style="color: #feacd0;">lea</span>    <span style="color: #6ae4b9;">esi</span>, [<span style="color: #6ae4b9;">rdx</span> - <span style="color: #88ca9f;">0x41</span>]
   <span style="color: #88ca9f;">13</span>:                <span style="color: #feacd0;">cmp</span>    <span style="color: #6ae4b9;">sil</span>, <span style="color: #88ca9f;">0x19</span>
   <span style="color: #88ca9f;">17</span>:                <span style="color: #feacd0;">ja</span>     <span style="color: #88ca9f;">1e</span>
   <span style="color: #88ca9f;">19</span>:                <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0x20</span>
-  <span style="color: #88ca9f;">1c</span>:                <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">BYTE</span> PTR [<span style="color: #6ae4b9;">rcx</span>], <span style="color: #6ae4b9;">dl</span>
+  <span style="color: #88ca9f;">1c</span>:                <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rcx</span>], <span style="color: #6ae4b9;">dl</span>
   <span style="color: #88ca9f;">1e</span>:                <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #88ca9f;">0x1</span>
-  <span style="color: #88ca9f;">22</span>:                <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> PTR [<span style="color: #6ae4b9;">rcx</span>]
+  <span style="color: #88ca9f;">22</span>:                <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rcx</span>]
   <span style="color: #88ca9f;">25</span>:                <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">dl</span>, <span style="color: #6ae4b9;">dl</span>
   <span style="color: #88ca9f;">27</span>:                <span style="color: #feacd0;">jne</span>    <span style="color: #88ca9f;">10</span>
   <span style="color: #88ca9f;">29</span>:                <span style="color: #feacd0;">repz</span> <span style="color: #feacd0;">ret</span>
@@ -281,16 +281,16 @@ After removing the unused labels, and renaming the used ones.
 </div>
 </div>
 
-<div id="outline-container-org7a2eeb9" class="outline-2">
-<h2 id="org7a2eeb9"><span class="section-number-2">2.</span> Assembly notes</h2>
+<div id="outline-container-org882e368" class="outline-2">
+<h2 id="org882e368"><span class="section-number-2">2.</span> Assembly notes</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Here are notes I considered important when translating the assembly into C code.
 </p>
 </div>
 
-<div id="outline-container-org11be24f" class="outline-3">
-<h3 id="org11be24f"><span class="section-number-3">2.1.</span> Function parameters</h3>
+<div id="outline-container-orga0f4ec2" class="outline-3">
+<h3 id="orga0f4ec2"><span class="section-number-3">2.1.</span> Function parameters</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 We can asume the first parameter of the function is a <code>char*</code> because it's always
@@ -299,8 +299,8 @@ using <code>BYTE [ptr]</code> when reading and writing values.
 </div>
 </div>
 
-<div id="outline-container-org4f6a476" class="outline-3">
-<h3 id="org4f6a476"><span class="section-number-3">2.2.</span> Single <code>while</code> loop</h3>
+<div id="outline-container-orga92816f" class="outline-3">
+<h3 id="orga92816f"><span class="section-number-3">2.2.</span> Single <code>while</code> loop</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 If we start translating to C code literally, we can see it technically checks if
@@ -311,8 +311,8 @@ optimization made by the compiler, so we can simplify this into a simple
 </div>
 </div>
 
-<div id="outline-container-orgaa7e996" class="outline-3">
-<h3 id="orgaa7e996"><span class="section-number-3">2.3.</span> Using <code>lea</code> without a pointer</h3>
+<div id="outline-container-org39b0194" class="outline-3">
+<h3 id="org39b0194"><span class="section-number-3">2.3.</span> Using <code>lea</code> without a pointer</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 After the <code>.loop</code> label, we load the effective address of <code>[rdx - 0x41]</code>. Keep in
@@ -333,8 +333,8 @@ Or in simpler words: If I am at <code>rdx</code>, and I move back <code>0x41</co
 </div>
 </div>
 
-<div id="outline-container-org7fef2b2" class="outline-3">
-<h3 id="org7fef2b2"><span class="section-number-3">2.4.</span> Understanding <code>0x41</code></h3>
+<div id="outline-container-orgad06066" class="outline-3">
+<h3 id="orgad06066"><span class="section-number-3">2.4.</span> Understanding <code>0x41</code></h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 At first, <code>0x41</code> doesn't look particularly special. First, we should convert it to
@@ -357,8 +357,8 @@ at <code>0x5A</code>, which is <code>Z</code>. We are basically checking if the 
 </div>
 </div>
 
-<div id="outline-container-org0125c0e" class="outline-3">
-<h3 id="org0125c0e"><span class="section-number-3">2.5.</span> The <code>SIL</code> register</h3>
+<div id="outline-container-org616e162" class="outline-3">
+<h3 id="org616e162"><span class="section-number-3">2.5.</span> The <code>SIL</code> register</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 Although the <code>SIL</code> register is not commonly used, it's used to access the <b>lower 8
@@ -367,8 +367,8 @@ bits of the <code>ESI</code> register</b>.
 </div>
 </div>
 
-<div id="outline-container-orgfb39567" class="outline-3">
-<h3 id="orgfb39567"><span class="section-number-3">2.6.</span> Using <code>repz</code> along with <code>ret</code></h3>
+<div id="outline-container-orgf6b5df3" class="outline-3">
+<h3 id="orgf6b5df3"><span class="section-number-3">2.6.</span> Using <code>repz</code> along with <code>ret</code></h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 For more information about why <code>repz</code> is used with <code>ret</code>, see <a href="challenge6.html">Challenge 6</a>.
@@ -377,8 +377,8 @@ For more information about why <code>repz</code> is used with <code>ret</code>, 
 </div>
 </div>
 
-<div id="outline-container-org3c5e181" class="outline-2">
-<h2 id="org3c5e181"><span class="section-number-2">3.</span> C translation</h2>
+<div id="outline-container-orgf102100" class="outline-2">
+<h2 id="orgf102100"><span class="section-number-2">3.</span> C translation</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The first version uses register names and is a more direct translation.
