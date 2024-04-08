@@ -208,21 +208,21 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org1918ce5">1. Original assembly</a></li>
-<li><a href="#orge5cdc13">2. Assembly notes</a>
+<li><a href="#org827b5a4">1. Original assembly</a></li>
+<li><a href="#org4abac9e">2. Assembly notes</a>
 <ul>
-<li><a href="#orgd4945c5">2.1. Second parameter: Array or struct</a></li>
-<li><a href="#org22bb0c8">2.2. Getting the return value of the <code>r12</code> function</a></li>
+<li><a href="#org9a9f95e">2.1. Second parameter: Array or struct</a></li>
+<li><a href="#orged6c885">2.2. Getting the return value of the <code>r12</code> function</a></li>
 </ul>
 </li>
-<li><a href="#org7e32ffd">3. C translation</a></li>
-<li><a href="#org3f09b6f">4. Function purpose</a></li>
+<li><a href="#org1791da9">3. C translation</a></li>
+<li><a href="#org9749a7b">4. Function purpose</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org1918ce5" class="outline-2">
-<h2 id="org1918ce5"><span class="section-number-2">1.</span> Original assembly</h2>
+<div id="outline-container-org827b5a4" class="outline-2">
+<h2 id="org827b5a4"><span class="section-number-2">1.</span> Original assembly</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Original challenge link: <a href="https://challenges.re/8/">Click me</a>.
@@ -325,8 +325,8 @@ After removing the unused labels, and renaming the used ones.
 </div>
 </div>
 
-<div id="outline-container-orge5cdc13" class="outline-2">
-<h2 id="orge5cdc13"><span class="section-number-2">2.</span> Assembly notes</h2>
+<div id="outline-container-org4abac9e" class="outline-2">
+<h2 id="org4abac9e"><span class="section-number-2">2.</span> Assembly notes</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 These are some notes I considered important when translating the assembly into C
@@ -334,8 +334,8 @@ code.
 </p>
 </div>
 
-<div id="outline-container-orgd4945c5" class="outline-3">
-<h3 id="orgd4945c5"><span class="section-number-3">2.1.</span> Second parameter: Array or struct</h3>
+<div id="outline-container-org9a9f95e" class="outline-3">
+<h3 id="org9a9f95e"><span class="section-number-3">2.1.</span> Second parameter: Array or struct</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 The second parameter of the function is loaded into <code>rbx</code>, and is dereferenced
@@ -359,8 +359,8 @@ might be accessing a structure, and accessing the pointers at <code>[rbx + 0x10]
 </div>
 </div>
 
-<div id="outline-container-org22bb0c8" class="outline-3">
-<h3 id="org22bb0c8"><span class="section-number-3">2.2.</span> Getting the return value of the <code>r12</code> function</h3>
+<div id="outline-container-orged6c885" class="outline-3">
+<h3 id="orged6c885"><span class="section-number-3">2.2.</span> Getting the return value of the <code>r12</code> function</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 The first argument of our function is moved from <code>rdi</code> to <code>r12</code>. At some point, we
@@ -385,8 +385,8 @@ is more readable.
 </div>
 </div>
 
-<div id="outline-container-org7e32ffd" class="outline-2">
-<h2 id="org7e32ffd"><span class="section-number-2">3.</span> C translation</h2>
+<div id="outline-container-org1791da9" class="outline-2">
+<h2 id="org1791da9"><span class="section-number-2">3.</span> C translation</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The first version uses register names, treats <code>rbx</code> as an array, and is a bit more
@@ -488,8 +488,8 @@ statement.
 </div>
 </div>
 
-<div id="outline-container-org3f09b6f" class="outline-2">
-<h2 id="org3f09b6f"><span class="section-number-2">4.</span> Function purpose</h2>
+<div id="outline-container-org9749a7b" class="outline-2">
+<h2 id="org9749a7b"><span class="section-number-2">4.</span> Function purpose</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 As we can see by the final C code, the function traverses a <a href="https://en.wikipedia.org/wiki/Doubly_linked_list">doubly linked list</a>
@@ -517,8 +517,56 @@ science. <b>It features recursion</b> and a callback function.
 </blockquote>
 
 <p>
-If we look at our code again, there is no recursion.
+If we look at our code again, there is no recursion. I asked the author of the
+challenges, Dennis Yurichev, and he told me that his original function did use
+recursion, and that it was a slightly different algorithm.
 </p>
+
+<p>
+This function is for <b>searching a node in a binary tree</b>. I have never used it
+personally, but I knew about it. The reason he says "usually hidden from
+programmers" is because this algorithm is used in many map/dictionary
+implementations for different languages.
+</p>
+
+<p>
+In his code, the structure had an extra <code>parent</code> member which was not used. The
+<i>callback</i> function is supposed to indicate if we should continue left or right in
+the tree, and in his code, it's called recursively, rather than iteratively. I
+also renamed some symbols to match my last example.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">MyNode</span> {
+    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">key</span>;
+    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">value</span>;
+    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">MyNode</span>* <span style="color: #6ae4b9;">left</span>;
+    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">MyNode</span>* <span style="color: #6ae4b9;">right</span>;
+} <span style="color: #79a8ff;">MyNode</span>;
+
+<span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">int</span> (*<span style="color: #79a8ff;">cmp_func_t</span>)(<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">key1</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">key2</span>);
+
+<span style="color: #79a8ff;">MyNode</span>* <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">cmp_func_t</span> <span style="color: #6ae4b9;">cmp_func</span>, <span style="color: #79a8ff;">MyNode</span>* <span style="color: #6ae4b9;">node</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">key</span>) {
+    <span style="color: #ff6f9f;">if</span> (node == <span style="color: #88ca9f;">NULL</span>)
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">cmp_result</span> = cmp_func(key, node-&gt;key);
+    <span style="color: #ff6f9f;">if</span> (cmp_result == <span style="color: #88ca9f;">0</span>) {
+        <span style="color: #ff6f9f;">return</span> node; <span style="color: #989898;">/* </span><span style="color: #989898;">Key found</span><span style="color: #989898;"> */</span>
+    } <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (cmp_result &lt; <span style="color: #88ca9f;">0</span>) {
+        <span style="color: #ff6f9f;">if</span> (node-&gt;left != <span style="color: #88ca9f;">NULL</span>)
+            <span style="color: #ff6f9f;">return</span> func(cmp_func, node-&gt;left, key);
+        <span style="color: #ff6f9f;">else</span>
+            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">Leftmost node</span><span style="color: #989898;"> */</span>
+    } <span style="color: #ff6f9f;">else</span> {
+        <span style="color: #ff6f9f;">if</span> (node-&gt;right != <span style="color: #88ca9f;">NULL</span>)
+            <span style="color: #ff6f9f;">return</span> func(cmp_func, node-&gt;right, key);
+        <span style="color: #ff6f9f;">else</span>
+            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">Rightmost node</span><span style="color: #989898;"> */</span>
+    }
+}
+</pre>
+</div>
 </div>
 </div>
 </div>

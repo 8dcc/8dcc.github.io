@@ -252,4 +252,47 @@ from programmers. It implements one of the most popular algorithms in computer
 science. *It features recursion* and a callback function.
 #+end_quote
 
-If we look at our code again, there is no recursion.
+If we look at our code again, there is no recursion. I asked the author of the
+challenges, Dennis Yurichev, and he told me that his original function did use
+recursion, and that it was a slightly different algorithm.
+
+This function is for *searching a node in a binary tree*. I have never used it
+personally, but I knew about it. The reason he says "usually hidden from
+programmers" is because this algorithm is used in many map/dictionary
+implementations for different languages.
+
+In his code, the structure had an extra =parent= member which was not used. The
+/callback/ function is supposed to indicate if we should continue left or right in
+the tree, and in his code, it's called recursively, rather than iteratively. I
+also renamed some symbols to match my last example.
+
+#+begin_src C
+typedef struct MyNode {
+    void* key;
+    void* value;
+    struct MyNode* left;
+    struct MyNode* right;
+} MyNode;
+
+typedef int (*cmp_func_t)(void* key1, void* key2);
+
+MyNode* func(cmp_func_t cmp_func, MyNode* node, void* key) {
+    if (node == NULL)
+        return NULL;
+
+    int cmp_result = cmp_func(key, node->key);
+    if (cmp_result == 0) {
+        return node; /* Key found */
+    } else if (cmp_result < 0) {
+        if (node->left != NULL)
+            return func(cmp_func, node->left, key);
+        else
+            return NULL; /* Leftmost node */
+    } else {
+        if (node->right != NULL)
+            return func(cmp_func, node->right, key);
+        else
+            return NULL; /* Rightmost node */
+    }
+}
+#+end_src
