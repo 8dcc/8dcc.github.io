@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reverse engineering</title>
+<title>Challenge 9</title>
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -197,89 +197,124 @@
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">Reverse engineering</h1>
+<h1 class="title">Challenge 9</h1>
 <p>
-<a href="../index.html">Index</a>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
 </p>
 
 <hr />
 
-<div id="outline-container-org490e983" class="outline-2">
-<h2 id="org490e983">List of articles</h2>
-<div class="outline-text-2" id="text-org490e983">
-<p>
-List of my articles solving RE challenges:
-</p>
-
-<ul class="org-ul">
-<li><a href="challenge2.html">Challenge 2</a></li>
-<li><a href="challenge3.html">Challenge 3</a></li>
-<li><a href="challenge4.html">Challenge 4</a></li>
-<li><a href="challenge5.html">Challenge 5</a></li>
-<li><a href="challenge6.html">Challenge 6</a></li>
-<li><a href="challenge7.html">Challenge 7</a></li>
-<li><a href="challenge8.html">Challenge 8</a></li>
-<li><a href="challenge9.html">Challenge 9</a></li>
-</ul>
-
-<p>
-My other articles about reverse engineering:
-</p>
-
-<ul class="org-ul">
-<li><a href="devildaggers.html">Reversing Devil Daggers</a></li>
-<li><a href="reversing-keygen.html">Reversing a simple keygen</a></li>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org5f8cd1e">1. Original assembly</a></li>
+<li><a href="#org212901f">2. C translation</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org3afdf5a" class="outline-2">
-<h2 id="org3afdf5a">External resources</h2>
-<div class="outline-text-2" id="text-org3afdf5a">
+<div id="outline-container-org5f8cd1e" class="outline-2">
+<h2 id="org5f8cd1e"><span class="section-number-2">1.</span> Original assembly</h2>
+<div class="outline-text-2" id="text-1">
 <p>
-Good resources for learning and practicing reverse engineering:
+Original challenge link: <a href="https://challenges.re/9/">Click me</a>.
 </p>
 
-<ul class="org-ul">
-<li><a href="https://www.felixcloutier.com/x86/">Online x86 and amd64 instruction reference</a></li>
-<li><a href="https://www.xorpd.net/">xorpd's website</a>, specially his <a href="https://www.xorpd.net/pages/xchg_rax/snip_00.html">xchg rax, rax</a> book, which you can read online
-for free.</li>
-<li><a href="https://en.wikipedia.org/wiki/Reversing:_Secrets_of_Reverse_Engineering">Reversing: Secrets of Reverse Engineering</a>, by Eldad Eilam. Apart from RE, it's
-a great resource to learn about assembly, compiler optimizations, operating
-system design, and much more.</li>
-<li><a href="https://challenges.re/">challenges.re</a>, has a lot of challenges with different difficulties.</li>
-</ul>
+<p>
+Even the author says that this challenge is quite easy, so I won't make any
+assembly notes for this one.
+</p>
+
+<p>
+This challenge only included the used labels, so I only had to make some minor
+changes to fit the <a href="https://nasm.us/">nasm</a> syntax.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">.LC0</span>:
+    <span style="color: #4ae2ff;">.string</span> <span style="color: #00d3d0;">"error!"</span>
+<span style="color: #4ae2ff;">func</span>:
+    <span style="color: #feacd0;">sub</span> <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">8</span>
+    <span style="color: #feacd0;">movzx</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rdi</span>]
+    <span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">al</span>, <span style="color: #88ca9f;">89</span>
+    <span style="color: #feacd0;">je</span>  .L3
+    <span style="color: #feacd0;">jle</span> .L21
+    <span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">al</span>, <span style="color: #88ca9f;">110</span>
+    <span style="color: #feacd0;">je</span>  .L6
+    <span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">al</span>, <span style="color: #88ca9f;">121</span>
+    <span style="color: #feacd0;">jne</span> .L2
+<span style="color: #4ae2ff;">.L3</span>:
+    <span style="color: #feacd0;">mov</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">1</span>
+    <span style="color: #feacd0;">add</span> <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">8</span>
+    <span style="color: #feacd0;">ret</span>
+<span style="color: #4ae2ff;">.L21</span>:
+    <span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">al</span>, <span style="color: #88ca9f;">78</span>
+    <span style="color: #feacd0;">je</span>  .L6
+<span style="color: #4ae2ff;">.L2</span>:
+    <span style="color: #feacd0;">mov</span> <span style="color: #6ae4b9;">edi</span>, .LC0
+    <span style="color: #feacd0;">call</span>    puts
+    <span style="color: #feacd0;">xor</span> <span style="color: #6ae4b9;">edi</span>, <span style="color: #6ae4b9;">edi</span>
+    <span style="color: #feacd0;">call</span>    exit
+<span style="color: #4ae2ff;">.L6</span>:
+    <span style="color: #feacd0;">xor</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
+    <span style="color: #feacd0;">add</span> <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">8</span>
+    <span style="color: #feacd0;">ret</span>
+</pre>
 </div>
 </div>
+</div>
 
-<div id="outline-container-org6735b83" class="outline-2">
-<h2 id="org6735b83">Intel manuals</h2>
-<div class="outline-text-2" id="text-org6735b83">
+<div id="outline-container-org212901f" class="outline-2">
+<h2 id="org212901f"><span class="section-number-2">2.</span> C translation</h2>
+<div class="outline-text-2" id="text-2">
 <p>
-Throughout this section, you might see some references to the <b>Intel Software
-Developer Manual</b>. The manuals on the official website are regularly updated, so you can read and
-download the specific version of the volumes I used for the references from the
-following links (See also, <a href="https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html">Intel download page</a>):
+Literal translation preserving the branching.
 </p>
 
-<ul class="org-ul">
-<li>Intel SDM, Volume 1: <a href="../manuals/intel-sdm-vol-1.pdf">253665-sdm-vol-1.pdf</a></li>
-<li>Intel SDM, Volume 2: <a href="../manuals/intel-sdm-vol-2abcd.pdf">325383-sdm-vol-2abcd.pdf</a></li>
-<li>Intel SDM, Volume 3: <a href="../manuals/intel-sdm-vol-3abcd.pdf">325384-sdm-vol-3abcd.pdf</a></li>
-<li>Intel SDM, Volume 4: <a href="../manuals/intel-sdm-vol-4.pdf">335592-sdm-vol-4.pdf</a></li>
-<li>AMD Manual: <a href="../manuals/amd-manual.pdf">24593.pdf</a></li>
-</ul>
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">str</span>) {
+    <span style="color: #ff6f9f;">if</span> (*str == <span style="color: #00d3d0;">'Y'</span>) {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">.L3</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">1</span>;
+    } <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (*str &lt; <span style="color: #00d3d0;">'Y'</span>) {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">.L21</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">if</span> (*str == <span style="color: #00d3d0;">'N'</span>) {
+            <span style="color: #989898;">/* </span><span style="color: #989898;">.L6</span><span style="color: #989898;"> */</span>
+            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+        }
+    } <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (*str == <span style="color: #00d3d0;">'n'</span>) {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">.L6</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+    } <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (*str != <span style="color: #00d3d0;">'y'</span>) {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">.L2</span><span style="color: #989898;"> */</span>
+        puts(<span style="color: #00d3d0;">"error!"</span>);
+        exit(<span style="color: #88ca9f;">0</span>);
+    } <span style="color: #ff6f9f;">else</span> {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">.L3</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">1</span>;
+    }
+}
+</pre>
+</div>
 
 <p>
-References to the manuals look something like:
+Simplified into this.
 </p>
 
-<blockquote>
-<p>
-See <i>Intel SDM, Vol. 1, Chapter 1.2.3</i>, <i>Intel SDM, Vol. 3, Figure 4-5</i> and <i>AMD
-Manual, Figure 6-7</i>.
-</p>
-</blockquote>
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">str</span>) {
+    <span style="color: #ff6f9f;">if</span> (*str == <span style="color: #00d3d0;">'Y'</span> || *str == <span style="color: #00d3d0;">'y'</span>)
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">1</span>;
+
+    <span style="color: #ff6f9f;">if</span> (*str == <span style="color: #00d3d0;">'N'</span> || *str == <span style="color: #00d3d0;">'n'</span>)
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+
+    puts(<span style="color: #00d3d0;">"error!"</span>);
+    exit(<span style="color: #88ca9f;">0</span>);
+}
+</pre>
+</div>
 </div>
 </div>
 </div>

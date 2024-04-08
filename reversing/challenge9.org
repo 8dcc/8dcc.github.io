@@ -1,0 +1,97 @@
+#+TITLE: Challenge 9
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: showeverything
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Original assembly
+
+Original challenge link: [[https://challenges.re/9/][Click me]].
+
+Even the author says that this challenge is quite easy, so I won't make any
+assembly notes for this one.
+
+This challenge only included the used labels, so I only had to make some minor
+changes to fit the [[https://nasm.us/][nasm]] syntax.
+
+#+begin_src nasm
+.LC0:
+    .string "error!"
+func:
+    sub	rsp, 8
+    movzx	eax, BYTE [rdi]
+    cmp	al, 89
+    je	.L3
+    jle	.L21
+    cmp	al, 110
+    je	.L6
+    cmp	al, 121
+    jne	.L2
+.L3:
+    mov	eax, 1
+    add	rsp, 8
+    ret
+.L21:
+    cmp	al, 78
+    je	.L6
+.L2:
+    mov	edi, .LC0
+    call	puts
+    xor	edi, edi
+    call	exit
+.L6:
+    xor	eax, eax
+    add	rsp, 8
+    ret
+#+end_src
+
+* C translation
+
+Literal translation preserving the branching.
+
+#+begin_src C
+void func(char* str) {
+    if (*str == 'Y') {
+        /* .L3 */
+        return 1;
+    } else if (*str < 'Y') {
+        /* .L21 */
+        if (*str == 'N') {
+            /* .L6 */
+            return 0;
+        }
+    } else if (*str == 'n') {
+        /* .L6 */
+        return 0;
+    } else if (*str != 'y') {
+        /* .L2 */
+        puts("error!");
+        exit(0);
+    } else {
+        /* .L3 */
+        return 1;
+    }
+}
+#+end_src
+
+Simplified into this.
+
+#+begin_src C
+void func(char* str) {
+    if (*str == 'Y' || *str == 'y')
+        return 1;
+
+    if (*str == 'N' || *str == 'n')
+        return 0;
+
+    puts("error!");
+    exit(0);
+}
+#+end_src
