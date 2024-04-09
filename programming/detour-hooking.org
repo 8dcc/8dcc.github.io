@@ -264,7 +264,8 @@ Windows. The platform-specific function is =protect_addr()=.
 
 To use it, you just need to:
 
-1. Use the =LIBDETOUR_DECL_TYPE= to specify the type of your original function.
+1. Use the =LIBDETOUR_DECL_TYPE= macro to specify the type of your original
+   function.
 2. Declare a /Detour Context/, and initialize it by calling =libdetour_init= with
    the original and hook function pointers.
 3. To add the hook, call =libdetour_add= with the context you just declared.
