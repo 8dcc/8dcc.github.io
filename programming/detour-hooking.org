@@ -264,13 +264,14 @@ Windows. The platform-specific function is =protect_addr()=.
 
 To use it, you just need to:
 
-1. Use the =DETOUR_DECL_TYPE= to specify the type of your original function.
-2. Declare a /Detour Context/, and initialize it by calling =detour_init= with the
-   original and hook function pointers.
-3. To add the hook, call =detour_add= with the context you just declared.
-4. To call the original function, use the =DETOUR_ORIG_CALL= or =DETOUR_ORIG_GET=
-   macros, depending on if you want to store the returned value.
+1. Use the =LIBDETOUR_DECL_TYPE= to specify the type of your original function.
+2. Declare a /Detour Context/, and initialize it by calling =libdetour_init= with
+   the original and hook function pointers.
+3. To add the hook, call =libdetour_add= with the context you just declared.
+4. To call the original function, use the =LIBDETOUR_ORIG_CALL= or
+   =LIBDETOUR_ORIG_GET= macros, depending on if you want to store the returned
+   value.
 5. When you are done, remove the hook by passing the /Detour Context/ to the
-   =detour_del= function.
+   =libdetour_del= function.
 
 You can find the code, full usage and an example in the [[https://github.com/8dcc/libdetour][GitHub repository]].
