@@ -19,6 +19,14 @@ pre.src .linenr {
     user-select: none;
 }
 
+a:has(> code) {
+    text-decoration: none;
+}
+
+a:has(> code):hover {
+    text-decoration: underline;
+}
+
 code {
     background-image: linear-gradient(rgba(0, 0, 0, 0.15) 0 0);
     border-radius: 2px;
