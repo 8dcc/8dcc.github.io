@@ -11,7 +11,7 @@ p, li {
 }
 
 #text-table-of-contents li {
-    line-height: normal;
+    line-height: 1.3em;
 }
 
 /*----------------------------------------------------------------------------*/
