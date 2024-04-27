@@ -208,30 +208,30 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org8338bc5">1. About the game</a></li>
-<li><a href="#org2875962">2. Getting general information about the game</a></li>
-<li><a href="#orgb67d4a6">3. Making a simple godmode with detour hooking</a>
+<li><a href="#about-the-game">1. About the game</a></li>
+<li><a href="#getting-general-information-about-the-game">2. Getting general information about the game</a></li>
+<li><a href="#making-a-simple-godmode-with-detour-hooking">3. Making a simple godmode with detour hooking</a>
 <ul>
-<li><a href="#org7972230">3.1. Getting the function pointer</a></li>
-<li><a href="#org63725a7">3.2. Hooking <code>verse2::hero::take_hit()</code></a></li>
+<li><a href="#getting-the-function-pointer">3.1. Getting the function pointer</a></li>
+<li><a href="#hooking-verse2-hero-take-hit">3.2. Hooking <code>verse2::hero::take_hit()</code></a></li>
 </ul>
 </li>
-<li><a href="#org9d95ce4">4. Enabling the hidden particle and level editors</a>
+<li><a href="#enabling-the-hidden-particle-and-level-editors">4. Enabling the hidden particle and level editors</a>
 <ul>
-<li><a href="#orgee4804c">4.1. Getting a pointer to <code>verse2::globals</code></a></li>
-<li><a href="#org8cb6519">4.2. Declaring a <code>verse_globals_t</code> struct</a></li>
-<li><a href="#org046f843">4.3. Enabling and disabling the editors</a></li>
+<li><a href="#getting-a-pointer-to-verse2-globals">4.1. Getting a pointer to <code>verse2::globals</code></a></li>
+<li><a href="#declaring-a-verse-globals-t-struct">4.2. Declaring a <code>verse_globals_t</code> struct</a></li>
+<li><a href="#enabling-and-disabling-the-editors">4.3. Enabling and disabling the editors</a></li>
 </ul>
 </li>
-<li><a href="#org0dd1a10">5. Enabling the top-down camera outside of replays</a></li>
-<li><a href="#orgd211622">6. Complete source code</a></li>
+<li><a href="#enabling-the-top-down-camera-outside-of-replays">5. Enabling the top-down camera outside of replays</a></li>
+<li><a href="#complete-source-code">6. Complete source code</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org8338bc5" class="outline-2">
-<h2 id="org8338bc5"><span class="section-number-2">1.</span> About the game</h2>
-<div class="outline-text-2" id="text-1">
+<div id="outline-container-about-the-game" class="outline-2">
+<h2 id="about-the-game"><span class="section-number-2">1.</span> About the game</h2>
+<div class="outline-text-2" id="text-about-the-game">
 <p>
 <a href="https://devildaggers.com/">Devil Daggers</a> is a very fun and simple first-person shooter with a 1990s visual
 style. The game uses it's own engine, which makes the reversing task very
@@ -248,9 +248,9 @@ For reversing, I will use <a href="https://cutter.re/">cutter</a>.
 </div>
 </div>
 
-<div id="outline-container-org2875962" class="outline-2">
-<h2 id="org2875962"><span class="section-number-2">2.</span> Getting general information about the game</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-getting-general-information-about-the-game" class="outline-2">
+<h2 id="getting-general-information-about-the-game"><span class="section-number-2">2.</span> Getting general information about the game</h2>
+<div class="outline-text-2" id="text-getting-general-information-about-the-game">
 <p>
 If we open the <code>devildaggers</code> binary in cutter, and go through the function list,
 we can immediately get some useful information. The game uses <a href="https://github.com/ocornut/imgui">ImGui</a> for the
@@ -265,7 +265,7 @@ bit, we can start to see these <code>verse2</code> classes:
 </p>
 
 
-<div id="org765550f" class="figure">
+<div id="orgafc3dc6" class="figure">
 <p><img src="../img/devildaggers1.png" alt="devildaggers1.png" />
 </p>
 </div>
@@ -278,13 +278,14 @@ inside <code>verse2::hero::*</code>. Some functions that look interesting are <c
 </div>
 </div>
 
-<div id="outline-container-orgb67d4a6" class="outline-2">
-<h2 id="orgb67d4a6"><span class="section-number-2">3.</span> Making a simple godmode with detour hooking</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-making-a-simple-godmode-with-detour-hooking" class="outline-2">
+<h2 id="making-a-simple-godmode-with-detour-hooking"><span class="section-number-2">3.</span> Making a simple godmode with detour hooking</h2>
+<div class="outline-text-2" id="text-making-a-simple-godmode-with-detour-hooking">
 </div>
-<div id="outline-container-org7972230" class="outline-3">
-<h3 id="org7972230"><span class="section-number-3">3.1.</span> Getting the function pointer</h3>
-<div class="outline-text-3" id="text-3-1">
+
+<div id="outline-container-getting-the-function-pointer" class="outline-3">
+<h3 id="getting-the-function-pointer"><span class="section-number-3">3.1.</span> Getting the function pointer</h3>
+<div class="outline-text-3" id="text-getting-the-function-pointer">
 <p>
 Let's start by getting a pointer to the function we are interested in. Since
 these symbols are exported, we can use <code>dlsym()</code> to get a pointer.
@@ -347,7 +348,7 @@ type of the parameters.
 </p>
 
 
-<div id="org429bca3" class="figure">
+<div id="org6ab915f" class="figure">
 <p><img src="../img/devildaggers2.png" alt="devildaggers2.png" />
 </p>
 </div>
@@ -361,7 +362,7 @@ returning.
 </p>
 
 
-<div id="orge4dd51a" class="figure">
+<div id="org8237b6b" class="figure">
 <p><img src="../img/devildaggers3.png" alt="devildaggers3.png" />
 </p>
 </div>
@@ -373,7 +374,7 @@ before continuing with the execution.
 </p>
 
 
-<div id="orgd90f469" class="figure">
+<div id="orgb4dd885" class="figure">
 <p><img src="../img/devildaggers4.png" alt="devildaggers4.png" />
 </p>
 </div>
@@ -409,9 +410,9 @@ The final code for finding <code>verse2::hero::take_hit()</code> looks like this
 </div>
 </div>
 
-<div id="outline-container-org63725a7" class="outline-3">
-<h3 id="org63725a7"><span class="section-number-3">3.2.</span> Hooking <code>verse2::hero::take_hit()</code></h3>
-<div class="outline-text-3" id="text-3-2">
+<div id="outline-container-hooking-verse2-hero-take-hit" class="outline-3">
+<h3 id="hooking-verse2-hero-take-hit"><span class="section-number-3">3.2.</span> Hooking <code>verse2::hero::take_hit()</code></h3>
+<div class="outline-text-3" id="text-hooking-verse2-hero-take-hit">
 <p>
 We will be using the detour hooking method I explained in
 <a href="../programming/detour-hooking.html">my detour hooking article</a>, specifically we will be using
@@ -508,9 +509,9 @@ avoid relocation errors.
 </div>
 </div>
 
-<div id="outline-container-org9d95ce4" class="outline-2">
-<h2 id="org9d95ce4"><span class="section-number-2">4.</span> Enabling the hidden particle and level editors</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-enabling-the-hidden-particle-and-level-editors" class="outline-2">
+<h2 id="enabling-the-hidden-particle-and-level-editors"><span class="section-number-2">4.</span> Enabling the hidden particle and level editors</h2>
+<div class="outline-text-2" id="text-enabling-the-hidden-particle-and-level-editors">
 <p>
 While searching for some strings (specifically "Score submitted", which appears
 when you die), I found a <code>verse2::VERSE::step_ui()</code> function which seems to be
@@ -519,7 +520,7 @@ related to some "PARTICLES" and "PROGRESSION" windows.
 </p>
 
 
-<div id="org614a618" class="figure">
+<div id="orgcebba79" class="figure">
 <p><img src="../img/devildaggers5.png" alt="devildaggers5.png" />
 </p>
 </div>
@@ -531,15 +532,15 @@ loaded into <code>rax</code> is <code>verse2::globals</code>.
 </p>
 
 
-<div id="org1b6fbe3" class="figure">
+<div id="orgde040b9" class="figure">
 <p><img src="../img/devildaggers6.png" alt="devildaggers6.png" />
 </p>
 </div>
 </div>
 
-<div id="outline-container-orgee4804c" class="outline-3">
-<h3 id="orgee4804c"><span class="section-number-3">4.1.</span> Getting a pointer to <code>verse2::globals</code></h3>
-<div class="outline-text-3" id="text-4-1">
+<div id="outline-container-getting-a-pointer-to-verse2-globals" class="outline-3">
+<h3 id="getting-a-pointer-to-verse2-globals"><span class="section-number-3">4.1.</span> Getting a pointer to <code>verse2::globals</code></h3>
+<div class="outline-text-3" id="text-getting-a-pointer-to-verse2-globals">
 <p>
 At this point, I already hooked another function called <code>verse2::hero::step()</code>,
 which is useful since it's executed every tick and contains a pointer to the
@@ -554,7 +555,7 @@ internally.
 </p>
 
 
-<div id="orgef56fca" class="figure">
+<div id="org00a94fa" class="figure">
 <p><img src="../img/devildaggers7.png" alt="devildaggers7.png" />
 </p>
 </div>
@@ -638,9 +639,9 @@ Or in a more compact way using a <code>RELATIVE2ABSOLUTE()</code> macro:
 </div>
 </div>
 
-<div id="outline-container-org8cb6519" class="outline-3">
-<h3 id="org8cb6519"><span class="section-number-3">4.2.</span> Declaring a <code>verse_globals_t</code> struct</h3>
-<div class="outline-text-3" id="text-4-2">
+<div id="outline-container-declaring-a-verse-globals-t-struct" class="outline-3">
+<h3 id="declaring-a-verse-globals-t-struct"><span class="section-number-3">4.2.</span> Declaring a <code>verse_globals_t</code> struct</h3>
+<div class="outline-text-3" id="text-declaring-a-verse-globals-t-struct">
 <p>
 Since we want to change two booleans for the level and particle editors, we
 should declare our own <code>verse_globals_t</code> structure with the offsets we got before
@@ -675,9 +676,9 @@ structure:
 </div>
 </div>
 
-<div id="outline-container-org046f843" class="outline-3">
-<h3 id="org046f843"><span class="section-number-3">4.3.</span> Enabling and disabling the editors</h3>
-<div class="outline-text-3" id="text-4-3">
+<div id="outline-container-enabling-and-disabling-the-editors" class="outline-3">
+<h3 id="enabling-and-disabling-the-editors"><span class="section-number-3">4.3.</span> Enabling and disabling the editors</h3>
+<div class="outline-text-3" id="text-enabling-and-disabling-the-editors">
 <p>
 Now we can simply set these two members to true, if the user wants to enable
 the editors. I set them inside my <code>verse2::hero::step()</code> hook:
@@ -702,13 +703,13 @@ have a look at <code>verse2::VERSE::step_ui()</code>)
 </p>
 
 
-<div id="org1f1b4eb" class="figure">
+<div id="orgf7f1710" class="figure">
 <p><img src="../img/devildaggers8.png" alt="devildaggers8.png" />
 </p>
 </div>
 
 
-<div id="org49b01b1" class="figure">
+<div id="org644ed80" class="figure">
 <p><img src="../img/devildaggers9.png" alt="devildaggers9.png" />
 </p>
 </div>
@@ -720,9 +721,9 @@ Don't forget to set them to false when unloading the library (in <code>unload()<
 </div>
 </div>
 
-<div id="outline-container-org0dd1a10" class="outline-2">
-<h2 id="org0dd1a10"><span class="section-number-2">5.</span> Enabling the top-down camera outside of replays</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-enabling-the-top-down-camera-outside-of-replays" class="outline-2">
+<h2 id="enabling-the-top-down-camera-outside-of-replays"><span class="section-number-2">5.</span> Enabling the top-down camera outside of replays</h2>
+<div class="outline-text-2" id="text-enabling-the-top-down-camera-outside-of-replays">
 <p>
 There is a top-down camera mode available when watching a replay, so I thought
 it would be interesting to enable it while playing.
@@ -760,16 +761,16 @@ suggestion feel free to <a href="https://github.com/8dcc/8dcc.github.io">contrib
 </p>
 
 
-<div id="org829e87a" class="figure">
+<div id="org6f18010" class="figure">
 <p><img src="../img/devildaggers10.png" alt="devildaggers10.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgd211622" class="outline-2">
-<h2 id="orgd211622"><span class="section-number-2">6.</span> Complete source code</h2>
-<div class="outline-text-2" id="text-6">
+<div id="outline-container-complete-source-code" class="outline-2">
+<h2 id="complete-source-code"><span class="section-number-2">6.</span> Complete source code</h2>
+<div class="outline-text-2" id="text-complete-source-code">
 <p>
 The complete source code with some extra features can be found in
 <a href="https://github.com/8dcc/devildaggers-re">8dcc/devildaggers-re</a>.

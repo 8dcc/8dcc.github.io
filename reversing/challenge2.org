@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * Original assembly
+:PROPERTIES:
+:CUSTOM_ID: original-assembly
+:END:
 
 Original challenge link: [[https://challenges.re/2/][Click me]].
 
@@ -44,6 +47,9 @@ func:
 #+end_src
 
 * Analysis
+:PROPERTIES:
+:CUSTOM_ID: analysis
+:END:
 
 Let's try to figure this out step by step.
 
@@ -179,6 +185,9 @@ Which matches the previous operations.
 The final OR'd result will be saved to =eax= and returned.
 
 * C translation
+:PROPERTIES:
+:CUSTOM_ID: c-translation
+:END:
 
 This is a simple C translation of the assembly:
 
@@ -209,6 +218,9 @@ int main(void) {
 | swap(swap(0xDEADBEEF)) | 0xDEADBEEF |
 
 * Inverse function
+:PROPERTIES:
+:CUSTOM_ID: inverse-function
+:END:
 
 I made my own inverse function before realizing that the original swapping
 function is actually an [[https://en.wikipedia.org/wiki/Involution_(mathematics)][involutory function]], so using it on its own output

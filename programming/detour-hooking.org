@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * What does hooking mean?
+:PROPERTIES:
+:CUSTOM_ID: what-does-hooking-mean
+:END:
 
 Hooking consists in intercepting and altering function calls or event passed
 between software components. In this case, we will be focusing on *function
@@ -39,6 +42,9 @@ the control is passed to our =hook= function. From there, we could call the
 original function, change the behavior, spoof the returned value, etc.
 
 * Detour hooking
+:PROPERTIES:
+:CUSTOM_ID: detour-hooking
+:END:
 
 Detour hooking is a hooking technique where we overwrite the first bytes of the
 target function (=foo=) to introduce a jump to our =hook= function.
@@ -110,6 +116,9 @@ fcn.00001139+0x8     f2 0f 11 4d f0          movsd   qword [rbp - 0x10], xmm1 ; 
 #+end_src
 
 * Hooking from C
+:PROPERTIES:
+:CUSTOM_ID: hooking-from-c
+:END:
 
 The basic process from C would be:
 
@@ -258,6 +267,9 @@ hook(orig_ptr, jmp_bytes);
 #+end_src
 
 * Detour hooking library
+:PROPERTIES:
+:CUSTOM_ID: detour-hooking-library
+:END:
 
 I made a simple detour hooking library in pure C for both GNU/Linux and
 Windows. The platform-specific function is =protect_addr()=.

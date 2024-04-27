@@ -208,17 +208,17 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org2d15cf1">1. Original assembly</a></li>
-<li><a href="#orge6c1617">2. Analysis</a></li>
-<li><a href="#orgf5e43f4">3. C translation</a></li>
-<li><a href="#orgfa02fbb">4. Inverse function</a></li>
+<li><a href="#original-assembly">1. Original assembly</a></li>
+<li><a href="#analysis">2. Analysis</a></li>
+<li><a href="#c-translation">3. C translation</a></li>
+<li><a href="#inverse-function">4. Inverse function</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org2d15cf1" class="outline-2">
-<h2 id="org2d15cf1"><span class="section-number-2">1.</span> Original assembly</h2>
-<div class="outline-text-2" id="text-1">
+<div id="outline-container-original-assembly" class="outline-2">
+<h2 id="original-assembly"><span class="section-number-2">1.</span> Original assembly</h2>
+<div class="outline-text-2" id="text-original-assembly">
 <p>
 Original challenge link: <a href="https://challenges.re/2/">Click me</a>.
 </p>
@@ -256,9 +256,9 @@ bit to fit the <a href="https://www.nasm.us/">nasm</a> syntax.
 </div>
 </div>
 
-<div id="outline-container-orge6c1617" class="outline-2">
-<h2 id="orge6c1617"><span class="section-number-2">2.</span> Analysis</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-analysis" class="outline-2">
+<h2 id="analysis"><span class="section-number-2">2.</span> Analysis</h2>
+<div class="outline-text-2" id="text-analysis">
 <p>
 Let's try to figure this out step by step.
 </p>
@@ -364,7 +364,7 @@ them back together.
 Let's try to visualize these last steps with an example:
 </p>
 
-<pre class="example" id="org8b2f974">
+<pre class="example" id="org6e794de">
 Base number:    0xDEADBEEF  0b11011110101011011011111011101111
 
 After masking:  0x0E0D0E0F  0b00001110000011010000111000001111 (eax)
@@ -442,9 +442,9 @@ The final OR'd result will be saved to <code>eax</code> and returned.
 </div>
 </div>
 
-<div id="outline-container-orgf5e43f4" class="outline-2">
-<h2 id="orgf5e43f4"><span class="section-number-2">3.</span> C translation</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-c-translation" class="outline-2">
+<h2 id="c-translation"><span class="section-number-2">3.</span> C translation</h2>
+<div class="outline-text-2" id="text-c-translation">
 <p>
 This is a simple C translation of the assembly:
 </p>
@@ -474,9 +474,9 @@ This is a simple C translation of the assembly:
 </div>
 </div>
 
-<div id="outline-container-orgfa02fbb" class="outline-2">
-<h2 id="orgfa02fbb"><span class="section-number-2">4.</span> Inverse function</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-inverse-function" class="outline-2">
+<h2 id="inverse-function"><span class="section-number-2">4.</span> Inverse function</h2>
+<div class="outline-text-2" id="text-inverse-function">
 <p>
 I made my own inverse function before realizing that the original swapping
 function is actually an <a href="https://en.wikipedia.org/wiki/Involution_(mathematics)">involutory function</a>, so using it on its own output

@@ -208,19 +208,19 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org6278fb2">1. Original assembly</a></li>
-<li><a href="#orga7fbcc9">2. Analysis</a></li>
-<li><a href="#org41af1ab">3. Why does this work?</a></li>
-<li><a href="#orgb251946">4. Why do some versions use the <code>0x01010101</code> constant?</a></li>
-<li><a href="#org5a373eb">5. C translation</a></li>
-<li><a href="#org328e364">6. Iterative C version</a></li>
+<li><a href="#original-assembly">1. Original assembly</a></li>
+<li><a href="#analysis">2. Analysis</a></li>
+<li><a href="#why-does-this-work">3. Why does this work?</a></li>
+<li><a href="#why-do-some-versions-use-the-0x01010101-constant">4. Why do some versions use the <code>0x01010101</code> constant?</a></li>
+<li><a href="#c-translation">5. C translation</a></li>
+<li><a href="#iterative-c-version">6. Iterative C version</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org6278fb2" class="outline-2">
-<h2 id="org6278fb2"><span class="section-number-2">1.</span> Original assembly</h2>
-<div class="outline-text-2" id="text-1">
+<div id="outline-container-original-assembly" class="outline-2">
+<h2 id="original-assembly"><span class="section-number-2">1.</span> Original assembly</h2>
+<div class="outline-text-2" id="text-original-assembly">
 <p>
 Original challenge link: <a href="https://challenges.re/4/">Click me</a>.
 </p>
@@ -255,9 +255,9 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </div>
 </div>
 
-<div id="outline-container-orga7fbcc9" class="outline-2">
-<h2 id="orga7fbcc9"><span class="section-number-2">2.</span> Analysis</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-analysis" class="outline-2">
+<h2 id="analysis"><span class="section-number-2">2.</span> Analysis</h2>
+<div class="outline-text-2" id="text-analysis">
 <p>
 First of all, it loads the function argument into <code>edx</code>, and shifts it one bit to
 the right. Then it AND's the <code>edx</code> register to keep only the even bits (0, 2, &#x2026;,
@@ -398,9 +398,9 @@ our input.
 </div>
 </div>
 
-<div id="outline-container-org41af1ab" class="outline-2">
-<h2 id="org41af1ab"><span class="section-number-2">3.</span> Why does this work?</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-why-does-this-work" class="outline-2">
+<h2 id="why-does-this-work"><span class="section-number-2">3.</span> Why does this work?</h2>
+<div class="outline-text-2" id="text-why-does-this-work">
 <p>
 After discovering what this functions does, I decided to look a bit more into
 how it works. I discovered <a href="https://stackoverflow.com/questions/109023/count-the-number-of-set-bits-in-a-32-bit-integer">this</a> stackoverflow link. Turns out this is called
@@ -488,9 +488,9 @@ I still can't fully understand how this works, though.
 </div>
 </div>
 
-<div id="outline-container-orgb251946" class="outline-2">
-<h2 id="orgb251946"><span class="section-number-2">4.</span> Why do some versions use the <code>0x01010101</code> constant?</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-why-do-some-versions-use-the-0x01010101-constant" class="outline-2">
+<h2 id="why-do-some-versions-use-the-0x01010101-constant"><span class="section-number-2">4.</span> Why do some versions use the <code>0x01010101</code> constant?</h2>
+<div class="outline-text-2" id="text-why-do-some-versions-use-the-0x01010101-constant">
 <p>
 In the assembly code, the value was used for multiplication, right before
 shifting and returning.
@@ -506,7 +506,7 @@ Multiplying small values (less or equal than <code>0xFF</code>) by <code>0x01010
 to the remaining 3 bytes of the <code>DWORD</code>. For example:
 </p>
 
-<pre class="example" id="org873e326">
+<pre class="example" id="orga57970a">
       0xAB                          0b10101011
 0x01010101  0b00000001000000010000000100000001
 ---------------------------------------------- (MUL)
@@ -587,7 +587,7 @@ see that these two shifts from ARM are doing the same as the <code>0x01010101</c
 multiplication:
 </p>
 
-<pre class="example" id="org0c360ad">
+<pre class="example" id="orgd6f507b">
 Base:               0x000000AB
 After first shift:  0x00AB0000
                     ---------- (ADD)
@@ -609,9 +609,9 @@ other ones, right before returning the upper one?</b>
 </div>
 </div>
 
-<div id="outline-container-org5a373eb" class="outline-2">
-<h2 id="org5a373eb"><span class="section-number-2">5.</span> C translation</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-c-translation" class="outline-2">
+<h2 id="c-translation"><span class="section-number-2">5.</span> C translation</h2>
+<div class="outline-text-2" id="text-c-translation">
 <p>
 These are two C translation of the x86 assembly code, one uses multiplication
 for the last step, while the other uses shifting.
@@ -652,9 +652,9 @@ printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits_shifting(<span st
 </div>
 </div>
 
-<div id="outline-container-org328e364" class="outline-2">
-<h2 id="org328e364"><span class="section-number-2">6.</span> Iterative C version</h2>
-<div class="outline-text-2" id="text-6">
+<div id="outline-container-iterative-c-version" class="outline-2">
+<h2 id="iterative-c-version"><span class="section-number-2">6.</span> Iterative C version</h2>
+<div class="outline-text-2" id="text-iterative-c-version">
 <p>
 A simpler (but probably slower) way of doing it with a <code>for</code> loop:
 </p>

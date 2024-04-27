@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * About the game
+:PROPERTIES:
+:CUSTOM_ID: about-the-game
+:END:
 
 [[https://devildaggers.com/][Devil Daggers]] is a very fun and simple first-person shooter with a 1990s visual
 style. The game uses it's own engine, which makes the reversing task very
@@ -22,6 +25,9 @@ I will be using the linux version of the steam game, currently v3.2.
 For reversing, I will use [[https://cutter.re/][cutter]].
 
 * Getting general information about the game
+:PROPERTIES:
+:CUSTOM_ID: getting-general-information-about-the-game
+:END:
 
 If we open the =devildaggers= binary in cutter, and go through the function list,
 we can immediately get some useful information. The game uses [[https://github.com/ocornut/imgui][ImGui]] for the
@@ -39,8 +45,14 @@ inside =verse2::hero::*=. Some functions that look interesting are =hero::step()
 =hero::take_hit()= and =hero::change_state_dead()=.
 
 * Making a simple godmode with detour hooking
+:PROPERTIES:
+:CUSTOM_ID: making-a-simple-godmode-with-detour-hooking
+:END:
 
 ** Getting the function pointer
+:PROPERTIES:
+:CUSTOM_ID: getting-the-function-pointer
+:END:
 
 Let's start by getting a pointer to the function we are interested in. Since
 these symbols are exported, we can use =dlsym()= to get a pointer.
@@ -123,6 +135,9 @@ bool globals_init(void) {
 #+end_src
 
 ** Hooking =verse2::hero::take_hit()=
+:PROPERTIES:
+:CUSTOM_ID: hooking-verse2-hero-take-hit
+:END:
 
 We will be using the detour hooking method I explained in
 [[file:../programming/detour-hooking.org][my detour hooking article]], specifically we will be using
@@ -205,6 +220,9 @@ When compiling, remember to link with the =detour.c= source and to use =-fPIC= t
 avoid relocation errors.
 
 * Enabling the hidden particle and level editors
+:PROPERTIES:
+:CUSTOM_ID: enabling-the-hidden-particle-and-level-editors
+:END:
 
 While searching for some strings (specifically "Score submitted", which appears
 when you die), I found a =verse2::VERSE::step_ui()= function which seems to be
@@ -220,6 +238,9 @@ loaded into =rax= is =verse2::globals=.
 [[file:../img/devildaggers6.png]]
 
 ** Getting a pointer to =verse2::globals=
+:PROPERTIES:
+:CUSTOM_ID: getting-a-pointer-to-verse2-globals
+:END:
 
 At this point, I already hooked another function called =verse2::hero::step()=,
 which is useful since it's executed every tick and contains a pointer to the
@@ -294,6 +315,9 @@ void* verse_globals = *(void**)RELATIVE2ABSOLUTE((uintptr_t)hero_step + 0x41);
 #+end_src
 
 ** Declaring a =verse_globals_t= struct
+:PROPERTIES:
+:CUSTOM_ID: declaring-a-verse-globals-t-struct
+:END:
 
 Since we want to change two booleans for the level and particle editors, we
 should declare our own =verse_globals_t= structure with the offsets we got before
@@ -320,6 +344,9 @@ verse_globals_t* verse_globals;
 #+end_src
 
 ** Enabling and disabling the editors
+:PROPERTIES:
+:CUSTOM_ID: enabling-and-disabling-the-editors
+:END:
 
 Now we can simply set these two members to true, if the user wants to enable
 the editors. I set them inside my =verse2::hero::step()= hook:
@@ -346,6 +373,9 @@ have a look at =verse2::VERSE::step_ui()=)
 Don't forget to set them to false when unloading the library (in =unload()=).
 
 * Enabling the top-down camera outside of replays
+:PROPERTIES:
+:CUSTOM_ID: enabling-the-top-down-camera-outside-of-replays
+:END:
 
 There is a top-down camera mode available when watching a replay, so I thought
 it would be interesting to enable it while playing.
@@ -377,6 +407,9 @@ suggestion feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] t
 [[file:../img/devildaggers10.png]]
 
 * Complete source code
+:PROPERTIES:
+:CUSTOM_ID: complete-source-code
+:END:
 
 The complete source code with some extra features can be found in
 [[https://github.com/8dcc/devildaggers-re][8dcc/devildaggers-re]].

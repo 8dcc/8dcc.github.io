@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
 
 Team Fortress 2 (TF2) is a 2007 multiplayer first-person shooter game developed
 and published by Valve Corporation ([[https://en.wikipedia.org/wiki/Team_Fortress_2][Wikipedia]]).
@@ -39,6 +42,9 @@ time and help, and [[https://github.com/nepcat][nepcat]] for his helpful PRs, an
 Now that this long introduction is finished, we can get to finding =bSendPacket=.
 
 * The problem
+:PROPERTIES:
+:CUSTOM_ID: the-problem
+:END:
 
 First, in case the reader is unfamiliar with game hacking in the source engine,
 I need to briefly explain what =bSendPacket= is used for.
@@ -81,6 +87,9 @@ of somehow tricking =CL_Move= into thinking that this variable has the value we
 want it to have, and ideally do that from =ClientModeShared::CreateMove=.
 
 * The old solution
+:PROPERTIES:
+:CUSTOM_ID: the-old-solution
+:END:
 
 When I started developing my cheat for the 32-bit game, I came across an
 (almost) valid solution.
@@ -120,18 +129,30 @@ that I didn't realize until the game updated to 64-bits, and it has probably
 caused me a lot of unusual trouble before.
 
 * The new problem
+:PROPERTIES:
+:CUSTOM_ID: the-new-problem
+:END:
 
 TODO
 
 * Finding the right offset in the stack
+:PROPERTIES:
+:CUSTOM_ID: finding-the-right-offset-in-the-stack
+:END:
 
 TODO
 
 * Getting the value with an assembly proxy
+:PROPERTIES:
+:CUSTOM_ID: getting-the-value-with-an-assembly-proxy
+:END:
 
 TODO
 
 * Getting the value using GCC's built-ins
+:PROPERTIES:
+:CUSTOM_ID: getting-the-value-using-gccs-built-ins
+:END:
 
 TODO
 

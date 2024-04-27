@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * Original assembly
+:PROPERTIES:
+:CUSTOM_ID: original-assembly
+:END:
 
 Original challenge link: [[https://challenges.re/7/][Click me]].
 
@@ -61,16 +64,25 @@ func:
 #+end_src
 
 * Assembly notes
+:PROPERTIES:
+:CUSTOM_ID: assembly-notes
+:END:
 
 These are some notes I considered important when translating the assembly into C
 code.
 
 ** Function parameters
+:PROPERTIES:
+:CUSTOM_ID: function-parameters
+:END:
 
 We can asume the first parameter of the function is a =char*= because it's always
 using =BYTE [ptr]= when reading and writing values.
 
 ** Single =while= loop
+:PROPERTIES:
+:CUSTOM_ID: single-while-loop
+:END:
 
 If we start translating to C code literally, we can see it technically checks if
 =*ptr= is zero once, and then does a =do { ... } while();= loop. This is likely an
@@ -78,6 +90,9 @@ optimization made by the compiler, so we can simplify this into a simple
 =while () { ... }= loop.
 
 ** Using =lea= without a pointer
+:PROPERTIES:
+:CUSTOM_ID: using-lea-without-a-pointer
+:END:
 
 After the =.loop= label, we load the effective address of =[rdx - 0x41]=. Keep in
 mind that =rdx= is not holding the pointer, but the dereferenced value at this
@@ -91,6 +106,9 @@ address, and we subtracted =0x41=, at what address would be located the
 Or in simpler words: If I am at =rdx=, and I move back =0x41= bytes, where am I?
 
 ** Understanding =0x41=
+:PROPERTIES:
+:CUSTOM_ID: understanding-0x41
+:END:
 
 At first, =0x41= doesn't look particularly special. First, we should convert it to
 decimal to see if it rings any bell. 65 doesn't give much clue, but since we
@@ -106,15 +124,24 @@ at =0x5A=, which is =Z=. We are basically checking if the character is between =
 =Z=.
 
 ** The =SIL= register
+:PROPERTIES:
+:CUSTOM_ID: the-sil-register
+:END:
 
 Although the =SIL= register is not commonly used, it's used to access the *lower 8
 bits of the =ESI= register*.
 
 ** Using =repz= along with =ret=
+:PROPERTIES:
+:CUSTOM_ID: using-repz-along-with-ret
+:END:
 
 For more information about why =repz= is used with =ret=, see [[file:challenge6.org][Challenge 6]].
 
 * C translation
+:PROPERTIES:
+:CUSTOM_ID: c-translation
+:END:
 
 The first version uses register names and is a more direct translation.
 

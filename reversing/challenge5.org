@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * Original assembly
+:PROPERTIES:
+:CUSTOM_ID: original-assembly
+:END:
 
 Original challenge link: [[https://challenges.re/5/][Click me]].
 
@@ -59,11 +62,17 @@ func:
 #+end_src
 
 * Assembly notes
+:PROPERTIES:
+:CUSTOM_ID: assembly-notes
+:END:
 
 Here are some important notes before converting the code to a higher level
 language.
 
 ** First checks
+:PROPERTIES:
+:CUSTOM_ID: first-checks
+:END:
 
 As you can see, the first thing the function does is check if =rcx= is greater
 than =rsi=. If it is, it returns zero. Otherwise, it subtracts =rcx= from =rsi=, adds
@@ -83,6 +92,9 @@ So in this case, it's checking if =rsi= minus =rcx= plus one is zero or not. In
 other words, if =rcx= is equal to =rsi+1=. If it is, it returns zero.
 
 ** Function parameters
+:PROPERTIES:
+:CUSTOM_ID: function-parameters
+:END:
 
 We can see that the function has 4 parameters because registers =rdi=, =rsi=, =rdx=
 and =rcx= are being used. See [[file:challenge3.org][challenge 3]] for more information on the AMD64 System
@@ -99,6 +111,9 @@ because:
   not hard to see that these are =char*=.
 
 ** Function return type
+:PROPERTIES:
+:CUSTOM_ID: function-return-type
+:END:
 
 We can tell that the function returns a =char*= because at line 31 of the assembly
 code, it's returning without changing the value of =rax=, and the only place it's
@@ -109,6 +124,9 @@ The other place where we don't return zero is at line 10, where we return the
 first parameter, which as we know is a =char*=.
 
 ** Constructing the =for= loops
+:PROPERTIES:
+:CUSTOM_ID: constructing-the-for-loops
+:END:
 
 We can see that the labels =.L4= and =.L8= are being used as loops because of the
 conditional jumps at lines 29 and 34 of the assembly code. We can get the loop
@@ -151,6 +169,9 @@ value was stored in the =r11= register on line 6. It's important to know where t
 meaning/usage of the registers change.
 
 ** Conditional move
+:PROPERTIES:
+:CUSTOM_ID: conditional-move
+:END:
 
 After =.L8=, on line 25, it compares =rax[rsi]= with =rdx[rsi]=, and moves =r9d= to =r8d=
 if they are not equal. To do this, it uses the =cmovne= instruction:
@@ -167,6 +188,9 @@ execution continues with the instruction following the =CMOVcc= instruction.
 #+end_quote
 
 * C translation
+:PROPERTIES:
+:CUSTOM_ID: c-translation
+:END:
 
 From the [[file:challenge4.org][previous challenge]], I learned that it's a good approach to first
 convert the assembly code into a higher level language like C, and try to figure

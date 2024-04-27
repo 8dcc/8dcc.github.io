@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * Original assembly
+:PROPERTIES:
+:CUSTOM_ID: original-assembly
+:END:
 
 Original challenge link: [[https://challenges.re/6/][Click me]].
 
@@ -71,10 +74,16 @@ func:
 #+end_src
 
 * Assembly notes
+:PROPERTIES:
+:CUSTOM_ID: assembly-notes
+:END:
 
 Important notes for understanding the assembly.
 
 ** Local variables
+:PROPERTIES:
+:CUSTOM_ID: local-variables
+:END:
 
 We can see that the function uses local variables because, after preserving the
 stack frame, we store the values of =rdi= and =rsi= (the two function arguments)
@@ -90,6 +99,9 @@ into =[rbp - N]=. Keep in mind that the stack grows downwards, so the stack layo
 #+end_example
 
 ** Argument types
+:PROPERTIES:
+:CUSTOM_ID: argument-types
+:END:
 
 Just like in [[file:challenge5.org][challenge 5]], we can conclude that the type of the first argument
 (=rdi=) is a =char*= because of the =BYTE [...]= operations.
@@ -99,6 +111,9 @@ after moving it to =[rbp - 0x10]=, and then to =rax=, it's accessing its content
 with =WORD [...]=.
 
 * C translation
+:PROPERTIES:
+:CUSTOM_ID: c-translation
+:END:
 
 Following the strategy used in [[file:challenge5.org][challenge 5]], I will start by translating the
 assembly into simple C pseudo-code, and trying to improve the code and symbol
@@ -152,6 +167,9 @@ We can't put the condition directly in the loop, because according to the
 assembly, it always transfers the byte, before checking if it's zero.
 
 * Optimized version
+:PROPERTIES:
+:CUSTOM_ID: optimized-version
+:END:
 
 Now, let's compare it to the optimized version provided in the website. I
 changed the label names again.

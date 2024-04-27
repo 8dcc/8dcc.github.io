@@ -208,22 +208,22 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org247b00e">1. Original assembly</a></li>
-<li><a href="#org8e5118b">2. Assembly notes</a>
+<li><a href="#original-assembly">1. Original assembly</a></li>
+<li><a href="#assembly-notes">2. Assembly notes</a>
 <ul>
-<li><a href="#org4dda083">2.1. Local variables</a></li>
-<li><a href="#orgdaf6390">2.2. Argument types</a></li>
+<li><a href="#local-variables">2.1. Local variables</a></li>
+<li><a href="#argument-types">2.2. Argument types</a></li>
 </ul>
 </li>
-<li><a href="#org256b10a">3. C translation</a></li>
-<li><a href="#org06ca949">4. Optimized version</a></li>
+<li><a href="#c-translation">3. C translation</a></li>
+<li><a href="#optimized-version">4. Optimized version</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org247b00e" class="outline-2">
-<h2 id="org247b00e"><span class="section-number-2">1.</span> Original assembly</h2>
-<div class="outline-text-2" id="text-1">
+<div id="outline-container-original-assembly" class="outline-2">
+<h2 id="original-assembly"><span class="section-number-2">1.</span> Original assembly</h2>
+<div class="outline-text-2" id="text-original-assembly">
 <p>
 Original challenge link: <a href="https://challenges.re/6/">Click me</a>.
 </p>
@@ -291,17 +291,17 @@ After removing the unused labels, and renaming the used ones.
 </div>
 </div>
 
-<div id="outline-container-org8e5118b" class="outline-2">
-<h2 id="org8e5118b"><span class="section-number-2">2.</span> Assembly notes</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-assembly-notes" class="outline-2">
+<h2 id="assembly-notes"><span class="section-number-2">2.</span> Assembly notes</h2>
+<div class="outline-text-2" id="text-assembly-notes">
 <p>
 Important notes for understanding the assembly.
 </p>
 </div>
 
-<div id="outline-container-org4dda083" class="outline-3">
-<h3 id="org4dda083"><span class="section-number-3">2.1.</span> Local variables</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-local-variables" class="outline-3">
+<h3 id="local-variables"><span class="section-number-3">2.1.</span> Local variables</h3>
+<div class="outline-text-3" id="text-local-variables">
 <p>
 We can see that the function uses local variables because, after preserving the
 stack frame, we store the values of <code>rdi</code> and <code>rsi</code> (the two function arguments)
@@ -309,7 +309,7 @@ into <code>[rbp - N]</code>. Keep in mind that the stack grows downwards, so the
 (relative to <code>RBP</code>) would be the following:
 </p>
 
-<pre class="example" id="orgc2d67ac">
+<pre class="example" id="org7e3db6e">
 +-----+-------+------+---------+---------+----------------+-----+
 |     | -0x10 | -0x8 |   RBP   |  +0x8   |     +0x10      |     |
 |-----+-------+------+---------+---------+----------------+-----|
@@ -319,9 +319,9 @@ into <code>[rbp - N]</code>. Keep in mind that the stack grows downwards, so the
 </div>
 </div>
 
-<div id="outline-container-orgdaf6390" class="outline-3">
-<h3 id="orgdaf6390"><span class="section-number-3">2.2.</span> Argument types</h3>
-<div class="outline-text-3" id="text-2-2">
+<div id="outline-container-argument-types" class="outline-3">
+<h3 id="argument-types"><span class="section-number-3">2.2.</span> Argument types</h3>
+<div class="outline-text-3" id="text-argument-types">
 <p>
 Just like in <a href="challenge5.html">challenge 5</a>, we can conclude that the type of the first argument
 (<code>rdi</code>) is a <code>char*</code> because of the <code>BYTE [...]</code> operations.
@@ -336,9 +336,9 @@ with <code>WORD [...]</code>.
 </div>
 </div>
 
-<div id="outline-container-org256b10a" class="outline-2">
-<h2 id="org256b10a"><span class="section-number-2">3.</span> C translation</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-c-translation" class="outline-2">
+<h2 id="c-translation"><span class="section-number-2">3.</span> C translation</h2>
+<div class="outline-text-2" id="text-c-translation">
 <p>
 Following the strategy used in <a href="challenge5.html">challenge 5</a>, I will start by translating the
 assembly into simple C pseudo-code, and trying to improve the code and symbol
@@ -402,9 +402,9 @@ assembly, it always transfers the byte, before checking if it's zero.
 </div>
 </div>
 
-<div id="outline-container-org06ca949" class="outline-2">
-<h2 id="org06ca949"><span class="section-number-2">4.</span> Optimized version</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-optimized-version" class="outline-2">
+<h2 id="optimized-version"><span class="section-number-2">4.</span> Optimized version</h2>
+<div class="outline-text-2" id="text-optimized-version">
 <p>
 Now, let's compare it to the optimized version provided in the website. I
 changed the label names again.

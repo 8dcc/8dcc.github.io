@@ -208,25 +208,25 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org08708fc">1. Original assembly</a></li>
-<li><a href="#orgefbe3c1">2. Assembly notes</a>
+<li><a href="#original-assembly">1. Original assembly</a></li>
+<li><a href="#assembly-notes">2. Assembly notes</a>
 <ul>
-<li><a href="#orgab5fcde">2.1. Function parameters</a></li>
-<li><a href="#org9ba79d9">2.2. Single <code>while</code> loop</a></li>
-<li><a href="#org4fae97c">2.3. Using <code>lea</code> without a pointer</a></li>
-<li><a href="#org3332064">2.4. Understanding <code>0x41</code></a></li>
-<li><a href="#org2c65314">2.5. The <code>SIL</code> register</a></li>
-<li><a href="#org75df51e">2.6. Using <code>repz</code> along with <code>ret</code></a></li>
+<li><a href="#function-parameters">2.1. Function parameters</a></li>
+<li><a href="#single-while-loop">2.2. Single <code>while</code> loop</a></li>
+<li><a href="#using-lea-without-a-pointer">2.3. Using <code>lea</code> without a pointer</a></li>
+<li><a href="#understanding-0x41">2.4. Understanding <code>0x41</code></a></li>
+<li><a href="#the-sil-register">2.5. The <code>SIL</code> register</a></li>
+<li><a href="#using-repz-along-with-ret">2.6. Using <code>repz</code> along with <code>ret</code></a></li>
 </ul>
 </li>
-<li><a href="#org2febd79">3. C translation</a></li>
+<li><a href="#c-translation">3. C translation</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org08708fc" class="outline-2">
-<h2 id="org08708fc"><span class="section-number-2">1.</span> Original assembly</h2>
-<div class="outline-text-2" id="text-1">
+<div id="outline-container-original-assembly" class="outline-2">
+<h2 id="original-assembly"><span class="section-number-2">1.</span> Original assembly</h2>
+<div class="outline-text-2" id="text-original-assembly">
 <p>
 Original challenge link: <a href="https://challenges.re/7/">Click me</a>.
 </p>
@@ -282,18 +282,18 @@ After removing the unused labels, and renaming the used ones.
 </div>
 </div>
 
-<div id="outline-container-orgefbe3c1" class="outline-2">
-<h2 id="orgefbe3c1"><span class="section-number-2">2.</span> Assembly notes</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-assembly-notes" class="outline-2">
+<h2 id="assembly-notes"><span class="section-number-2">2.</span> Assembly notes</h2>
+<div class="outline-text-2" id="text-assembly-notes">
 <p>
 These are some notes I considered important when translating the assembly into C
 code.
 </p>
 </div>
 
-<div id="outline-container-orgab5fcde" class="outline-3">
-<h3 id="orgab5fcde"><span class="section-number-3">2.1.</span> Function parameters</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-function-parameters" class="outline-3">
+<h3 id="function-parameters"><span class="section-number-3">2.1.</span> Function parameters</h3>
+<div class="outline-text-3" id="text-function-parameters">
 <p>
 We can asume the first parameter of the function is a <code>char*</code> because it's always
 using <code>BYTE [ptr]</code> when reading and writing values.
@@ -301,9 +301,9 @@ using <code>BYTE [ptr]</code> when reading and writing values.
 </div>
 </div>
 
-<div id="outline-container-org9ba79d9" class="outline-3">
-<h3 id="org9ba79d9"><span class="section-number-3">2.2.</span> Single <code>while</code> loop</h3>
-<div class="outline-text-3" id="text-2-2">
+<div id="outline-container-single-while-loop" class="outline-3">
+<h3 id="single-while-loop"><span class="section-number-3">2.2.</span> Single <code>while</code> loop</h3>
+<div class="outline-text-3" id="text-single-while-loop">
 <p>
 If we start translating to C code literally, we can see it technically checks if
 <code>*ptr</code> is zero once, and then does a <code>do { ... } while();</code> loop. This is likely an
@@ -313,9 +313,9 @@ optimization made by the compiler, so we can simplify this into a simple
 </div>
 </div>
 
-<div id="outline-container-org4fae97c" class="outline-3">
-<h3 id="org4fae97c"><span class="section-number-3">2.3.</span> Using <code>lea</code> without a pointer</h3>
-<div class="outline-text-3" id="text-2-3">
+<div id="outline-container-using-lea-without-a-pointer" class="outline-3">
+<h3 id="using-lea-without-a-pointer"><span class="section-number-3">2.3.</span> Using <code>lea</code> without a pointer</h3>
+<div class="outline-text-3" id="text-using-lea-without-a-pointer">
 <p>
 After the <code>.loop</code> label, we load the effective address of <code>[rdx - 0x41]</code>. Keep in
 mind that <code>rdx</code> is not holding the pointer, but the dereferenced value at this
@@ -335,9 +335,9 @@ Or in simpler words: If I am at <code>rdx</code>, and I move back <code>0x41</co
 </div>
 </div>
 
-<div id="outline-container-org3332064" class="outline-3">
-<h3 id="org3332064"><span class="section-number-3">2.4.</span> Understanding <code>0x41</code></h3>
-<div class="outline-text-3" id="text-2-4">
+<div id="outline-container-understanding-0x41" class="outline-3">
+<h3 id="understanding-0x41"><span class="section-number-3">2.4.</span> Understanding <code>0x41</code></h3>
+<div class="outline-text-3" id="text-understanding-0x41">
 <p>
 At first, <code>0x41</code> doesn't look particularly special. First, we should convert it to
 decimal to see if it rings any bell. 65 doesn't give much clue, but since we
@@ -359,9 +359,9 @@ at <code>0x5A</code>, which is <code>Z</code>. We are basically checking if the 
 </div>
 </div>
 
-<div id="outline-container-org2c65314" class="outline-3">
-<h3 id="org2c65314"><span class="section-number-3">2.5.</span> The <code>SIL</code> register</h3>
-<div class="outline-text-3" id="text-2-5">
+<div id="outline-container-the-sil-register" class="outline-3">
+<h3 id="the-sil-register"><span class="section-number-3">2.5.</span> The <code>SIL</code> register</h3>
+<div class="outline-text-3" id="text-the-sil-register">
 <p>
 Although the <code>SIL</code> register is not commonly used, it's used to access the <b>lower 8
 bits of the <code>ESI</code> register</b>.
@@ -369,9 +369,9 @@ bits of the <code>ESI</code> register</b>.
 </div>
 </div>
 
-<div id="outline-container-org75df51e" class="outline-3">
-<h3 id="org75df51e"><span class="section-number-3">2.6.</span> Using <code>repz</code> along with <code>ret</code></h3>
-<div class="outline-text-3" id="text-2-6">
+<div id="outline-container-using-repz-along-with-ret" class="outline-3">
+<h3 id="using-repz-along-with-ret"><span class="section-number-3">2.6.</span> Using <code>repz</code> along with <code>ret</code></h3>
+<div class="outline-text-3" id="text-using-repz-along-with-ret">
 <p>
 For more information about why <code>repz</code> is used with <code>ret</code>, see <a href="challenge6.html">Challenge 6</a>.
 </p>
@@ -379,9 +379,9 @@ For more information about why <code>repz</code> is used with <code>ret</code>, 
 </div>
 </div>
 
-<div id="outline-container-org2febd79" class="outline-2">
-<h2 id="org2febd79"><span class="section-number-2">3.</span> C translation</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-c-translation" class="outline-2">
+<h2 id="c-translation"><span class="section-number-2">3.</span> C translation</h2>
+<div class="outline-text-2" id="text-c-translation">
 <p>
 The first version uses register names and is a more direct translation.
 </p>

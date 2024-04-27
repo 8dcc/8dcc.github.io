@@ -12,6 +12,9 @@
 #+TOC: headlines 3
 
 * What is signature scanning?
+:PROPERTIES:
+:CUSTOM_ID: what-is-signature-scanning
+:END:
 
 First, let's have a look at a sample program:
 
@@ -54,6 +57,9 @@ In our case, we would want to look for the bytes of the binary corresponding to
 =my_func=.
 
 * Finding the function inside the binary
+:PROPERTIES:
+:CUSTOM_ID: finding-the-function-inside-the-binary
+:END:
 
 I will compile the previous source with =gcc 13.2.1=. We need to use =-O0= so the
 function call doesn't get optimized. I also used =strip= to "simulate" a real
@@ -96,6 +102,9 @@ calling =my_func=. Let's double-click it to have a look at the assembly:
 Yeah, that looks like our function.
 
 * Getting the signature
+:PROPERTIES:
+:CUSTOM_ID: getting-the-signature
+:END:
 
 The signature is going to be an arbitrary number of bytes from the target
 function. However, some of the bytes will not be constant, so we need to have
@@ -128,11 +137,17 @@ which bytes are unknown. IDA patterns are usually cleaner, but make the
 signature scanning function a bit larger.
 
 * Signature scanning function
+:PROPERTIES:
+:CUSTOM_ID: signature-scanning-function
+:END:
 
 This is a simple function that scans a memory area from =start= to =end= and
 searches for a =pattern= in IDA format.
 
 ** Parsing the IDA pattern string
+:PROPERTIES:
+:CUSTOM_ID: parsing-the-ida-pattern-string
+:END:
 
 First, we would need a function to convert those ="E5 "= strings into =0xE5=. Here
 it is:
@@ -175,6 +190,9 @@ uint8_t hex_to_byte(const char* hex) {
 #+end_src
 
 ** The =do_scan= function
+:PROPERTIES:
+:CUSTOM_ID: the-do-scan-function
+:END:
 
 And with that, we can make our =do_scan= function:
 
@@ -244,11 +262,17 @@ void* do_scan(void* start, void* end, const char* pattern) {
 #+end_src
 
 ** Getting the bounds of a loaded module
+:PROPERTIES:
+:CUSTOM_ID: getting-the-bounds-of-a-loaded-module
+:END:
 
 To get the =start= and =end= addresses, we need to find where the binary was loaded
 in memory. I am going to show 2 methods of getting this information.
 
 *** The unreliable method
+:PROPERTIES:
+:CUSTOM_ID: the-unreliable-method
+:END:
 
 On linux, we could use =dlopen()= to get the start and end addresses of a loaded
 module if we were, for example, injecting our own shared object.
@@ -315,6 +339,9 @@ I say /in theory/ because in my experience, this is not the case. Usually
 reliable way.
 
 *** Parsing =/proc/self/maps=
+:PROPERTIES:
+:CUSTOM_ID: parsing-proc-self-maps
+:END:
 
 The =/proc/<pid>/= folder contains many useful files, one of them being =maps=. The
 =maps= file shows information about the currently mapped memory regions and their
@@ -481,6 +508,9 @@ void* sigscan(const char* module, const char* ida_pattern) {
 #+end_src
 
 * Using our =sigscan= function
+:PROPERTIES:
+:CUSTOM_ID: using-our-sigscan-function
+:END:
 
 Now that we have the signature and our function for scanning, we just have to
 create a shared object that we can inject into a running process.
@@ -521,6 +551,9 @@ __attribute__((destructor)) void unload() {
 #+end_src
 
 * Injecting script and final Makefile
+:PROPERTIES:
+:CUSTOM_ID: injecting-script-and-final-makefile
+:END:
 
 We can inject our library into the binary the [[https://www.sourceware.org/gdb/][GNU Debugger]].
 
@@ -570,6 +603,9 @@ inject: my_lib.so
 #+end_src
 
 * Signature scanning library
+:PROPERTIES:
+:CUSTOM_ID: signature-scanning-library
+:END:
 
 If you just want something that works, I made a lightweight single-header
 signature scanning library in pure C for GNU/Linux. This is the [[https://github.com/8dcc/libsigscan][link]].

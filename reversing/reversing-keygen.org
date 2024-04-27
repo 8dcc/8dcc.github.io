@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
 
 I created a simple keygen program that takes a user and a key, and prints a
 message if the key is valid. Let's try to figure out how to make a keygen for
@@ -20,6 +23,9 @@ will not be using the same code, but feel free to check [[file:../programming/cr
 in case you are interested.
 
 * Trying out the program
+:PROPERTIES:
+:CUSTOM_ID: trying-out-the-program
+:END:
 
 First, let's try running the program to see what it's asking.
 
@@ -38,11 +44,17 @@ From this, we can at least expect:
 - Depending on the result, a last call to =printf()= with the text ="Invalid key."=.
 
 * The main function
+:PROPERTIES:
+:CUSTOM_ID: the-main-function
+:END:
 
 Let's start by having a look at the main function with [[https://rizin.re/][rizin]] 0.6.3 (you can also
 use [[https://cutter.re][cutter]] or [[https://hex-rays.com/ida-pro/][IDA]], if you prefer a GUI program).
 
 ** Finding the main function
+:PROPERTIES:
+:CUSTOM_ID: finding-the-main-function
+:END:
 
 We start by running the =aaa= rizin command, which is used to "Analyze all calls,
 references, emulation and apply signatures".
@@ -108,6 +120,9 @@ The address being loaded into =rdi= at =entry0+0x14= should be our main function
 =f+ main 0xc8 @ 0x140d=.
 
 ** Disassembling the main function
+:PROPERTIES:
+:CUSTOM_ID: disassembling-the-main-function
+:END:
 
 Let's have a look at the disassembly of the main function.
 
@@ -199,6 +214,9 @@ change the conditional jump so it always jumps to the code that gets executed
 when the key is correct.
 
 * Disassembling the key generator
+:PROPERTIES:
+:CUSTOM_ID: disassembling-the-key-generator
+:END:
 
 Now that we understand the main logic, let's have a look at the =generate_key()=
 function at =0x1189=.
@@ -449,6 +467,9 @@ void func(const char* user, const char* real_key) {
 #+end_src
 
 * Alternative: Decompiling with IDA or ghidra
+:PROPERTIES:
+:CUSTOM_ID: alternative-decompiling-with-ida-or-ghidra
+:END:
 
 This option is not always reliable or not always available, so it's important to
 understand how the actual assembly works before jumping into the decompiler.
@@ -468,6 +489,9 @@ similar as possible.
 #+end_quote
 
 ** IDA Pro
+:PROPERTIES:
+:CUSTOM_ID: ida-pro
+:END:
 
 This is the generated C code by /IDA Pro Version 7.7.220118 Windows x64/ (/x64
 Decompiler Hex-Rays SA 7.7.0.220118/).
@@ -497,6 +521,9 @@ Note how IDA decides to translate =(x << 4)= to =(x * 16)=, since they are
 equivalent and the second is more likely to be used.
 
 ** Rizin's version of ghidra
+:PROPERTIES:
+:CUSTOM_ID: rizins-version-of-ghidra
+:END:
 
 This is the generated C code by /rizin 0.6.1 @ linux-x86-64/.
 

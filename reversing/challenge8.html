@@ -208,22 +208,22 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org827b5a4">1. Original assembly</a></li>
-<li><a href="#org4abac9e">2. Assembly notes</a>
+<li><a href="#original-assembly">1. Original assembly</a></li>
+<li><a href="#assembly-notes">2. Assembly notes</a>
 <ul>
-<li><a href="#org9a9f95e">2.1. Second parameter: Array or struct</a></li>
-<li><a href="#orged6c885">2.2. Getting the return value of the <code>r12</code> function</a></li>
+<li><a href="#second-parameter-array-or-struct">2.1. Second parameter: Array or struct</a></li>
+<li><a href="#getting-the-return-value-of-the-r12-function">2.2. Getting the return value of the <code>r12</code> function</a></li>
 </ul>
 </li>
-<li><a href="#org1791da9">3. C translation</a></li>
-<li><a href="#org9749a7b">4. Function purpose</a></li>
+<li><a href="#c-translation">3. C translation</a></li>
+<li><a href="#function-purpose">4. Function purpose</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org827b5a4" class="outline-2">
-<h2 id="org827b5a4"><span class="section-number-2">1.</span> Original assembly</h2>
-<div class="outline-text-2" id="text-1">
+<div id="outline-container-original-assembly" class="outline-2">
+<h2 id="original-assembly"><span class="section-number-2">1.</span> Original assembly</h2>
+<div class="outline-text-2" id="text-original-assembly">
 <p>
 Original challenge link: <a href="https://challenges.re/8/">Click me</a>.
 </p>
@@ -325,18 +325,18 @@ After removing the unused labels, and renaming the used ones.
 </div>
 </div>
 
-<div id="outline-container-org4abac9e" class="outline-2">
-<h2 id="org4abac9e"><span class="section-number-2">2.</span> Assembly notes</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-assembly-notes" class="outline-2">
+<h2 id="assembly-notes"><span class="section-number-2">2.</span> Assembly notes</h2>
+<div class="outline-text-2" id="text-assembly-notes">
 <p>
 These are some notes I considered important when translating the assembly into C
 code.
 </p>
 </div>
 
-<div id="outline-container-org9a9f95e" class="outline-3">
-<h3 id="org9a9f95e"><span class="section-number-3">2.1.</span> Second parameter: Array or struct</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-second-parameter-array-or-struct" class="outline-3">
+<h3 id="second-parameter-array-or-struct"><span class="section-number-3">2.1.</span> Second parameter: Array or struct</h3>
+<div class="outline-text-3" id="text-second-parameter-array-or-struct">
 <p>
 The second parameter of the function is loaded into <code>rbx</code>, and is dereferenced
 throughout the function. By that we can tell that it's a pointer, and all the
@@ -359,9 +359,9 @@ might be accessing a structure, and accessing the pointers at <code>[rbx + 0x10]
 </div>
 </div>
 
-<div id="outline-container-orged6c885" class="outline-3">
-<h3 id="orged6c885"><span class="section-number-3">2.2.</span> Getting the return value of the <code>r12</code> function</h3>
-<div class="outline-text-3" id="text-2-2">
+<div id="outline-container-getting-the-return-value-of-the-r12-function" class="outline-3">
+<h3 id="getting-the-return-value-of-the-r12-function"><span class="section-number-3">2.2.</span> Getting the return value of the <code>r12</code> function</h3>
+<div class="outline-text-3" id="text-getting-the-return-value-of-the-r12-function">
 <p>
 The first argument of our function is moved from <code>rdi</code> to <code>r12</code>. At some point, we
 call the function at the address in <code>r12</code>, so we know the first parameter is a
@@ -385,9 +385,9 @@ is more readable.
 </div>
 </div>
 
-<div id="outline-container-org1791da9" class="outline-2">
-<h2 id="org1791da9"><span class="section-number-2">3.</span> C translation</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-c-translation" class="outline-2">
+<h2 id="c-translation"><span class="section-number-2">3.</span> C translation</h2>
+<div class="outline-text-2" id="text-c-translation">
 <p>
 The first version uses register names, treats <code>rbx</code> as an array, and is a bit more
 messy when it comes to branching.
@@ -488,9 +488,9 @@ statement.
 </div>
 </div>
 
-<div id="outline-container-org9749a7b" class="outline-2">
-<h2 id="org9749a7b"><span class="section-number-2">4.</span> Function purpose</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-function-purpose" class="outline-2">
+<h2 id="function-purpose"><span class="section-number-2">4.</span> Function purpose</h2>
+<div class="outline-text-2" id="text-function-purpose">
 <p>
 As we can see by the final C code, the function traverses a <a href="https://en.wikipedia.org/wiki/Doubly_linked_list">doubly linked list</a>
 starting at <i>node</i>, moving left or right depending on the return value of a

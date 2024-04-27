@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * Original assembly
+:PROPERTIES:
+:CUSTOM_ID: original-assembly
+:END:
 
 Original challenge link: [[https://challenges.re/3/][Click me]].
 
@@ -50,6 +53,9 @@ f:
 #+end_src
 
 * Analysis
+:PROPERTIES:
+:CUSTOM_ID: analysis
+:END:
 
 First of all, it loads the function argument into =edx=.
 
@@ -188,6 +194,9 @@ Finally, we could say that this is an algorithm for *counting the leading zero
 bits of a double word*. See [[*More information][More information]].
 
 * C version
+:PROPERTIES:
+:CUSTOM_ID: c-version
+:END:
 
 I made a similar version, but it's not exactly a /translation/ since I am using a
 =for= loop instead of copying and pasting the /Shift + OR/ code 5 times.
@@ -230,6 +239,9 @@ int main(void) {
 : func(0x000F0055) -> 12
 
 * More information
+:PROPERTIES:
+:CUSTOM_ID: more-information
+:END:
 
 After emailing Dennis Yurichev, the owner of the [[https://challenges.re/][challenges.re]] website, I
 discovered that this called a [[https://en.wikipedia.org/wiki/Find_first_set][find first set]] algorithm. From Wikipedia:

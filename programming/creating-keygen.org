@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * What is a keygen?
+:PROPERTIES:
+:CUSTOM_ID: what-is-a-keygen
+:END:
 
 From Wikipedia:
 
@@ -33,6 +36,9 @@ Many programs use the internet to validate the keys, which obviously has some
 advantages, but in our case we are going to validate them locally.
 
 ** Types of license keys
+:PROPERTIES:
+:CUSTOM_ID: types-of-license-keys
+:END:
 
 First of all, I am not an expert on this area, so feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to
 this blog if you have any suggestions. For more information about types of
@@ -69,6 +75,9 @@ make a simple key generation function, and an application that uses it to
 validate an input key from the user.
 
 * Things to avoid when making the function
+:PROPERTIES:
+:CUSTOM_ID: things-to-avoid-when-making-the-function
+:END:
 
 When generating a program like this, it's a good idea to asume that there is
 going to be someone attempting to reverse our program and figure out how our key
@@ -77,6 +86,9 @@ generation algorithm works.
 Here are some things we should try to avoid when making the function.
 
 ** Generating similar keys for similar users
+:PROPERTIES:
+:CUSTOM_ID: generating-similar-keys-for-similar-users
+:END:
 
 Imagine our algorithm just turned each letter of the name to its position in the
 alphabet. The user =abcd= would generate the key =1234=.
@@ -91,6 +103,9 @@ into "how did this character turn into this other character", which is obviously
 easier to find.
 
 ** Making the user and the key lengths proportional
+:PROPERTIES:
+:CUSTOM_ID: making-the-user-and-the-key-lengths-proportional
+:END:
 
 Imagine we had the algorithm from the last example. The user is also able to
 tell that the lengths of the strings are proportional, for example:
@@ -115,6 +130,9 @@ abcdefghij -> 123456789 (Last character is ignored, produces same output as abcd
 #+end_example
 
 ** Collisions
+:PROPERTIES:
+:CUSTOM_ID: collisions
+:END:
 
 In cryptography, a [[https://en.wikipedia.org/wiki/Collision_resistance][collision]] is produced when two different inputs produce the
 same output. This is a problem when hashing, since one of the basic properties
@@ -124,6 +142,9 @@ In our case, we should try to avoid collisions as much as possible, but I won't
 be focusing on this too much on this article.
 
 * The key generation function
+:PROPERTIES:
+:CUSTOM_ID: the-key-generation-function
+:END:
 
 This is a simple keygen function I came up with, but it's far from perfect so
 feel free to contribute with a better version, as I said above.
@@ -210,6 +231,9 @@ int main(int argc, char** argv) {
 #+end_src
 
 * Validating a user login
+:PROPERTIES:
+:CUSTOM_ID: validating-a-user-login
+:END:
 
 We could use the previous keygen program to generate a key for each user, and
 use that to log-in. In this case we will be using the same =generate_key= function
@@ -309,6 +333,9 @@ int main(void) {
 #+end_src
 
 * Other resources
+:PROPERTIES:
+:CUSTOM_ID: other-resources
+:END:
 
 - [[https://en.wikipedia.org/wiki/Keygen][Keygen wikipedia page]]
 - [[https://github.com/bitcookies/winrar-keygen/blob/master/README.HOW_DOES_IT_WORK.md][WinRAR key generation algorithm explained]].

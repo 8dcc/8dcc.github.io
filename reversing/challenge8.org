@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * Original assembly
+:PROPERTIES:
+:CUSTOM_ID: original-assembly
+:END:
 
 Original challenge link: [[https://challenges.re/8/][Click me]].
 
@@ -107,11 +110,17 @@ func:
 #+end_src
 
 * Assembly notes
+:PROPERTIES:
+:CUSTOM_ID: assembly-notes
+:END:
 
 These are some notes I considered important when translating the assembly into C
 code.
 
 ** Second parameter: Array or struct
+:PROPERTIES:
+:CUSTOM_ID: second-parameter-array-or-struct
+:END:
 
 The second parameter of the function is loaded into =rbx=, and is dereferenced
 throughout the function. By that we can tell that it's a pointer, and all the
@@ -128,6 +137,9 @@ might be accessing a structure, and accessing the pointers at =[rbx + 0x10]= and
 =[rbx + 0x18]= to jump to the previous and next elements in the linked list.
 
 ** Getting the return value of the =r12= function
+:PROPERTIES:
+:CUSTOM_ID: getting-the-return-value-of-the-r12-function
+:END:
 
 The first argument of our function is moved from =rdi= to =r12=. At some point, we
 call the function at the address in =r12=, so we know the first parameter is a
@@ -144,6 +156,9 @@ For the C translation, I will create a =callback_t= typedef so the parameter typ
 is more readable.
 
 * C translation
+:PROPERTIES:
+:CUSTOM_ID: c-translation
+:END:
 
 The first version uses register names, treats =rbx= as an array, and is a bit more
 messy when it comes to branching.
@@ -234,6 +249,9 @@ As you can see, I also moved the duplicated =NULL= check outside of the =if=
 statement.
 
 * Function purpose
+:PROPERTIES:
+:CUSTOM_ID: function-purpose
+:END:
 
 As we can see by the final C code, the function traverses a [[https://en.wikipedia.org/wiki/Doubly_linked_list][doubly linked list]]
 starting at /node/, moving left or right depending on the return value of a

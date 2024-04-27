@@ -12,6 +12,9 @@
 #+TOC: headlines 2
 
 * Original assembly
+:PROPERTIES:
+:CUSTOM_ID: original-assembly
+:END:
 
 Original challenge link: [[https://challenges.re/4/][Click me]].
 
@@ -41,6 +44,9 @@ func:
 #+end_src
 
 * Analysis
+:PROPERTIES:
+:CUSTOM_ID: analysis
+:END:
 
 First of all, it loads the function argument into =edx=, and shifts it one bit to
 the right. Then it AND's the =edx= register to keep only the even bits (0, 2, ...,
@@ -108,6 +114,9 @@ With this, can see that it's a function for *counting the number of set bits* in
 our input.
 
 * Why does this work?
+:PROPERTIES:
+:CUSTOM_ID: why-does-this-work
+:END:
 
 After discovering what this functions does, I decided to look a bit more into
 how it works. I discovered [[https://stackoverflow.com/questions/109023/count-the-number-of-set-bits-in-a-32-bit-integer][this]] stackoverflow link. Turns out this is called
@@ -161,6 +170,9 @@ x = (x & 0x0000ffff) + ((x >> 16) & 0x0000ffff);
 I still can't fully understand how this works, though.
 
 * Why do some versions use the =0x01010101= constant?
+:PROPERTIES:
+:CUSTOM_ID: why-do-some-versions-use-the-0x01010101-constant
+:END:
 
 In the assembly code, the value was used for multiplication, right before
 shifting and returning.
@@ -247,6 +259,9 @@ My final question, however, is: *Why would you do copy the lower byte to the
 other ones, right before returning the upper one?*
 
 * C translation
+:PROPERTIES:
+:CUSTOM_ID: c-translation
+:END:
 
 These are two C translation of the x86 assembly code, one uses multiplication
 for the last step, while the other uses shifting.
@@ -290,6 +305,9 @@ printf("%d\n", count_bits_shifting(0xDEADBEEF)); /* 24 */
 | 24 |
 
 * Iterative C version
+:PROPERTIES:
+:CUSTOM_ID: iterative-c-version
+:END:
 
 A simpler (but probably slower) way of doing it with a =for= loop:
 

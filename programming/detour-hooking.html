@@ -208,17 +208,17 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge42527a">1. What does hooking mean?</a></li>
-<li><a href="#org1e93933">2. Detour hooking</a></li>
-<li><a href="#orga4eb455">3. Hooking from C</a></li>
-<li><a href="#org0c03a19">4. Detour hooking library</a></li>
+<li><a href="#what-does-hooking-mean">1. What does hooking mean?</a></li>
+<li><a href="#detour-hooking">2. Detour hooking</a></li>
+<li><a href="#hooking-from-c">3. Hooking from C</a></li>
+<li><a href="#detour-hooking-library">4. Detour hooking library</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orge42527a" class="outline-2">
-<h2 id="orge42527a"><span class="section-number-2">1.</span> What does hooking mean?</h2>
-<div class="outline-text-2" id="text-1">
+<div id="outline-container-what-does-hooking-mean" class="outline-2">
+<h2 id="what-does-hooking-mean"><span class="section-number-2">1.</span> What does hooking mean?</h2>
+<div class="outline-text-2" id="text-what-does-hooking-mean">
 <p>
 Hooking consists in intercepting and altering function calls or event passed
 between software components. In this case, we will be focusing on <b>function
@@ -253,9 +253,9 @@ original function, change the behavior, spoof the returned value, etc.
 </div>
 </div>
 
-<div id="outline-container-org1e93933" class="outline-2">
-<h2 id="org1e93933"><span class="section-number-2">2.</span> Detour hooking</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-detour-hooking" class="outline-2">
+<h2 id="detour-hooking"><span class="section-number-2">2.</span> Detour hooking</h2>
+<div class="outline-text-2" id="text-detour-hooking">
 <p>
 Detour hooking is a hooking technique where we overwrite the first bytes of the
 target function (<code>foo</code>) to introduce a jump to our <code>hook</code> function.
@@ -342,9 +342,9 @@ fcn.00001139+<span style="color: #88ca9f;">0x8</span>     f2 <span style="color:
 </div>
 </div>
 
-<div id="outline-container-orga4eb455" class="outline-2">
-<h2 id="orga4eb455"><span class="section-number-2">3.</span> Hooking from C</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-hooking-from-c" class="outline-2">
+<h2 id="hooking-from-c"><span class="section-number-2">3.</span> Hooking from C</h2>
+<div class="outline-text-2" id="text-hooking-from-c">
 <p>
 The basic process from C would be:
 </p>
@@ -417,7 +417,7 @@ the address of the previous page. For more information see <a href="https://stac
 answer</a>.
 </p>
 
-<pre class="example" id="org50731ca">
+<pre class="example" id="org0d908fa">
 Ptr:                 0x12345    0b10010001101000101
 Page size:           0x01000    0b00001000000000000
 Page size - 1:       0x00FFF    0b00000111111111111
@@ -527,9 +527,9 @@ result = (<span style="color: #79a8ff;">orig_t</span>)<span style="color: #4ae2f
 </div>
 </div>
 
-<div id="outline-container-org0c03a19" class="outline-2">
-<h2 id="org0c03a19"><span class="section-number-2">4.</span> Detour hooking library</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-detour-hooking-library" class="outline-2">
+<h2 id="detour-hooking-library"><span class="section-number-2">4.</span> Detour hooking library</h2>
+<div class="outline-text-2" id="text-detour-hooking-library">
 <p>
 I made a simple detour hooking library in pure C for both GNU/Linux and
 Windows. The platform-specific function is <code>protect_addr()</code>.
