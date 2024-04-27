@@ -29,15 +29,14 @@ releasing fixes for the cheat, that would get used by people who are just
 interested in copy-pasting a working cheat and selling it, or making [[https://www.theverge.com/2022/5/27/23144061/valve-team-fortress-2-bot-problem-savetf2-spam][bots]]. As I
 explained in the repository's README, I made this project because I enjoyed
 reversing the game in a platform with not much reference, and I enjoyed the low
-level aspect of essentially having to do all the dirty work of reversing the
+level aspect of essentially having to do all the "dirty work" of reversing the
 game and making everything work.
 
-It is not fair to say that I was the only one involved, and obviously some
-people did help me greatly. I just want to quickly mention [[https://github.com/Lak3][Lak3]] for his time and
-help, and [[https://github.com/nepcat][nepcat]] for his helpful PRs, and his interest in the project.
+However, It is not fair to say that I was the only one involved, and obviously
+some people did help me greatly. I just want to quickly mention [[https://github.com/Lak3][Lak3]] for his
+time and help, and [[https://github.com/nepcat][nepcat]] for his helpful PRs, and his interest in the project.
 
-Now that my little goodbye letter to the project is finished, we can get to
-finding =bSendPacket=.
+Now that this long introduction is finished, we can get to finding =bSendPacket=.
 
 * The problem
 
@@ -70,12 +69,16 @@ CL_Move()  ->  CHLClient::CreateMove()  ->  CInput::CreateMove()  ->  ClientMode
 #+end_example
 
 Okay, but why is this important? Let's have a look at this last function,
-=CL_Move=. It defines a [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2130][local variable]] called =bSendPacket=, which will later
-[[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2178-L2188][decides]] if the current command should be sent or, on the other hand, choked.
+=CL_Move=. It defines a [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2130][local variable]] called =bSendPacket=, which will later [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2178-L2188][decide]]
+if the current command should be sent or, on the other hand, choked. Being able
+to control which packets are sent and which ones aren't is extremely useful for
+us, so we need to find a way of changing its value.
 
-Being able to control which packets are sent and which ones aren't is extremely
-useful for us, so we need to find a way of changing the value of this local
-variable, ideally from =ClientModeShared::CreateMove=.
+As I said, this is a *local variable*, so we can't just treat it as a global and
+get a pointer to it. This variable is declared within the [[https://en.wikipedia.org/wiki/Call_stack#STACK-FRAME][stack frame]] of
+=CL_Move=, and only exists throughout its life cycle. We will need to find a way
+of somehow tricking =CL_Move= into thinking that this variable has the value we
+want it to have, and ideally do that from =ClientModeShared::CreateMove=.
 
 * The old solution
 
@@ -95,9 +98,9 @@ to decompile the function.
 
 I renamed the variables on the decompiler window (right split), but it should be
 pretty clear what does what by comparing it with the source. As we can see by
-the bytes on the left (/Options > General > Number of opcode bytes/), it's setting
-=esi= (=bSendPacket=) to true by moving the literal value =0x00000001= (note that this
-is [[https://en.wikipedia.org/wiki/Endianness][little endian]]).
+the opcode bytes on the left split (/Options > General > Number of opcode bytes/),
+it's setting =esi= (=bSendPacket=) to true by moving the literal value =0x00000001=
+(note that this is [[https://en.wikipedia.org/wiki/Endianness][little endian]]).
 
 We could get a pointer to where those =01 00 00 00= bytes are in memory, and then
 cast it to a =bool*=. To do this, we could, for example, look for a signature in
