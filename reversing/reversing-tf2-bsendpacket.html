@@ -210,11 +210,24 @@
 <ul>
 <li><a href="#introduction">1. Introduction</a></li>
 <li><a href="#the-problem">2. The problem</a></li>
-<li><a href="#the-old-solution">3. The old solution</a></li>
+<li><a href="#the-old-solution">3. The old solution</a>
+<ul>
+<li><a href="#flaws-with-this-approach">3.1. Flaws with this approach</a></li>
+</ul>
+</li>
 <li><a href="#the-new-problem">4. The new problem</a></li>
-<li><a href="#finding-the-right-offset-in-the-stack">5. Finding the right offset in the stack</a></li>
-<li><a href="#getting-the-value-with-an-assembly-proxy">6. Getting the value with an assembly proxy</a></li>
-<li><a href="#getting-the-value-using-gccs-built-ins">7. Getting the value using GCC's built-ins</a></li>
+<li><a href="#an-alternative-to-opcode-patching">5. An alternative to opcode patching</a>
+<ul>
+<li><a href="#finding-and-analyzing-chlclient-createmove">5.1. Finding and analyzing <code>CHLClient::CreateMove</code></a></li>
+</ul>
+</li>
+<li><a href="#finding-the-right-offset-in-the-stack">6. Finding the right offset in the stack</a>
+<ul>
+<li><a href="#understanding-the-stack">6.1. Understanding the stack</a></li>
+</ul>
+</li>
+<li><a href="#getting-the-value-with-an-assembly-proxy">7. Getting the value with an assembly proxy</a></li>
+<li><a href="#getting-the-value-using-gccs-built-ins">8. Getting the value using GCC's built-ins</a></li>
 </ul>
 </div>
 </div>
@@ -298,7 +311,7 @@ in <a href="https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4
 So, in order, the calls would be the following:
 </p>
 
-<pre class="example" id="org34cc291">
+<pre class="example" id="org0725897">
 CL_Move()  -&gt;  CHLClient::CreateMove()  -&gt;  CInput::CreateMove()  -&gt;  ClientModeShared::CreateMove()
 </pre>
 
@@ -342,7 +355,7 @@ to decompile the function.
 </p>
 
 
-<div id="org0e444c9" class="figure">
+<div id="orgbf27dbc" class="figure">
 <p><img src="../img/bsendpacket1.png" alt="bsendpacket1.png" />
 </p>
 </div>
@@ -351,7 +364,7 @@ to decompile the function.
 I renamed the variables on the decompiler window (right split), but it should be
 pretty clear what does what by comparing it with the source. As we can see by
 the opcode bytes on the left split (<i>Options &gt; General &gt; Number of opcode bytes</i>),
-it's setting <code>esi</code> (<code>bSendPacket</code>) to true by moving the literal value <code>0x00000001</code>
+it's setting <code>esi</code> (<code>bSendPacket</code>) to true by moving the <i>immediate</i> value <code>0x00000001</code>
 (note that this is <a href="https://en.wikipedia.org/wiki/Endianness">little endian</a>).
 </p>
 
@@ -361,7 +374,11 @@ cast it to a <code>bool*</code>. To do this, we could, for example, look for a s
 the game's memory (see my <a href="../programming/signature-scanning.html">Signature Scanning in C</a> entry). Once we have this
 pointer, we could use it for controlling the packet flow, right?  Not really.
 </p>
+</div>
 
+<div id="outline-container-flaws-with-this-approach" class="outline-3">
+<h3 id="flaws-with-this-approach"><span class="section-number-3">3.1.</span> Flaws with this approach</h3>
+<div class="outline-text-3" id="text-flaws-with-this-approach">
 <p>
 This approach has a couple of flaws. The first one is that we can't force it to
 true, just to false. If we leave it as it was (true), the game might set it to
@@ -379,27 +396,233 @@ caused me a lot of unusual trouble before.
 </p>
 </div>
 </div>
+</div>
 
 <div id="outline-container-the-new-problem" class="outline-2">
 <h2 id="the-new-problem"><span class="section-number-2">4.</span> The new problem</h2>
 <div class="outline-text-2" id="text-the-new-problem">
 <p>
-TODO
+Let's have a look at <code>CL_Move</code> after the 64-bit update. Again, we search for
+strings and check the xrefs.
+</p>
+
+
+<div id="orgfcf6c73" class="figure">
+<p><img src="../img/bsendpacket2.png" alt="bsendpacket2.png" />
+</p>
+</div>
+
+<p>
+We can see that it's moving moving <code>ebx</code> (<code>v3</code>) into <code>r12d</code> (<code>bSendPacket</code>), but how do
+we know that it's setting it to true?  Let's scroll up a bit.
+</p>
+
+
+<div id="org0d8d090" class="figure">
+<p><img src="../img/bsendpacket3.png" alt="bsendpacket3.png" />
+</p>
+</div>
+
+<p>
+As you can see, it's moving the value returned by <code>sub_5376C0</code> (<code>eax</code>) into <code>ebx</code>. If
+the <code>test al, al</code> is zero (function returned false), it jumps to <code>loc_47A007</code>, which
+just returns.
+</p>
+
+<p>
+The fact that it's moving <i>true</i> from a register instead of an immediate value is
+a slight problem, since we can't just patch some <code>01 00 00 00</code> bytes. The opcode
+bytes for the <code>mov</code> instruction are now <code>41 89 DC</code>, but we <i>could</i> still patch it.
+</p>
+
+<p>
+If we look at the general purpose registers for <code>x86_64</code>, we can see that <code>r12d</code> is
+the <b>double-word</b> version of the <code>r12</code> register.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Quad-word</th>
+<th scope="col" class="org-left">Double-word</th>
+<th scope="col" class="org-left">Word</th>
+<th scope="col" class="org-left">Upper byte</th>
+<th scope="col" class="org-left">Lower byte</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>rax</code></td>
+<td class="org-left"><code>eax</code></td>
+<td class="org-left"><code>ax</code></td>
+<td class="org-left"><code>ah</code></td>
+<td class="org-left"><code>al</code></td>
+</tr>
+
+<tr>
+<td class="org-left"><code>rbx</code></td>
+<td class="org-left"><code>ebx</code></td>
+<td class="org-left"><code>bx</code></td>
+<td class="org-left"><code>bh</code></td>
+<td class="org-left"><code>bl</code></td>
+</tr>
+
+<tr>
+<td class="org-left">&#x2026;</td>
+<td class="org-left">&#x2026;</td>
+<td class="org-left">&#x2026;</td>
+<td class="org-left">&#x2026;</td>
+<td class="org-left">&#x2026;</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>r12</code></td>
+<td class="org-left"><code>r12d</code></td>
+<td class="org-left"><code>r12w</code></td>
+<td class="org-left"><i>None</i></td>
+<td class="org-left"><code>r12b</code></td>
+</tr>
+</tbody>
+</table>
+
+<p>
+We might be able to find another 3-byte instruction that we can write
+there. After a wild guess, I found that <code>mov r12b, 1</code> does exactly what we want,
+since <code>bSendPacket</code> can only be one or zero, and the instruction is only 3 bytes:
+<code>41 b4 01</code>.
+</p>
+
+<p>
+However, as I mentioned before, this solution does not solve the flaws of the
+old 32-bit version. We still can't force it to true, and it will only apply for
+the next tick, not the current one. Furthermore, it has another disadvantage
+compared to the old: Since the instruction is 3 bytes long, and it's not an
+immediate value, we can't treat it as a <code>bool*</code> like we did before.
 </p>
 </div>
 </div>
 
+<div id="outline-container-an-alternative-to-opcode-patching" class="outline-2">
+<h2 id="an-alternative-to-opcode-patching"><span class="section-number-2">5.</span> An alternative to opcode patching</h2>
+<div class="outline-text-2" id="text-an-alternative-to-opcode-patching">
+<p>
+First, we can see that, throughout <code>CL_Move</code>, the <code>r12</code> register is not used for
+anything other than <code>bSendPacket</code>. If we look at the System V AMD64 ABI
+(<a href="https://en.wikipedia.org/wiki/X86_calling_conventions#System_V_AMD64_ABI">Wikipedia</a>, <a href="https://refspecs.linuxbase.org/elf/x86_64-abi-0.99.pdf">PDF</a>), we can read the following:
+</p>
+
+<blockquote>
+<p>
+<b>System V AMD64 ABI - 3.2.1 Registers and the Stack Frame</b>
+</p>
+
+<p>
+Registers <code>rbp</code>, <code>rbx</code> and <code>r12</code> through <code>r15</code> "belong" to the calling function and the
+called function is required to preserve their values. In other words, a called
+function must preserve these registers' values for its caller.
+</p>
+</blockquote>
+
+<p>
+That's good news. That means that <i>theoretically</i>, if the functions between
+<code>ClientModeShared::CreateMove</code> and <code>CL_Move</code> don't use <code>r12</code>, it would remain
+unchanged. On the other hand, if a child function want's to modify <code>r12</code>
+(<code>bSendPacket</code>) it will have to push it onto the stack, and pop it before
+returning.
+</p>
+
+<p>
+And more good news, if we look at the source of <code>CL_Move</code>, we can see that the
+<a href="https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2178-L2192"><code>bSendPacket</code> checks</a> happen after the <a href="https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2165-L2169"><code>CHLClient::CreateMove</code> call</a> is made. That
+means we could change the value of <code>bSendPacket</code> and the changes would take effect
+on the current tick.
+</p>
+
+<p>
+Let's hope for the best and start looking at each function.
+</p>
+</div>
+
+<div id="outline-container-finding-and-analyzing-chlclient-createmove" class="outline-3">
+<h3 id="finding-and-analyzing-chlclient-createmove"><span class="section-number-3">5.1.</span> Finding and analyzing <code>CHLClient::CreateMove</code></h3>
+<div class="outline-text-3" id="text-finding-and-analyzing-chlclient-createmove">
+<p>
+If we open the 64-bit <code>client.so</code> in IDA, we can go to the <code>CHLClient</code>
+<a href="https://en.wikipedia.org/wiki/Virtual_method_table">Virtual Method Table</a> (VMT) thanks to to <a href="https://en.wikipedia.org/wiki/Run-time_type_information">RTTI</a> and start checking those
+functions. Some plugin like <a href="https://sourceforge.net/projects/idafunctionstringassociate/">Function String Associate</a> might come in handy for
+looking at the strings in surrounding functions from the VMT.
+</p>
+
+<p>
+After a bit of decompiling, we can find that it's on index 21 (since
+<code>(0x26B2178-0x26B20D0)/8</code> is 21).
+</p>
+
+
+<div id="orga225a93" class="figure">
+<p><img src="../img/bsendpacket4.png" alt="bsendpacket4.png" />
+</p>
+</div>
+
+<p>
+As you can see, it matches the source of <a href="https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/game/client/cdll_client_int.cpp#L1448"><code>CHLClient::CreateMove</code></a>. We can
+probably tell that <code>off_2D65868[0]</code> is <code>CInput</code>, since it's also passing it as the
+<code>thisptr</code> parameter.
+</p>
+
+<p>
+If we look at the actual disassembly, we find some bad news.
+</p>
+
+
+<div id="org35180f7" class="figure">
+<p><img src="../img/bsendpacket5.png" alt="bsendpacket5.png" />
+</p>
+</div>
+
+<p>
+Indeed, the <code>r12</code> register is being pushed to the stack and then used as a local
+variable for this function. Well&#x2026; Shit.
+</p>
+
+<p>
+Not all is lost, though. It would have been easy to just modify the unchanged
+<code>r12</code> register, but we can still access its value <b>from the stack</b>.
+</p>
+</div>
+</div>
+</div>
+
 <div id="outline-container-finding-the-right-offset-in-the-stack" class="outline-2">
-<h2 id="finding-the-right-offset-in-the-stack"><span class="section-number-2">5.</span> Finding the right offset in the stack</h2>
+<h2 id="finding-the-right-offset-in-the-stack"><span class="section-number-2">6.</span> Finding the right offset in the stack</h2>
 <div class="outline-text-2" id="text-finding-the-right-offset-in-the-stack">
+</div>
+
+<div id="outline-container-understanding-the-stack" class="outline-3">
+<h3 id="understanding-the-stack"><span class="section-number-3">6.1.</span> Understanding the stack</h3>
+<div class="outline-text-3" id="text-understanding-the-stack">
 <p>
 TODO
 </p>
 </div>
 </div>
+</div>
 
 <div id="outline-container-getting-the-value-with-an-assembly-proxy" class="outline-2">
-<h2 id="getting-the-value-with-an-assembly-proxy"><span class="section-number-2">6.</span> Getting the value with an assembly proxy</h2>
+<h2 id="getting-the-value-with-an-assembly-proxy"><span class="section-number-2">7.</span> Getting the value with an assembly proxy</h2>
 <div class="outline-text-2" id="text-getting-the-value-with-an-assembly-proxy">
 <p>
 TODO
@@ -408,7 +631,7 @@ TODO
 </div>
 
 <div id="outline-container-getting-the-value-using-gccs-built-ins" class="outline-2">
-<h2 id="getting-the-value-using-gccs-built-ins"><span class="section-number-2">7.</span> Getting the value using GCC's built-ins</h2>
+<h2 id="getting-the-value-using-gccs-built-ins"><span class="section-number-2">8.</span> Getting the value using GCC's built-ins</h2>
 <div class="outline-text-2" id="text-getting-the-value-using-gccs-built-ins">
 <p>
 TODO

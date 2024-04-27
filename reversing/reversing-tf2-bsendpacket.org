@@ -108,13 +108,18 @@ to decompile the function.
 I renamed the variables on the decompiler window (right split), but it should be
 pretty clear what does what by comparing it with the source. As we can see by
 the opcode bytes on the left split (/Options > General > Number of opcode bytes/),
-it's setting =esi= (=bSendPacket=) to true by moving the literal value =0x00000001=
+it's setting =esi= (=bSendPacket=) to true by moving the /immediate/ value =0x00000001=
 (note that this is [[https://en.wikipedia.org/wiki/Endianness][little endian]]).
 
 We could get a pointer to where those =01 00 00 00= bytes are in memory, and then
 cast it to a =bool*=. To do this, we could, for example, look for a signature in
 the game's memory (see my [[file:../programming/signature-scanning.org][Signature Scanning in C]] entry). Once we have this
 pointer, we could use it for controlling the packet flow, right?  Not really.
+
+** Flaws with this approach
+:PROPERTIES:
+:CUSTOM_ID: flaws-with-this-approach
+:END:
 
 This approach has a couple of flaws. The first one is that we can't force it to
 true, just to false. If we leave it as it was (true), the game might set it to
@@ -133,14 +138,119 @@ caused me a lot of unusual trouble before.
 :CUSTOM_ID: the-new-problem
 :END:
 
-TODO
+Let's have a look at =CL_Move= after the 64-bit update. Again, we search for
+strings and check the xrefs.
+
+[[file:../img/bsendpacket2.png]]
+
+We can see that it's moving moving =ebx= (=v3=) into =r12d= (=bSendPacket=), but how do
+we know that it's setting it to true?  Let's scroll up a bit.
+
+[[file:../img/bsendpacket3.png]]
+
+As you can see, it's moving the value returned by =sub_5376C0= (=eax=) into =ebx=. If
+the =test al, al= is zero (function returned false), it jumps to =loc_47A007=, which
+just returns.
+
+The fact that it's moving /true/ from a register instead of an immediate value is
+a slight problem, since we can't just patch some =01 00 00 00= bytes. The opcode
+bytes for the =mov= instruction are now =41 89 DC=, but we /could/ still patch it.
+
+If we look at the general purpose registers for =x86_64=, we can see that =r12d= is
+the *double-word* version of the =r12= register.
+
+| Quad-word | Double-word | Word | Upper byte | Lower byte |
+|-----------+-------------+------+------------+------------|
+| =rax=       | =eax=         | =ax=   | =ah=         | =al=         |
+| =rbx=       | =ebx=         | =bx=   | =bh=         | =bl=         |
+| ...       | ...         | ...  | ...        | ...        |
+| =r12=       | =r12d=        | =r12w= | /None/       | =r12b=       |
+
+We might be able to find another 3-byte instruction that we can write
+there. After a wild guess, I found that =mov r12b, 1= does exactly what we want,
+since =bSendPacket= can only be one or zero, and the instruction is only 3 bytes:
+=41 b4 01=.
+
+However, as I mentioned before, this solution does not solve the flaws of the
+old 32-bit version. We still can't force it to true, and it will only apply for
+the next tick, not the current one. Furthermore, it has another disadvantage
+compared to the old: Since the instruction is 3 bytes long, and it's not an
+immediate value, we can't treat it as a =bool*= like we did before.
+
+* An alternative to opcode patching
+:PROPERTIES:
+:CUSTOM_ID: an-alternative-to-opcode-patching
+:END:
+
+First, we can see that, throughout =CL_Move=, the =r12= register is not used for
+anything other than =bSendPacket=. If we look at the System V AMD64 ABI
+([[https://en.wikipedia.org/wiki/X86_calling_conventions#System_V_AMD64_ABI][Wikipedia]], [[https://refspecs.linuxbase.org/elf/x86_64-abi-0.99.pdf][PDF]]), we can read the following:
+
+#+begin_quote
+*System V AMD64 ABI - 3.2.1 Registers and the Stack Frame*
+
+Registers =rbp=, =rbx= and =r12= through =r15= "belong" to the calling function and the
+called function is required to preserve their values. In other words, a called
+function must preserve these registers' values for its caller.
+#+end_quote
+
+That's good news. That means that /theoretically/, if the functions between
+=ClientModeShared::CreateMove= and =CL_Move= don't use =r12=, it would remain
+unchanged. On the other hand, if a child function want's to modify =r12=
+(=bSendPacket=) it will have to push it onto the stack, and pop it before
+returning.
+
+And more good news, if we look at the source of =CL_Move=, we can see that the
+[[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2178-L2192][=bSendPacket= checks]] happen after the [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2165-L2169][=CHLClient::CreateMove= call]] is made. That
+means we could change the value of =bSendPacket= and the changes would take effect
+on the current tick.
+
+Let's hope for the best and start looking at each function.
+
+** Finding and analyzing =CHLClient::CreateMove=
+:PROPERTIES:
+:CUSTOM_ID: finding-and-analyzing-chlclient-createmove
+:END:
+
+If we open the 64-bit =client.so= in IDA, we can go to the =CHLClient=
+[[https://en.wikipedia.org/wiki/Virtual_method_table][Virtual Method Table]] (VMT) thanks to to [[https://en.wikipedia.org/wiki/Run-time_type_information][RTTI]] and start checking those
+functions. Some plugin like [[https://sourceforge.net/projects/idafunctionstringassociate/][Function String Associate]] might come in handy for
+looking at the strings in surrounding functions from the VMT.
+
+After a bit of decompiling, we can find that it's on index 21 (since
+=(0x26B2178-0x26B20D0)/8= is 21).
+
+[[file:../img/bsendpacket4.png]]
+
+As you can see, it matches the source of [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/game/client/cdll_client_int.cpp#L1448][=CHLClient::CreateMove=]]. We can
+probably tell that =off_2D65868[0]= is =CInput=, since it's also passing it as the
+=thisptr= parameter.
+
+If we look at the actual disassembly, we find some bad news.
+
+[[file:../img/bsendpacket5.png]]
+
+Indeed, the =r12= register is being pushed to the stack and then used as a local
+variable for this function. Well... Shit.
+
+Not all is lost, though. It would have been easy to just modify the unchanged
+=r12= register, but we can still access its value *from the stack*.
 
 * Finding the right offset in the stack
 :PROPERTIES:
 :CUSTOM_ID: finding-the-right-offset-in-the-stack
 :END:
 
+** Understanding the stack
+:PROPERTIES:
+:CUSTOM_ID: understanding-the-stack
+:END:
+
 TODO
+
+#+begin_comment
+Insert figure 3.3 of System V AMD64 ABI and Wikipedia stack frame image.
+#+end_comment
 
 * Getting the value with an assembly proxy
 :PROPERTIES:
