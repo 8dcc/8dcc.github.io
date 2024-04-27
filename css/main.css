@@ -33,13 +33,15 @@ pre.src .linenr {
 
 /*----------------------------------------------------------------------------*/
 
-a:has(> code) {
-    text-decoration: none;
+a {
+    text-decoration-color: RGBA(0, 0, 255, 0.2);
 }
 
-a:has(> code):hover {
-    text-decoration: underline;
+a:hover {
+    text-decoration-color: RGB(0, 0, 255);
 }
+
+/*----------------------------------------------------------------------------*/
 
 code {
     background-image: linear-gradient(rgba(0, 0, 0, 0.15) 0 0);
