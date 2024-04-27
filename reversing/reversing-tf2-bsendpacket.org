@@ -1,0 +1,137 @@
+#+TITLE: Reversing TF2's bSendPacket
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: showeverything
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Introduction
+
+Team Fortress 2 (TF2) is a 2007 multiplayer first-person shooter game developed
+and published by Valve Corporation ([[https://en.wikipedia.org/wiki/Team_Fortress_2][Wikipedia]]).
+
+On [[https://github.com/8dcc/tf2-cheat/commit/0daa5bb7b03abf0ae8b150312f0147eb7ef5a148][Aug 6, 2023]], I started working on a TF2 cheat for GNU/Linux, and in over 600
+commits, I was pretty happy with the result.
+
+However, on April 19, 2024 (just a few days before writing this), Valve released
+a 64-bit update. For windows, this just meant an extra architecture, but on
+GNU/Linux, they entirely removed the 32-bit binaries. I decided to archive the
+repository and continue developing the cheat privately.
+
+One of the main reasons for this decision was that I wanted to avoid essentially
+releasing fixes for the cheat, that would get used by people who are just
+interested in copy-pasting a working cheat and selling it, or making [[https://www.theverge.com/2022/5/27/23144061/valve-team-fortress-2-bot-problem-savetf2-spam][bots]]. As I
+explained in the repository's README, I made this project because I enjoyed
+reversing the game in a platform with not much reference, and I enjoyed the low
+level aspect of essentially having to do all the dirty work of reversing the
+game and making everything work.
+
+It is not fair to say that I was the only one involved, and obviously some
+people did help me greatly. I just want to quickly mention [[https://github.com/Lak3][Lak3]] for his time and
+help, and [[https://github.com/nepcat][nepcat]] for his helpful PRs, and his interest in the project.
+
+Now that my little goodbye letter to the project is finished, we can get to
+finding =bSendPacket=.
+
+* The problem
+
+First, in case the reader is unfamiliar with game hacking in the source engine,
+I need to briefly explain what =bSendPacket= is used for.
+
+In the source engine, we run a lot of our hacks from the =CreateMove= hook (for
+more information about hooking in general, see my [[file:../programming/detour-hooking.org][Detour Hooking]]
+entry). However, there is not just one =CreateMove=, and some people choose to
+hook one over the other. In my case, I have always hooked
+=ClientModeShared::CreateMove=.
+
+Let's have a look at where this is called by looking at the [[https://github.com/OthmanAba/TeamFortress2][leaked TF2 source]].
+
+1. Our =ClientModeShared::CreateMove= function is defined in
+   [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/game/client/clientmode_shared.cpp#L417][=clientmode_shared.cpp=]]. As you can see, it calls another =CreateMove=
+   function, but we don't care about that one.
+2. This =ClientModeShared::CreateMove= function is called from =CInput::CreateMove=,
+   defined in [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/game/client/in_main.cpp#L1111][=in_main.cpp=]]. You can see it calls it from a =g_pClientMode= global
+   pointer.
+3. This =CInput::CreateMove= function is called from =CHLClient::CreateMove=,
+   defined in [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/game/client/cdll_client_int.cpp#L1448][=cdll_client_int.cpp=]].
+4. Finally, this =CHLClient::CreateMove= function is called from =CL_Move=, defined
+   in [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2119][=cl_main.cpp=]].
+
+So, in order, the calls would be the following:
+
+#+begin_example text
+CL_Move()  ->  CHLClient::CreateMove()  ->  CInput::CreateMove()  ->  ClientModeShared::CreateMove()
+#+end_example
+
+Okay, but why is this important? Let's have a look at this last function,
+=CL_Move=. It defines a [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2130][local variable]] called =bSendPacket=, which will later
+[[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2178-L2188][decides]] if the current command should be sent or, on the other hand, choked.
+
+Being able to control which packets are sent and which ones aren't is extremely
+useful for us, so we need to find a way of changing the value of this local
+variable, ideally from =ClientModeShared::CreateMove=.
+
+* The old solution
+
+When I started developing my cheat for the 32-bit game, I came across an
+(almost) valid solution.
+
+Since =CL_Move= only sets =bSendPacket= to true on [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/engine/cl_main.cpp#L2130][once place]], we could just
+overwrite this constant in memory, so that it gets initialized to true only
+whenever we want.
+
+Let's look at the *old 32-bit binary* from IDA. If we open =engine.so=, where
+=CL_Move= is located, we can search for the function by looking for the strings
+that it uses, and jumping to their xrefs. Then, we can hit the almighty =F5= key
+to decompile the function.
+
+[[file:../img/bsendpacket1.png]]
+
+I renamed the variables on the decompiler window (right split), but it should be
+pretty clear what does what by comparing it with the source. As we can see by
+the bytes on the left (/Options > General > Number of opcode bytes/), it's setting
+=esi= (=bSendPacket=) to true by moving the literal value =0x00000001= (note that this
+is [[https://en.wikipedia.org/wiki/Endianness][little endian]]).
+
+We could get a pointer to where those =01 00 00 00= bytes are in memory, and then
+cast it to a =bool*=. To do this, we could, for example, look for a signature in
+the game's memory (see my [[file:../programming/signature-scanning.org][Signature Scanning in C]] entry). Once we have this
+pointer, we could use it for controlling the packet flow, right?  Not really.
+
+This approach has a couple of flaws. The first one is that we can't force it to
+true, just to false. If we leave it as it was (true), the game might set it to
+false later in the function. This is not a problem in our case, but it's
+something to keep in mind.
+
+Another problem is that, if we look at the position of the value we are changing
+and the position where =CL_Move= calls =CHLClient::CreateMove=, we can see that we
+are overwriting the bytes of an instruction that *has already been executed in
+this tick*. Therefore, our change will affect the next tick. This is a problem
+that I didn't realize until the game updated to 64-bits, and it has probably
+caused me a lot of unusual trouble before.
+
+* The new problem
+
+TODO
+
+* Finding the right offset in the stack
+
+TODO
+
+* Getting the value with an assembly proxy
+
+TODO
+
+* Getting the value using GCC's built-ins
+
+TODO
+
+#+begin_comment
+https://gcc.gnu.org/onlinedocs/gcc/Return-Address.html
+#+end_comment
