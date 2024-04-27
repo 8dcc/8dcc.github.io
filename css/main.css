@@ -4,6 +4,14 @@ body {
     margin-bottom: 2.5em;
 }
 
+p, li {
+    line-height: 1.4em;
+}
+
+#text-table-of-contents li {
+    line-height: normal;
+}
+
 pre.src {
     background:#111111;
     color:white;
