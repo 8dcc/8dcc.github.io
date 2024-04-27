@@ -1,7 +1,7 @@
 #+TITLE: Detour hooking
 #+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
-#+STARTUP: showeverything
+#+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
 

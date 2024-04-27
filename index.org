@@ -1,7 +1,7 @@
 #+TITLE: 8dcc's blog
 #+AUTHOR: 8dcc
 #+OPTIONS: toc:nil num:nil
-#+STARTUP: showeverything
+#+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="img/favicon.png">
 
 I will use this blog to post information in a more centralized way, instead of
