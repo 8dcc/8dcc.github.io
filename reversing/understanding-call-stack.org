@@ -466,7 +466,6 @@ Sources:
 2. [[https://stackoverflow.com/q/73275183/11715554][StackOverflow 2]] (Check comments)
 3. [[https://www.reddit.com/r/asm/comments/1afi6nr/comment/koabzk0/][Reddit answer]] (Skeeto saves the day once more)
 
-
 ** Calling it from =DrawPoint=
 :PROPERTIES:
 :CUSTOM_ID: calling-it-from-drawpoint

@@ -221,9 +221,15 @@
 <li><a href="#finding-and-analyzing-chlclient-createmove">5.1. Finding and analyzing <code>CHLClient::CreateMove</code></a></li>
 </ul>
 </li>
-<li><a href="#finding-the-right-offset-in-the-stack">6. Finding the right offset in the stack</a></li>
+<li><a href="#finding-the-right-offset-in-the-stack">6. Finding the right offset in the stack</a>
+<ul>
+<li><a href="#stack-of-chlclient-createmove">6.1. Stack of <code>CHLClient::CreateMove</code></a></li>
+<li><a href="#stack-of-cinput-createmove">6.2. Stack of <code>CInput::CreateMove</code></a></li>
+</ul>
+</li>
 <li><a href="#getting-the-value-with-an-assembly-proxy">7. Getting the value with an assembly proxy</a></li>
 <li><a href="#getting-the-value-using-gccs-built-ins">8. Getting the value using GCC's built-ins</a></li>
+<li><a href="#final-test-and-conclusion">9. Final test and conclusion</a></li>
 </ul>
 </div>
 </div>
@@ -307,7 +313,7 @@ in <a href="https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4
 So, in order, the calls would be the following:
 </p>
 
-<pre class="example" id="orgefc4229">
+<pre class="example" id="orgf337a74">
 CL_Move()  -&gt;  CHLClient::CreateMove()  -&gt;  CInput::CreateMove()  -&gt;  ClientModeShared::CreateMove()
 </pre>
 
@@ -352,7 +358,7 @@ to decompile the function.
 </p>
 
 
-<div id="org6a510a8" class="figure">
+<div id="org346f026" class="figure">
 <p><img src="../img/bsendpacket1.png" alt="bsendpacket1.png" />
 </p>
 </div>
@@ -404,7 +410,7 @@ strings and check the xrefs.
 </p>
 
 
-<div id="orgf7ff940" class="figure">
+<div id="orgd137b7f" class="figure">
 <p><img src="../img/bsendpacket2.png" alt="bsendpacket2.png" />
 </p>
 </div>
@@ -415,7 +421,7 @@ we know that it's setting it to true?  Let's scroll up a bit.
 </p>
 
 
-<div id="org53fe186" class="figure">
+<div id="org38dc72f" class="figure">
 <p><img src="../img/bsendpacket3.png" alt="bsendpacket3.png" />
 </p>
 </div>
@@ -569,7 +575,7 @@ After a bit of decompiling, we can find that it's on index 21 (since
 </p>
 
 
-<div id="orgbac6604" class="figure">
+<div id="org7034173" class="figure">
 <p><img src="../img/bsendpacket4.png" alt="bsendpacket4.png" />
 </p>
 </div>
@@ -585,7 +591,7 @@ If we look at the actual disassembly, we find some bad news.
 </p>
 
 
-<div id="org3aaffdd" class="figure">
+<div id="org5e41b74" class="figure">
 <p><img src="../img/bsendpacket5.png" alt="bsendpacket5.png" />
 </p>
 </div>
@@ -613,8 +619,105 @@ check out my <a href="understanding-call-stack.html">Understanding and traversin
 <h2 id="finding-the-right-offset-in-the-stack"><span class="section-number-2">6.</span> Finding the right offset in the stack</h2>
 <div class="outline-text-2" id="text-finding-the-right-offset-in-the-stack">
 <p>
-TODO
+Just as a reminder, this is how <code>ClientModeShared::CreateMove()</code> is called.
 </p>
+
+<pre class="example" id="org0b33267">
+CL_Move()  -&gt;  CHLClient::CreateMove()  -&gt;  CInput::CreateMove()  -&gt;  ClientModeShared::CreateMove()
+</pre>
+
+<p>
+Since <code>bSendPacket</code> is defined in <code>CL_Move</code>, and we know it's a callee-preserved
+variable, we can start checking at what <code>CHLClient::CreateMove()</code> does with
+<code>r12</code>. We already saw it pushed it to the stack, so let's keep track of what is
+pushed to the stack, so we can calculate where <code>bSendPacket</code> will end.
+</p>
+
+<p>
+We will have to keep in mind 3 things:
+</p>
+
+<ol class="org-ol">
+<li>Pushed (and potentially popped) values onto the stack.</li>
+<li>Subtractions/changes to <code>rsp</code>.</li>
+<li>Each <code>call</code> we step through is pushing 8 bytes. Other calls can be ignored
+since the pushed bytes by <code>call</code> will be popped by <code>ret</code>.</li>
+</ol>
+</div>
+
+<div id="outline-container-stack-of-chlclient-createmove" class="outline-3">
+<h3 id="stack-of-chlclient-createmove"><span class="section-number-3">6.1.</span> Stack of <code>CHLClient::CreateMove</code></h3>
+<div class="outline-text-3" id="text-stack-of-chlclient-createmove">
+<p>
+I have highlighted the important instructions.
+</p>
+
+
+<div id="orgb1a2390" class="figure">
+<p><img src="../img/bsendpacket6.png" alt="bsendpacket6.png" />
+</p>
+</div>
+
+<p>
+After the first push, <code>r12</code> is at <code>[rsp]</code>. After the second, at <code>[rsp + 0x8]</code>. Then,
+we allocate 0x18 bytes on the stack, so we also need to keep that in mind. Now
+it's at <code>[rsp + 0x20]</code>. Finally, <code>CInput::CreateMove</code> gets called, and the return
+address is pushed onto the stack. When entering <code>CInput::CreateMove</code>, <code>bSendPacket</code>
+is at <code>[rsp + 0x28]</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-stack-of-cinput-createmove" class="outline-3">
+<h3 id="stack-of-cinput-createmove"><span class="section-number-3">6.2.</span> Stack of <code>CInput::CreateMove</code></h3>
+<div class="outline-text-3" id="text-stack-of-cinput-createmove">
+<p>
+We continue by having a look at the next function. We can find it on the <code>CInput</code>
+vtable, when writing this, it's at index 3.
+</p>
+
+<p>
+This function is longer, so first we will analyze the pushed registers and the
+allocated space, and then we will try to find the call to
+<code>ClientModeShared::CreateMove</code> from the decompiler window.
+</p>
+
+
+<div id="orgc5870a9" class="figure">
+<p><img src="../img/bsendpacket7.png" alt="bsendpacket7.png" />
+</p>
+</div>
+
+<p>
+It pushes a total of 6 registers, since each is 8 bytes, we can add 0x30 to the
+stack offset from before. After all these pushes, <code>bSendPacket</code> is at
+<code>[rsp +0x58]</code>. Then, it subtracts 0x98 from <code>rsp</code> for allocating some space yet
+again. As we can see, this function uses way more local variables than the
+previous. After the subtraction, <code>bSendPacket</code> is at <code>[rsp + 0xF0]</code>.
+</p>
+
+<p>
+We can decompile the function and look for the call to
+<code>ClientModeShared::CreateMove</code> from there.
+</p>
+
+
+<div id="org27af7bd" class="figure">
+<p><img src="../img/bsendpacket8.png" alt="bsendpacket8.png" />
+</p>
+</div>
+
+<p>
+Since the function is too large, you will just have to trust me. There were no
+other changes to the stack up to this call. Again, remember that this <code>call</code>
+pushes another 8 bytes onto the stack.
+</p>
+
+<p>
+Finally, we get our stack offset. When calling <code>ClientModeShared::CreateMove</code>,
+<code>CL_Move</code>'s <code>bSendPacket</code> is at <code>[rsp + 0xF8]</code>.
+</p>
+</div>
 </div>
 </div>
 
@@ -622,7 +725,54 @@ TODO
 <h2 id="getting-the-value-with-an-assembly-proxy"><span class="section-number-2">7.</span> Getting the value with an assembly proxy</h2>
 <div class="outline-text-2" id="text-getting-the-value-with-an-assembly-proxy">
 <p>
-TODO
+This is very good. Since we are hooking <code>ClientModeShared::CreateMove</code>, we could
+get a pointer to this offset on the stack right when we are called, and then
+continue with our execution normally. Then, whenever we want to change the
+value, we can write to that pointer and it will contain the address of the <code>r12</code>
+register that <code>CHLClient::CreateMove</code> pushed to the stack for preserving <code>CL_Move</code>'s
+<code>bSendPacket</code>. Took some work, but we are here.
+</p>
+
+<p>
+Let's write a simple assembly proxy for storing this address into a global
+pointer.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #ff6740;">%define</span> SENDPACKET_STACK_OFFSET <span style="color: #88ca9f;">0xF8</span>
+
+<span style="color: #ff6f9f;">default</span> <span style="color: #79a8ff;">REL</span>
+
+<span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.data</span>
+    <span style="color: #ff6f9f;">global</span> bSendPacket
+    <span style="color: #4ae2ff;">bSendPacket</span>: <span style="color: #feacd0;">dq</span> <span style="color: #88ca9f;">1</span>               <span style="color: #989898;">; </span><span style="color: #989898;">Bool pointer to bSendPacket on the stack</span>
+
+<span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.text</span>
+    <span style="color: #ff6f9f;">extern</span> h_CreateMove:function    <span style="color: #989898;">; </span><span style="color: #989898;">hooks.c (func)</span>
+
+<span style="color: #ff6f9f;">global</span> h_CreateMoveProxy
+<span style="color: #4ae2ff;">h_CreateMoveProxy</span>:
+    <span style="color: #feacd0;">lea</span>     <span style="color: #6ae4b9;">rax</span>, [<span style="color: #6ae4b9;">rsp</span> + SENDPACKET_STACK_OFFSET]
+    <span style="color: #feacd0;">mov</span>     [bSendPacket], <span style="color: #6ae4b9;">rax</span>
+    <span style="color: #feacd0;">jmp</span>     h_CreateMove <span style="color: #79a8ff;">wrt</span> ..plt
+</pre>
+</div>
+
+<p>
+We simply define a quad-word on the <code>.data</code> section, and save the value at
+<code>[rsp + OFFSET]</code> there. Finally, we jump to our real <code>CreateMove</code> hook, defined in
+C.
+</p>
+
+<p>
+For more information about <code>default rel</code> and <code>wrt ..plt</code>, see my <a href="understanding-call-stack.html#note-about-position-independent-executables">Note about Position
+Independent Executables</a> in my other entry about the call stack.
+</p>
+
+<p>
+Now, instead of hooking our old <code>h_CreateMove</code> hook, we will hook this
+<code>h_CreateMoveProxy</code> assembly procedure, which will take care of calling the C
+hook.
 </p>
 </div>
 </div>
@@ -631,10 +781,96 @@ TODO
 <h2 id="getting-the-value-using-gccs-built-ins"><span class="section-number-2">8.</span> Getting the value using GCC's built-ins</h2>
 <div class="outline-text-2" id="text-getting-the-value-using-gccs-built-ins">
 <p>
-TODO
+Instead of having a separate assembly file for just 3 instructions, I thought
+about using inline assembly. Then, I remembered that inline assembly in GCC
+looks absolutely terrible and unreadable.
+</p>
+
+<p>
+However, I found a better solution: <a href="https://gcc.gnu.org/onlinedocs/gcc/Return-Address.html">GCC's built-ins</a>. <sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
+</p>
+
+<p>
+We could ideally use <code>__builtin_stack_address()</code>, but that was not available in my
+GCC version (13.2.1). Instead, we can just use <code>__builtin_frame_address()</code> and add
+8 to skip over <code>rbp</code> itself. From there, we can add our offset, cast it to a <code>bool*</code>
+and we are ready to go.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#if</span> <span style="color: #ff6740; font-weight: bold;">!</span><span style="color: #ff6740;">defined</span>(__has_builtin) || <span style="color: #ff6740; font-weight: bold;">!</span>__has_builtin(__builtin_frame_address)
+<span style="color: #ff6740;">#error</span> <span style="color: #00d3d0;">"This version of GCC doesn't support __builtin_frame_address()"</span>
+<span style="color: #ff6740;">#endif</span>
+
+<span style="color: #79a8ff;">bool</span>* <span style="color: #6ae4b9;">bSendPacket</span> = <span style="color: #88ca9f;">NULL</span>;
+
+<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">h_CreateMove</span>(<span style="color: #79a8ff;">ClientMode</span>* <span style="color: #6ae4b9;">thisptr</span>, <span style="color: #79a8ff;">float</span> <span style="color: #6ae4b9;">flInputSampleTime</span>,
+                  <span style="color: #79a8ff;">usercmd_t</span>* <span style="color: #6ae4b9;">cmd</span>) {
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Get current frame address, skip over pushed RBP, get pointer to bool by</span>
+<span style="color: #989898;">     * adding offset to that.</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">current_frame_address</span> = __builtin_frame_address(<span style="color: #88ca9f;">0</span>);
+    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">current_stack_address</span> = current_frame_address + <span style="color: #88ca9f;">0x8</span>;
+    bSendPacket = (<span style="color: #79a8ff;">bool</span>*)(current_stack_address + SENDPACKET_STACK_OFFSET);
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+}
+</pre>
+</div>
+
+<p>
+And that's it, we can read and write from the real thing.
 </p>
 </div>
 </div>
+
+<div id="outline-container-final-test-and-conclusion" class="outline-2">
+<h2 id="final-test-and-conclusion"><span class="section-number-2">9.</span> Final test and conclusion</h2>
+<div class="outline-text-2" id="text-final-test-and-conclusion">
+<p>
+We can make one final test to make sure we got everything right. Let's force
+<code>bSendPacket</code> to false from our <code>CreateMove</code> hook. If everything was done correctly,
+we should start lagging and we should get a timeout.
+</p>
+
+<p>
+We join a game, inject, and&#x2026;
+</p>
+
+
+<div id="orgc206251" class="figure">
+<p><img src="../img/slomo.gif" alt="slomo.gif" />
+</p>
 </div>
+
+
+<div id="orgf1a934e" class="figure">
+<p><img src="../img/bsendpacket9.png" alt="bsendpacket9.png" />
+</p>
+</div>
+
+<p>
+Note that we don't need to change <b>anything</b> related to the code that used the old
+32-bit <code>bSendPacket</code>, since they can still read and write from the same <code>bool*</code>. The
+only difference is that now it points to a value on the stack, instead of some
+immediate value. We also don't need to use any signature scanning at all for
+finding those old immediate values, and most importantly, <b>the changes to
+<code>bSendPacket</code> will take effect on the current tick</b>, instead of the next.
+</p>
+
+<p>
+If you reached this far, I hope you have learned something.
+</p>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Credits for the
+built-in method to Jester01 from <code>##asm</code> and his infinite knowledge.</p></div></div>
+
+
+</div>
+</div></div>
 </body>
 </html>

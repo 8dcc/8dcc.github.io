@@ -246,22 +246,174 @@ check out my [[file:understanding-call-stack.org][Understanding and traversing t
 :CUSTOM_ID: finding-the-right-offset-in-the-stack
 :END:
 
-TODO
+Just as a reminder, this is how =ClientModeShared::CreateMove()= is called.
+
+#+begin_example text
+CL_Move()  ->  CHLClient::CreateMove()  ->  CInput::CreateMove()  ->  ClientModeShared::CreateMove()
+#+end_example
+
+Since =bSendPacket= is defined in =CL_Move=, and we know it's a callee-preserved
+variable, we can start checking at what =CHLClient::CreateMove()= does with
+=r12=. We already saw it pushed it to the stack, so let's keep track of what is
+pushed to the stack, so we can calculate where =bSendPacket= will end.
+
+We will have to keep in mind 3 things:
+
+1. Pushed (and potentially popped) values onto the stack.
+2. Subtractions/changes to =rsp=.
+3. Each =call= we step through is pushing 8 bytes. Other calls can be ignored
+   since the pushed bytes by =call= will be popped by =ret=.
+
+** Stack of =CHLClient::CreateMove=
+:PROPERTIES:
+:CUSTOM_ID: stack-of-chlclient-createmove
+:END:
+
+I have highlighted the important instructions.
+
+[[file:../img/bsendpacket6.png]]
+
+After the first push, =r12= is at =[rsp]=. After the second, at =[rsp + 0x8]=. Then,
+we allocate 0x18 bytes on the stack, so we also need to keep that in mind. Now
+it's at =[rsp + 0x20]=. Finally, =CInput::CreateMove= gets called, and the return
+address is pushed onto the stack. When entering =CInput::CreateMove=, =bSendPacket=
+is at =[rsp + 0x28]=.
+
+** Stack of =CInput::CreateMove=
+:PROPERTIES:
+:CUSTOM_ID: stack-of-cinput-createmove
+:END:
+
+We continue by having a look at the next function. We can find it on the =CInput=
+vtable, when writing this, it's at index 3.
+
+This function is longer, so first we will analyze the pushed registers and the
+allocated space, and then we will try to find the call to
+=ClientModeShared::CreateMove= from the decompiler window.
+
+[[file:../img/bsendpacket7.png]]
+
+It pushes a total of 6 registers, since each is 8 bytes, we can add 0x30 to the
+stack offset from before. After all these pushes, =bSendPacket= is at
+=[rsp +0x58]=. Then, it subtracts 0x98 from =rsp= for allocating some space yet
+again. As we can see, this function uses way more local variables than the
+previous. After the subtraction, =bSendPacket= is at =[rsp + 0xF0]=.
+
+We can decompile the function and look for the call to
+=ClientModeShared::CreateMove= from there.
+
+[[file:../img/bsendpacket8.png]]
+
+Since the function is too large, you will just have to trust me. There were no
+other changes to the stack up to this call. Again, remember that this =call=
+pushes another 8 bytes onto the stack.
+
+Finally, we get our stack offset. When calling =ClientModeShared::CreateMove=,
+=CL_Move='s =bSendPacket= is at =[rsp + 0xF8]=.
 
 * Getting the value with an assembly proxy
 :PROPERTIES:
 :CUSTOM_ID: getting-the-value-with-an-assembly-proxy
 :END:
 
-TODO
+This is very good. Since we are hooking =ClientModeShared::CreateMove=, we could
+get a pointer to this offset on the stack right when we are called, and then
+continue with our execution normally. Then, whenever we want to change the
+value, we can write to that pointer and it will contain the address of the =r12=
+register that =CHLClient::CreateMove= pushed to the stack for preserving =CL_Move='s
+=bSendPacket=. Took some work, but we are here.
+
+Let's write a simple assembly proxy for storing this address into a global
+pointer.
+
+#+begin_src nasm
+%define SENDPACKET_STACK_OFFSET 0xF8
+
+default REL
+
+section .data
+    global bSendPacket
+    bSendPacket: dq 1               ; Bool pointer to bSendPacket on the stack
+
+section .text
+    extern h_CreateMove:function    ; hooks.c (func)
+
+global h_CreateMoveProxy
+h_CreateMoveProxy:
+    lea     rax, [rsp + SENDPACKET_STACK_OFFSET]
+    mov     [bSendPacket], rax
+    jmp     h_CreateMove wrt ..plt
+#+end_src
+
+We simply define a quad-word on the =.data= section, and save the value at
+=[rsp + OFFSET]= there. Finally, we jump to our real =CreateMove= hook, defined in
+C.
+
+For more information about =default rel= and =wrt ..plt=, see my [[file:understanding-call-stack.org::*Note about Position Independent Executables][Note about Position
+Independent Executables]] in my other entry about the call stack.
+
+Now, instead of hooking our old =h_CreateMove= hook, we will hook this
+=h_CreateMoveProxy= assembly procedure, which will take care of calling the C
+hook.
 
 * Getting the value using GCC's built-ins
 :PROPERTIES:
 :CUSTOM_ID: getting-the-value-using-gccs-built-ins
 :END:
 
-TODO
+Instead of having a separate assembly file for just 3 instructions, I thought
+about using inline assembly. Then, I remembered that inline assembly in GCC
+looks absolutely terrible and unreadable.
 
-#+begin_comment
-https://gcc.gnu.org/onlinedocs/gcc/Return-Address.html
-#+end_comment
+However, I found a better solution: [[https://gcc.gnu.org/onlinedocs/gcc/Return-Address.html][GCC's built-ins]]. [fn:: Credits for the
+built-in method to Jester01 from =##asm= and his infinite knowledge.]
+
+We could ideally use =__builtin_stack_address()=, but that was not available in my
+GCC version (13.2.1). Instead, we can just use =__builtin_frame_address()= and add
+8 to skip over =rbp= itself. From there, we can add our offset, cast it to a =bool*=
+and we are ready to go.
+
+#+begin_src C
+#if !defined(__has_builtin) || !__has_builtin(__builtin_frame_address)
+#error "This version of GCC doesn't support __builtin_frame_address()"
+#endif
+
+bool* bSendPacket = NULL;
+
+bool h_CreateMove(ClientMode* thisptr, float flInputSampleTime,
+                  usercmd_t* cmd) {
+    /* Get current frame address, skip over pushed RBP, get pointer to bool by
+     ,* adding offset to that. */
+    void* current_frame_address = __builtin_frame_address(0);
+    void* current_stack_address = current_frame_address + 0x8;
+    bSendPacket = (bool*)(current_stack_address + SENDPACKET_STACK_OFFSET);
+
+    /* ... */
+}
+#+end_src
+
+And that's it, we can read and write from the real thing.
+
+* Final test and conclusion
+:PROPERTIES:
+:CUSTOM_ID: final-test-and-conclusion
+:END:
+
+We can make one final test to make sure we got everything right. Let's force
+=bSendPacket= to false from our =CreateMove= hook. If everything was done correctly,
+we should start lagging and we should get a timeout.
+
+We join a game, inject, and...
+
+[[file:../img/slomo.gif]]
+
+[[file:../img/bsendpacket9.png]]
+
+Note that we don't need to change *anything* related to the code that used the old
+32-bit =bSendPacket=, since they can still read and write from the same =bool*=. The
+only difference is that now it points to a value on the stack, instead of some
+immediate value. We also don't need to use any signature scanning at all for
+finding those old immediate values, and most importantly, *the changes to
+=bSendPacket= will take effect on the current tick*, instead of the next.
+
+If you reached this far, I hope you have learned something.
