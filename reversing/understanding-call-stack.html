@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Understanding and traversing the call stack</title>
+<meta name="author" content="8dcc" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Understanding and traversing the call stack</h1>
+<p>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
+</p>
+
+<hr />
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#introduction">1. Introduction</a></li>
+<li><a href="#main-uses-of-the-stack">2. Main uses of the stack</a></li>
+<li><a href="#stack-frames">3. Stack frames</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-introduction" class="outline-2">
+<h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-introduction">
+<p>
+First, a brief description of the <a href="https://en.wikipedia.org/wiki/Call_stack">stack</a>. The stack is a data structure used for
+storing various kinds of information required by the active procedures of a
+computer program. The stack obviously follows a <a href="https://en.wikipedia.org/wiki/Stack_(abstract_data_type)">LIFO</a> system, and it's usually
+accessed by <i>pushing</i> or <i>popping</i> data (although this is not always the case, as we
+will see). The stack usually <b>grows downwards</b>, which is a key detail that might
+be easy to forget at first.
+</p>
+
+<p>
+There are two very important registers when dealing with the stack. The <code>rsp</code>
+register (stack pointer) always points to the top of the stack, and the <code>rbp</code>
+register (base pointer) is used to delimit stack frames (more on this
+bellow). The <code>rip</code> register will be mentioned as well, since it points to the
+address of the next instruction to the one being executed.
+</p>
+
+<p>
+When a value is <i>pushed</i> onto the stack the <code>rsp</code> register is decremented, <b>and then</b>
+the value is moved onto the top of the stack. Therefore, the <code>rsp</code> register always
+points to the last pushed item. Remember that the stack (usually) grows
+downwards.
+</p>
+
+<p>
+When a value is <i>popped</i> from the stack, the value on top of the stack is moved
+into the specified register and the <code>rsp</code> register is incremented.
+</p>
+</div>
+</div>
+
+<div id="outline-container-main-uses-of-the-stack" class="outline-2">
+<h2 id="main-uses-of-the-stack"><span class="section-number-2">2.</span> Main uses of the stack</h2>
+<div class="outline-text-2" id="text-main-uses-of-the-stack">
+<p>
+The stack is used mainly for 3 purposes:
+</p>
+
+<ol class="org-ol">
+<li>Storing some or all of the function arguments.</li>
+<li>Storing the return address when calling a function.</li>
+<li>Storing data local to the function (preserved registers, local variables,
+etc.).</li>
+</ol>
+
+<p>
+When function <code>foo</code> wants to call function <code>bar</code>, it will push some of the arguments
+on the stack (this depends on the architecture). Then, it will push the address
+of the next instruction (<code>rip</code> register) onto the stack, so <code>bar</code> knows where to
+return once it's done. Then, after <code>foo</code> calls <code>bar</code>, <code>bar</code> might push some of the
+registers that need to be preserved by the callee, like <code>rbp</code> or <code>r12</code>, and it will
+allocate some space for storing its data, if needed. This will be explained in
+more detail bellow, with an example.
+</p>
+
+<p>
+These kind of details are specified in the Application Binary Interface (ABI) of
+each architecture. For example, about the pushed arguments in <code>x86_64</code>, we can
+find the following.
+</p>
+
+<blockquote>
+<p>
+<b>System V AMD64 ABI - 3.2.3 Parameter Passing</b>
+</p>
+
+<p>
+Once arguments are classified, the registers get assigned (in left-to-right
+order) for passing as follows:
+</p>
+
+<ol class="org-ol">
+<li>If the class is MEMORY, pass the argument on the stack.</li>
+
+<li>If the class is INTEGER, the next available register of the sequence <code>rdi</code>,
+<code>rsi</code>, <code>rdx</code>, <code>rcx</code>, <code>r8</code> and <code>r9</code> is used.</li>
+
+<li>[&#x2026;]</li>
+</ol>
+
+<p>
+If there are no registers available for any eightbyte of an argument, the whole
+argument is passed on the stack.
+</p>
+</blockquote>
+
+<p>
+And about pushing the return address, we can also read the following.
+</p>
+
+<blockquote>
+<p>
+<b>System V AMD64 ABI - 3.2.1 Registers and the Stack Frame</b>
+</p>
+
+<p>
+If a calling function wants to preserve such a register value across a function
+call, it must save the value in its local stack frame.
+</p>
+</blockquote>
+
+<p>
+Note that the return address is usually pushed <b>implicitly</b> by the <code>call</code>
+instruction. The following would be equivalent.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">The following:</span>
+<span style="color: #feacd0;">call</span>    <span style="color: #88ca9f;">0xDEADBEEF</span>
+
+<span style="color: #989898;">; </span><span style="color: #989898;">Internally does:</span>
+<span style="color: #feacd0;">push</span>    rip
+<span style="color: #feacd0;">jmp</span>     <span style="color: #88ca9f;">0xDEADBEEF</span>
+</pre>
+</div>
+
+<p>
+Note that in the example above, <code>rip</code> would point to the <code>jmp</code> instruction itself,
+which is not accurate. The correct version would be:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #feacd0;">push</span>    next
+<span style="color: #feacd0;">jmp</span>     <span style="color: #88ca9f;">0xDEADBEEF</span>
+
+<span style="color: #4ae2ff;">next</span>: <span style="color: #feacd0;">nop</span>  <span style="color: #989898;">; </span><span style="color: #989898;">Continue execution...</span>
+</pre>
+</div>
+
+<p>
+Just like the return address is pushed implicitly, it's also popped implicitly
+by the <code>ret</code> instruction.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">The following</span>
+<span style="color: #feacd0;">ret</span>
+
+<span style="color: #989898;">; </span><span style="color: #989898;">Internally does (without actually writing to RAX)</span>
+<span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rax</span>
+<span style="color: #feacd0;">jmp</span>     <span style="color: #6ae4b9;">rax</span>
+
+<span style="color: #989898;">; </span><span style="color: #989898;">Or simply (although we can't directly write to RIP)</span>
+<span style="color: #feacd0;">pop</span>     rip
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-stack-frames" class="outline-2">
+<h2 id="stack-frames"><span class="section-number-2">3.</span> Stack frames</h2>
+<div class="outline-text-2" id="text-stack-frames">
+<p>
+The term <i>stack frame</i> has been mentioned a few times, so let me explain exactly
+what it is. A stack frame is used to <b>divide the stack</b> depending on the
+subroutine that owns/needs the information. The Wikipedia page has a very good
+diagram for visualizing how a stack frame is organized.
+</p>
+
+
+<div id="orgbed25c4" class="figure">
+<p><img src="../img/callstack1.png" alt="callstack1.png" />
+</p>
+</div>
+
+<p>
+The diagram shows the call stack layout for an upward-growing stack after the
+<code>DrawSquare</code> subroutine (shown in blue) called <code>DrawLine</code> (shown in green), which is
+the currently executing routine.
+</p>
+
+<p>
+When <code>DrawSquare</code> wants to call <code>DrawLine</code>, it pushes its arguments onto the
+stack. Those belong to the stack frame of <code>DrawLine</code>. Then, as I mentioned, the
+<code>call</code> instruction will push the return address onto the stack (i.e. <code>rip</code>, which
+would contain the next instruction of <code>DrawSquare</code>). Then, <code>DrawLine</code> is free to
+push or allocate space on the stack for his local variables.
+</p>
+
+<p>
+Usually, we preserve the <code>rbp</code> register (containing the base pointer of the
+caller) by pushing it onto the stack itself. Then, the current value of <code>rsp</code> is
+saved there throughout the execution of our procedure. That's why the following
+pattern is a common way of identifying functions from assembly.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">...</span>
+
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #6ae4b9;">rbp</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbp</span>
+    <span style="color: #feacd0;">ret</span>
+</pre>
+</div>
+
+<p>
+A more detailed example will be provided bellow.
+</p>
+
+<p>
+In the last example, the stack grew upwards, which is not normally the case. The
+next one (from the ABI) shows a more realistic (but perhaps more confusing)
+version, where the top of the stack is in a lower address than the bottom.
+</p>
+
+
+<div id="org9e39a17" class="figure">
+<p><img src="../img/callstack2.png" alt="callstack2.png" />
+</p>
+</div>
+
+<p>
+As an example, let's write some of the assembly that <code>DrawLine</code> could be using. To
+avoid cluttering the code with comments, I moved the explanation of each part to
+the legend bellow.
+</p>
+
+<p>
+In the following code, <code>DrawLine</code> pushes the base pointer (<code>rbp</code>) for <b>preserving the
+caller's stack frame</b>. Then, it saves the value of <code>rsp</code> in <code>rbp</code>, creating its own
+stack frame. This allows us to freely change <code>rsp</code>, while being able to access
+function arguments and local variables with offsets relative to <code>rbp</code>. This might
+seem a bit confusing at first, but it's a key detail since it essentially
+creates a <b>linked list</b>, where you can follow <code>rbp</code>'s to traverse stack frames.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">DrawLine</span>:
+                                <span style="color: #989898;">; </span><span style="color: #989898;">(1)</span>
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(2)</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>            <span style="color: #989898;">; </span><span style="color: #989898;">(3)</span>
+
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbx</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(4)</span>
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">r12</span>
+
+    <span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x20</span>           <span style="color: #989898;">; </span><span style="color: #989898;">(5)</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">The real body of the procedure starts... (6)</span>
+    <span style="color: #989898;">;</span><span style="color: #989898;">---------------------------------------------------------------------------</span>
+
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r12</span>, [<span style="color: #6ae4b9;">rbp</span> + <span style="color: #88ca9f;">0x16</span>]   <span style="color: #989898;">; </span><span style="color: #989898;">(7)</span>
+    <span style="color: #feacd0;">mov</span>     [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x8</span>], <span style="color: #6ae4b9;">r12</span>    <span style="color: #989898;">; </span><span style="color: #989898;">(8)</span>
+
+    <span style="color: #989898;">;</span><span style="color: #989898;">---------------------------------------------------------------------------</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">The body of the procedure ends...</span>
+
+    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x20</span>           <span style="color: #989898;">; </span><span style="color: #989898;">(9)</span>
+
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">r12</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(10)</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbx</span>
+
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #6ae4b9;">rbp</span>            <span style="color: #989898;">; </span><span style="color: #989898;">(11)</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbp</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(12)</span>
+    <span style="color: #feacd0;">ret</span>                         <span style="color: #989898;">; </span><span style="color: #989898;">(13)</span>
+</pre>
+</div>
+
+<p>
+Legend of the code above:
+</p>
+<ol class="org-ol">
+<li>Right when we got called, <code>RSP</code> points to the return address in <code>DrawSquare</code>, and
+the <code>DrawLine</code> arguments are right bellow it, from <code>[RSP+0x8]</code> to
+<code>[RSP+(n*0x8)]</code>. They are lower on the stack, but higher in memory.</li>
+<li>The first thing we usually do is push the old <code>RBP</code> value that <code>DrawSquare</code> was
+using. After pushing it, <code>RSP</code> will point to the old <code>RBP</code>, that's why we
+mentioned the "linked list" of <code>RBP</code>'s. The return address will be at <code>[RSP+8]</code>
+after pushing.</li>
+<li>The current value of <code>RSP</code> is saved into <code>RBP</code>, creating our stack frame. This
+way, we can freely change <code>RSP</code>, and access parameters with stack offsets
+relative to <code>RBP</code>.</li>
+<li>Now <code>DrawLine</code> needs to push some registers that must be preserved by the
+callee (according to the ABI). After this, the "real" body of the procedure
+will be able to safely use these preserved registers.</li>
+<li>It subtracts from <code>RSP</code> to allocate <code>0x20</code> bytes some space for local variables.</li>
+<li>The procedure body might access the function arguments by <b>adding</b> to <code>RBP</code>, or
+it might need to store values in the reserved stack space, and access them by
+<b>subtracting</b> to <code>RBP</code> (e.g. for local variables).</li>
+<li>Here, it adds <code>0x16</code> to the base pointer for "jumping" over both the pushed <code>RBP</code>
+and the return address, accessing some argument, and saving it into <code>r12</code>.</li>
+<li>Then, it saves that value into some of the stack space that we reserved when
+subtracting from <code>RSP</code>.</li>
+<li>When we are done, we add back the space previously subtracted from <code>RSP</code>.</li>
+<li>We pop back the registers that had to be preserved by the callee.</li>
+<li>We restore the base pointer into <code>RSP</code>.</li>
+<li>We pop the caller's <code>RBP</code> register.</li>
+<li>Finally, <code>RSP</code> points to the return address from <code>DrawSquare</code>, which was pushed
+by the <code>call</code> instruction. As I said, the <code>ret</code> instruction will pop it and jump
+to it.</li>
+</ol>
+
+<p>
+Now that we have a good understanding of how the stack works, we can look at the
+assembly of each function to see where our <code>bSendPacket</code> variable will end up in
+the stack.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>
