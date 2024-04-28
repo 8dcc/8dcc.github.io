@@ -11,14 +11,21 @@
 
 #+TOC: headlines 2
 
+#+begin_comment
+TODO: Is subroutine/procedure/function the correct term for assembly?
+#+end_comment
+
 * Introduction
 :PROPERTIES:
 :CUSTOM_ID: introduction
 :END:
 
+This entry talks about the call stack from a very low-level perspective, so you
+should be familiar with basic assembly.
+
 First, a brief description of the [[https://en.wikipedia.org/wiki/Call_stack][stack]]. The stack is a data structure used for
 storing various kinds of information required by the active procedures of a
-computer program. The stack obviously follows a [[https://en.wikipedia.org/wiki/Stack_(abstract_data_type)][LIFO]] system, and it's usually
+computer program. The stack is obviously a [[https://en.wikipedia.org/wiki/Stack_(abstract_data_type)][LIFO]] system, and it's usually
 accessed by /pushing/ or /popping/ data (although this is not always the case, as we
 will see). The stack usually *grows downwards*, which is a key detail that might
 be easy to forget at first.
@@ -58,8 +65,9 @@ allocate some space for storing its data, if needed. This will be explained in
 more detail bellow, with an example.
 
 These kind of details are specified in the Application Binary Interface (ABI) of
-each architecture. For example, about the pushed arguments in =x86_64=, we can
-find the following.
+each architecture. For example, if we look in the System V AMD64 ABI ([[https://en.wikipedia.org/wiki/X86_calling_conventions#System_V_AMD64_ABI][Wikipedia]],
+[[https://refspecs.linuxbase.org/elf/x86_64-abi-0.99.pdf][PDF]]), we can find the following about the usage of registers and the stack for
+passing arguments.
 
 #+begin_quote
 *System V AMD64 ABI - 3.2.3 Parameter Passing*
@@ -78,7 +86,10 @@ If there are no registers available for any eightbyte of an argument, the whole
 argument is passed on the stack.
 #+end_quote
 
-And about pushing the return address, we can also read the following.
+As you can see, unlike in the i386 ABI ([[https://www.sco.com/developers/devspecs/abi386-4.pdf][PDF]], pg. 36-37), not all parameters are
+passed through the stack.
+
+About preserving the registers, we can also read the following.
 
 #+begin_quote
 *System V AMD64 ABI - 3.2.1 Registers and the Stack Frame*
@@ -87,8 +98,14 @@ If a calling function wants to preserve such a register value across a function
 call, it must save the value in its local stack frame.
 #+end_quote
 
-Note that the return address is usually pushed *implicitly* by the =call=
-instruction. The following would be equivalent.
+** Implicit =push= and =pop= instructions
+:PROPERTIES:
+:CUSTOM_ID: implicit-push-and-pop-instructions
+:END:
+
+About the return address, it's important to note that it is usually pushed
+*implicitly* by the =call= instruction. The rough translation would be the
+following.
 
 #+begin_src nasm
 ; The following:
@@ -99,8 +116,9 @@ push    rip
 jmp     0xDEADBEEF
 #+end_src
 
-Note that in the example above, =rip= would point to the =jmp= instruction itself,
-which is not accurate. The correct version would be:
+Note that the example above is not strictly correct. First, we can't write or
+read from =rip= directly, and second, =rip= would point to the =jmp= instruction
+itself, which is not accurate. The correct form would be:
 
 #+begin_src nasm
 push    next
@@ -129,10 +147,20 @@ pop     rip
 :CUSTOM_ID: stack-frames
 :END:
 
-The term /stack frame/ has been mentioned a few times, so let me explain exactly
-what it is. A stack frame is used to *divide the stack* depending on the
-subroutine that owns/needs the information. The Wikipedia page has a very good
-diagram for visualizing how a stack frame is organized.
+The term /stack frame/ has been mentioned, so let me explain exactly what it
+is. Stack frames are used to *divide the stack* depending on the subroutine that
+owns/needs the information. It's used to indicate, for example, that the region
+that =foo= reserved on the stack belongs to =foo=, and not =bar= (since it's on =foo='s
+stack frame).
+
+You also have to understand that the specifics about who owns /X/ kind of
+information vary depending on the *convention*. For example, the two diagrams in
+this section use different conventions when it comes to the parameters of the
+callee function. This is not important for understanding the concept of the
+stack frame itself.
+
+The [[https://en.wikipedia.org/wiki/Call_stack#STACK-FRAME][Wikipedia page]] has a very good diagram for visualizing how a stack frame is
+typically organized.
 
 [[file:../img/callstack1.png]]
 
@@ -141,15 +169,16 @@ The diagram shows the call stack layout for an upward-growing stack after the
 the currently executing routine.
 
 When =DrawSquare= wants to call =DrawLine=, it pushes its arguments onto the
-stack. Those belong to the stack frame of =DrawLine=. Then, as I mentioned, the
-=call= instruction will push the return address onto the stack (i.e. =rip=, which
-would contain the next instruction of =DrawSquare=). Then, =DrawLine= is free to
-push or allocate space on the stack for his local variables.
+stack. In this convention, those belong to the stack frame of =DrawLine=. Then, as
+I mentioned, the =call= instruction will push the return address onto the stack
+(i.e. =rip=, which would contain the next instruction of =DrawSquare=). Finally,
+=DrawLine= is free to push or allocate space on the stack for his local variables.
 
-Usually, we preserve the =rbp= register (containing the base pointer of the
-caller) by pushing it onto the stack itself. Then, the current value of =rsp= is
-saved there throughout the execution of our procedure. That's why the following
-pattern is a common way of identifying functions from assembly.
+Usually, one of the first things a function does is preserve the =rbp= register
+(containing the base pointer of the caller) by pushing it onto the stack
+itself. Then, the current value of =rsp= is saved there throughout the execution
+of our procedure. That's why the following pattern is a common way of
+identifying functions from assembly.
 
 #+begin_src nasm
 func:
@@ -163,13 +192,25 @@ func:
     ret
 #+end_src
 
-A more detailed example will be provided bellow.
+** Specifics of the AMD64 ABI
+:PROPERTIES:
+:CUSTOM_ID: specifics-of-the-amd64-abi
+:END:
 
 In the last example, the stack grew upwards, which is not normally the case. The
 next one (from the ABI) shows a more realistic (but perhaps more confusing)
 version, where the top of the stack is in a lower address than the bottom.
 
 [[file:../img/callstack2.png]]
+
+As I mentioned before, the specifics depend on the convention. Unlike in the
+previous example, in the AMD64 ABI the arguments belong to the stack frame of
+the *caller*, not the callee.
+
+** Detailed =DrawLine= example
+:PROPERTIES:
+:CUSTOM_ID: detailed-drawline-example
+:END:
 
 As an example, let's write some of the assembly that =DrawLine= could be using. To
 avoid cluttering the code with comments, I moved the explanation of each part to
@@ -212,24 +253,24 @@ DrawLine:
     ret                         ; (13)
 #+end_src
 
-Legend of the code above:
 1. Right when we got called, =RSP= points to the return address in =DrawSquare=, and
    the =DrawLine= arguments are right bellow it, from =[RSP+0x8]= to
-   =[RSP+(n*0x8)]=. They are lower on the stack, but higher in memory.
+   =[RSP+(n*0x8)]=. Note that they are lower on the stack, but higher in memory.
 2. The first thing we usually do is push the old =RBP= value that =DrawSquare= was
-   using. After pushing it, =RSP= will point to the old =RBP=, that's why we
-   mentioned the "linked list" of =RBP='s. The return address will be at =[RSP+8]=
-   after pushing.
+   using. After pushing it, =RSP= will point to the old =RBP=, therefore the "linked
+   list" of =RBP='s. The return address will be at =[RSP+8]= after the push.
 3. The current value of =RSP= is saved into =RBP=, creating our stack frame. This
    way, we can freely change =RSP=, and access parameters with stack offsets
    relative to =RBP=.
 4. Now =DrawLine= needs to push some registers that must be preserved by the
    callee (according to the ABI). After this, the "real" body of the procedure
-   will be able to safely use these preserved registers.
-5. It subtracts from =RSP= to allocate =0x20= bytes some space for local variables.
-6. The procedure body might access the function arguments by *adding* to =RBP=, or
-   it might need to store values in the reserved stack space, and access them by
-   *subtracting* to =RBP= (e.g. for local variables).
+   will be able to safely use these registers without overwriting the caller's
+   values.
+5. The procedure subtracts from =RSP= to allocate =0x20= bytes some space for local
+   variables.
+6. From the procedure body, it might access the function arguments by *adding* to
+   =RBP=, or it might need to store values in the reserved stack space, and access
+   them by *subtracting* to =RBP= (e.g. for local variables).
 7. Here, it adds =0x16= to the base pointer for "jumping" over both the pushed =RBP=
    and the return address, accessing some argument, and saving it into =r12=.
 8. Then, it saves that value into some of the stack space that we reserved when
@@ -242,6 +283,9 @@ Legend of the code above:
     by the =call= instruction. As I said, the =ret= instruction will pop it and jump
     to it.
 
-Now that we have a good understanding of how the stack works, we can look at the
-assembly of each function to see where our =bSendPacket= variable will end up in
-the stack.
+* Traversing the call stack
+:PROPERTIES:
+:CUSTOM_ID: traversing-the-call-stack
+:END:
+
+TODO

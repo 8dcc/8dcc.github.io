@@ -209,8 +209,18 @@
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
 <li><a href="#introduction">1. Introduction</a></li>
-<li><a href="#main-uses-of-the-stack">2. Main uses of the stack</a></li>
-<li><a href="#stack-frames">3. Stack frames</a></li>
+<li><a href="#main-uses-of-the-stack">2. Main uses of the stack</a>
+<ul>
+<li><a href="#implicit-push-and-pop-instructions">2.1. Implicit <code>push</code> and <code>pop</code> instructions</a></li>
+</ul>
+</li>
+<li><a href="#stack-frames">3. Stack frames</a>
+<ul>
+<li><a href="#specifics-of-the-amd64-abi">3.1. Specifics of the AMD64 ABI</a></li>
+<li><a href="#detailed-drawline-example">3.2. Detailed <code>DrawLine</code> example</a></li>
+</ul>
+</li>
+<li><a href="#traversing-the-call-stack">4. Traversing the call stack</a></li>
 </ul>
 </div>
 </div>
@@ -219,9 +229,14 @@
 <h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-introduction">
 <p>
+This entry talks about the call stack from a very low-level perspective, so you
+should be familiar with basic assembly.
+</p>
+
+<p>
 First, a brief description of the <a href="https://en.wikipedia.org/wiki/Call_stack">stack</a>. The stack is a data structure used for
 storing various kinds of information required by the active procedures of a
-computer program. The stack obviously follows a <a href="https://en.wikipedia.org/wiki/Stack_(abstract_data_type)">LIFO</a> system, and it's usually
+computer program. The stack is obviously a <a href="https://en.wikipedia.org/wiki/Stack_(abstract_data_type)">LIFO</a> system, and it's usually
 accessed by <i>pushing</i> or <i>popping</i> data (although this is not always the case, as we
 will see). The stack usually <b>grows downwards</b>, which is a key detail that might
 be easy to forget at first.
@@ -275,8 +290,9 @@ more detail bellow, with an example.
 
 <p>
 These kind of details are specified in the Application Binary Interface (ABI) of
-each architecture. For example, about the pushed arguments in <code>x86_64</code>, we can
-find the following.
+each architecture. For example, if we look in the System V AMD64 ABI (<a href="https://en.wikipedia.org/wiki/X86_calling_conventions#System_V_AMD64_ABI">Wikipedia</a>,
+<a href="https://refspecs.linuxbase.org/elf/x86_64-abi-0.99.pdf">PDF</a>), we can find the following about the usage of registers and the stack for
+passing arguments.
 </p>
 
 <blockquote>
@@ -305,7 +321,12 @@ argument is passed on the stack.
 </blockquote>
 
 <p>
-And about pushing the return address, we can also read the following.
+As you can see, unlike in the i386 ABI (<a href="https://www.sco.com/developers/devspecs/abi386-4.pdf">PDF</a>, pg. 36-37), not all parameters are
+passed through the stack.
+</p>
+
+<p>
+About preserving the registers, we can also read the following.
 </p>
 
 <blockquote>
@@ -318,10 +339,15 @@ If a calling function wants to preserve such a register value across a function
 call, it must save the value in its local stack frame.
 </p>
 </blockquote>
+</div>
 
+<div id="outline-container-implicit-push-and-pop-instructions" class="outline-3">
+<h3 id="implicit-push-and-pop-instructions"><span class="section-number-3">2.1.</span> Implicit <code>push</code> and <code>pop</code> instructions</h3>
+<div class="outline-text-3" id="text-implicit-push-and-pop-instructions">
 <p>
-Note that the return address is usually pushed <b>implicitly</b> by the <code>call</code>
-instruction. The following would be equivalent.
+About the return address, it's important to note that it is usually pushed
+<b>implicitly</b> by the <code>call</code> instruction. The rough translation would be the
+following.
 </p>
 
 <div class="org-src-container">
@@ -335,8 +361,9 @@ instruction. The following would be equivalent.
 </div>
 
 <p>
-Note that in the example above, <code>rip</code> would point to the <code>jmp</code> instruction itself,
-which is not accurate. The correct version would be:
+Note that the example above is not strictly correct. First, we can't write or
+read from <code>rip</code> directly, and second, <code>rip</code> would point to the <code>jmp</code> instruction
+itself, which is not accurate. The correct form would be:
 </p>
 
 <div class="org-src-container">
@@ -366,19 +393,34 @@ by the <code>ret</code> instruction.
 </div>
 </div>
 </div>
+</div>
 
 <div id="outline-container-stack-frames" class="outline-2">
 <h2 id="stack-frames"><span class="section-number-2">3.</span> Stack frames</h2>
 <div class="outline-text-2" id="text-stack-frames">
 <p>
-The term <i>stack frame</i> has been mentioned a few times, so let me explain exactly
-what it is. A stack frame is used to <b>divide the stack</b> depending on the
-subroutine that owns/needs the information. The Wikipedia page has a very good
-diagram for visualizing how a stack frame is organized.
+The term <i>stack frame</i> has been mentioned, so let me explain exactly what it
+is. Stack frames are used to <b>divide the stack</b> depending on the subroutine that
+owns/needs the information. It's used to indicate, for example, that the region
+that <code>foo</code> reserved on the stack belongs to <code>foo</code>, and not <code>bar</code> (since it's on <code>foo</code>'s
+stack frame).
+</p>
+
+<p>
+You also have to understand that the specifics about who owns <i>X</i> kind of
+information vary depending on the <b>convention</b>. For example, the two diagrams in
+this section use different conventions when it comes to the parameters of the
+callee function. This is not important for understanding the concept of the
+stack frame itself.
+</p>
+
+<p>
+The <a href="https://en.wikipedia.org/wiki/Call_stack#STACK-FRAME">Wikipedia page</a> has a very good diagram for visualizing how a stack frame is
+typically organized.
 </p>
 
 
-<div id="orgbed25c4" class="figure">
+<div id="org3f153fd" class="figure">
 <p><img src="../img/callstack1.png" alt="callstack1.png" />
 </p>
 </div>
@@ -391,17 +433,18 @@ the currently executing routine.
 
 <p>
 When <code>DrawSquare</code> wants to call <code>DrawLine</code>, it pushes its arguments onto the
-stack. Those belong to the stack frame of <code>DrawLine</code>. Then, as I mentioned, the
-<code>call</code> instruction will push the return address onto the stack (i.e. <code>rip</code>, which
-would contain the next instruction of <code>DrawSquare</code>). Then, <code>DrawLine</code> is free to
-push or allocate space on the stack for his local variables.
+stack. In this convention, those belong to the stack frame of <code>DrawLine</code>. Then, as
+I mentioned, the <code>call</code> instruction will push the return address onto the stack
+(i.e. <code>rip</code>, which would contain the next instruction of <code>DrawSquare</code>). Finally,
+<code>DrawLine</code> is free to push or allocate space on the stack for his local variables.
 </p>
 
 <p>
-Usually, we preserve the <code>rbp</code> register (containing the base pointer of the
-caller) by pushing it onto the stack itself. Then, the current value of <code>rsp</code> is
-saved there throughout the execution of our procedure. That's why the following
-pattern is a common way of identifying functions from assembly.
+Usually, one of the first things a function does is preserve the <code>rbp</code> register
+(containing the base pointer of the caller) by pushing it onto the stack
+itself. Then, the current value of <code>rsp</code> is saved there throughout the execution
+of our procedure. That's why the following pattern is a common way of
+identifying functions from assembly.
 </p>
 
 <div class="org-src-container">
@@ -416,11 +459,11 @@ pattern is a common way of identifying functions from assembly.
     <span style="color: #feacd0;">ret</span>
 </pre>
 </div>
+</div>
 
-<p>
-A more detailed example will be provided bellow.
-</p>
-
+<div id="outline-container-specifics-of-the-amd64-abi" class="outline-3">
+<h3 id="specifics-of-the-amd64-abi"><span class="section-number-3">3.1.</span> Specifics of the AMD64 ABI</h3>
+<div class="outline-text-3" id="text-specifics-of-the-amd64-abi">
 <p>
 In the last example, the stack grew upwards, which is not normally the case. The
 next one (from the ABI) shows a more realistic (but perhaps more confusing)
@@ -428,11 +471,22 @@ version, where the top of the stack is in a lower address than the bottom.
 </p>
 
 
-<div id="org9e39a17" class="figure">
+<div id="org8604eb5" class="figure">
 <p><img src="../img/callstack2.png" alt="callstack2.png" />
 </p>
 </div>
 
+<p>
+As I mentioned before, the specifics depend on the convention. Unlike in the
+previous example, in the AMD64 ABI the arguments belong to the stack frame of
+the <b>caller</b>, not the callee.
+</p>
+</div>
+</div>
+
+<div id="outline-container-detailed-drawline-example" class="outline-3">
+<h3 id="detailed-drawline-example"><span class="section-number-3">3.2.</span> Detailed <code>DrawLine</code> example</h3>
+<div class="outline-text-3" id="text-detailed-drawline-example">
 <p>
 As an example, let's write some of the assembly that <code>DrawLine</code> could be using. To
 avoid cluttering the code with comments, I moved the explanation of each part to
@@ -479,27 +533,25 @@ creates a <b>linked list</b>, where you can follow <code>rbp</code>'s to travers
 </pre>
 </div>
 
-<p>
-Legend of the code above:
-</p>
 <ol class="org-ol">
 <li>Right when we got called, <code>RSP</code> points to the return address in <code>DrawSquare</code>, and
 the <code>DrawLine</code> arguments are right bellow it, from <code>[RSP+0x8]</code> to
-<code>[RSP+(n*0x8)]</code>. They are lower on the stack, but higher in memory.</li>
+<code>[RSP+(n*0x8)]</code>. Note that they are lower on the stack, but higher in memory.</li>
 <li>The first thing we usually do is push the old <code>RBP</code> value that <code>DrawSquare</code> was
-using. After pushing it, <code>RSP</code> will point to the old <code>RBP</code>, that's why we
-mentioned the "linked list" of <code>RBP</code>'s. The return address will be at <code>[RSP+8]</code>
-after pushing.</li>
+using. After pushing it, <code>RSP</code> will point to the old <code>RBP</code>, therefore the "linked
+list" of <code>RBP</code>'s. The return address will be at <code>[RSP+8]</code> after the push.</li>
 <li>The current value of <code>RSP</code> is saved into <code>RBP</code>, creating our stack frame. This
 way, we can freely change <code>RSP</code>, and access parameters with stack offsets
 relative to <code>RBP</code>.</li>
 <li>Now <code>DrawLine</code> needs to push some registers that must be preserved by the
 callee (according to the ABI). After this, the "real" body of the procedure
-will be able to safely use these preserved registers.</li>
-<li>It subtracts from <code>RSP</code> to allocate <code>0x20</code> bytes some space for local variables.</li>
-<li>The procedure body might access the function arguments by <b>adding</b> to <code>RBP</code>, or
-it might need to store values in the reserved stack space, and access them by
-<b>subtracting</b> to <code>RBP</code> (e.g. for local variables).</li>
+will be able to safely use these registers without overwriting the caller's
+values.</li>
+<li>The procedure subtracts from <code>RSP</code> to allocate <code>0x20</code> bytes some space for local
+variables.</li>
+<li>From the procedure body, it might access the function arguments by <b>adding</b> to
+<code>RBP</code>, or it might need to store values in the reserved stack space, and access
+them by <b>subtracting</b> to <code>RBP</code> (e.g. for local variables).</li>
 <li>Here, it adds <code>0x16</code> to the base pointer for "jumping" over both the pushed <code>RBP</code>
 and the return address, accessing some argument, and saving it into <code>r12</code>.</li>
 <li>Then, it saves that value into some of the stack space that we reserved when
@@ -512,11 +564,15 @@ subtracting from <code>RSP</code>.</li>
 by the <code>call</code> instruction. As I said, the <code>ret</code> instruction will pop it and jump
 to it.</li>
 </ol>
+</div>
+</div>
+</div>
 
+<div id="outline-container-traversing-the-call-stack" class="outline-2">
+<h2 id="traversing-the-call-stack"><span class="section-number-2">4.</span> Traversing the call stack</h2>
+<div class="outline-text-2" id="text-traversing-the-call-stack">
 <p>
-Now that we have a good understanding of how the stack works, we can look at the
-assembly of each function to see where our <code>bSendPacket</code> variable will end up in
-the stack.
+TODO
 </p>
 </div>
 </div>
