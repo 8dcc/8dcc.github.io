@@ -155,9 +155,9 @@ stack frame).
 
 You also have to understand that the specifics about who owns /X/ kind of
 information vary depending on the *convention*. For example, the two diagrams in
-this section use different conventions when it comes to the parameters of the
-callee function. This is not important for understanding the concept of the
-stack frame itself.
+this section use different conventions when it comes to who "owns" the
+parameters when calling a function. This is not important for understanding the
+concept of the stack frame itself.
 
 The [[https://en.wikipedia.org/wiki/Call_stack#STACK-FRAME][Wikipedia page]] has a very good diagram for visualizing how a stack frame is
 typically organized.
@@ -257,7 +257,7 @@ DrawLine:
    the =DrawLine= arguments are right bellow it, from =[RSP+0x8]= to
    =[RSP+(n*0x8)]=. Note that they are lower on the stack, but higher in memory.
 2. The first thing we usually do is push the old =RBP= value that =DrawSquare= was
-   using. After pushing it, =RSP= will point to the old =RBP=, therefore the "linked
+   using. After pushing it, =RSP= will point to the old =RBP=, hence the "linked
    list" of =RBP='s. The return address will be at =[RSP+8]= after the push.
 3. The current value of =RSP= is saved into =RBP=, creating our stack frame. This
    way, we can freely change =RSP=, and access parameters with stack offsets
@@ -288,4 +288,311 @@ DrawLine:
 :CUSTOM_ID: traversing-the-call-stack
 :END:
 
-TODO
+Let's look at some example C code.
+
+#+begin_src C
+#include <stdio.h>
+
+void DrawPoint(int x, int y) {
+    printf("Drawing point: %d, %d\n", x, y);
+}
+
+void DrawLine(int x0, int y0, int x1, int y1) {
+    for (int y = y0; y <= y1; y++)
+        for (int x = x0; x <= x1; x++)
+            DrawPoint(x, y);
+}
+
+void DrawSquare(int x, int y, int w, int h) {
+    int x1 = x + w;
+    int y1 = y + h;
+
+    DrawLine(x, y, x1, y);   /* Up */
+    DrawLine(x, y, x, y1);   /* Left */
+    DrawLine(x, y1, x1, y1); /* Down */
+    DrawLine(x1, y, x1, y1); /* Right */
+}
+#+end_src
+
+The call stack for =DrawPoint()= would be the following:
+
+#+begin_example text
+(???)  ->  DrawSquare()  ->  DrawLine()  ->  DrawPoint()
+#+end_example
+
+** The =AsmPrintCallStack= function
+:PROPERTIES:
+:CUSTOM_ID: the-asmprintcallstack-function
+:END:
+
+Since we now have a deep understanding of the stack, let's write some assembly
+code that prints the backtrace of where we were called.
+
+#+begin_src nasm
+default rel
+extern printf
+
+section .data
+    fmt: db "%d: %p", 0xA, 0x0
+
+section .text
+
+; void AsmPrintCallStack(int depth);
+global AsmPrintCallStack
+AsmPrintCallStack:
+    push    rbp
+    mov     rbp, rsp
+    push    r12
+    push    r13
+
+    ; Initialize counter to the first "depth" argument
+    mov     r13, rdi
+
+    ; Get address of old RBP, skip ours
+    mov     r12, [rbp]
+
+.loop:
+    ; If RBP is NULL, we are done.
+    test    r13, r13
+    jz      .done
+
+    ; Otherwise, we can print it.
+    ; We add 8 to the current RBP to get the current return address.
+    mov     rdx, [r12 + 0x8]
+    mov     rsi, r13
+    lea     rdi, [rel fmt]
+    call    printf wrt ..plt
+
+    ; And jump to the next one
+    dec     r13
+    mov     r12, [r12]
+    jmp     .loop
+
+.done:
+    pop     r13
+    pop     r12
+    mov     rsp, rbp
+    pop     rbp
+    ret
+#+end_src
+
+Let me briefly explain what's going on. First, we use =default rel= to enable
+[[https://www.nasm.us/xdoc/2.13.02rc2/html/nasmdoc6.html#section-6.2.1][RIP-relative addressing]] (See also [[https://www.nasm.us/xdoc/2.13.02rc2/html/nasmdoc3.html#section-3.3][section 3.3]] of the NASM manual). More of this
+is explained in the next section. We also declare =printf= as an =extern= symbol.
+
+On the =.data= section, we declare our format string, that will be used later when
+calling =printf=.
+
+On the =.text= section, the function preserves the previous stack frame as we have
+seen before. It also preserves =r12= and =r13=, which will be used for storing the
+current base pointer and the current counter, respectively.
+
+Then, it initializes the counter (=r13=) to the first argument of the function
+(=rdi=), and the =r12= register to the base pointer *of the caller*, by dereferencing
+our own base pointer. If we moved =rbp= to =r12=, instead of =[rbp]=, we would also
+print the address of our caller. If you are confused about this, check the
+diagram in [[#specifics-of-the-amd64-abi][Specifics of the AMD64 ABI]].
+
+Then, the loop starts. We check if the iterator is zero, and if it is, we return
+from the function. Otherwise, we will calculate the return address of the
+current stack frame by adding 8 to the base pointer. We will then call =printf=
+with the =fmt= string as its first argument, the iterator as the second one and
+the return address we just calculated as its third argument.
+
+After calling =printf=, we will decrease the iterator and dereference the current
+base pointer, jumping to the previous stack frame. Finally, we jump back to the
+=.loop= label.
+
+The rough C translation of the loop would be the following:
+
+#+begin_src C
+while (i != 0) {
+    void* ret_addr = *(cur_base_ptr + 0x8);
+    printf("%d: %p\n", i, ret_addr);
+
+    i--;
+    cur_base_ptr = *cur_base_ptr;
+}
+#+end_src
+
+** Note about Position Independent Executables
+:PROPERTIES:
+:CUSTOM_ID: note-about-position-independent-executables
+:END:
+
+You might be wondering why we had to use =wrt ..plt= when calling =printf=. It's for
+the same reason why we have to use =lea rdi, [rel fmt]= instead of
+=mov rdi, fmt=. Our GCC has [[https://en.wikipedia.org/wiki/Position-independent_code][=-fPIE=]] (Position Independent Executable) enabled by
+default. That means that our addresses and calls have to be relative. We have
+two solutions for this:
+
+1. Disable PIE by passing =-no-pie= to GCC when linking.
+2. Adapt our assembly to link with PIE.
+
+I chose to use the second option, so I can explain how it works. If we just used
+=call print= and =mov rdi, fmt=, and linked with PIE enabled, we would get the
+following warnings:
+
+#+begin_example text
+/usr/bin/ld: obj/callstack.asm.o: warning: relocation in read-only section `.text'
+/usr/bin/ld: obj/callstack.asm.o: relocation R_X86_64_PC32 against symbol `printf@@GLIBC_2.2.5' can not be used when making a PIE object; recompile with -fPIE
+/usr/bin/ld: final link failed: bad value
+#+end_example
+
+Before trying to understand this /terrible/ error message, you need to understand
+that the linker asumes *all* of our object files have been *compiled*, and not
+assembled by hand. Therefore, when it says "recompile with =-fPIE=", it's not
+necessarily talking about our C object files, but also our hand-written assembly
+ones. You should read the error as "Whoever made this ASM (human or compiler),
+make it PIE compatible".
+
+So, how do we make our assembly PIE compatible? The most important part is that,
+we need to call =printf= through the [[https://en.wikipedia.org/wiki/Position-independent_code#Technical_details][Procedure Linkage Table]] (PLT) instead of a
+direct call. That's exactly what =wrt ..plt= is doing.
+
+That would fix the second linker error, but what about the first warning? That
+happens because we are using the =mov= instruction with the absolute address of
+=fmt=. This creates a 64-bit relocation, since this absolute address isn't known
+until run time, and the dynamic linker has to fill it out. The linker doesn't
+like runtime relocations in =.text=, hence the "relocation in read-only section
+=.text=" warning. Since =printf= needs an absolute address, we can convert the
+RIP-relative address to an absolute one with =lea rdi, [rel fmt]=. The =rel= stands
+for relative, and although we don't need it since we specified =default rel= at
+the top, I chose to emphasize it anyway.
+
+Sources:
+
+1. [[https://stackoverflow.com/a/46493456/11715554][StackOverflow 1]]
+2. [[https://stackoverflow.com/q/73275183/11715554][StackOverflow 2]] (Check comments)
+3. [[https://www.reddit.com/r/asm/comments/1afi6nr/comment/koabzk0/][Reddit answer]] (Skeeto saves the day once more)
+
+
+** Calling it from =DrawPoint=
+:PROPERTIES:
+:CUSTOM_ID: calling-it-from-drawpoint
+:END:
+
+Now that we have our =AsmPrintCallStack= function, we can modify our C code a bit
+to call it from =DrawPoint=.
+
+#+begin_src C
+extern void AsmPrintCallStack(int depth);
+
+void DrawPoint(int x, int y) {
+    printf("Drawing point: %d, %d\n", x, y);
+
+    AsmPrintCallStack(3);
+}
+#+end_src
+
+We will print the last 3 return addresses, one for =DrawLine=, one for =DrawSquare=
+and the last one for =main=.
+
+** Our =main= function
+:PROPERTIES:
+:CUSTOM_ID: our-main-function
+:END:
+
+Our main function simply calls =DrawSquare()=.
+
+We will print the addresses of each function from main, so we can verify that
+the addresses from =AsmPrintCallStack= are correct.
+
+#+begin_src C
+int main(void) {
+    printf("(main) Address of DrawPoint:  %p\n", DrawPoint);
+    printf("(main) Address of DrawLine:   %p\n", DrawLine);
+    printf("(main) Address of DrawSquare: %p\n", DrawSquare);
+    printf("(main) Address of main:       %p\n", main);
+
+    /* DrawPoint only gets called once */
+    DrawSquare(5, 5, 0, 0);
+
+    return 0;
+}
+#+end_src
+
+** Makefile
+:PROPERTIES:
+:CUSTOM_ID: makefile
+:END:
+
+The =-fPIE= parameter should not be necessary, but I still added it to emphasize
+what I mentioned in [[*Note about Position Independent Executables][Note about Position Independent Executables]].
+
+#+begin_src makefile
+CC=gcc
+CFLAGS=-Wall -Wextra
+LDFLAGS=-fPIE
+
+ASM=nasm
+ASMFLAGS=-f elf64
+
+OBJS=obj/main.c.o obj/callstack.asm.o
+BIN=callstack-test.out
+
+all: $(BIN)
+
+clean:
+	rm -f $(BIN) $(OBJS)
+
+$(BIN): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+obj/main.c.o: main.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+obj/callstack.asm.o: callstack.asm
+	@mkdir -p $(dir $@)
+	$(ASM) $(ASMFLAGS) -o $@ $<
+#+end_src
+
+** Checking the output
+:PROPERTIES:
+:CUSTOM_ID: checking-the-output
+:END:
+
+Then, we can just run =make= and check the output:
+
+#+begin_example text
+(main) Address of DrawPoint:  0x5a1e3d78e139
+(main) Address of DrawLine:   0x5a1e3d78e170
+(main) Address of DrawSquare: 0x5a1e3d78e1bf
+(main) Address of main:       0x5a1e3d78e238
+Drawing point: 5, 5
+3: 0x5a1e3d78e1a3
+2: 0x5a1e3d78e1fc
+1: 0x5a1e3d78e2cd
+Drawing point: 5, 5
+3: 0x5a1e3d78e1a3
+2: 0x5a1e3d78e20f
+1: 0x5a1e3d78e2cd
+Drawing point: 5, 5
+3: 0x5a1e3d78e1a3
+2: 0x5a1e3d78e222
+1: 0x5a1e3d78e2cd
+Drawing point: 5, 5
+3: 0x5a1e3d78e1a3
+2: 0x5a1e3d78e235
+1: 0x5a1e3d78e2cd
+#+end_example
+
+That looks about right. The only address that's changing is the second one,
+since each call to =DrawLine= from =DrawSquare= increments the =RIP= register by some
+bytes.
+
+If we really want to make sure it's accurate, let's disassemble the binary and
+look at the offsets inside the functions. I will be using [[https://rizin.re/][rizin]], but any similar
+tool will do.
+
+According to our output, the next instruction to the call to =DrawPoint= should be
+at offset =+0x33= (=0x5a1e3d78e1a3-0x5a1e3d78e170=) inside =DrawLine=. Let's have a
+look.
+
+[[file:../img/callstack3.png]]
+
+Indeed, the call to =DrawPoint= is at =+0x2e=, and the next instruction is at
+=+0x33=. We can see that this is also the case with =DrawSquare= and =main=.
+
+[[file:../img/callstack4.png]]

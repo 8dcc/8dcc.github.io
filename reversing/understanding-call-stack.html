@@ -220,7 +220,16 @@
 <li><a href="#detailed-drawline-example">3.2. Detailed <code>DrawLine</code> example</a></li>
 </ul>
 </li>
-<li><a href="#traversing-the-call-stack">4. Traversing the call stack</a></li>
+<li><a href="#traversing-the-call-stack">4. Traversing the call stack</a>
+<ul>
+<li><a href="#the-asmprintcallstack-function">4.1. The <code>AsmPrintCallStack</code> function</a></li>
+<li><a href="#note-about-position-independent-executables">4.2. Note about Position Independent Executables</a></li>
+<li><a href="#calling-it-from-drawpoint">4.3. Calling it from <code>DrawPoint</code></a></li>
+<li><a href="#our-main-function">4.4. Our <code>main</code> function</a></li>
+<li><a href="#makefile">4.5. Makefile</a></li>
+<li><a href="#checking-the-output">4.6. Checking the output</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -409,9 +418,9 @@ stack frame).
 <p>
 You also have to understand that the specifics about who owns <i>X</i> kind of
 information vary depending on the <b>convention</b>. For example, the two diagrams in
-this section use different conventions when it comes to the parameters of the
-callee function. This is not important for understanding the concept of the
-stack frame itself.
+this section use different conventions when it comes to who "owns" the
+parameters when calling a function. This is not important for understanding the
+concept of the stack frame itself.
 </p>
 
 <p>
@@ -420,7 +429,7 @@ typically organized.
 </p>
 
 
-<div id="org3f153fd" class="figure">
+<div id="org6199cc3" class="figure">
 <p><img src="../img/callstack1.png" alt="callstack1.png" />
 </p>
 </div>
@@ -471,7 +480,7 @@ version, where the top of the stack is in a lower address than the bottom.
 </p>
 
 
-<div id="org8604eb5" class="figure">
+<div id="orge62c6df" class="figure">
 <p><img src="../img/callstack2.png" alt="callstack2.png" />
 </p>
 </div>
@@ -538,7 +547,7 @@ creates a <b>linked list</b>, where you can follow <code>rbp</code>'s to travers
 the <code>DrawLine</code> arguments are right bellow it, from <code>[RSP+0x8]</code> to
 <code>[RSP+(n*0x8)]</code>. Note that they are lower on the stack, but higher in memory.</li>
 <li>The first thing we usually do is push the old <code>RBP</code> value that <code>DrawSquare</code> was
-using. After pushing it, <code>RSP</code> will point to the old <code>RBP</code>, therefore the "linked
+using. After pushing it, <code>RSP</code> will point to the old <code>RBP</code>, hence the "linked
 list" of <code>RBP</code>'s. The return address will be at <code>[RSP+8]</code> after the push.</li>
 <li>The current value of <code>RSP</code> is saved into <code>RBP</code>, creating our stack frame. This
 way, we can freely change <code>RSP</code>, and access parameters with stack offsets
@@ -572,8 +581,383 @@ to it.</li>
 <h2 id="traversing-the-call-stack"><span class="section-number-2">4.</span> Traversing the call stack</h2>
 <div class="outline-text-2" id="text-traversing-the-call-stack">
 <p>
-TODO
+Let's look at some example C code.
 </p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+
+<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">DrawPoint</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span>) {
+    printf(<span style="color: #00d3d0;">"Drawing point: %d, %d\n"</span>, x, y);
+}
+
+<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">DrawLine</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x0</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y0</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x1</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y1</span>) {
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span> = y0; y &lt;= y1; y++)
+        <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span> = x0; x &lt;= x1; x++)
+            DrawPoint(x, y);
+}
+
+<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">DrawSquare</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">w</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">h</span>) {
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x1</span> = x + w;
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y1</span> = y + h;
+
+    DrawLine(x, y, x1, y);   <span style="color: #989898;">/* </span><span style="color: #989898;">Up</span><span style="color: #989898;"> */</span>
+    DrawLine(x, y, x, y1);   <span style="color: #989898;">/* </span><span style="color: #989898;">Left</span><span style="color: #989898;"> */</span>
+    DrawLine(x, y1, x1, y1); <span style="color: #989898;">/* </span><span style="color: #989898;">Down</span><span style="color: #989898;"> */</span>
+    DrawLine(x1, y, x1, y1); <span style="color: #989898;">/* </span><span style="color: #989898;">Right</span><span style="color: #989898;"> */</span>
+}
+</pre>
+</div>
+
+<p>
+The call stack for <code>DrawPoint()</code> would be the following:
+</p>
+
+<pre class="example" id="org348aa93">
+(???)  -&gt;  DrawSquare()  -&gt;  DrawLine()  -&gt;  DrawPoint()
+</pre>
+</div>
+
+<div id="outline-container-the-asmprintcallstack-function" class="outline-3">
+<h3 id="the-asmprintcallstack-function"><span class="section-number-3">4.1.</span> The <code>AsmPrintCallStack</code> function</h3>
+<div class="outline-text-3" id="text-the-asmprintcallstack-function">
+<p>
+Since we now have a deep understanding of the stack, let's write some assembly
+code that prints the backtrace of where we were called.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #ff6f9f;">default</span> <span style="color: #79a8ff;">rel</span>
+<span style="color: #ff6f9f;">extern</span> printf
+
+<span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.data</span>
+    <span style="color: #4ae2ff;">fmt</span>: <span style="color: #feacd0;">db</span> <span style="color: #00d3d0;">"%d: %p"</span>, <span style="color: #88ca9f;">0xA</span>, <span style="color: #88ca9f;">0x0</span>
+
+<span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.text</span>
+
+<span style="color: #989898;">; </span><span style="color: #989898;">void AsmPrintCallStack(int depth);</span>
+<span style="color: #ff6f9f;">global</span> AsmPrintCallStack
+<span style="color: #4ae2ff;">AsmPrintCallStack</span>:
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">r12</span>
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">r13</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">Initialize counter to the first "depth" argument</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r13</span>, <span style="color: #6ae4b9;">rdi</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">Get address of old RBP, skip ours</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r12</span>, [<span style="color: #6ae4b9;">rbp</span>]
+
+<span style="color: #4ae2ff;">.loop</span>:
+    <span style="color: #989898;">; </span><span style="color: #989898;">If RBP is NULL, we are done.</span>
+    <span style="color: #feacd0;">test</span>    <span style="color: #6ae4b9;">r13</span>, <span style="color: #6ae4b9;">r13</span>
+    <span style="color: #feacd0;">jz</span>      .done
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">Otherwise, we can print it.</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">We add 8 to the current RBP to get the current return address.</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rdx</span>, [<span style="color: #6ae4b9;">r12</span> + <span style="color: #88ca9f;">0x8</span>]
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsi</span>, <span style="color: #6ae4b9;">r13</span>
+    <span style="color: #feacd0;">lea</span>     <span style="color: #6ae4b9;">rdi</span>, [<span style="color: #79a8ff;">rel</span> fmt]
+    <span style="color: #feacd0;">call</span>    printf <span style="color: #79a8ff;">wrt</span> ..plt
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">And jump to the next one</span>
+    <span style="color: #feacd0;">dec</span>     <span style="color: #6ae4b9;">r13</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r12</span>, [<span style="color: #6ae4b9;">r12</span>]
+    <span style="color: #feacd0;">jmp</span>     .loop
+
+<span style="color: #4ae2ff;">.done</span>:
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">r13</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">r12</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #6ae4b9;">rbp</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbp</span>
+    <span style="color: #feacd0;">ret</span>
+</pre>
+</div>
+
+<p>
+Let me briefly explain what's going on. First, we use <code>default rel</code> to enable
+<a href="https://www.nasm.us/xdoc/2.13.02rc2/html/nasmdoc6.html#section-6.2.1">RIP-relative addressing</a> (See also <a href="https://www.nasm.us/xdoc/2.13.02rc2/html/nasmdoc3.html#section-3.3">section 3.3</a> of the NASM manual). More of this
+is explained in the next section. We also declare <code>printf</code> as an <code>extern</code> symbol.
+</p>
+
+<p>
+On the <code>.data</code> section, we declare our format string, that will be used later when
+calling <code>printf</code>.
+</p>
+
+<p>
+On the <code>.text</code> section, the function preserves the previous stack frame as we have
+seen before. It also preserves <code>r12</code> and <code>r13</code>, which will be used for storing the
+current base pointer and the current counter, respectively.
+</p>
+
+<p>
+Then, it initializes the counter (<code>r13</code>) to the first argument of the function
+(<code>rdi</code>), and the <code>r12</code> register to the base pointer <b>of the caller</b>, by dereferencing
+our own base pointer. If we moved <code>rbp</code> to <code>r12</code>, instead of <code>[rbp]</code>, we would also
+print the address of our caller. If you are confused about this, check the
+diagram in <a href="#specifics-of-the-amd64-abi">Specifics of the AMD64 ABI</a>.
+</p>
+
+<p>
+Then, the loop starts. We check if the iterator is zero, and if it is, we return
+from the function. Otherwise, we will calculate the return address of the
+current stack frame by adding 8 to the base pointer. We will then call <code>printf</code>
+with the <code>fmt</code> string as its first argument, the iterator as the second one and
+the return address we just calculated as its third argument.
+</p>
+
+<p>
+After calling <code>printf</code>, we will decrease the iterator and dereference the current
+base pointer, jumping to the previous stack frame. Finally, we jump back to the
+<code>.loop</code> label.
+</p>
+
+<p>
+The rough C translation of the loop would be the following:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">while</span> (i != <span style="color: #88ca9f;">0</span>) {
+    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">ret_addr</span> = *(cur_base_ptr + <span style="color: #88ca9f;">0x8</span>);
+    printf(<span style="color: #00d3d0;">"%d: %p\n"</span>, i, ret_addr);
+
+    i--;
+    cur_base_ptr = *cur_base_ptr;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-note-about-position-independent-executables" class="outline-3">
+<h3 id="note-about-position-independent-executables"><span class="section-number-3">4.2.</span> Note about Position Independent Executables</h3>
+<div class="outline-text-3" id="text-note-about-position-independent-executables">
+<p>
+You might be wondering why we had to use <code>wrt ..plt</code> when calling <code>printf</code>. It's for
+the same reason why we have to use <code>lea rdi, [rel fmt]</code> instead of
+<code>mov rdi, fmt</code>. Our GCC has <a href="https://en.wikipedia.org/wiki/Position-independent_code"><code>-fPIE</code></a> (Position Independent Executable) enabled by
+default. That means that our addresses and calls have to be relative. We have
+two solutions for this:
+</p>
+
+<ol class="org-ol">
+<li>Disable PIE by passing <code>-no-pie</code> to GCC when linking.</li>
+<li>Adapt our assembly to link with PIE.</li>
+</ol>
+
+<p>
+I chose to use the second option, so I can explain how it works. If we just used
+<code>call print</code> and <code>mov rdi, fmt</code>, and linked with PIE enabled, we would get the
+following warnings:
+</p>
+
+<pre class="example" id="org6840501">
+/usr/bin/ld: obj/callstack.asm.o: warning: relocation in read-only section `.text'
+/usr/bin/ld: obj/callstack.asm.o: relocation R_X86_64_PC32 against symbol `printf@@GLIBC_2.2.5' can not be used when making a PIE object; recompile with -fPIE
+/usr/bin/ld: final link failed: bad value
+</pre>
+
+<p>
+Before trying to understand this <i>terrible</i> error message, you need to understand
+that the linker asumes <b>all</b> of our object files have been <b>compiled</b>, and not
+assembled by hand. Therefore, when it says "recompile with <code>-fPIE</code>", it's not
+necessarily talking about our C object files, but also our hand-written assembly
+ones. You should read the error as "Whoever made this ASM (human or compiler),
+make it PIE compatible".
+</p>
+
+<p>
+So, how do we make our assembly PIE compatible? The most important part is that,
+we need to call <code>printf</code> through the <a href="https://en.wikipedia.org/wiki/Position-independent_code#Technical_details">Procedure Linkage Table</a> (PLT) instead of a
+direct call. That's exactly what <code>wrt ..plt</code> is doing.
+</p>
+
+<p>
+That would fix the second linker error, but what about the first warning? That
+happens because we are using the <code>mov</code> instruction with the absolute address of
+<code>fmt</code>. This creates a 64-bit relocation, since this absolute address isn't known
+until run time, and the dynamic linker has to fill it out. The linker doesn't
+like runtime relocations in <code>.text</code>, hence the "relocation in read-only section
+<code>.text</code>" warning. Since <code>printf</code> needs an absolute address, we can convert the
+RIP-relative address to an absolute one with <code>lea rdi, [rel fmt]</code>. The <code>rel</code> stands
+for relative, and although we don't need it since we specified <code>default rel</code> at
+the top, I chose to emphasize it anyway.
+</p>
+
+<p>
+Sources:
+</p>
+
+<ol class="org-ol">
+<li><a href="https://stackoverflow.com/a/46493456/11715554">StackOverflow 1</a></li>
+<li><a href="https://stackoverflow.com/q/73275183/11715554">StackOverflow 2</a> (Check comments)</li>
+<li><a href="https://www.reddit.com/r/asm/comments/1afi6nr/comment/koabzk0/">Reddit answer</a> (Skeeto saves the day once more)</li>
+</ol>
+</div>
+</div>
+
+
+<div id="outline-container-calling-it-from-drawpoint" class="outline-3">
+<h3 id="calling-it-from-drawpoint"><span class="section-number-3">4.3.</span> Calling it from <code>DrawPoint</code></h3>
+<div class="outline-text-3" id="text-calling-it-from-drawpoint">
+<p>
+Now that we have our <code>AsmPrintCallStack</code> function, we can modify our C code a bit
+to call it from <code>DrawPoint</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">AsmPrintCallStack</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">depth</span>);
+
+<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">DrawPoint</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span>) {
+    printf(<span style="color: #00d3d0;">"Drawing point: %d, %d\n"</span>, x, y);
+
+    AsmPrintCallStack(<span style="color: #88ca9f;">3</span>);
+}
+</pre>
+</div>
+
+<p>
+We will print the last 3 return addresses, one for <code>DrawLine</code>, one for <code>DrawSquare</code>
+and the last one for <code>main</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-our-main-function" class="outline-3">
+<h3 id="our-main-function"><span class="section-number-3">4.4.</span> Our <code>main</code> function</h3>
+<div class="outline-text-3" id="text-our-main-function">
+<p>
+Our main function simply calls <code>DrawSquare()</code>.
+</p>
+
+<p>
+We will print the addresses of each function from main, so we can verify that
+the addresses from <code>AsmPrintCallStack</code> are correct.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
+    printf(<span style="color: #00d3d0;">"(main) Address of DrawPoint:  %p\n"</span>, DrawPoint);
+    printf(<span style="color: #00d3d0;">"(main) Address of DrawLine:   %p\n"</span>, DrawLine);
+    printf(<span style="color: #00d3d0;">"(main) Address of DrawSquare: %p\n"</span>, DrawSquare);
+    printf(<span style="color: #00d3d0;">"(main) Address of main:       %p\n"</span>, main);
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">DrawPoint only gets called once</span><span style="color: #989898;"> */</span>
+    DrawSquare(<span style="color: #88ca9f;">5</span>, <span style="color: #88ca9f;">5</span>, <span style="color: #88ca9f;">0</span>, <span style="color: #88ca9f;">0</span>);
+
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-makefile" class="outline-3">
+<h3 id="makefile"><span class="section-number-3">4.5.</span> Makefile</h3>
+<div class="outline-text-3" id="text-makefile">
+<p>
+The <code>-fPIE</code> parameter should not be necessary, but I still added it to emphasize
+what I mentioned in <a href="#note-about-position-independent-executables">Note about Position Independent Executables</a>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-makefile"><span style="color: #6ae4b9;">CC</span>=gcc
+<span style="color: #6ae4b9;">CFLAGS</span>=-Wall -Wextra
+<span style="color: #6ae4b9;">LDFLAGS</span>=-fPIE
+
+<span style="color: #6ae4b9;">ASM</span>=nasm
+<span style="color: #6ae4b9;">ASMFLAGS</span>=-f elf64
+
+<span style="color: #6ae4b9;">OBJS</span>=obj/main.c.o obj/callstack.asm.o
+<span style="color: #6ae4b9;">BIN</span>=callstack-test.out
+
+<span style="color: #4ae2ff;">all</span>: $(<span style="color: #6ae4b9;">BIN</span>)
+
+<span style="color: #4ae2ff;">clean</span>:
+    rm -f $(<span style="color: #6ae4b9;">BIN</span>) $(<span style="color: #6ae4b9;">OBJS</span>)
+
+<span style="color: #4ae2ff;">$(</span><span style="color: #4ae2ff;">BIN</span><span style="color: #4ae2ff;">)</span>: $(<span style="color: #6ae4b9;">OBJS</span>)
+    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">^</span> $(<span style="color: #6ae4b9;">LDFLAGS</span>)
+
+<span style="color: #4ae2ff;">obj/main.c.o</span>: main.c
+    @mkdir -p $(<span style="color: #6ae4b9;">dir</span> <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span>)
+    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -c -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span>
+
+<span style="color: #4ae2ff;">obj/callstack.asm.o</span>: callstack.asm
+    @mkdir -p $(<span style="color: #6ae4b9;">dir</span> <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span>)
+    $(<span style="color: #6ae4b9;">ASM</span>) $(<span style="color: #6ae4b9;">ASMFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-checking-the-output" class="outline-3">
+<h3 id="checking-the-output"><span class="section-number-3">4.6.</span> Checking the output</h3>
+<div class="outline-text-3" id="text-checking-the-output">
+<p>
+Then, we can just run <code>make</code> and check the output:
+</p>
+
+<pre class="example" id="orgf861cd2">
+(main) Address of DrawPoint:  0x5a1e3d78e139
+(main) Address of DrawLine:   0x5a1e3d78e170
+(main) Address of DrawSquare: 0x5a1e3d78e1bf
+(main) Address of main:       0x5a1e3d78e238
+Drawing point: 5, 5
+3: 0x5a1e3d78e1a3
+2: 0x5a1e3d78e1fc
+1: 0x5a1e3d78e2cd
+Drawing point: 5, 5
+3: 0x5a1e3d78e1a3
+2: 0x5a1e3d78e20f
+1: 0x5a1e3d78e2cd
+Drawing point: 5, 5
+3: 0x5a1e3d78e1a3
+2: 0x5a1e3d78e222
+1: 0x5a1e3d78e2cd
+Drawing point: 5, 5
+3: 0x5a1e3d78e1a3
+2: 0x5a1e3d78e235
+1: 0x5a1e3d78e2cd
+</pre>
+
+<p>
+That looks about right. The only address that's changing is the second one,
+since each call to <code>DrawLine</code> from <code>DrawSquare</code> increments the <code>RIP</code> register by some
+bytes.
+</p>
+
+<p>
+If we really want to make sure it's accurate, let's disassemble the binary and
+look at the offsets inside the functions. I will be using <a href="https://rizin.re/">rizin</a>, but any similar
+tool will do.
+</p>
+
+<p>
+According to our output, the next instruction to the call to <code>DrawPoint</code> should be
+at offset <code>+0x33</code> (<code>0x5a1e3d78e1a3-0x5a1e3d78e170</code>) inside <code>DrawLine</code>. Let's have a
+look.
+</p>
+
+
+<div id="orgf22299c" class="figure">
+<p><img src="../img/callstack3.png" alt="callstack3.png" />
+</p>
+</div>
+
+<p>
+Indeed, the call to <code>DrawPoint</code> is at <code>+0x2e</code>, and the next instruction is at
+<code>+0x33</code>. We can see that this is also the case with <code>DrawSquare</code> and <code>main</code>.
+</p>
+
+
+<div id="orga6da040" class="figure">
+<p><img src="../img/callstack4.png" alt="callstack4.png" />
+</p>
+</div>
+</div>
 </div>
 </div>
 </div>
