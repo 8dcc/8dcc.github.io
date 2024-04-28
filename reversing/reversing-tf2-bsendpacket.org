@@ -401,11 +401,9 @@ version, where the top of the stack is in a lower address than the bottom.
 
 [[file:../img/bsendpacket8.png]]
 
-As an example, let's write some of the assembly that =DrawLine= could be using.
-
-#+begin_comment
-TODO: Remove code comments, add "legend" bellow.
-#+end_comment
+As an example, let's write some of the assembly that =DrawLine= could be using. To
+avoid cluttering the code with comments, I moved the explanation of each part to
+the legend bellow.
 
 In the following code, =DrawLine= pushes the base pointer (=rbp=) for *preserving the
 caller's stack frame*. Then, it saves the value of =rsp= in =rbp=, creating its own
@@ -416,60 +414,67 @@ creates a *linked list*, where you can follow =rbp='s to traverse stack frames.
 
 #+begin_src nasm
 DrawLine:
-    ; Right when we got called, RSP points to return address in DrawSquare, and
-    ; the DrawLine arguments are right bellow it, from [RSP+8] to [RSP+(n*8)].
+                                ; (1)
+    push    rbp                 ; (2)
+    mov     rbp, rsp            ; (3)
 
-    ; The first thing we usually do is push the old RBP value that DrawSquare
-    ; was using. After pushing, RSP will point to the old RBP, therefore the
-    ; mentioned "linked list" of RBP's. The return address will be at [RSP+8]
-    push    rbp
-
-    ; The current value of RSP is saved into RBP, creating our stack frame. This
-    ; way, we can freely change RSP, and access parameters with stack offsets
-    ; relative to RBP.
-    mov     rbp, rsp
-
-    ; Perhaps DrawLine needs to push some registers that the callee must
-    ; preserve.
-    push    rbx
+    push    rbx                 ; (4)
     push    r12
 
-    ; And maybe it subtract from RSP to allocate some space for local variables.
-    sub     rsp, 0x20
+    sub     rsp, 0x20           ; (5)
 
-    ; The real body of the procedure starts... The procedure can safely use
-    ; preserved registers like r12.
-    ; --------------------------------------------------------------------------
+    ; The real body of the procedure starts... (6)
+    ;---------------------------------------------------------------------------
 
-    ; Then, the procedure body might access the function arguments by adding to
-    ; RBP, or it might need to store values in the reserved stack space, and
-    ; access them by subtracting to RBP (e.g. for local variables).
-    ; Here, it "jumps" over the pused RBP and the return address to access some
-    ; argument, and saves it into r12. Then, it saves that value into some of
-    ; the stack space that we reserved when subtracting from RSP.
-    mov     r12, [rbp + 0x16]
-    mov     [rbp - 0x8], r12
+    mov     r12, [rbp + 0x16]   ; (7)
+    mov     [rbp - 0x8], r12    ; (8)
 
-    ; --------------------------------------------------------------------------
+    ;---------------------------------------------------------------------------
     ; The body of the procedure ends...
 
-    ; We can add back the space we reserved to RSP
-    add     rsp, 0x20
+    add     rsp, 0x20           ; (9)
 
-    ; Then, we can pop the registers that had to be preserved by the callee
-    pop     r12
+    pop     r12                 ; (10)
     pop     rbx
 
-    ; Then, we can restore the base pointer into RSP
-    mov     rsp, rbp
-
-    ; And pop the caller's RBP register
-    pop     rbp
-
-    ; Finally, RSP points to the return address from DrawSquare, the ret
-    ; instruction will pop it and jump to it.
-    ret
+    mov     rsp, rbp            ; (11)
+    pop     rbp                 ; (12)
+    ret                         ; (13)
 #+end_src
+
+Legend of the code above:
+1. Right when we got called, =RSP= points to the return address in =DrawSquare=, and
+   the =DrawLine= arguments are right bellow it, from =[RSP+0x8]= to
+   =[RSP+(n*0x8)]=. They are lower on the stack, but higher in memory.
+2. The first thing we usually do is push the old =RBP= value that =DrawSquare= was
+   using. After pushing it, =RSP= will point to the old =RBP=, that's why we
+   mentioned the "linked list" of =RBP='s. The return address will be at =[RSP+8]=
+   after pushing.
+3. The current value of =RSP= is saved into =RBP=, creating our stack frame. This
+   way, we can freely change =RSP=, and access parameters with stack offsets
+   relative to =RBP=.
+4. Now =DrawLine= needs to push some registers that must be preserved by the
+   callee (according to the ABI). After this, the "real" body of the procedure
+   will be able to safely use these preserved registers.
+5. It subtracts from =RSP= to allocate =0x20= bytes some space for local variables.
+6. The procedure body might access the function arguments by *adding* to =RBP=, or
+   it might need to store values in the reserved stack space, and access them by
+   *subtracting* to =RBP= (e.g. for local variables).
+7. Here, it adds =0x16= to the base pointer for "jumping" over both the pushed =RBP=
+   and the return address, accessing some argument, and saving it into =r12=.
+8. Then, it saves that value into some of the stack space that we reserved when
+   subtracting from =RSP=.
+9. When we are done, we add back the space previously subtracted from =RSP=.
+10. We pop back the registers that had to be preserved by the callee.
+11. We restore the base pointer into =RSP=.
+12. We pop the caller's =RBP= register.
+13. Finally, =RSP= points to the return address from =DrawSquare=, which was pushed
+    by the =call= instruction. As I said, the =ret= instruction will pop it and jump
+    to it.
+
+Now that we have a good understanding of how the stack works, we can look at the
+assembly of each function to see where our =bSendPacket= variable will end up in
+the stack.
 
 * Finding the right offset in the stack
 :PROPERTIES:

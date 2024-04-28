@@ -313,7 +313,7 @@ in <a href="https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4
 So, in order, the calls would be the following:
 </p>
 
-<pre class="example" id="org9ca486a">
+<pre class="example" id="orga61fa32">
 CL_Move()  -&gt;  CHLClient::CreateMove()  -&gt;  CInput::CreateMove()  -&gt;  ClientModeShared::CreateMove()
 </pre>
 
@@ -358,7 +358,7 @@ to decompile the function.
 </p>
 
 
-<div id="org711902f" class="figure">
+<div id="orge22d8cd" class="figure">
 <p><img src="../img/bsendpacket1.png" alt="bsendpacket1.png" />
 </p>
 </div>
@@ -410,7 +410,7 @@ strings and check the xrefs.
 </p>
 
 
-<div id="org95cbf48" class="figure">
+<div id="org901b024" class="figure">
 <p><img src="../img/bsendpacket2.png" alt="bsendpacket2.png" />
 </p>
 </div>
@@ -421,7 +421,7 @@ we know that it's setting it to true?  Let's scroll up a bit.
 </p>
 
 
-<div id="org36b2657" class="figure">
+<div id="org99fc9b5" class="figure">
 <p><img src="../img/bsendpacket3.png" alt="bsendpacket3.png" />
 </p>
 </div>
@@ -575,7 +575,7 @@ After a bit of decompiling, we can find that it's on index 21 (since
 </p>
 
 
-<div id="orgc015b85" class="figure">
+<div id="org41c2bc3" class="figure">
 <p><img src="../img/bsendpacket4.png" alt="bsendpacket4.png" />
 </p>
 </div>
@@ -591,7 +591,7 @@ If we look at the actual disassembly, we find some bad news.
 </p>
 
 
-<div id="org5b0c718" class="figure">
+<div id="orgfff1d95" class="figure">
 <p><img src="../img/bsendpacket5.png" alt="bsendpacket5.png" />
 </p>
 </div>
@@ -777,7 +777,7 @@ diagram for visualizing how a stack frame is organized.
 </p>
 
 
-<div id="org21e10a1" class="figure">
+<div id="orge020393" class="figure">
 <p><img src="../img/bsendpacket7.png" alt="bsendpacket7.png" />
 </p>
 </div>
@@ -827,13 +827,15 @@ version, where the top of the stack is in a lower address than the bottom.
 </p>
 
 
-<div id="orgf427ef0" class="figure">
+<div id="org745bffc" class="figure">
 <p><img src="../img/bsendpacket8.png" alt="bsendpacket8.png" />
 </p>
 </div>
 
 <p>
-As an example, let's write some of the assembly that <code>DrawLine</code> could be using.
+As an example, let's write some of the assembly that <code>DrawLine</code> could be using. To
+avoid cluttering the code with comments, I moved the explanation of each part to
+the legend bellow.
 </p>
 
 <p>
@@ -847,61 +849,74 @@ creates a <b>linked list</b>, where you can follow <code>rbp</code>'s to travers
 
 <div class="org-src-container">
 <pre class="src src-nasm"><span style="color: #4ae2ff;">DrawLine</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Right when we got called, RSP points to return address in DrawSquare, and</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">the DrawLine arguments are right bellow it, from [RSP+8] to [RSP+(n*8)].</span>
+                                <span style="color: #989898;">; </span><span style="color: #989898;">(1)</span>
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(2)</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>            <span style="color: #989898;">; </span><span style="color: #989898;">(3)</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">The first thing we usually do is push the old RBP value that DrawSquare</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">was using. After pushing, RSP will point to the old RBP, therefore the</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">mentioned "linked list" of RBP's. The return address will be at [RSP+8]</span>
-    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>
-
-    <span style="color: #989898;">; </span><span style="color: #989898;">The current value of RSP is saved into RBP, creating our stack frame. This</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">way, we can freely change RSP, and access parameters with stack offsets</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">relative to RBP.</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>
-
-    <span style="color: #989898;">; </span><span style="color: #989898;">Perhaps DrawLine needs to push some registers that the callee must</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">preserve.</span>
-    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbx</span>
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbx</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(4)</span>
     <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">r12</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">And maybe it subtract from RSP to allocate some space for local variables.</span>
-    <span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x20</span>
+    <span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x20</span>           <span style="color: #989898;">; </span><span style="color: #989898;">(5)</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">The real body of the procedure starts... The procedure can safely use</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">preserved registers like r12.</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">--------------------------------------------------------------------------</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">The real body of the procedure starts... (6)</span>
+    <span style="color: #989898;">;</span><span style="color: #989898;">---------------------------------------------------------------------------</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">Then, the procedure body might access the function arguments by adding to</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">RBP, or it might need to store values in the reserved stack space, and</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">access them by subtracting to RBP (e.g. for local variables).</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">Here, it "jumps" over the pused RBP and the return address to access some</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">argument, and saves it into r12. Then, it saves that value into some of</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">the stack space that we reserved when subtracting from RSP.</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r12</span>, [<span style="color: #6ae4b9;">rbp</span> + <span style="color: #88ca9f;">0x16</span>]
-    <span style="color: #feacd0;">mov</span>     [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x8</span>], <span style="color: #6ae4b9;">r12</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r12</span>, [<span style="color: #6ae4b9;">rbp</span> + <span style="color: #88ca9f;">0x16</span>]   <span style="color: #989898;">; </span><span style="color: #989898;">(7)</span>
+    <span style="color: #feacd0;">mov</span>     [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x8</span>], <span style="color: #6ae4b9;">r12</span>    <span style="color: #989898;">; </span><span style="color: #989898;">(8)</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">--------------------------------------------------------------------------</span>
+    <span style="color: #989898;">;</span><span style="color: #989898;">---------------------------------------------------------------------------</span>
     <span style="color: #989898;">; </span><span style="color: #989898;">The body of the procedure ends...</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">We can add back the space we reserved to RSP</span>
-    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x20</span>
+    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x20</span>           <span style="color: #989898;">; </span><span style="color: #989898;">(9)</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">Then, we can pop the registers that had to be preserved by the callee</span>
-    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">r12</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">r12</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(10)</span>
     <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbx</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">Then, we can restore the base pointer into RSP</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #6ae4b9;">rbp</span>
-
-    <span style="color: #989898;">; </span><span style="color: #989898;">And pop the caller's RBP register</span>
-    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbp</span>
-
-    <span style="color: #989898;">; </span><span style="color: #989898;">Finally, RSP points to the return address from DrawSquare, the ret</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">instruction will pop it and jump to it.</span>
-    <span style="color: #feacd0;">ret</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #6ae4b9;">rbp</span>            <span style="color: #989898;">; </span><span style="color: #989898;">(11)</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbp</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(12)</span>
+    <span style="color: #feacd0;">ret</span>                         <span style="color: #989898;">; </span><span style="color: #989898;">(13)</span>
 </pre>
 </div>
+
+<p>
+Legend of the code above:
+</p>
+<ol class="org-ol">
+<li>Right when we got called, <code>RSP</code> points to the return address in <code>DrawSquare</code>, and
+the <code>DrawLine</code> arguments are right bellow it, from <code>[RSP+0x8]</code> to
+<code>[RSP+(n*0x8)]</code>. They are lower on the stack, but higher in memory.</li>
+<li>The first thing we usually do is push the old <code>RBP</code> value that <code>DrawSquare</code> was
+using. After pushing it, <code>RSP</code> will point to the old <code>RBP</code>, that's why we
+mentioned the "linked list" of <code>RBP</code>'s. The return address will be at <code>[RSP+8]</code>
+after pushing.</li>
+<li>The current value of <code>RSP</code> is saved into <code>RBP</code>, creating our stack frame. This
+way, we can freely change <code>RSP</code>, and access parameters with stack offsets
+relative to <code>RBP</code>.</li>
+<li>Now <code>DrawLine</code> needs to push some registers that must be preserved by the
+callee (according to the ABI). After this, the "real" body of the procedure
+will be able to safely use these preserved registers.</li>
+<li>It subtracts from <code>RSP</code> to allocate <code>0x20</code> bytes some space for local variables.</li>
+<li>The procedure body might access the function arguments by <b>adding</b> to <code>RBP</code>, or
+it might need to store values in the reserved stack space, and access them by
+<b>subtracting</b> to <code>RBP</code> (e.g. for local variables).</li>
+<li>Here, it adds <code>0x16</code> to the base pointer for "jumping" over both the pushed <code>RBP</code>
+and the return address, accessing some argument, and saving it into <code>r12</code>.</li>
+<li>Then, it saves that value into some of the stack space that we reserved when
+subtracting from <code>RSP</code>.</li>
+<li>When we are done, we add back the space previously subtracted from <code>RSP</code>.</li>
+<li>We pop back the registers that had to be preserved by the callee.</li>
+<li>We restore the base pointer into <code>RSP</code>.</li>
+<li>We pop the caller's <code>RBP</code> register.</li>
+<li>Finally, <code>RSP</code> points to the return address from <code>DrawSquare</code>, which was pushed
+by the <code>call</code> instruction. As I said, the <code>ret</code> instruction will pop it and jump
+to it.</li>
+</ol>
+
+<p>
+Now that we have a good understanding of how the stack works, we can look at the
+assembly of each function to see where our <code>bSendPacket</code> variable will end up in
+the stack.
+</p>
 </div>
 </div>
 </div>
