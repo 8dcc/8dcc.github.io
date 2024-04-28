@@ -221,13 +221,15 @@
 <li><a href="#finding-and-analyzing-chlclient-createmove">5.1. Finding and analyzing <code>CHLClient::CreateMove</code></a></li>
 </ul>
 </li>
-<li><a href="#finding-the-right-offset-in-the-stack">6. Finding the right offset in the stack</a>
+<li><a href="#understanding-the-stack">6. Understanding the stack</a>
 <ul>
-<li><a href="#understanding-the-stack">6.1. Understanding the stack</a></li>
+<li><a href="#main-uses-of-the-stack">6.1. Main uses of the stack</a></li>
+<li><a href="#stack-frames">6.2. Stack frames</a></li>
 </ul>
 </li>
-<li><a href="#getting-the-value-with-an-assembly-proxy">7. Getting the value with an assembly proxy</a></li>
-<li><a href="#getting-the-value-using-gccs-built-ins">8. Getting the value using GCC's built-ins</a></li>
+<li><a href="#finding-the-right-offset-in-the-stack">7. Finding the right offset in the stack</a></li>
+<li><a href="#getting-the-value-with-an-assembly-proxy">8. Getting the value with an assembly proxy</a></li>
+<li><a href="#getting-the-value-using-gccs-built-ins">9. Getting the value using GCC's built-ins</a></li>
 </ul>
 </div>
 </div>
@@ -311,7 +313,7 @@ in <a href="https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4
 So, in order, the calls would be the following:
 </p>
 
-<pre class="example" id="org0725897">
+<pre class="example" id="org9ca486a">
 CL_Move()  -&gt;  CHLClient::CreateMove()  -&gt;  CInput::CreateMove()  -&gt;  ClientModeShared::CreateMove()
 </pre>
 
@@ -326,9 +328,10 @@ us, so we need to find a way of changing its value.
 <p>
 As I said, this is a <b>local variable</b>, so we can't just treat it as a global and
 get a pointer to it. This variable is declared within the <a href="https://en.wikipedia.org/wiki/Call_stack#STACK-FRAME">stack frame</a> of
-<code>CL_Move</code>, and only exists throughout its life cycle. We will need to find a way
-of somehow tricking <code>CL_Move</code> into thinking that this variable has the value we
-want it to have, and ideally do that from <code>ClientModeShared::CreateMove</code>.
+<code>CL_Move</code>, and only exists throughout its life cycle (this will be explained
+bellow in more detail). We will need to find a way of somehow tricking <code>CL_Move</code>
+into thinking that this variable has the value we want it to have, and ideally
+do that from <code>ClientModeShared::CreateMove</code>.
 </p>
 </div>
 </div>
@@ -355,7 +358,7 @@ to decompile the function.
 </p>
 
 
-<div id="orgbf27dbc" class="figure">
+<div id="org711902f" class="figure">
 <p><img src="../img/bsendpacket1.png" alt="bsendpacket1.png" />
 </p>
 </div>
@@ -407,7 +410,7 @@ strings and check the xrefs.
 </p>
 
 
-<div id="orgfcf6c73" class="figure">
+<div id="org95cbf48" class="figure">
 <p><img src="../img/bsendpacket2.png" alt="bsendpacket2.png" />
 </p>
 </div>
@@ -418,7 +421,7 @@ we know that it's setting it to true?  Let's scroll up a bit.
 </p>
 
 
-<div id="org0d8d090" class="figure">
+<div id="org36b2657" class="figure">
 <p><img src="../img/bsendpacket3.png" alt="bsendpacket3.png" />
 </p>
 </div>
@@ -572,7 +575,7 @@ After a bit of decompiling, we can find that it's on index 21 (since
 </p>
 
 
-<div id="orga225a93" class="figure">
+<div id="orgc015b85" class="figure">
 <p><img src="../img/bsendpacket4.png" alt="bsendpacket4.png" />
 </p>
 </div>
@@ -588,7 +591,7 @@ If we look at the actual disassembly, we find some bad news.
 </p>
 
 
-<div id="org35180f7" class="figure">
+<div id="org5b0c718" class="figure">
 <p><img src="../img/bsendpacket5.png" alt="bsendpacket5.png" />
 </p>
 </div>
@@ -606,23 +609,314 @@ Not all is lost, though. It would have been easy to just modify the unchanged
 </div>
 </div>
 
-<div id="outline-container-finding-the-right-offset-in-the-stack" class="outline-2">
-<h2 id="finding-the-right-offset-in-the-stack"><span class="section-number-2">6.</span> Finding the right offset in the stack</h2>
-<div class="outline-text-2" id="text-finding-the-right-offset-in-the-stack">
+<div id="outline-container-understanding-the-stack" class="outline-2">
+<h2 id="understanding-the-stack"><span class="section-number-2">6.</span> Understanding the stack</h2>
+<div class="outline-text-2" id="text-understanding-the-stack">
+<p>
+Before trying to find the variable, we have to understand how the stack
+works. If you think already know how it works, you can skip to
+<a href="#finding-the-right-offset-in-the-stack">Finding the right offset in the stack</a>.
+</p>
+
+<p>
+First, a brief description of the <a href="https://en.wikipedia.org/wiki/Call_stack">stack</a>. The stack is a data structure used for
+storing various kinds of information required by the active procedures of a
+computer program. The stack obviously follows a <a href="https://en.wikipedia.org/wiki/Stack_(abstract_data_type)">LIFO</a> system, and it's usually
+accessed by <i>pushing</i> or <i>popping</i> data (although this is not always the case, as we
+will see). The stack usually <b>grows downwards</b>, which is a key detail that might
+be easy to forget at first.
+</p>
+
+<p>
+There are two very important registers when dealing with the stack. The <code>rsp</code>
+register (stack pointer) always points to the top of the stack, and the <code>rbp</code>
+register (base pointer) is used to delimit stack frames (more on this
+bellow). The <code>rip</code> register will be mentioned as well, since it points to the
+address of the next instruction to the one being executed.
+</p>
+
+<p>
+When a value is <i>pushed</i> onto the stack the <code>rsp</code> register is decremented, <b>and then</b>
+the value is moved onto the top of the stack. Therefore, the <code>rsp</code> register always
+points to the last pushed item. Remember that the stack (usually) grows
+downwards.
+</p>
+
+<p>
+When a value is <i>popped</i> from the stack, the value on top of the stack is moved
+into the specified register and the <code>rsp</code> register is incremented.
+</p>
 </div>
 
-<div id="outline-container-understanding-the-stack" class="outline-3">
-<h3 id="understanding-the-stack"><span class="section-number-3">6.1.</span> Understanding the stack</h3>
-<div class="outline-text-3" id="text-understanding-the-stack">
+<div id="outline-container-main-uses-of-the-stack" class="outline-3">
+<h3 id="main-uses-of-the-stack"><span class="section-number-3">6.1.</span> Main uses of the stack</h3>
+<div class="outline-text-3" id="text-main-uses-of-the-stack">
+<p>
+The stack is used mainly for 3 purposes:
+</p>
+
+<ol class="org-ol">
+<li>Storing some or all of the function arguments.</li>
+<li>Storing the return address when calling a function.</li>
+<li>Storing data local to the function (preserved registers, local variables,
+etc.).</li>
+</ol>
+
+<p>
+When function <code>foo</code> wants to call function <code>bar</code>, it will push some of the arguments
+on the stack (this depends on the architecture). Then, it will push the address
+of the next instruction (<code>rip</code> register) onto the stack, so <code>bar</code> knows where to
+return once it's done. Then, after <code>foo</code> calls <code>bar</code>, <code>bar</code> might push some of the
+registers that need to be preserved by the callee, like <code>rbp</code> or <code>r12</code>, and it will
+allocate some space for storing its data, if needed. This will be explained in
+more detail bellow, with an example.
+</p>
+
+<p>
+These kind of details are specified in the Application Binary Interface (ABI) of
+each architecture. For example, about the pushed arguments in <code>x86_64</code>, we can
+find the following.
+</p>
+
+<blockquote>
+<p>
+<b>System V AMD64 ABI - 3.2.3 Parameter Passing</b>
+</p>
+
+<p>
+Once arguments are classified, the registers get assigned (in left-to-right
+order) for passing as follows:
+</p>
+
+<ol class="org-ol">
+<li>If the class is MEMORY, pass the argument on the stack.</li>
+
+<li>If the class is INTEGER, the next available register of the sequence <code>rdi</code>,
+<code>rsi</code>, <code>rdx</code>, <code>rcx</code>, <code>r8</code> and <code>r9</code> is used.</li>
+
+<li>[&#x2026;]</li>
+</ol>
+
+<p>
+If there are no registers available for any eightbyte of an argument, the whole
+argument is passed on the stack.
+</p>
+</blockquote>
+
+<p>
+And about pushing the return address, we can also read the following.
+</p>
+
+<blockquote>
+<p>
+<b>System V AMD64 ABI - 3.2.1 Registers and the Stack Frame</b>
+</p>
+
+<p>
+If a calling function wants to preserve such a register value across a function
+call, it must save the value in its local stack frame.
+</p>
+</blockquote>
+
+<p>
+Note that the return address is usually pushed <b>implicitly</b> by the <code>call</code>
+instruction. The following would be equivalent.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">The following:</span>
+<span style="color: #feacd0;">call</span>    <span style="color: #88ca9f;">0xDEADBEEF</span>
+
+<span style="color: #989898;">; </span><span style="color: #989898;">Internally does:</span>
+<span style="color: #feacd0;">push</span>    rip
+<span style="color: #feacd0;">jmp</span>     <span style="color: #88ca9f;">0xDEADBEEF</span>
+</pre>
+</div>
+
+<p>
+Note that in the example above, <code>rip</code> would point to the <code>jmp</code> instruction itself,
+which is not accurate. The correct version would be:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #feacd0;">push</span>    next
+<span style="color: #feacd0;">jmp</span>     <span style="color: #88ca9f;">0xDEADBEEF</span>
+
+<span style="color: #4ae2ff;">next</span>: <span style="color: #feacd0;">nop</span>  <span style="color: #989898;">; </span><span style="color: #989898;">Continue execution...</span>
+</pre>
+</div>
+
+<p>
+Just like the return address is pushed implicitly, it's also popped implicitly
+by the <code>ret</code> instruction.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">The following</span>
+<span style="color: #feacd0;">ret</span>
+
+<span style="color: #989898;">; </span><span style="color: #989898;">Internally does (without actually writing to RAX)</span>
+<span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rax</span>
+<span style="color: #feacd0;">jmp</span>     <span style="color: #6ae4b9;">rax</span>
+
+<span style="color: #989898;">; </span><span style="color: #989898;">Or simply (although we can't directly write to RIP)</span>
+<span style="color: #feacd0;">pop</span>     rip
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-stack-frames" class="outline-3">
+<h3 id="stack-frames"><span class="section-number-3">6.2.</span> Stack frames</h3>
+<div class="outline-text-3" id="text-stack-frames">
+<p>
+The term <i>stack frame</i> has been mentioned a few times, so let me explain exactly
+what it is. A stack frame is used to <b>divide the stack</b> depending on the
+subroutine that owns/needs the information. The Wikipedia page has a very good
+diagram for visualizing how a stack frame is organized.
+</p>
+
+
+<div id="org21e10a1" class="figure">
+<p><img src="../img/bsendpacket7.png" alt="bsendpacket7.png" />
+</p>
+</div>
+
+<p>
+The diagram shows the call stack layout for an upward-growing stack after the
+<code>DrawSquare</code> subroutine (shown in blue) called <code>DrawLine</code> (shown in green), which is
+the currently executing routine.
+</p>
+
+<p>
+When <code>DrawSquare</code> wants to call <code>DrawLine</code>, it pushes its arguments onto the
+stack. Those belong to the stack frame of <code>DrawLine</code>. Then, as I mentioned, the
+<code>call</code> instruction will push the return address onto the stack (i.e. <code>rip</code>, which
+would contain the next instruction of <code>DrawSquare</code>). Then, <code>DrawLine</code> is free to
+push or allocate space on the stack for his local variables.
+</p>
+
+<p>
+Usually, we preserve the <code>rbp</code> register (containing the base pointer of the
+caller) by pushing it onto the stack itself. Then, the current value of <code>rsp</code> is
+saved there throughout the execution of our procedure. That's why the following
+pattern is a common way of identifying functions from assembly.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">...</span>
+
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #6ae4b9;">rbp</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbp</span>
+    <span style="color: #feacd0;">ret</span>
+</pre>
+</div>
+
+<p>
+A more detailed example will be provided bellow.
+</p>
+
+<p>
+In the last example, the stack grew upwards, which is not normally the case. The
+next one (from the ABI) shows a more realistic (but perhaps more confusing)
+version, where the top of the stack is in a lower address than the bottom.
+</p>
+
+
+<div id="orgf427ef0" class="figure">
+<p><img src="../img/bsendpacket8.png" alt="bsendpacket8.png" />
+</p>
+</div>
+
+<p>
+As an example, let's write some of the assembly that <code>DrawLine</code> could be using.
+</p>
+
+<p>
+In the following code, <code>DrawLine</code> pushes the base pointer (<code>rbp</code>) for <b>preserving the
+caller's stack frame</b>. Then, it saves the value of <code>rsp</code> in <code>rbp</code>, creating its own
+stack frame. This allows us to freely change <code>rsp</code>, while being able to access
+function arguments and local variables with offsets relative to <code>rbp</code>. This might
+seem a bit confusing at first, but it's a key detail since it essentially
+creates a <b>linked list</b>, where you can follow <code>rbp</code>'s to traverse stack frames.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">DrawLine</span>:
+    <span style="color: #989898;">; </span><span style="color: #989898;">Right when we got called, RSP points to return address in DrawSquare, and</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">the DrawLine arguments are right bellow it, from [RSP+8] to [RSP+(n*8)].</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">The first thing we usually do is push the old RBP value that DrawSquare</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">was using. After pushing, RSP will point to the old RBP, therefore the</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">mentioned "linked list" of RBP's. The return address will be at [RSP+8]</span>
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">The current value of RSP is saved into RBP, creating our stack frame. This</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">way, we can freely change RSP, and access parameters with stack offsets</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">relative to RBP.</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">Perhaps DrawLine needs to push some registers that the callee must</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">preserve.</span>
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbx</span>
+    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">r12</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">And maybe it subtract from RSP to allocate some space for local variables.</span>
+    <span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x20</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">The real body of the procedure starts... The procedure can safely use</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">preserved registers like r12.</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">--------------------------------------------------------------------------</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">Then, the procedure body might access the function arguments by adding to</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">RBP, or it might need to store values in the reserved stack space, and</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">access them by subtracting to RBP (e.g. for local variables).</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">Here, it "jumps" over the pused RBP and the return address to access some</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">argument, and saves it into r12. Then, it saves that value into some of</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">the stack space that we reserved when subtracting from RSP.</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r12</span>, [<span style="color: #6ae4b9;">rbp</span> + <span style="color: #88ca9f;">0x16</span>]
+    <span style="color: #feacd0;">mov</span>     [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x8</span>], <span style="color: #6ae4b9;">r12</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">--------------------------------------------------------------------------</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">The body of the procedure ends...</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">We can add back the space we reserved to RSP</span>
+    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x20</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">Then, we can pop the registers that had to be preserved by the callee</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">r12</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbx</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">Then, we can restore the base pointer into RSP</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #6ae4b9;">rbp</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">And pop the caller's RBP register</span>
+    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbp</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">Finally, RSP points to the return address from DrawSquare, the ret</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">instruction will pop it and jump to it.</span>
+    <span style="color: #feacd0;">ret</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-finding-the-right-offset-in-the-stack" class="outline-2">
+<h2 id="finding-the-right-offset-in-the-stack"><span class="section-number-2">7.</span> Finding the right offset in the stack</h2>
+<div class="outline-text-2" id="text-finding-the-right-offset-in-the-stack">
 <p>
 TODO
 </p>
 </div>
 </div>
-</div>
 
 <div id="outline-container-getting-the-value-with-an-assembly-proxy" class="outline-2">
-<h2 id="getting-the-value-with-an-assembly-proxy"><span class="section-number-2">7.</span> Getting the value with an assembly proxy</h2>
+<h2 id="getting-the-value-with-an-assembly-proxy"><span class="section-number-2">8.</span> Getting the value with an assembly proxy</h2>
 <div class="outline-text-2" id="text-getting-the-value-with-an-assembly-proxy">
 <p>
 TODO
@@ -631,7 +925,7 @@ TODO
 </div>
 
 <div id="outline-container-getting-the-value-using-gccs-built-ins" class="outline-2">
-<h2 id="getting-the-value-using-gccs-built-ins"><span class="section-number-2">8.</span> Getting the value using GCC's built-ins</h2>
+<h2 id="getting-the-value-using-gccs-built-ins"><span class="section-number-2">9.</span> Getting the value using GCC's built-ins</h2>
 <div class="outline-text-2" id="text-getting-the-value-using-gccs-built-ins">
 <p>
 TODO

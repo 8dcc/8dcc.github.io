@@ -82,9 +82,10 @@ us, so we need to find a way of changing its value.
 
 As I said, this is a *local variable*, so we can't just treat it as a global and
 get a pointer to it. This variable is declared within the [[https://en.wikipedia.org/wiki/Call_stack#STACK-FRAME][stack frame]] of
-=CL_Move=, and only exists throughout its life cycle. We will need to find a way
-of somehow tricking =CL_Move= into thinking that this variable has the value we
-want it to have, and ideally do that from =ClientModeShared::CreateMove=.
+=CL_Move=, and only exists throughout its life cycle (this will be explained
+bellow in more detail). We will need to find a way of somehow tricking =CL_Move=
+into thinking that this variable has the value we want it to have, and ideally
+do that from =ClientModeShared::CreateMove=.
 
 * The old solution
 :PROPERTIES:
@@ -236,21 +237,246 @@ variable for this function. Well... Shit.
 Not all is lost, though. It would have been easy to just modify the unchanged
 =r12= register, but we can still access its value *from the stack*.
 
+* Understanding the stack
+:PROPERTIES:
+:CUSTOM_ID: understanding-the-stack
+:END:
+
+Before trying to find the variable, we have to understand how the stack
+works. If you think already know how it works, you can skip to
+[[Finding the right offset in the stack][Finding the right offset in the stack]].
+
+First, a brief description of the [[https://en.wikipedia.org/wiki/Call_stack][stack]]. The stack is a data structure used for
+storing various kinds of information required by the active procedures of a
+computer program. The stack obviously follows a [[https://en.wikipedia.org/wiki/Stack_(abstract_data_type)][LIFO]] system, and it's usually
+accessed by /pushing/ or /popping/ data (although this is not always the case, as we
+will see). The stack usually *grows downwards*, which is a key detail that might
+be easy to forget at first.
+
+There are two very important registers when dealing with the stack. The =rsp=
+register (stack pointer) always points to the top of the stack, and the =rbp=
+register (base pointer) is used to delimit stack frames (more on this
+bellow). The =rip= register will be mentioned as well, since it points to the
+address of the next instruction to the one being executed.
+
+When a value is /pushed/ onto the stack the =rsp= register is decremented, *and then*
+the value is moved onto the top of the stack. Therefore, the =rsp= register always
+points to the last pushed item. Remember that the stack (usually) grows
+downwards.
+
+When a value is /popped/ from the stack, the value on top of the stack is moved
+into the specified register and the =rsp= register is incremented.
+
+** Main uses of the stack
+:PROPERTIES:
+:CUSTOM_ID: main-uses-of-the-stack
+:END:
+
+The stack is used mainly for 3 purposes:
+
+1. Storing some or all of the function arguments.
+2. Storing the return address when calling a function.
+3. Storing data local to the function (preserved registers, local variables,
+   etc.).
+
+When function =foo= wants to call function =bar=, it will push some of the arguments
+on the stack (this depends on the architecture). Then, it will push the address
+of the next instruction (=rip= register) onto the stack, so =bar= knows where to
+return once it's done. Then, after =foo= calls =bar=, =bar= might push some of the
+registers that need to be preserved by the callee, like =rbp= or =r12=, and it will
+allocate some space for storing its data, if needed. This will be explained in
+more detail bellow, with an example.
+
+These kind of details are specified in the Application Binary Interface (ABI) of
+each architecture. For example, about the pushed arguments in =x86_64=, we can
+find the following.
+
+#+begin_quote
+*System V AMD64 ABI - 3.2.3 Parameter Passing*
+
+Once arguments are classified, the registers get assigned (in left-to-right
+order) for passing as follows:
+
+1. If the class is MEMORY, pass the argument on the stack.
+
+2. If the class is INTEGER, the next available register of the sequence =rdi=,
+   =rsi=, =rdx=, =rcx=, =r8= and =r9= is used.
+
+3. [...]
+
+If there are no registers available for any eightbyte of an argument, the whole
+argument is passed on the stack.
+#+end_quote
+
+And about pushing the return address, we can also read the following.
+
+#+begin_quote
+*System V AMD64 ABI - 3.2.1 Registers and the Stack Frame*
+
+If a calling function wants to preserve such a register value across a function
+call, it must save the value in its local stack frame.
+#+end_quote
+
+Note that the return address is usually pushed *implicitly* by the =call=
+instruction. The following would be equivalent.
+
+#+begin_src nasm
+; The following:
+call    0xDEADBEEF
+
+; Internally does:
+push    rip
+jmp     0xDEADBEEF
+#+end_src
+
+Note that in the example above, =rip= would point to the =jmp= instruction itself,
+which is not accurate. The correct version would be:
+
+#+begin_src nasm
+push    next
+jmp     0xDEADBEEF
+
+next: nop  ; Continue execution...
+#+end_src
+
+Just like the return address is pushed implicitly, it's also popped implicitly
+by the =ret= instruction.
+
+#+begin_src nasm
+; The following
+ret
+
+; Internally does (without actually writing to RAX)
+pop     rax
+jmp     rax
+
+; Or simply (although we can't directly write to RIP)
+pop     rip
+#+end_src
+
+** Stack frames
+:PROPERTIES:
+:CUSTOM_ID: stack-frames
+:END:
+
+The term /stack frame/ has been mentioned a few times, so let me explain exactly
+what it is. A stack frame is used to *divide the stack* depending on the
+subroutine that owns/needs the information. The Wikipedia page has a very good
+diagram for visualizing how a stack frame is organized.
+
+[[file:../img/bsendpacket7.png]]
+
+The diagram shows the call stack layout for an upward-growing stack after the
+=DrawSquare= subroutine (shown in blue) called =DrawLine= (shown in green), which is
+the currently executing routine.
+
+When =DrawSquare= wants to call =DrawLine=, it pushes its arguments onto the
+stack. Those belong to the stack frame of =DrawLine=. Then, as I mentioned, the
+=call= instruction will push the return address onto the stack (i.e. =rip=, which
+would contain the next instruction of =DrawSquare=). Then, =DrawLine= is free to
+push or allocate space on the stack for his local variables.
+
+Usually, we preserve the =rbp= register (containing the base pointer of the
+caller) by pushing it onto the stack itself. Then, the current value of =rsp= is
+saved there throughout the execution of our procedure. That's why the following
+pattern is a common way of identifying functions from assembly.
+
+#+begin_src nasm
+func:
+    push    rbp
+    mov     rbp, rsp
+
+    ; ...
+
+    mov     rsp, rbp
+    pop     rbp
+    ret
+#+end_src
+
+A more detailed example will be provided bellow.
+
+In the last example, the stack grew upwards, which is not normally the case. The
+next one (from the ABI) shows a more realistic (but perhaps more confusing)
+version, where the top of the stack is in a lower address than the bottom.
+
+[[file:../img/bsendpacket8.png]]
+
+As an example, let's write some of the assembly that =DrawLine= could be using.
+
+#+begin_comment
+TODO: Remove code comments, add "legend" bellow.
+#+end_comment
+
+In the following code, =DrawLine= pushes the base pointer (=rbp=) for *preserving the
+caller's stack frame*. Then, it saves the value of =rsp= in =rbp=, creating its own
+stack frame. This allows us to freely change =rsp=, while being able to access
+function arguments and local variables with offsets relative to =rbp=. This might
+seem a bit confusing at first, but it's a key detail since it essentially
+creates a *linked list*, where you can follow =rbp='s to traverse stack frames.
+
+#+begin_src nasm
+DrawLine:
+    ; Right when we got called, RSP points to return address in DrawSquare, and
+    ; the DrawLine arguments are right bellow it, from [RSP+8] to [RSP+(n*8)].
+
+    ; The first thing we usually do is push the old RBP value that DrawSquare
+    ; was using. After pushing, RSP will point to the old RBP, therefore the
+    ; mentioned "linked list" of RBP's. The return address will be at [RSP+8]
+    push    rbp
+
+    ; The current value of RSP is saved into RBP, creating our stack frame. This
+    ; way, we can freely change RSP, and access parameters with stack offsets
+    ; relative to RBP.
+    mov     rbp, rsp
+
+    ; Perhaps DrawLine needs to push some registers that the callee must
+    ; preserve.
+    push    rbx
+    push    r12
+
+    ; And maybe it subtract from RSP to allocate some space for local variables.
+    sub     rsp, 0x20
+
+    ; The real body of the procedure starts... The procedure can safely use
+    ; preserved registers like r12.
+    ; --------------------------------------------------------------------------
+
+    ; Then, the procedure body might access the function arguments by adding to
+    ; RBP, or it might need to store values in the reserved stack space, and
+    ; access them by subtracting to RBP (e.g. for local variables).
+    ; Here, it "jumps" over the pused RBP and the return address to access some
+    ; argument, and saves it into r12. Then, it saves that value into some of
+    ; the stack space that we reserved when subtracting from RSP.
+    mov     r12, [rbp + 0x16]
+    mov     [rbp - 0x8], r12
+
+    ; --------------------------------------------------------------------------
+    ; The body of the procedure ends...
+
+    ; We can add back the space we reserved to RSP
+    add     rsp, 0x20
+
+    ; Then, we can pop the registers that had to be preserved by the callee
+    pop     r12
+    pop     rbx
+
+    ; Then, we can restore the base pointer into RSP
+    mov     rsp, rbp
+
+    ; And pop the caller's RBP register
+    pop     rbp
+
+    ; Finally, RSP points to the return address from DrawSquare, the ret
+    ; instruction will pop it and jump to it.
+    ret
+#+end_src
+
 * Finding the right offset in the stack
 :PROPERTIES:
 :CUSTOM_ID: finding-the-right-offset-in-the-stack
 :END:
 
-** Understanding the stack
-:PROPERTIES:
-:CUSTOM_ID: understanding-the-stack
-:END:
-
 TODO
-
-#+begin_comment
-Insert figure 3.3 of System V AMD64 ABI and Wikipedia stack frame image.
-#+end_comment
 
 * Getting the value with an assembly proxy
 :PROPERTIES:
