@@ -250,9 +250,10 @@
 </li>
 <li><a href="#sicp-lisp-and-javascript">2. SICP, Lisp and JavaScript</a></li>
 <li><a href="#simple-example-factorial">3. Simple example: Factorial</a></li>
-<li><a href="#fixed-points">4. Fixed points</a></li>
-<li><a href="#fixed-point-combinators">5. Fixed-point combinators</a></li>
-<li><a href="#y-combinator">6. Y combinator</a></li>
+<li><a href="#simple-recursion-with-anonymous-functions">4. Simple recursion with anonymous functions</a></li>
+<li><a href="#fixed-points">5. Fixed points</a></li>
+<li><a href="#fixed-point-combinators">6. Fixed-point combinators</a></li>
+<li><a href="#y-combinator">7. Y combinator</a></li>
 </ul>
 </div>
 </div>
@@ -352,7 +353,7 @@ conventions:
 means \(\lambda x. (M N)\) and not $(&lambda; x. M) N).</li>
 <li>A sequence of abstractions is contracted:
 \((\lambda x. \lambda y. \lambda z. N)\) is abbreviated as
-\((\lambda x y z. N)\).</li>
+\((\lambda x\ y\ z. N)\).</li>
 <li>When all variables are single-letter, applications may be omitted: \((M N P)\)
 instead of \((M\ N\ P)\).</li>
 </ol>
@@ -382,7 +383,7 @@ its examples and explanations, while the second uses <a href="https://en.wikiped
 
 <p>
 I have not written much JavaScript when writing this, but I will try to write
-all examples in both lambda notation, Lisp and JavaScript.
+all examples in both lambda notation, Scheme and JavaScript.
 </p>
 </div>
 </div>
@@ -403,7 +404,7 @@ lambda calculus notation:
 </p>
 
 <p>
-In Lisp:
+In Scheme:
 </p>
 
 <div class="org-src-container">
@@ -452,8 +453,68 @@ alternative way.
 </div>
 </div>
 
+<div id="outline-container-simple-recursion-with-anonymous-functions" class="outline-2">
+<h2 id="simple-recursion-with-anonymous-functions"><span class="section-number-2">4.</span> Simple recursion with anonymous functions</h2>
+<div class="outline-text-2" id="text-simple-recursion-with-anonymous-functions">
+<p>
+Before trying to understand the Y combinator, let's have a look at an example of
+how an anonymous function might call itself without the need for symbols.
+</p>
+
+<p>
+\[
+(\lambda x. x\ x)(\lambda x. x\ x)
+\]
+</p>
+
+<p>
+Or in Scheme:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>x<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span>x x<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span>
+ <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>x<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span>x x<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<blockquote>
+<p>
+<b>Note:</b> Depending on the Lisp, you might need to use <code>(funcall x x)</code> instead of
+<code>(x x)</code>, since variables and functions don't share the same namespace. You can
+search about the differences between Lisp-1 and Lisp-2.
+</p>
+</blockquote>
+
+<p>
+Or in JavaScript:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">((x) =&gt; x(x))((x) =&gt; x(x))
+</pre>
+</div>
+
+<p>
+We can see that the two parenthesized expressions are identical, and that the
+first is applied to the second one. Let's try to simplify it by &beta;-reduction.
+</p>
+
+
+<div id="org3725613" class="figure">
+<p><img src="../img/ycombinator2.png" alt="ycombinator2.png" />
+</p>
+</div>
+
+<p>
+We are right back where we started. This function would call itself
+indefinitely, and a similar form will be used for the Y combinator bellow. But
+first, we must learn about fixed points.
+</p>
+</div>
+</div>
+
 <div id="outline-container-fixed-points" class="outline-2">
-<h2 id="fixed-points"><span class="section-number-2">4.</span> Fixed points</h2>
+<h2 id="fixed-points"><span class="section-number-2">5.</span> Fixed points</h2>
 <div class="outline-text-2" id="text-fixed-points">
 <p>
 Before getting into the fixed-point combinators, we need to define what a fixed
@@ -473,7 +534,7 @@ For example, if \(f(x) = x!\), 1 and 2 are fixed points, since \(f(1) = 1\) and
 </p>
 
 
-<div id="org6ada4fa" class="figure">
+<div id="orgf105a36" class="figure">
 <p><img src="../img/ycombinator1.png" alt="ycombinator1.png" width="250px" />
 </p>
 </div>
@@ -486,7 +547,7 @@ the point \((x, f(x))\), these 3 points were on the line \(x = y\).
 </div>
 
 <div id="outline-container-fixed-point-combinators" class="outline-2">
-<h2 id="fixed-point-combinators"><span class="section-number-2">5.</span> Fixed-point combinators</h2>
+<h2 id="fixed-point-combinators"><span class="section-number-2">6.</span> Fixed-point combinators</h2>
 <div class="outline-text-2" id="text-fixed-point-combinators">
 <p>
 A <b>fixed-point combinator</b> is a higher-order function (i.e. a function that takes
@@ -508,7 +569,7 @@ f(\text{fix}\ f) = \text{fix}\ f
 </div>
 
 <div id="outline-container-y-combinator" class="outline-2">
-<h2 id="y-combinator"><span class="section-number-2">6.</span> Y combinator</h2>
+<h2 id="y-combinator"><span class="section-number-2">7.</span> Y combinator</h2>
 <div class="outline-text-2" id="text-y-combinator">
 <p>
 An example of a fixed-point combinator is the Y combinator:
@@ -516,16 +577,54 @@ An example of a fixed-point combinator is the Y combinator:
 
 <p>
 \[
-Y = \lambda f. \big(\lambda x. f (x x)\big) \big(\lambda x. f (x x)\big)
+Y = \lambda f. \big(\lambda x. f (x\ x)\big) \big(\lambda x. f (x\ x)\big)
 \]
 </p>
 
 <p>
-Let's try to understand what it does, and why it's a fixed-point combinator.
+Let's try to understand what it does, and why it's a fixed-point combinator. We
+are saying that \(Y\) is a function that takes one parameter \(f\). The body
+consists of the same lambda term applied to itself: \((\lambda x. f(x\ x))\). You
+may realize why we explained how to do <a href="#simple-recursion-with-anonymous-functions">recursion with anonymous functions</a>
+earlier. A similar principle applies here, but we are also calling the \(f\)
+function.
 </p>
 
 <p>
-TODO
+Let's simplify it with &beta;-reduction step by step:
+</p>
+
+\begin{align*}
+Y\ g &= \lambda f. \big(\lambda x. f (x\ x)\big) \big(\lambda x. f (x\ x)\big) g
+        && \text{By definition of } Y \\
+     &= \big(\lambda x. g (x\ x)\big) \big(\lambda x. g (x\ x)\big)
+        && \text{By beta reduction: Replacing } f \text{ of } Y \text{ with } g \\
+     &= g \Big(\big(\lambda x. g (x\ x)\big) \big(\lambda x. g (x\ x)\big)\Big)
+        && \text{By beta reduction: Replacing } x \text{ of the first function with } \big(\lambda x. g (x\ x)\big) \\
+     &= g (Y\ g)
+        && \text{By equality}
+\end{align*}
+
+<p>
+Note how the reduction on the third step is applying \(g\) to the same expression
+in the second step, which we know is equal to \(Y\ g\). That's how we can verify
+that \(Y\ g = g(Y\ g)\).
+</p>
+
+<p>
+An alternative (and slightly simpler) version of the Y combinator is the
+following:
+</p>
+
+<p>
+\[
+X = \lambda f. (\lambda x. x\ x) (\lambda x. f(x\ x))
+\]
+</p>
+
+<p>
+Notice how the first call to \(f\) was not necessary, since this expression also
+&beta;-evaluates to the Y combinator.
 </p>
 </div>
 </div>

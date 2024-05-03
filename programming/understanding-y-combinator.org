@@ -86,7 +86,7 @@ conventions:
    means $\lambda x. (M N)$ and not $(\lambda x. M) N).
 4. A sequence of abstractions is contracted:
    $(\lambda x. \lambda y. \lambda z. N)$ is abbreviated as
-   $(\lambda x y z. N)$.
+   $(\lambda x\ y\ z. N)$.
 5. When all variables are single-letter, applications may be omitted: $(M N P)$
    instead of $(M\ N\ P)$.
 
@@ -107,7 +107,7 @@ This book has two editions. The first one uses [[https://en.wikipedia.org/wiki/S
 its examples and explanations, while the second uses [[https://en.wikipedia.org/wiki/JavaScript][JavaScript]].
 
 I have not written much JavaScript when writing this, but I will try to write
-all examples in both lambda notation, Lisp and JavaScript.
+all examples in both lambda notation, Scheme and JavaScript.
 
 * Simple example: Factorial
 :PROPERTIES:
@@ -127,7 +127,7 @@ NOTE: If this is incorrect or confusing and you have any suggestions, feel free
 to make a PR.
 #+end_comment
 
-In Lisp:
+In Scheme:
 
 #+begin_src scheme
 (define fact
@@ -160,6 +160,50 @@ In this case, we can simply ignore how =iszero=, =mult=, =prec= and even =fact= 
 In any case, we don't have those name-defining commodities in lambda
 calculus. We can't call ourselves by name, so we will have to find an
 alternative way.
+
+* Simple recursion with anonymous functions
+:PROPERTIES:
+:CUSTOM_ID: simple-recursion-with-anonymous-functions
+:END:
+
+Before trying to understand the Y combinator, let's have a look at an example of
+how an anonymous function might call itself without the need for symbols.
+
+$$
+(\lambda x. x\ x)(\lambda x. x\ x)
+$$
+
+Or in Scheme:
+
+#+begin_src scheme
+((lambda (x) (x x))
+ (lambda (x) (x x)))
+#+end_src
+
+#+begin_quote
+*Note:* Depending on the Lisp, you might need to use =(funcall x x)= instead of
+=(x x)=, since variables and functions don't share the same namespace. You can
+search about the differences between Lisp-1 and Lisp-2.
+#+end_quote
+
+Or in JavaScript:
+
+#+begin_src javascript
+((x) => x(x))((x) => x(x))
+#+end_src
+
+#+begin_comment
+NOTE: I am not sure if this expression has a name, feel free to make a PR.
+#+end_comment
+
+We can see that the two parenthesized expressions are identical, and that the
+first is applied to the second one. Let's try to simplify it by \beta-reduction.
+
+[[file:../img/ycombinator2.png]]
+
+We are right back where we started. This function would call itself
+indefinitely, and a similar form will be used for the Y combinator bellow. But
+first, we must learn about fixed points.
 
 * Fixed points
 :PROPERTIES:
@@ -207,12 +251,42 @@ $$
 An example of a fixed-point combinator is the Y combinator:
 
 $$
-Y = \lambda f. \big(\lambda x. f (x x)\big) \big(\lambda x. f (x x)\big)
+Y = \lambda f. \big(\lambda x. f (x\ x)\big) \big(\lambda x. f (x\ x)\big)
 $$
 
-Let's try to understand what it does, and why it's a fixed-point combinator.
+Let's try to understand what it does, and why it's a fixed-point combinator. We
+are saying that $Y$ is a function that takes one parameter $f$. The body
+consists of the same lambda term applied to itself: $(\lambda x. f(x\ x))$. You
+may realize why we explained how to do [[*Simple recursion with anonymous functions][recursion with anonymous functions]]
+earlier. A similar principle applies here, but we are also calling the $f$
+function.
 
-TODO
+Let's simplify it with \beta-reduction step by step:
+
+\begin{align*}
+Y\ g &= \lambda f. \big(\lambda x. f (x\ x)\big) \big(\lambda x. f (x\ x)\big) g
+        && \text{By definition of } Y \\
+     &= \big(\lambda x. g (x\ x)\big) \big(\lambda x. g (x\ x)\big)
+        && \text{By beta reduction: Replacing } f \text{ of } Y \text{ with } g \\
+     &= g \Big(\big(\lambda x. g (x\ x)\big) \big(\lambda x. g (x\ x)\big)\Big)
+        && \text{By beta reduction: Replacing } x \text{ of the first function with } \big(\lambda x. g (x\ x)\big) \\
+     &= g (Y\ g)
+        && \text{By equality}
+\end{align*}
+
+Note how the reduction on the third step is applying $g$ to the same expression
+in the second step, which we know is equal to $Y\ g$. That's how we can verify
+that $Y\ g = g(Y\ g)$.
+
+An alternative (and slightly simpler) version of the Y combinator is the
+following:
+
+$$
+X = \lambda f. (\lambda x. x\ x) (\lambda x. f(x\ x))
+$$
+
+Notice how the first call to $f$ was not necessary, since this expression also
+\beta-evaluates to the Y combinator.
 
 # -----
 
