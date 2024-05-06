@@ -254,6 +254,7 @@
 <li><a href="#fixed-points">5. Fixed points</a></li>
 <li><a href="#fixed-point-combinators">6. Fixed-point combinators</a></li>
 <li><a href="#y-combinator">7. Y combinator</a></li>
+<li><a href="#applications-of-the-y-combinator">8. Applications of the Y combinator</a></li>
 </ul>
 </div>
 </div>
@@ -334,6 +335,13 @@ There is also <b>eta reduction</b> (&eta;-reduction), which expresses the idea o
 functions are the same if and only if they give the same result for all
 arguments.
 </p>
+
+<p>
+<a href="#applications-of-the-y-combinator">Later</a> we will also mention the opposite of the beta reduction, the <b>beta
+abstraction</b>, which instead of simplifying an expression, it adds an extra
+function call that might be useful (e.g. in Lisps) for delaying the evaluation
+of the arguments.
+</p>
 </div>
 </div>
 
@@ -394,8 +402,8 @@ approach, and not on the Y combinator itself, I recommend you check it out.
 <p>
 One of the most valuable things that SICP has taught me is that sometimes it's
 extremely useful to treat functions as black boxes that are able to transform
-some inputs into some outputs. This has been useful not only when using
-functions, but also when designing them.
+some inputs into some outputs. They call this <i>wishful thinking</i>, and it has been
+useful not only when using functions, but also when designing them.
 </p>
 </div>
 </div>
@@ -509,7 +517,7 @@ the whole second parenthesized expression.
 </p>
 
 
-<div id="orga425c4c" class="figure">
+<div id="orgc09700f" class="figure">
 <p><img src="../img/ycombinator1.png" alt="ycombinator1.png" />
 </p>
 </div>
@@ -541,7 +549,7 @@ For example, if \(f(x) = x!\), 1 and 2 are fixed points, since \(f(1) = 1\) and
 </p>
 
 
-<div id="org4c331b4" class="figure">
+<div id="orga2bb247" class="figure">
 <p><img src="../img/ycombinator2.png" alt="ycombinator2.png" width="250px" />
 </p>
 </div>
@@ -621,12 +629,20 @@ Or in Scheme:
 </pre>
 </div>
 
+<blockquote>
+<p>
+<b>Note:</b> This version is not accurate, see <a href="#applications-of-the-y-combinator">Applications of the Y combinator</a> bellow.
+</p>
+</blockquote>
+
 <p>
 Or in JavaScript:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #ff6f9f;">var</span> <span style="color: #6ae4b9;">Y</span> = (f) =&gt; ((x) =&gt; f(x(x)))((x) =&gt; f(x(x)));
+<pre class="src src-javascript"><span style="color: #ff6f9f;">var</span> <span style="color: #6ae4b9;">Y</span> = (f) =&gt;
+    ((x) =&gt; f(x(x)))(
+     (x) =&gt; f(x(x)));
 </pre>
 </div>
 
@@ -637,7 +653,7 @@ useful concept, and it's where this image comes from.
 </p>
 
 
-<div id="org58d9902" class="figure">
+<div id="orgd426931" class="figure">
 <p><img src="../img/ycombinator3.png" alt="ycombinator3.png" width="250px" />
 </p>
 </div>
@@ -689,6 +705,230 @@ Notice how the first call to \(f\) was not necessary, since this expression also
 </p>
 </div>
 </div>
+
+<div id="outline-container-applications-of-the-y-combinator" class="outline-2">
+<h2 id="applications-of-the-y-combinator"><span class="section-number-2">8.</span> Applications of the Y combinator</h2>
+<div class="outline-text-2" id="text-applications-of-the-y-combinator">
+<p>
+You might be wondering what makes the Y combinator so special. As we said,
+lambda calculus doesn't have any kind of "global symbols", therefore a function
+can't reference itself by name. Let's go back to the factorial example in
+Scheme.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact</span>
+  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>n<span style="color: #cabf00;">)</span>
+    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #44bc44;">)</span>
+        <span style="color: #88ca9f;">1</span>
+        <span style="color: #44bc44;">(</span>* n <span style="color: #ff5f59;">(</span>fact <span style="color: #2fafff;">(</span>- n <span style="color: #88ca9f;">1</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+This recursive form is possible because <code>fact</code> can call itself using its name.
+</p>
+
+<p>
+The Y combinator allows us to call a function recursively in a language which
+<b>doesn't implement recursion</b>. Let's have a look at an alternative form of <code>fact</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact-generator</span>
+  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>self<span style="color: #cabf00;">)</span>
+    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>n<span style="color: #44bc44;">)</span>
+      <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #ff5f59;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #ff5f59;">)</span>
+          <span style="color: #88ca9f;">1</span>
+          <span style="color: #ff5f59;">(</span>* n <span style="color: #2fafff;">(</span>self <span style="color: #cabf00;">(</span>- n <span style="color: #88ca9f;">1</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+Let's carefully look at what' we just defined. We are defining <code>fact-generator</code> as
+a function that <b>does not</b> return the factorial of a number, but instead returns
+another <b>another lambda function</b> that will take a number <code>n</code>, and return its
+factorial. This inner lambda is able to use recursion <i>without</i> referencing itself
+by name because it can access the <code>self</code> parameter of the outer lambda.
+</p>
+
+<p>
+Let's look at how this generator should be used. We want to define <code>fact</code>, which
+is the actual factorial function that takes a number as its parameter and
+returns the factorial. That's what the inner lambda does, the one returned by
+<code>fact-generator</code>. However, the generator expects to receive the <code>fact</code> function as
+its <code>self</code> parameter, so the inner lambda can reference itself. At first sight, we
+could try something like this.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">Wrong.</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact</span>
+  <span style="color: #2fafff;">(</span>fact-generator fact<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+Here, we would pass the <code>fact</code> function to the <code>fact-generator</code> so it's able to
+return a <code>fact</code> that can reference itself. Unfortunately, we can't pass <code>fact</code> to
+the <code>fact-generator</code> because we still haven't defined what <code>fact</code> is (we are doing
+just that). Instead, since <code>fact-generator</code> returns <code>fact</code> but also expects it, we
+are looking for something like:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact</span>
+  <span style="color: #2fafff;">(</span>fact-generator <span style="color: #cabf00;">(</span>fact-generator <span style="color: #44bc44;">(</span>fact-generator ...<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+Does that look familiar? Indeed, this is just what the Y combinator allows us to
+do.
+</p>
+
+<p>
+However, our Scheme version of the Y combinator was not really correct. In
+Scheme (and in most Lisps), the parameters are evaluated <b>before</b> applying the
+function, so defining <code>Y</code> like we did before would cause infinite recursion when
+trying to apply the <code>(x x)</code> expressions. This will be more obvious when analyzing
+the combinator bellow, so let's look at a possible solution first.
+</p>
+
+<p>
+We can fix our Y combinator by <b>beta abstracting</b> those two applications.<sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup>
+</p>
+
+<blockquote>
+<p>
+If you have a function <code>F</code> in Scheme, you can define a totally equivalent function
+<code>G</code> by <code>(define G (lambda (args) (F args)))</code>. We say that <code>G</code> is a <i>beta abstraction</i> of
+<code>F</code>, or that <code>F</code> is a <i>beta reduction</i> of <code>G</code>.
+</p>
+
+<p>
+The usual reason you would beta abstract a function in Scheme is in order to
+delay the evaluation of its body, just what the doctor ordered.
+</p>
+</blockquote>
+
+<p>
+We can add this beta abstraction to the <code>(x x)</code> applications, effectively acting
+as a "proxy".
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">Y</span>
+  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>f<span style="color: #cabf00;">)</span>
+    <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>x<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span>f <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>n<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>x x<span style="color: #44bc44;">)</span> n<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span>
+     <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>x<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span>f <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>n<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>x x<span style="color: #44bc44;">)</span> n<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+This might be hard to understand at first, so let's try to understand it
+visually. This diagram represents the process of the inner lambdas in the
+function.
+</p>
+
+
+<div id="orgf530ff2" class="figure">
+<p><img src="../img/ycombinator4.svg" alt="ycombinator4.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+Let me explain each step of the diagram.
+</p>
+
+<ol class="org-ol">
+<li>We know that the lambda will receive a copy of itself as the argument <code>x</code>, as
+we have seen <a href="#simple-recursion-with-anonymous-functions">above</a> with the \((\lambda x. x\ x)(\lambda x. x\ x)\) expression.</li>
+<li>With <i>wishful thinking</i>, you can think of the <code>(x x)</code> expressions as <code>fact</code>, since
+this is what the current expression will be returning. This will make more
+sense bellow, but for now you will have to trust that this will return <code>fact</code>.</li>
+<li>The <code>(lambda (n) (fact n))</code> expression acts as a proxy, receiving some
+arguments, in this case <code>n</code>, and calling <code>fact</code> with them. We name this simple
+lambda <code>fact-proxy</code>, and calling it is essentially the same as calling <code>fact</code>.</li>
+<li>We know that <code>f</code> is the function that has been passed to <code>Y</code>, in this case
+<code>fact-generator</code>. We substitute the name for readability. We can also
+substitute <code>fact-proxy</code> with just <code>fact</code>.</li>
+<li>Finally, the expression returned by <code>(fact-generator fact)</code> gets passed to
+another lambda, or returned by <code>Y</code>, depending on whether or not we are the
+first call in the recursive cycle.</li>
+</ol>
+
+<p>
+With this, we can see that <code>(Y fact-generator)</code> will return <code>(fact-generator fact)</code>,
+which returns a recursive <code>fact</code> function, even though <code>fact</code> has not been defined
+yet.
+</p>
+
+<p>
+Now that you know what the expression returns, you can verify that the second
+point was true. The <code>(x x)</code> expression is calling <code>x</code> with a copy of the expression
+as argument (the gray expression at the top). That argument will be used
+exclusively for looping, as mentioned in point one. Therefore <code>x</code>, which is a
+lambda just like us, returns <code>fact</code>. That's why we were able to replace <code>(x x)</code> with
+<code>fact</code> on point two.
+</p>
+
+<p>
+We know the <code>(x x)</code> call returns <code>fact</code>, but Scheme will try to evaluate the call to
+<code>x</code>, which also contains another call to <code>x</code>, etc. That's what the <code>fact-proxy</code> is
+for.
+</p>
+
+<p>
+With this example, you can also realize that the following expression makes more
+sense now.
+</p>
+
+\begin{align*}
+Y f &= f (Y f) \\
+    &= f (f (f (...)))
+\end{align*}
+
+<p>
+Which is just what we wanted to achieve earlier.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact</span>
+  <span style="color: #2fafff;">(</span>fact-generator <span style="color: #cabf00;">(</span>fact-generator <span style="color: #44bc44;">(</span>fact-generator ...<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+Finally, we can <a href="https://try.scheme.org/">try</a> our full example.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">Y</span>
+  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>f<span style="color: #cabf00;">)</span>
+    <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>x<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span>f <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>n<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>x x<span style="color: #44bc44;">)</span> n<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span>
+     <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>x<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span>f <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>n<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>x x<span style="color: #44bc44;">)</span> n<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact-generator</span>
+  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>self<span style="color: #cabf00;">)</span>
+    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>n<span style="color: #44bc44;">)</span>
+      <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #ff5f59;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #ff5f59;">)</span>
+          <span style="color: #88ca9f;">1</span>
+          <span style="color: #ff5f59;">(</span>* n <span style="color: #2fafff;">(</span>self <span style="color: #cabf00;">(</span>- n <span style="color: #88ca9f;">1</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact</span>
+  <span style="color: #2fafff;">(</span>Y fact-generator<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+
+<span style="color: #ff5f59;">(</span>fact <span style="color: #88ca9f;">5</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+If you reached this far, I hope you have learned something. If you feel like
+some explanations could be improved, feel free to <a href="../index.html#contributing">contribute</a>.
+</p>
+</div>
+</div>
 <div id="footnotes">
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
@@ -707,6 +947,11 @@ See the <a href="https://en.wikipedia.org/wiki/Fixed_point_(mathematics)">Wikipe
 
 <div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
 See the <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator">Wikipedia page</a> for fixed-point combinator.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+See <a href="https://jao.io/blog/2014/08/06/spj-s-y-combinator-in-scheme/">jao.io</a> article about the Y combinator in Scheme, and about how to
+design good websites.
 </p></div></div>
 
 

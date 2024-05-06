@@ -71,6 +71,11 @@ There is also *eta reduction* (\eta-reduction), which expresses the idea of
 functions are the same if and only if they give the same result for all
 arguments.
 
+[[*Applications of the Y combinator][Later]] we will also mention the opposite of the beta reduction, the *beta
+abstraction*, which instead of simplifying an expression, it adds an extra
+function call that might be useful (e.g. in Lisps) for delaying the evaluation
+of the arguments.
+
 ** Notation
 :PROPERTIES:
 :CUSTOM_ID: notation
@@ -116,8 +121,8 @@ approach, and not on the Y combinator itself, I recommend you check it out.
 
 One of the most valuable things that SICP has taught me is that sometimes it's
 extremely useful to treat functions as black boxes that are able to transform
-some inputs into some outputs. This has been useful not only when using
-functions, but also when designing them.
+some inputs into some outputs. They call this /wishful thinking/, and it has been
+useful not only when using functions, but also when designing them.
 
 * Simple example: Factorial
 :PROPERTIES:
@@ -283,10 +288,16 @@ Or in Scheme:
      (lambda (x) (f (x x))))))
 #+end_src
 
+#+begin_quote
+*Note:* This version is not accurate, see [[*Applications of the Y combinator][Applications of the Y combinator]] bellow.
+#+end_quote
+
 Or in JavaScript:
 
 #+begin_src javascript
-var Y = (f) => ((x) => f(x(x)))((x) => f(x(x)));
+var Y = (f) =>
+    ((x) => f(x(x)))(
+     (x) => f(x(x)));
 #+end_src
 
 Since it's a fixed-point combinator, calling $Y$ with a function as its
@@ -330,23 +341,15 @@ $$
 Notice how the first call to $f$ was not necessary, since this expression also
 \beta-evaluates to the Y combinator.
 
-# -----
-
-[fn:1] See the [[https://en.wikipedia.org/wiki/Lambda_calculus][Wikipedia page]] for lambda calculus.
-[fn:2] See the [[https://en.wikipedia.org/wiki/Extensionality][Wikipedia page]] for extensionality.
-[fn:3] See the [[https://en.wikipedia.org/wiki/Fixed-point_combinator][Wikipedia page]] for fixed-point combinator.
-[fn:4] See the [[https://en.wikipedia.org/wiki/Fixed_point_(mathematics)][Wikipedia page]] for fixed point.
-
-# TODO --------------------------------------------------------
-
-* COMMENT Applications of the Y combinator
+* Applications of the Y combinator
 :PROPERTIES:
 :CUSTOM_ID: applications-of-the-y-combinator
 :END:
 
 You might be wondering what makes the Y combinator so special. As we said,
-lambda calculus doesn't allow us to name functions and use that name from within
-the function. Let's go back to the factorial example.
+lambda calculus doesn't have any kind of "global symbols", therefore a function
+can't reference itself by name. Let's go back to the factorial example in
+Scheme.
 
 #+begin_src scheme
 (define fact
@@ -356,9 +359,9 @@ the function. Let's go back to the factorial example.
         (* n (fact (- n 1))))))
 #+end_src
 
-That form is possible because =fact= can call itself using his name.
+This recursive form is possible because =fact= can call itself using its name.
 
-The Y combinator allows us to call a function recursivelly in a language which
+The Y combinator allows us to call a function recursively in a language which
 *doesn't implement recursion*. Let's have a look at an alternative form of =fact=.
 
 #+begin_src scheme
@@ -370,34 +373,153 @@ The Y combinator allows us to call a function recursivelly in a language which
           (* n (self (- n 1)))))))
 #+end_src
 
-This =fact-generator= function *does not* return the factorial of a number, but
-*another function* that will take a number, and that is able to call itself.
+Let's carefully look at what' we just defined. We are defining =fact-generator= as
+a function that *does not* return the factorial of a number, but instead returns
+another *another lambda function* that will take a number =n=, and return its
+factorial. This inner lambda is able to use recursion /without/ referencing itself
+by name because it can access the =self= parameter of the outer lambda.
 
-Ignoring all the Scheme primitives, we can see that the inner lambda doesn't
-reference itself by name. Instead, it calls the procedure that the outer lambda
-received as the =self= parameter.
-
-For getting the actual =fact= function, we would have to do something like this.
+Let's look at how this generator should be used. We want to define =fact=, which
+is the actual factorial function that takes a number as its parameter and
+returns the factorial. That's what the inner lambda does, the one returned by
+=fact-generator=. However, the generator expects to receive the =fact= function as
+its =self= parameter, so the inner lambda can reference itself. At first sight, we
+could try something like this.
 
 #+begin_src scheme
-;; NOTE: We can't just do this, "fact" is not bound.
+;; Wrong.
 (define fact
   (fact-generator fact))
 #+end_src
 
-However, we can't pass =fact= to the =fact-generator= because we still haven't
-defined what =fact= is.
-
-We can slightly modify the Y combinator to do this for us. Instead of /just/
-calling $f$ with $Y\ f$ as its argument, it can also pass a $n$ argument.
+Here, we would pass the =fact= function to the =fact-generator= so it's able to
+return a =fact= that can reference itself. Unfortunately, we can't pass =fact= to
+the =fact-generator= because we still haven't defined what =fact= is (we are doing
+just that). Instead, since =fact-generator= returns =fact= but also expects it, we
+are looking for something like:
 
 #+begin_src scheme
-;; FIXME
-(define Y
-  (lambda (f n)
-    ((lambda (x n) (f (x x) n))
-     (lambda (x n) (f (x x) n)))))
+(define fact
+  (fact-generator (fact-generator (fact-generator ...))))
 #+end_src
 
-When we call this version of =Y= with our last =fact= function, =Y= will *return a
-function* that is TODO
+Does that look familiar? Indeed, this is just what the Y combinator allows us to
+do.
+
+However, our Scheme version of the Y combinator was not really correct. In
+Scheme (and in most Lisps), the parameters are evaluated *before* applying the
+function, so defining =Y= like we did before would cause infinite recursion when
+trying to apply the =(x x)= expressions. This will be more obvious when analyzing
+the combinator bellow, so let's look at a possible solution first.
+
+#+begin_comment
+TODO: Add link to eval-apply cycle if I write an article about something
+similar.
+#+end_comment
+
+We can fix our Y combinator by *beta abstracting* those two applications.[fn:5]
+
+#+begin_quote
+If you have a function =F= in Scheme, you can define a totally equivalent function
+=G= by =(define G (lambda (args) (F args)))=. We say that =G= is a /beta abstraction/ of
+=F=, or that =F= is a /beta reduction/ of =G=.
+
+The usual reason you would beta abstract a function in Scheme is in order to
+delay the evaluation of its body, just what the doctor ordered.
+#+end_quote
+
+We can add this beta abstraction to the =(x x)= applications, effectively acting
+as a "proxy".
+
+#+begin_src scheme
+(define Y
+  (lambda (f)
+    ((lambda (x) (f (lambda (n) ((x x) n))))
+     (lambda (x) (f (lambda (n) ((x x) n)))))))
+#+end_src
+
+This might be hard to understand at first, so let's try to understand it
+visually. This diagram represents the process of the inner lambdas in the
+function.
+
+[[file:../img/ycombinator4.svg]]
+
+Let me explain each step of the diagram.
+
+1. We know that the lambda will receive a copy of itself as the argument =x=, as
+   we have seen [[*Simple recursion with anonymous functions][above]] with the $(\lambda x. x\ x)(\lambda x. x\ x)$ expression.
+2. With /wishful thinking/, you can think of the =(x x)= expressions as =fact=, since
+   this is what the current expression will be returning. This will make more
+   sense bellow, but for now you will have to trust that this will return =fact=.
+3. The =(lambda (n) (fact n))= expression acts as a proxy, receiving some
+   arguments, in this case =n=, and calling =fact= with them. We name this simple
+   lambda =fact-proxy=, and calling it is essentially the same as calling =fact=.
+4. We know that =f= is the function that has been passed to =Y=, in this case
+   =fact-generator=. We substitute the name for readability. We can also
+   substitute =fact-proxy= with just =fact=.
+5. Finally, the expression returned by =(fact-generator fact)= gets passed to
+   another lambda, or returned by =Y=, depending on whether or not we are the
+   first call in the recursive cycle.
+
+With this, we can see that =(Y fact-generator)= will return =(fact-generator fact)=,
+which returns a recursive =fact= function, even though =fact= has not been defined
+yet.
+
+Now that you know what the expression returns, you can verify that the second
+point was true. The =(x x)= expression is calling =x= with a copy of the expression
+as argument (the gray expression at the top). That argument will be used
+exclusively for looping, as mentioned in point one. Therefore =x=, which is a
+lambda just like us, returns =fact=. That's why we were able to replace =(x x)= with
+=fact= on point two.
+
+We know the =(x x)= call returns =fact=, but Scheme will try to evaluate the call to
+=x=, which also contains another call to =x=, etc. That's what the =fact-proxy= is
+for.
+
+With this example, you can also realize that the following expression makes more
+sense now.
+
+\begin{align*}
+Y f &= f (Y f) \\
+    &= f (f (f (...)))
+\end{align*}
+
+Which is just what we wanted to achieve earlier.
+
+#+begin_src scheme
+(define fact
+  (fact-generator (fact-generator (fact-generator ...))))
+#+end_src
+
+Finally, we can [[https://try.scheme.org/][try]] our full example.
+
+#+begin_src scheme
+(define Y
+  (lambda (f)
+    ((lambda (x) (f (lambda (n) ((x x) n))))
+     (lambda (x) (f (lambda (n) ((x x) n)))))))
+
+(define fact-generator
+  (lambda (self)
+    (lambda (n)
+      (if (equal? n 0)
+          1
+          (* n (self (- n 1)))))))
+
+(define fact
+  (Y fact-generator))
+
+(fact 5)
+#+end_src
+
+If you reached this far, I hope you have learned something. If you feel like
+some explanations could be improved, feel free to [[file:../index.org::#contributing][contribute]].
+
+# -----
+
+[fn:1] See the [[https://en.wikipedia.org/wiki/Lambda_calculus][Wikipedia page]] for lambda calculus.
+[fn:2] See the [[https://en.wikipedia.org/wiki/Extensionality][Wikipedia page]] for extensionality.
+[fn:3] See the [[https://en.wikipedia.org/wiki/Fixed-point_combinator][Wikipedia page]] for fixed-point combinator.
+[fn:4] See the [[https://en.wikipedia.org/wiki/Fixed_point_(mathematics)][Wikipedia page]] for fixed point.
+[fn:5] See [[https://jao.io/blog/2014/08/06/spj-s-y-combinator-in-scheme/][jao.io]] article about the Y combinator in Scheme, and about how to
+design good websites.
