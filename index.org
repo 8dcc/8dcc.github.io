@@ -3,6 +3,7 @@
 #+OPTIONS: toc:nil num:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/main.css">
 
 I will use this blog to post information in a more centralized way, instead of
 spreading it across the wikis of the different projects.
