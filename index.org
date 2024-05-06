@@ -8,11 +8,17 @@ I will use this blog to post information in a more centralized way, instead of
 spreading it across the wikis of the different projects.
 
 * Current sections
+:PROPERTIES:
+:CUSTOM_ID: current-sections
+:END:
 
 - [[file:reversing/index.org][Reverse engineering]]
 - [[file:programming/index.org][Programming]]
 
 * External documentations
+:PROPERTIES:
+:CUSTOM_ID: external-documentations
+:END:
 
 I will probably end up moving other documentations I have written for my
 projects here, but until then, make sure you also check out:
@@ -22,6 +28,9 @@ projects here, but until then, make sure you also check out:
 - Finding the offsets and [[https://github.com/8dcc/tf2-cheat/wiki/Getting-SDL-offsets][hooking SDL functions]].
 
 * External links
+:PROPERTIES:
+:CUSTOM_ID: external-links
+:END:
 
 External links you might find interesting:
 
@@ -30,6 +39,9 @@ External links you might find interesting:
 - [[https://www.codewars.com/users/8dcc][Codewars profile]]
 
 * Contributing
+:PROPERTIES:
+:CUSTOM_ID: contributing
+:END:
 
 Feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this blog if you find any errors or if you have any
 suggestions.
