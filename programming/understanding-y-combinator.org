@@ -243,7 +243,7 @@ For example, for some functions $f$, we can locate a fixed point by beginning
 with an initial guess and applying $f$ repeatedly.
 
 $$
-f(x),\quad f(f(x)),\quad f(f(f(x))),\quad ...,
+f(x),\quad f(f(x)),\quad f(f(f(x))),\quad \dots,
 $$
 
 We would do that until the value doesn't change very much, and we are satisfied
@@ -481,7 +481,7 @@ sense now.
 
 \begin{align*}
 Y f &= f (Y f) \\
-    &= f (f (f (...)))
+    &= f (f (f (\dots)))
 \end{align*}
 
 Which is just what we wanted to achieve earlier.
