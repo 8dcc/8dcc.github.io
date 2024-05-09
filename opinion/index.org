@@ -1,0 +1,19 @@
+#+TITLE: Opinion
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil num:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]]
+
+-----
+
+* List of entries
+:PROPERTIES:
+:CUSTOM_ID: list-of-entries
+:END:
+
+These are used to share personal opinions on various topics.
+
+- [[file:emacs-features.org][My favorite GNU/Emacs features]]

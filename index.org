@@ -15,6 +15,7 @@ spreading it across the wikis of the different projects.
 
 - [[file:reversing/index.org][Reverse engineering]]
 - [[file:programming/index.org][Programming]]
+- [[file:opinion/index.org][Opinion]]
 
 * External documentations
 :PROPERTIES:
