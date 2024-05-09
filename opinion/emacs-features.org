@@ -1,0 +1,249 @@
+#+TITLE: My favorite GNU/Emacs features
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+[[https://www.gnu.org/software/emacs/][Emacs]] is an amazing editor. I come from [[https://neovim.io/][neovim]] and I decided to try [[https://github.com/doomemacs/doomemacs][doom emacs]]
+some years ago, and decided to eventually "doom-ify" vanilla Emacs to my liking,
+removing all features I didn't like or use.
+
+As you might have heard, Emacs /is not/ a text editor, Emacs /has/ a text editor. It
+has a lot of features, and it's so easy to customize and extend that it creates
+an amazing environment for programming or general text editing.
+
+With that in mind, let me say that Emacs is not really comparable to vi-like
+editors... Because they are just editors. They do one thing, and they do it
+really good: They let you edit text files, and very efficiently. Emacs is much
+more, which can save time but might also be an overkill for some people.
+
+I decided to make a list of some of the Emacs features/packages I enjoy the
+most, mainly because I keep forgetting some stuff even exists. I am using GNU
+Emacs version 29.3, in GNU/Linux.
+
+** Quick note about vanilla keybinds
+:PROPERTIES:
+:CUSTOM_ID: quick-note-about-vanilla-keybinds
+:END:
+
+I don't like the vanilla GNU Emacs keybinds. At all. I don't know them and I
+don't want to, even the most experienced Emacs users say they suck, and often
+change them.
+
+I use evil mode, which allows vi-like keybinds. See [[*Evil mode][Evil mode]] bellow.
+
+See also [[https://en.wikipedia.org/wiki/Repetitive_strain_injury][RSI]], [[http://xahlee.info/kbd/typing_rsi.html][Xah Lee's RSI page]] and [[http://xahlee.info/emacs/emacs/emacs_pinky.html][Xah Lee's Emacs pinky page]].
+
+** Quick note about keybind notation
+:PROPERTIES:
+:CUSTOM_ID: quick-note-about-keybind-notation
+:END:
+
+The key notation used in the Emacs context is the following.
+
+| Key | Description                                 |
+|-----+---------------------------------------------|
+| =C-=  | Press and hold the Control key              |
+| =M-=  | Press and hold the Meta (Alt) key           |
+| =S-=  | Press and hold the Shift key                |
+| =DEL= | Press the Backspace key, *not the delete key* |
+| =RET= | Press the Return or Enter key               |
+| =SPC= | Press the Space bar                         |
+| =ESC= | Press the Escape key                        |
+| =TAB= | Press the Tab key                           |
+
+For example:
+
+- =C-M-s= (or, equivalently, =M-C-s=): Press and hold both *Control* and *Meta* (Alt)
+  keys while hitting the *s* key.
+- =SPC t c=: Press *Space*, then *t* and finally *c*.
+- =M-x find-file RET=: Press and hold *Meta* (Alt), hit the *x* key, type " find-file ", and press
+  *Return*.
+
+Note that =M-x ... RET= is a common pattern, since =M-x= opens the "execute command"
+menu.
+
+* General design choices
+:PROPERTIES:
+:CUSTOM_ID: general-design-choices
+:END:
+
+** GUI vs. Terminal
+:PROPERTIES:
+:CUSTOM_ID: gui-vs-terminal
+:END:
+
+Emacs is a GUI program. It can be ran in a terminal, but you will be limiting
+its potential. The fact that Emacs has its own window has a lot of advantages
+over terminal editors like neovim.
+
+For example, you can display inline images, open PDF files, change the font
+styles (without being limited by the terminal's styles), change the fonts
+themselves for certain regions, etc.
+
+** Emacs Lisp
+:PROPERTIES:
+:CUSTOM_ID: emacs-lisp
+:END:
+
+Emacs uses its own dialect of [[https://en.wikipedia.org/wiki/Lisp][Lisp]] as its programming language: [[https://en.wikipedia.org/wiki/Emacs_Lisp][Emacs Lisp]].
+
+I started looking at Lisp languages because Richard Stallman, one of the
+creators of Emacs, recommended it in one of his talks. Then I found that Emacs
+is made in its own Lisp dialect.
+
+Since using Emacs, specially since switching to vanilla, I have learned a lot
+about Lisp and functional programming, and I can say I don't regret it one bit.
+
+Even if you don't use Emacs, *check out the Lisp language family*, you will learn
+a lot.
+
+Another interesting part about Emacs Lisp is its self documentation. If you go
+to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/index.html][Emacs manual website]], you can read the following.
+
+#+begin_quote
+Emacs is the advanced, extensible, customizable, *self-documenting* editor.
+#+end_quote
+
+They are not lying. Simply press =C-h v= and start typing a variable name to
+display its documentation. You can also search for functions with =C-h f=.
+
+See also: [[https://www.gnu.org/software/emacs/manual/pdf/elisp.pdf][Emacs Lisp manual (PDF)]].
+
+* Built-in features
+:PROPERTIES:
+:CUSTOM_ID: built-in-features
+:END:
+
+These packages are currently built into vanilla GNU Emacs, but this might not be
+the case in older versions, so keep that in mind.
+
+** Org mode
+:PROPERTIES:
+:CUSTOM_ID: org-mode
+:END:
+
+TODO
+
+** GDB
+:PROPERTIES:
+:CUSTOM_ID: gdb
+:END:
+
+TODO
+
+** Eshell
+:PROPERTIES:
+:CUSTOM_ID: eshell
+:END:
+
+TODO
+
+At first I didnt like it
+
+** Grep
+:PROPERTIES:
+:CUSTOM_ID: grep
+:END:
+
+TODO
+
+** Compilation
+:PROPERTIES:
+:CUSTOM_ID: compilation
+:END:
+
+TODO
+
+Links to errors in files
+
+** Browser and external documentation
+:PROPERTIES:
+:CUSTOM_ID: browser-and-external-documentation
+:END:
+
+TODO
+
+- eww (not a replacement for browsers)
+- man
+
+** ERC
+:PROPERTIES:
+:CUSTOM_ID: erc
+:END:
+
+TODO
+
+** Calculator
+:PROPERTIES:
+:CUSTOM_ID: calculator
+:END:
+
+TODO
+
+I dont know much about it, but its very interesting
+
+** Misc
+:PROPERTIES:
+:CUSTOM_ID: misc
+:END:
+
+TODO
+
+Games:
+- Zone
+- ...
+
+Emms.
+
+* External packages
+:PROPERTIES:
+:CUSTOM_ID: external-packages
+:END:
+
+These packages are currently not built into vanilla GNU Emacs, but this might
+change in the future, so keep that in mind.
+
+** Evil mode
+:PROPERTIES:
+:CUSTOM_ID: evil-mode
+:END:
+
+TODO
+
+** Magit
+:PROPERTIES:
+:CUSTOM_ID: magit
+:END:
+
+TODO
+
+** Ediff
+:PROPERTIES:
+:CUSTOM_ID: ediff
+:END:
+
+TODO
+
+Integration with magit
+
+* Honorable mentions
+:PROPERTIES:
+:CUSTOM_ID: honorable-mentions
+:END:
+
+TODO
+
+Which-key, consult packages, etc.
