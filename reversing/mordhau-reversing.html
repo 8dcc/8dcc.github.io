@@ -215,7 +215,16 @@
 <li><a href="#my-motives">1.3. My motives</a></li>
 </ul>
 </li>
-<li><a href="#gallery">2. Gallery</a></li>
+<li><a href="#finding-the-necessary-offsets-with-ida-pro">2. Finding the necessary offsets with IDA Pro</a>
+<ul>
+<li><a href="#gnames">2.1. <code>GNames</code></a></li>
+<li><a href="#gobjects">2.2. <code>GObjects</code></a></li>
+<li><a href="#uworld">2.3. <code>UWorld</code></a></li>
+</ul>
+</li>
+<li><a href="#dumping-and-exploring-the-game-with-uedumper">3. Dumping and exploring the game with UEDumper</a></li>
+<li><a href="#magic-hexadecimal-tree">4. Magic hexadecimal tree</a></li>
+<li><a href="#gallery">5. Gallery</a></li>
 </ul>
 </div>
 </div>
@@ -241,7 +250,7 @@ was so broken that you could fly anywhere, clip into stuff, and do much more.
 </p>
 
 
-<div id="orgd1388a8" class="figure">
+<div id="org2a40a4d" class="figure">
 <p><img src="../img/mordhau1.jpg" alt="mordhau1.jpg" />
 </p>
 </div>
@@ -255,12 +264,12 @@ themselves and kill them, or vote kick them.
 
 <p>
 However, they ended up patching most of the funny glitches, and even removing
-votekicks entirely. You could still clip into stuff and do other glitches, since
-the developers did such a bad job, but it was not the same.
+vote-kicks entirely. You could still clip into stuff and do other glitches,
+since the developers did such a bad job, but it was not the same.
 </p>
 
 
-<div id="org4bb55c7" class="figure">
+<div id="org54ff2f1" class="figure">
 <p><img src="../img/mordhau2.jpg" alt="mordhau2.jpg" />
 </p>
 </div>
@@ -292,19 +301,19 @@ enough to handle a big game like this.
 <p>
 The game has no anti-cheat at all. You can read and write any values in memory,
 and change whatever you want as if this was <a href="https://github.com/8dcc/hl-cheat">Half-Life 1</a>. I heard they <i>had</i> an
-anticheat at some point, but they removed it for some reason.
+anti-cheat at some point, but they removed it for some reason.
 </p>
 
 <p>
-Not only do they lack an anticheat, but they look like <b>they want people to cheat</b>
-in their game. Years ago I noticed that they published an update with a <a href="https://en.wikipedia.org/wiki/Program_database">PDB</a>
-file, which contains very useful debugging information. I remember copying it
-quickly after noticing, because I <i>obviously</i> thought it was a mistake. Well,
+Not only do they lack an anti-cheat, but they look like <b>they want people to
+cheat</b> in their game. Years ago I noticed that they published an update with a
+<a href="https://en.wikipedia.org/wiki/Program_database">PDB</a> file, which contains very useful debugging information. I remember copying
+it quickly after noticing, because I <i>obviously</i> thought it was a mistake. Well,
 let's have a look at the binaries folder now.
 </p>
 
 
-<div id="org6f6c459" class="figure">
+<div id="orgd417a5a" class="figure">
 <p><img src="../img/mordhau3.png" alt="mordhau3.png" />
 </p>
 </div>
@@ -387,7 +396,7 @@ took it down exclusively based on my screenshots.
 </p>
 
 
-<div id="org8307f10" class="figure">
+<div id="org6cd4344" class="figure">
 <p><img src="../img/mordhau4.png" alt="mordhau4.png" />
 </p>
 </div>
@@ -402,8 +411,118 @@ or <a href="reversing-tf2-bsendpacket.html">TF2</a>.
 </div>
 </div>
 
+<div id="outline-container-finding-the-necessary-offsets-with-ida-pro" class="outline-2">
+<h2 id="finding-the-necessary-offsets-with-ida-pro"><span class="section-number-2">2.</span> Finding the necessary offsets with IDA Pro</h2>
+<div class="outline-text-2" id="text-finding-the-necessary-offsets-with-ida-pro">
+<p>
+As I said, the game is made in Unreal Engine 4. There is an amazing tool called
+<a href="https://github.com/Spuckwaffel/UEDumper">UEDumper</a>, which allows you to explore the game's structures, even live. However,
+this is a "universal" dumper, and it needs some offsets. We are going to get
+them using <a href="https://en.wikipedia.org/wiki/Interactive_Disassembler">IDA Pro</a>.
+</p>
+</div>
+
+<div id="outline-container-gnames" class="outline-3">
+<h3 id="gnames"><span class="section-number-3">2.1.</span> <code>GNames</code></h3>
+<div class="outline-text-3" id="text-gnames">
+<p>
+TODO
+</p>
+</div>
+</div>
+
+<div id="outline-container-gobjects" class="outline-3">
+<h3 id="gobjects"><span class="section-number-3">2.2.</span> <code>GObjects</code></h3>
+<div class="outline-text-3" id="text-gobjects">
+<p>
+TODO
+</p>
+</div>
+</div>
+
+<div id="outline-container-uworld" class="outline-3">
+<h3 id="uworld"><span class="section-number-3">2.3.</span> <code>UWorld</code></h3>
+<div class="outline-text-3" id="text-uworld">
+<p>
+TODO
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-dumping-and-exploring-the-game-with-uedumper" class="outline-2">
+<h2 id="dumping-and-exploring-the-game-with-uedumper"><span class="section-number-2">3.</span> Dumping and exploring the game with UEDumper</h2>
+<div class="outline-text-2" id="text-dumping-and-exploring-the-game-with-uedumper">
+<p>
+As I mentioned, you will first need to edit some files, and compile the UEDumper
+project itself.
+</p>
+
+<p>
+You will have to edit <code>UEDumper-1.8/UEDumper/Engine/Userdefined/Offsets.h</code>, and
+replace the offsets you got from IDA in the <code>setOffsets()</code> function. The format
+should be the following.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #ff6f9f;">inline</span> <span style="color: #88ca9f;">std</span>::<span style="color: #79a8ff;">vector</span>&lt;Offset&gt; <span style="color: #4ae2ff;">setOffsets</span>()
+{
+    <span style="color: #88ca9f;">std</span>::<span style="color: #79a8ff;">vector</span>&lt;Offset&gt; <span style="color: #6ae4b9;">offsets</span>;
+
+    <span style="color: #989898;">// </span><span style="color: #989898;">Mordhau-Win64-Shipping.exe</span>
+    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS, <span style="color: #00d3d0;">"OFFSET_GNAMES"</span>, <span style="color: #88ca9f;">0x57ABCD</span> });
+    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS, <span style="color: #00d3d0;">"OFFSET_GOBJECTS"</span>, <span style="color: #88ca9f;">0x57CDEF0</span> });
+    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS | OFFSET_LIVE_EDITOR, <span style="color: #00d3d0;">"OFFSET_UWORLD"</span>, <span style="color: #88ca9f;">0x58FEDCB</span> });
+
+    <span style="color: #ff6f9f;">return</span> offsets;
+}
+</pre>
+</div>
+
+<p>
+The first offset should be <code>GNames</code>, the second <code>GObjects</code> and the third
+<code>UWorld</code>. Again, remember adding the imagebase! TODO
+</p>
+
+<p>
+Then, you can save the file and compile the project using the "Release" version
+in the top bar of Visual Studio. Unfortunately I can't insert a screenshot
+because I compiled the project once, back when I had Windows installed. Imagine
+how often the developers update their game.
+</p>
+</div>
+</div>
+
+<div id="outline-container-magic-hexadecimal-tree" class="outline-2">
+<h2 id="magic-hexadecimal-tree"><span class="section-number-2">4.</span> Magic hexadecimal tree</h2>
+<div class="outline-text-2" id="text-magic-hexadecimal-tree">
+<p>
+If you have been following until now, you might realize what these numbers mean,
+and what to do with them.
+</p>
+
+<pre class="example" id="org53fdce4">
+&lt;UWorld&gt;
+0x123
+TODO
+</pre>
+
+<p>
+I am sorry if someone was expecting a quick guide on how to break X
+animation. You can do everything I did with the numbers above. I intentionally
+wanted to make this misleading to inexperienced programmers, so the game
+developers couldn't figure out how I did my magic.
+</p>
+
+<p>
+When the game updates, you just need to find and change the <code>UWorld</code> offset, and
+you will be good to go.
+</p>
+</div>
+</div>
+
 <div id="outline-container-gallery" class="outline-2">
-<h2 id="gallery"><span class="section-number-2">2.</span> Gallery</h2>
+<h2 id="gallery"><span class="section-number-2">5.</span> Gallery</h2>
 <div class="outline-text-2" id="text-gallery">
 <p>
 Since my account was banned, I decided to upload my funniest screenshots here.

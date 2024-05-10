@@ -180,7 +180,7 @@ You will have to edit =UEDumper-1.8/UEDumper/Engine/Userdefined/Offsets.h=, and
 replace the offsets you got from IDA in the =setOffsets()= function. The format
 should be the following.
 
-#+begin_example C++
+#+begin_src C++
 inline std::vector<Offset> setOffsets()
 {
     std::vector<Offset> offsets;
@@ -192,7 +192,7 @@ inline std::vector<Offset> setOffsets()
 
     return offsets;
 }
-#+end_example
+#+end_src
 
 The first offset should be =GNames=, the second =GObjects= and the third
 =UWorld=. Again, remember adding the imagebase! TODO
