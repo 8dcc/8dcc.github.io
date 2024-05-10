@@ -1,0 +1,234 @@
+#+TITLE: Mordhau: From reversing Unreal Engine 4 to breaking animations
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+[[https://en.wikipedia.org/wiki/Mordhau_(video_game)][Mordhau]] is a multiplayer video game made in [[https://en.wikipedia.org/wiki/Unreal_Engine][Unreal Engine 4]]. I have been
+playing this game for a long time, and I made a lot of friends along the
+way. The best part of this game has not been its fighting mechanics, but how
+funny the people were.
+
+** The golden era of the game
+:PROPERTIES:
+:CUSTOM_ID: the-golden-era-of-the-game
+:END:
+
+There was a time where you could do a lot of funny glitches, like
+[[https://www.youtube.com/watch?v=_eaOfSUGv70][flying around]]. This was by far when I had the most fun with people. The game
+was so broken that you could fly anywhere, clip into stuff, and do much more.
+
+[[file:../img/mordhau1.jpg]]
+
+You might think that people were using it to take advantage of people, but that
+was not the case. Instead, everyone was teaching glitches to each other, and
+goofing around. If someone was abusing a glitch, someone else could just glitch
+themselves and kill them, or vote kick them.
+
+However, they ended up patching most of the funny glitches, and even removing
+vote-kicks entirely. You could still clip into stuff and do other glitches,
+since the developers did such a bad job, but it was not the same.
+
+[[file:../img/mordhau2.jpg]]
+
+The game is only available for Windows (and consoles), but you can still run it
+on GNU/Linux through [[https://github.com/ValveSoftware/Proton][Proton]]. A friend I met while playing told me about this,
+and it's in fact what made me definitely switch from Windows to GNU/Linux on my
+main computer.
+
+This means that any memory inspecting (more on this bellow) has to be done
+*within the same wine prefix*. I personally use [[https://github.com/jcnils/protonhax][this tool]] to accomplish that.
+
+** The amazing developer team
+:PROPERTIES:
+:CUSTOM_ID: the-amazing-developer-team
+:END:
+
+The developers of this game are /terrible/. In plenty of ways. They are bad at
+programming, they are bad at promoting their game, they are bad at basic
+decision making, and they are bad at moderating. Basically, they are not mature
+enough to handle a big game like this.
+
+The game has no anti-cheat at all. You can read and write any values in memory,
+and change whatever you want as if this was [[https://github.com/8dcc/hl-cheat][Half-Life 1]]. I heard they /had/ an
+anti-cheat at some point, but they removed it for some reason.
+
+Not only do they lack an anti-cheat, but they look like *they want people to
+cheat* in their game. Years ago I noticed that they published an update with a
+[[https://en.wikipedia.org/wiki/Program_database][PDB]] file, which contains very useful debugging information. I remember copying
+it quickly after noticing, because I /obviously/ thought it was a mistake. Well,
+let's have a look at the binaries folder now.
+
+[[file:../img/mordhau3.png]]
+
+There it is, the third file on the list. They have been shipping the debugging
+information along the game for *years*. This is a big mistake, that allows anyone
+(with some reversing knowledge) to basically browse the source code of the
+game. I am assuming they don't know what the file is, so they just leave it in
+the output folder because they assume that the game needs it.
+
+You might also notice the suspicious =.i64= files. In case the reader is not
+familiar with reversing, these are 64-bit [[https://en.wikipedia.org/wiki/Interactive_Disassembler][IDA Pro]] databases, and they will be
+covered bellow.
+
+As a side note, I think it's very funny that this could happen to the developers
+to begin with. I don't know what they used to compile this program, but I think
+the compiler/IDE should only generate this =.pdb= file when compiling in /debug
+mode/, and not in /release mode/. I am not sure if this means that they are
+shipping the debug version or not.
+
+In any case, this is very funny, and it reminded me of how I didn't know what
+object files were when I first started with C/C++, so I was not sure about
+including them on my git project or not.
+
+Note that this article was written in May of 2024, so keep in mind that they
+might have actually fixed this after I spoon-fed this information to them. If
+it's still there, you can import this =.pdb= file from IDA Pro, although the rest
+of this article doesn't asume you have imported it.
+
+** My motives
+:PROPERTIES:
+:CUSTOM_ID: my-motives
+:END:
+
+I like reverse engineering, and I enjoy a few video-games. That's why, if I
+really enjoy playing a game, I might try to reverse engineer it, to see how it
+was done. Since I use GNU/Linux, I mainly enjoy reversing native Linux programs
+and games. Even if I really enjoy a Windows video-game, the reversing interest
+is usually not big enough to make me switch to Windows.
+
+However, since I had been playing Mordhau for such a long time, I decided to
+give it a try and, through Proton, see if I could find something interesting. I
+did find [[*Gallery][a lot of interesting stuff]]. I already knew how bad the game was, but
+noticing how many things were client-sided definitely made me realize that the
+developers were clueless.
+
+I knew I could get banned, because I found things that I had never seen anyone
+do before, but I decided that I had played the game long enough, and that I
+didn't care if I got banned. I rather have fun my way, than just play normally
+to avoid getting banned. I even took notes on writing this once I got banned.
+
+I don't particularly enjoy /cheating/, as in getting an unfair advantage over
+other players. I like reversing and making cheats because I enjoy the low-level
+aspect of understanding a game enough to do something that the developers are
+actively trying to prevent you from doing. That was a long sentence, by the way.
+
+And indeed, I started reversing the game on January 2024, and I didn't get
+banned until May of 2024. I think I saw a moderator in-game once... In my whole
+life. In the end, it was a jealous kid who reported my account. They immediately
+took it down exclusively based on my screenshots.
+
+[[file:../img/mordhau4.png]]
+
+Anyhow, this is good news, since now I am able to explain the reverse
+engineering process without being worried about bans, which was something I have
+wanted since I started reversing the game, just like it was with [[file:devildaggers.org][Devil Daggers]]
+or [[file:reversing-tf2-bsendpacket.org][TF2]].
+
+* Finding the necessary offsets with IDA Pro
+:PROPERTIES:
+:CUSTOM_ID: finding-the-necessary-offsets-with-ida-pro
+:END:
+
+As I said, the game is made in Unreal Engine 4. There is an amazing tool called
+[[https://github.com/Spuckwaffel/UEDumper][UEDumper]], which allows you to explore the game's structures, even live. However,
+this is a "universal" dumper, and it needs some offsets. We are going to get
+them using [[https://en.wikipedia.org/wiki/Interactive_Disassembler][IDA Pro]].
+
+** =GNames=
+:PROPERTIES:
+:CUSTOM_ID: gnames
+:END:
+
+TODO
+
+** =GObjects=
+:PROPERTIES:
+:CUSTOM_ID: gobjects
+:END:
+
+TODO
+
+** =UWorld=
+:PROPERTIES:
+:CUSTOM_ID: uworld
+:END:
+
+TODO
+
+* Dumping and exploring the game with UEDumper
+:PROPERTIES:
+:CUSTOM_ID: dumping-and-exploring-the-game-with-uedumper
+:END:
+
+As I mentioned, you will first need to edit some files, and compile the UEDumper
+project itself.
+
+You will have to edit =UEDumper-1.8/UEDumper/Engine/Userdefined/Offsets.h=, and
+replace the offsets you got from IDA in the =setOffsets()= function. The format
+should be the following.
+
+#+begin_example C++
+inline std::vector<Offset> setOffsets()
+{
+    std::vector<Offset> offsets;
+
+    // Mordhau-Win64-Shipping.exe
+    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS, "OFFSET_GNAMES", 0x57ABCD });
+    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS, "OFFSET_GOBJECTS", 0x57CDEF0 });
+    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS | OFFSET_LIVE_EDITOR, "OFFSET_UWORLD", 0x58FEDCB });
+
+    return offsets;
+}
+#+end_example
+
+The first offset should be =GNames=, the second =GObjects= and the third
+=UWorld=. Again, remember adding the imagebase! TODO
+
+Then, you can save the file and compile the project using the "Release" version
+in the top bar of Visual Studio. Unfortunately I can't insert a screenshot
+because I compiled the project once, back when I had Windows installed. Imagine
+how often the developers update their game.
+
+* Magic hexadecimal tree
+:PROPERTIES:
+:CUSTOM_ID: magic-hexadecimal-tree
+:END:
+
+If you have been following until now, you might realize what these numbers mean,
+and what to do with them.
+
+#+begin_example xml
+<UWorld>
+0x123
+TODO
+#+end_example
+
+I am sorry if someone was expecting a quick guide on how to break X
+animation. You can do everything I did with the numbers above. I intentionally
+wanted to make this misleading to inexperienced programmers, so the game
+developers couldn't figure out how I did my magic.
+
+When the game updates, you just need to find and change the =UWorld= offset, and
+you will be good to go.
+
+* Gallery
+:PROPERTIES:
+:CUSTOM_ID: gallery
+:END:
+
+Since my account was banned, I decided to upload my funniest screenshots here.
+
+TODO

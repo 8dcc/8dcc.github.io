@@ -23,7 +23,7 @@ spreading it across the wikis of the different projects.
 :END:
 
 I will probably end up moving other documentations I have written for my
-projects here, but until then, make sure you also check out:
+projects here, but until then, make sure to check out:
 
 - The [[https://github.com/fs-os/fs-os/wiki][fs-os wiki]], explaining the details of [[https://github.com/fs-os/fs-os][my operating system]].
 - [[https://github.com/8dcc/bms-cheat/wiki/Hooking-CreateMove][Hooking CreateMove]] in [[https://en.wikipedia.org/wiki/Source_(game_engine)][source]] games.
