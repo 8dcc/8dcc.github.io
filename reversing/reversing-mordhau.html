@@ -251,7 +251,7 @@ was so broken that you could fly anywhere, clip into stuff, and do much more.
 </p>
 
 
-<div id="org517dceb" class="figure">
+<div id="org2a158ba" class="figure">
 <p><img src="../img/mordhau1.jpg" alt="mordhau1.jpg" />
 </p>
 </div>
@@ -270,7 +270,7 @@ since the developers did such a bad job, but it was not the same.
 </p>
 
 
-<div id="org20e22be" class="figure">
+<div id="orgdbae32e" class="figure">
 <p><img src="../img/mordhau2.jpg" alt="mordhau2.jpg" />
 </p>
 </div>
@@ -314,7 +314,7 @@ let's have a look at the binaries folder now.
 </p>
 
 
-<div id="orgfb17bea" class="figure">
+<div id="org8cd4d2d" class="figure">
 <p><img src="../img/mordhau3.png" alt="mordhau3.png" />
 </p>
 </div>
@@ -399,7 +399,7 @@ immediately banned me exclusively based on my screenshots.
 </p>
 
 
-<div id="orgad862c0" class="figure">
+<div id="orge617d13" class="figure">
 <p><img src="../img/mordhau4.png" alt="mordhau4.png" />
 </p>
 </div>
@@ -452,7 +452,7 @@ pressing <code>Shift+F12</code>. From there, right click on the string list and 
 </p>
 
 
-<div id="org794b626" class="figure">
+<div id="org4bfe702" class="figure">
 <p><img src="../img/mordhau5.png" alt="mordhau5.png" />
 </p>
 </div>
@@ -472,7 +472,7 @@ not 16-bits.
 </p>
 
 
-<div id="orgdad9c58" class="figure">
+<div id="org5a7a8b5" class="figure">
 <p><img src="../img/mordhau6.png" alt="mordhau6.png" />
 </p>
 </div>
@@ -483,7 +483,7 @@ the <code>aMulticastdeleg</code> symbol, or by pressing the <code>x</code> key. 
 </p>
 
 
-<div id="org5d7bb80" class="figure">
+<div id="orgafcedf8" class="figure">
 <p><img src="../img/mordhau7.png" alt="mordhau7.png" />
 </p>
 </div>
@@ -496,7 +496,7 @@ its cross references.
 </p>
 
 
-<div id="org84388b2" class="figure">
+<div id="org923a51f" class="figure">
 <p><img src="../img/mordhau8.png" alt="mordhau8.png" />
 </p>
 </div>
@@ -509,7 +509,7 @@ this.
 </p>
 
 
-<div id="org698ca62" class="figure">
+<div id="org7e669bf" class="figure">
 <p><img src="../img/mordhau9.png" alt="mordhau9.png" />
 </p>
 </div>
@@ -531,7 +531,7 @@ prompt.
 </p>
 
 
-<div id="orga5370ef" class="figure">
+<div id="orgb860524" class="figure">
 <p><img src="../img/mordhau10.png" alt="mordhau10.png" />
 </p>
 </div>
@@ -548,7 +548,7 @@ parameter.
 </p>
 
 
-<div id="orgf906c21" class="figure">
+<div id="org2a24f92" class="figure">
 <p><img src="../img/mordhau11.png" alt="mordhau11.png" />
 </p>
 </div>
@@ -586,7 +586,7 @@ jump to its only xref. Once you are in the subroutine, press <code>F5</code> to 
 </p>
 
 
-<div id="org0fe2e6e" class="figure">
+<div id="org1ae35d2" class="figure">
 <p><img src="../img/mordhau12.png" alt="mordhau12.png" />
 </p>
 </div>
@@ -680,7 +680,50 @@ imagine how often the developers update their game.
 </p>
 
 <p>
-TODO
+Now you can open the <code>UEDumper.exe</code> file on the <code>build</code> folder. As I mentioned on
+the introduction, if you are running the game in GNU/Linux through Proton, you
+will need to use some kind of <a href="https://github.com/jcnils/protonhax">tool</a> to run the dumper under the same wine prefix
+as Mordhau.
+</p>
+
+
+<div id="org237263d" class="figure">
+<p><img src="../img/mordhau13.png" alt="mordhau13.png" />
+</p>
+</div>
+
+<p>
+Enter any project name and the name of the Mordhau executable. Again, remember
+this is not <code>Mordhau.exe</code> but <code>Mordhau-Win64-Shipping.exe</code>. When you have done this,
+press "Dump Game". If your offsets were correct, you should see something like
+this.
+</p>
+
+
+<div id="org8b3d4a0" class="figure">
+<p><img src="../img/mordhau14.png" alt="mordhau14.png" />
+</p>
+</div>
+
+<p>
+Once it's done loading, you can start inspecting the game live. Press "Live
+editor" on the top bar, then the "Add Inspector" button, then switch to the "Add
+Offset" tab, select <code>UWorld</code>, and enter any display name.
+</p>
+
+
+<div id="org5f26fe4" class="figure">
+<p><img src="../img/mordhau15.png" alt="mordhau15.png" />
+</p>
+</div>
+
+<p>
+After pressing "Add", you should be able to see the structures in a nice
+format. Expand "UWorld", and you will be able to navigate the game's structures
+by name. Each <code>+0030</code> value in red represents an offset relative to the parent. If
+you expand a structure, you are "dereferencing" it, and its offsets will be
+relative to that parent. In other words, you are traversing a chain (or tree) of
+pointers.
 </p>
 </div>
 </div>
@@ -708,89 +751,89 @@ until now, you might realize what these numbers mean, and what to do with them.
     |- <span style="color: #88ca9f;">0xA28</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try fixing</span>
     |- <span style="color: #88ca9f;">0xDB1</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 1</span>
     |- <span style="color: #88ca9f;">0x260</span>
+    |  |
+    |  |- <span style="color: #88ca9f;">0x8A0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Next 2 are client-sided, unfortunately</span>
+    |  |- <span style="color: #88ca9f;">0x8A4</span>
+    |  |- <span style="color: #88ca9f;">0x8A8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Vehicle. Others can use, carefuly</span>
+    |  |- <span style="color: #88ca9f;">0x8C4</span>
+    |  |- <span style="color: #88ca9f;">0x8CC</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Vehicle too</span>
+    |  |- <span style="color: #88ca9f;">0xDE8</span>
+    |  |- <span style="color: #88ca9f;">0x6A0</span>
+    |     |- <span style="color: #88ca9f;">0xC8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try fixing, with next one</span>
+    |     |- <span style="color: #88ca9f;">0xEC</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 9999, not client-sided</span>
+    |
+    |- <span style="color: #88ca9f;">0x2A0</span>
        |
-       |- <span style="color: #88ca9f;">0x8A0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Next 2 are client-sided, unfortunately</span>
-       |- <span style="color: #88ca9f;">0x8A4</span>
-       |- <span style="color: #88ca9f;">0x8A8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Vehicle. Others can use, carefuly</span>
-       |- <span style="color: #88ca9f;">0x8C4</span>
-       |- <span style="color: #88ca9f;">0x8CC</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Vehicle too</span>
-       |- <span style="color: #88ca9f;">0xDE8</span>
-       |- <span style="color: #88ca9f;">0x6A0</span>
-       |  |- <span style="color: #88ca9f;">0xC8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try fixing, with next one</span>
-       |  |- <span style="color: #88ca9f;">0xEC</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 9999, not client-sided</span>
+       |- <span style="color: #88ca9f;">0xB80</span>, <span style="color: #88ca9f;">0x128</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
+       |- <span style="color: #88ca9f;">0xF09</span>         <span style="color: #989898;">// </span><span style="color: #989898;">Try 2, new gameplay</span>
+       |- <span style="color: #88ca9f;">0xB78</span>, <span style="color: #88ca9f;">0x830</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Careful</span>
+       |- <span style="color: #88ca9f;">0x6A0</span>, <span style="color: #88ca9f;">0xF8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Client-sided, unfortunately</span>
+       |- <span style="color: #88ca9f;">0xB08</span>
+       |  |
+       |  |- <span style="color: #88ca9f;">0x61</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try kick, etc.</span>
+       |  |- <span style="color: #88ca9f;">0x6C</span>
+       |  |- <span style="color: #88ca9f;">0x6D</span>
+       |  |- <span style="color: #88ca9f;">0x6E</span>
        |
-       |- <span style="color: #88ca9f;">0x2A0</span>
+       |- <span style="color: #88ca9f;">0x288</span>
+       |  |
+       |  |- <span style="color: #88ca9f;">0xC49</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
+       |  |- <span style="color: #88ca9f;">0xD1C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 1, very OP</span>
+       |
+       |- <span style="color: #88ca9f;">0xE66</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 1</span>
+       |- <span style="color: #88ca9f;">0xEA4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try increasing</span>
+       |- <span style="color: #88ca9f;">0xEA8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
+       |- <span style="color: #88ca9f;">0xE94</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Not sure if it does anything</span>
+       |- <span style="color: #88ca9f;">0x1029</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Needs another option to be useful</span>
+       |- <span style="color: #88ca9f;">0x8C4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
+       |- <span style="color: #88ca9f;">0x8CC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
+       |
+       |- <span style="color: #88ca9f;">0x1200</span>
+       |  |
+       |  |- <span style="color: #88ca9f;">0xCEC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Next 3 will feel weird</span>
+       |  |- <span style="color: #88ca9f;">0xCF4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try... non ranged?</span>
+       |  |- <span style="color: #88ca9f;">0xD00</span>
+       |  |- <span style="color: #88ca9f;">0xD1F</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
+       |  |- <span style="color: #88ca9f;">0xCC8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try ranged</span>
+       |  |- <span style="color: #88ca9f;">0xEF8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Useful in very few weapons</span>
+       |  |- <span style="color: #88ca9f;">0xCBC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try throw</span>
+       |  |- <span style="color: #88ca9f;">0xD23</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Extremelly goofy one, personal favorite</span>
+       |  |- <span style="color: #88ca9f;">0x1A0C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Needed for a previous option</span>
+       |  |- <span style="color: #88ca9f;">0xCB9</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try pavise</span>
+       |  |- <span style="color: #88ca9f;">0x1C98</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Very goofy, pavise again</span>
+       |
+       |- <span style="color: #88ca9f;">0x11F8</span>
           |
-          |- <span style="color: #88ca9f;">0xB80</span>, <span style="color: #88ca9f;">0x128</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
-          |- <span style="color: #88ca9f;">0xF09</span>         <span style="color: #989898;">// </span><span style="color: #989898;">Try 2, new gameplay</span>
-          |- <span style="color: #88ca9f;">0xB78</span>, <span style="color: #88ca9f;">0x830</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Careful</span>
-          |- <span style="color: #88ca9f;">0x6A0</span>, <span style="color: #88ca9f;">0xF8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Client-sided, unfortunately</span>
-          |- <span style="color: #88ca9f;">0xB08</span>
-          |  |
-          |  |- <span style="color: #88ca9f;">0x61</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try kick, etc.</span>
-          |  |- <span style="color: #88ca9f;">0x6C</span>
-          |  |- <span style="color: #88ca9f;">0x6D</span>
-          |  |- <span style="color: #88ca9f;">0x6C</span>  <span style="color: #989898;">// </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Wrong, should be close</span>
-          |
-          |- <span style="color: #88ca9f;">0x288</span>
-          |  |
-          |  |- <span style="color: #88ca9f;">0xC49</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
-          |  |- <span style="color: #88ca9f;">0xD1C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 1, very OP</span>
-          |
-          |- <span style="color: #88ca9f;">0xE66</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 1</span>
-          |- <span style="color: #88ca9f;">0xEA4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try increasing</span>
-          |- <span style="color: #88ca9f;">0xEA8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
-          |- <span style="color: #88ca9f;">0xE94</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Not sure if it does anything</span>
-          |- <span style="color: #88ca9f;">0x1029</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Needs another option to be useful</span>
-          |- <span style="color: #88ca9f;">0x8C4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
-          |- <span style="color: #88ca9f;">0x8CC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
-          |
-          |- <span style="color: #88ca9f;">0x1200</span>
-          |  |
-          |  |- <span style="color: #88ca9f;">0xCEC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Next 3 will feel weird</span>
-          |  |- <span style="color: #88ca9f;">0xCF4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try... non ranged?</span>
-          |  |- <span style="color: #88ca9f;">0xD00</span>
-          |  |- <span style="color: #88ca9f;">0xD1F</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
-          |  |- <span style="color: #88ca9f;">0xCC8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try ranged</span>
-          |  |- <span style="color: #88ca9f;">0xEF8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Useful in very few weapons</span>
-          |  |- <span style="color: #88ca9f;">0xCBC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try throw</span>
-          |  |- <span style="color: #88ca9f;">0xD23</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Extremelly goofy one, personal favorite</span>
-          |  |- <span style="color: #88ca9f;">0x1A0C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Needed for a previous option</span>
-          |  |- <span style="color: #88ca9f;">0xCB9</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try pavise</span>
-          |  |- <span style="color: #88ca9f;">0x1C98</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Very goofy, pavise again</span>
-          |
-          |- <span style="color: #88ca9f;">0x11F8</span>
+          |- <span style="color: #88ca9f;">0xCEC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Most are shared with 0x1200</span>
+          |- <span style="color: #88ca9f;">0xCF4</span>
+          |- <span style="color: #88ca9f;">0xD00</span>
+          |- <span style="color: #88ca9f;">0xD1F</span>
+          |- <span style="color: #88ca9f;">0xD40</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try heal, unfortunately not shared</span>
+          |- <span style="color: #88ca9f;">0xCC8</span>
+          |- <span style="color: #88ca9f;">0xEF8</span>
+          |- <span style="color: #88ca9f;">0xCBC</span>
+          |- <span style="color: #88ca9f;">0xD23</span>
+          |- <span style="color: #88ca9f;">0x1A0C</span>
+          |- <span style="color: #88ca9f;">0xCB9</span>
+          |- <span style="color: #88ca9f;">0x1C98</span>
+          |- <span style="color: #88ca9f;">0xF40</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try polehammer, for example</span>
+          |- <span style="color: #88ca9f;">0xF41</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Should be always 1</span>
+          |- <span style="color: #88ca9f;">0xF54</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
+          |- <span style="color: #88ca9f;">0xF58</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
+          |- <span style="color: #88ca9f;">0x13E0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try maul, for example</span>
+          |- <span style="color: #88ca9f;">0x13E1</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Should be always 1</span>
+          |- <span style="color: #88ca9f;">0x13F0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try lowering a bit, combine with next 2</span>
+          |- <span style="color: #88ca9f;">0x13F4</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
+          |- <span style="color: #88ca9f;">0x13F8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
+          |- <span style="color: #88ca9f;">0xD40</span>, <span style="color: #88ca9f;">0xB0</span>
              |
-             |- <span style="color: #88ca9f;">0xCEC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Most are shared with 0x1200</span>
-             |- <span style="color: #88ca9f;">0xCF4</span>
-             |- <span style="color: #88ca9f;">0xD00</span>
-             |- <span style="color: #88ca9f;">0xD1F</span>
-             |- <span style="color: #88ca9f;">0xD40</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try heal, unfortunately not shared</span>
-             |- <span style="color: #88ca9f;">0xCC8</span>
-             |- <span style="color: #88ca9f;">0xEF8</span>
-             |- <span style="color: #88ca9f;">0xCBC</span>
-             |- <span style="color: #88ca9f;">0xD23</span>
-             |- <span style="color: #88ca9f;">0x1A0C</span>
-             |- <span style="color: #88ca9f;">0xCB9</span>
-             |- <span style="color: #88ca9f;">0x1C98</span>
-             |- <span style="color: #88ca9f;">0xF40</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try polehammer, for example</span>
-             |- <span style="color: #88ca9f;">0xF41</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Should be always 1</span>
-             |- <span style="color: #88ca9f;">0xF54</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
-             |- <span style="color: #88ca9f;">0xF58</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
-             |- <span style="color: #88ca9f;">0x13E0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try maul, for example</span>
-             |- <span style="color: #88ca9f;">0x13E1</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Should be always 1</span>
-             |- <span style="color: #88ca9f;">0x13F0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try lowering a bit, combine with next 2</span>
-             |- <span style="color: #88ca9f;">0x13F4</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
-             |- <span style="color: #88ca9f;">0x13F8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
-             |- <span style="color: #88ca9f;">0xD40</span>, <span style="color: #88ca9f;">0xB0</span>
-                |
-                |- <span style="color: #88ca9f;">0x14</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Be creative</span>
-                |- <span style="color: #88ca9f;">0x18</span>
-                |- <span style="color: #88ca9f;">0x1C</span>
-                |- <span style="color: #88ca9f;">0x7C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0 for next 3</span>
-                |- <span style="color: #88ca9f;">0x80</span>
-                |- <span style="color: #88ca9f;">0x84</span>
-                |- ...   <span style="color: #989898;">// </span><span style="color: #989898;">Groups of 6 repeat</span>
+             |- <span style="color: #88ca9f;">0x14</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Be creative</span>
+             |- <span style="color: #88ca9f;">0x18</span>
+             |- <span style="color: #88ca9f;">0x1C</span>
+             |- <span style="color: #88ca9f;">0x7C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0 for next 3</span>
+             |- <span style="color: #88ca9f;">0x80</span>
+             |- <span style="color: #88ca9f;">0x84</span>
+             |- ...   <span style="color: #989898;">// </span><span style="color: #989898;">Groups of 6 repeat</span>
 </pre>
 </div>
 
@@ -803,7 +846,12 @@ developers couldn't figure out how I did my magic.
 
 <p>
 When the game updates, you just need to find and change the <code>UWorld</code> offset, and
-you will be good to go.
+you will be good to go most of the times. If something bigger changes, but you
+can update the values easily.
+</p>
+
+<p>
+And more importantly, get creative. I found all this stuff by trial and error.
 </p>
 </div>
 </div>

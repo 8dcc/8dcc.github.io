@@ -328,7 +328,32 @@ in the top bar of Visual Studio. Unfortunately I can't insert a screenshot
 because I compiled the project once, back when I had Windows installed. Just
 imagine how often the developers update their game.
 
-TODO
+Now you can open the =UEDumper.exe= file on the =build= folder. As I mentioned on
+the introduction, if you are running the game in GNU/Linux through Proton, you
+will need to use some kind of [[https://github.com/jcnils/protonhax][tool]] to run the dumper under the same wine prefix
+as Mordhau.
+
+[[file:../img/mordhau13.png]]
+
+Enter any project name and the name of the Mordhau executable. Again, remember
+this is not =Mordhau.exe= but =Mordhau-Win64-Shipping.exe=. When you have done this,
+press "Dump Game". If your offsets were correct, you should see something like
+this.
+
+[[file:../img/mordhau14.png]]
+
+Once it's done loading, you can start inspecting the game live. Press "Live
+editor" on the top bar, then the "Add Inspector" button, then switch to the "Add
+Offset" tab, select =UWorld=, and enter any display name.
+
+[[file:../img/mordhau15.png]]
+
+After pressing "Add", you should be able to see the structures in a nice
+format. Expand "UWorld", and you will be able to navigate the game's structures
+by name. Each =+0030= value in red represents an offset relative to the parent. If
+you expand a structure, you are "dereferencing" it, and its offsets will be
+relative to that parent. In other words, you are traversing a chain (or tree) of
+pointers.
 
 * Magic hexadecimal tree
 :PROPERTIES:
@@ -353,89 +378,89 @@ until now, you might realize what these numbers mean, and what to do with them.
     |- 0xA28  // Try fixing
     |- 0xDB1  // Try 1
     |- 0x260
+    |  |
+    |  |- 0x8A0  // Next 2 are client-sided, unfortunately
+    |  |- 0x8A4
+    |  |- 0x8A8  // Vehicle. Others can use, carefuly
+    |  |- 0x8C4
+    |  |- 0x8CC  // Vehicle too
+    |  |- 0xDE8
+    |  |- 0x6A0
+    |     |- 0xC8  // Try fixing, with next one
+    |     |- 0xEC  // Try 9999, not client-sided
+    |
+    |- 0x2A0
        |
-       |- 0x8A0  // Next 2 are client-sided, unfortunately
-       |- 0x8A4
-       |- 0x8A8  // Vehicle. Others can use, carefuly
-       |- 0x8C4
-       |- 0x8CC  // Vehicle too
-       |- 0xDE8
-       |- 0x6A0
-       |  |- 0xC8  // Try fixing, with next one
-       |  |- 0xEC  // Try 9999, not client-sided
+       |- 0xB80, 0x128  // Not useful
+       |- 0xF09         // Try 2, new gameplay
+       |- 0xB78, 0x830  // Careful
+       |- 0x6A0, 0xF8   // Client-sided, unfortunately
+       |- 0xB08
+       |  |
+       |  |- 0x61  // Try kick, etc.
+       |  |- 0x6C
+       |  |- 0x6D
+       |  |- 0x6E
        |
-       |- 0x2A0
+       |- 0x288
+       |  |
+       |  |- 0xC49  // Not useful
+       |  |- 0xD1C  // Try 1, very OP
+       |
+       |- 0xE66   // Try 1
+       |- 0xEA4   // Try increasing
+       |- 0xEA8   // Try -1
+       |- 0xE94   // Not sure if it does anything
+       |- 0x1029  // Needs another option to be useful
+       |- 0x8C4   // Try -1
+       |- 0x8CC   // Try -1
+       |
+       |- 0x1200
+       |  |
+       |  |- 0xCEC   // Next 3 will feel weird
+       |  |- 0xCF4   // Try... non ranged?
+       |  |- 0xD00
+       |  |- 0xD1F   // Not useful
+       |  |- 0xCC8   // Try ranged
+       |  |- 0xEF8   // Useful in very few weapons
+       |  |- 0xCBC   // Try throw
+       |  |- 0xD23   // Extremelly goofy one, personal favorite
+       |  |- 0x1A0C  // Needed for a previous option
+       |  |- 0xCB9   // Try pavise
+       |  |- 0x1C98  // Very goofy, pavise again
+       |
+       |- 0x11F8
           |
-          |- 0xB80, 0x128  // Not useful
-          |- 0xF09         // Try 2, new gameplay
-          |- 0xB78, 0x830  // Careful
-          |- 0x6A0, 0xF8   // Client-sided, unfortunately
-          |- 0xB08
-          |  |
-          |  |- 0x61  // Try kick, etc.
-          |  |- 0x6C
-          |  |- 0x6D
-          |  |- 0x6C  // TODO: Wrong, should be close
-          |
-          |- 0x288
-          |  |
-          |  |- 0xC49  // Not useful
-          |  |- 0xD1C  // Try 1, very OP
-          |
-          |- 0xE66   // Try 1
-          |- 0xEA4   // Try increasing
-          |- 0xEA8   // Try -1
-          |- 0xE94   // Not sure if it does anything
-          |- 0x1029  // Needs another option to be useful
-          |- 0x8C4   // Try -1
-          |- 0x8CC   // Try -1
-          |
-          |- 0x1200
-          |  |
-          |  |- 0xCEC   // Next 3 will feel weird
-          |  |- 0xCF4   // Try... non ranged?
-          |  |- 0xD00
-          |  |- 0xD1F   // Not useful
-          |  |- 0xCC8   // Try ranged
-          |  |- 0xEF8   // Useful in very few weapons
-          |  |- 0xCBC   // Try throw
-          |  |- 0xD23   // Extremelly goofy one, personal favorite
-          |  |- 0x1A0C  // Needed for a previous option
-          |  |- 0xCB9   // Try pavise
-          |  |- 0x1C98  // Very goofy, pavise again
-          |
-          |- 0x11F8
+          |- 0xCEC   // Most are shared with 0x1200
+          |- 0xCF4
+          |- 0xD00
+          |- 0xD1F
+          |- 0xD40   // Try heal, unfortunately not shared
+          |- 0xCC8
+          |- 0xEF8
+          |- 0xCBC
+          |- 0xD23
+          |- 0x1A0C
+          |- 0xCB9
+          |- 0x1C98
+          |- 0xF40   // Try polehammer, for example
+          |- 0xF41   // Should be always 1
+          |- 0xF54   // Try 0
+          |- 0xF58   // Try 0
+          |- 0x13E0  // Try maul, for example
+          |- 0x13E1  // Should be always 1
+          |- 0x13F0  // Try lowering a bit, combine with next 2
+          |- 0x13F4  // Try 0
+          |- 0x13F8  // Try 0
+          |- 0xD40, 0xB0
              |
-             |- 0xCEC   // Most are shared with 0x1200
-             |- 0xCF4
-             |- 0xD00
-             |- 0xD1F
-             |- 0xD40   // Try heal, unfortunately not shared
-             |- 0xCC8
-             |- 0xEF8
-             |- 0xCBC
-             |- 0xD23
-             |- 0x1A0C
-             |- 0xCB9
-             |- 0x1C98
-             |- 0xF40   // Try polehammer, for example
-             |- 0xF41   // Should be always 1
-             |- 0xF54   // Try 0
-             |- 0xF58   // Try 0
-             |- 0x13E0  // Try maul, for example
-             |- 0x13E1  // Should be always 1
-             |- 0x13F0  // Try lowering a bit, combine with next 2
-             |- 0x13F4  // Try 0
-             |- 0x13F8  // Try 0
-             |- 0xD40, 0xB0
-                |
-                |- 0x14  // Be creative
-                |- 0x18
-                |- 0x1C
-                |- 0x7C  // Try 0 for next 3
-                |- 0x80
-                |- 0x84
-                |- ...   // Groups of 6 repeat
+             |- 0x14  // Be creative
+             |- 0x18
+             |- 0x1C
+             |- 0x7C  // Try 0 for next 3
+             |- 0x80
+             |- 0x84
+             |- ...   // Groups of 6 repeat
 #+end_src
 
 I am sorry if someone was expecting a quick guide on how to break X
@@ -444,7 +469,10 @@ wanted to make this misleading to inexperienced programmers, so the game
 developers couldn't figure out how I did my magic.
 
 When the game updates, you just need to find and change the =UWorld= offset, and
-you will be good to go.
+you will be good to go most of the times. If something bigger changes, but you
+can update the values easily.
+
+And more importantly, get creative. I found all this stuff by trial and error.
 
 * Gallery
 :PROPERTIES:
