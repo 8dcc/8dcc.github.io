@@ -34,8 +34,8 @@ was so broken that you could fly anywhere, clip into stuff, and do much more.
 
 You might think that people were using it to take advantage of people, but that
 was not the case. Instead, everyone was teaching glitches to each other, and
-goofing around. If someone was abusing a glitch, someone else could just glitch
-themselves and kill them, or vote kick them.
+goofing around. If someone was abusing a glitch, someone else could just use
+another glitch and kill them, or simply vote kick them.
 
 However, they ended up patching most of the funny glitches, and even removing
 vote-kicks entirely. You could still clip into stuff and do other glitches,
