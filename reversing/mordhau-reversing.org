@@ -91,12 +91,12 @@ shipping the debug version or not.
 
 In any case, this is very funny, and it reminded me of how I didn't know what
 object files were when I first started with C/C++, so I was not sure about
-including them on my git project or not.
+including them on my git projects or not.
 
-Note that this article was written in May of 2024, so keep in mind that they
-might have actually fixed this after I spoon-fed this information to them. If
-it's still there, you can import this =.pdb= file from IDA Pro, although the rest
-of this article doesn't asume you have imported it.
+This article was been written in May of 2024, so keep in mind that they might
+have actually removed the =.pdb= file after I spoon-fed this information to
+them. If it's still there, you can import it from IDA Pro, although the rest of
+this article doesn't asume you have imported it.
 
 ** My motives
 :PROPERTIES:
@@ -118,24 +118,26 @@ developers were clueless.
 I knew I could get banned, because I found things that I had never seen anyone
 do before, but I decided that I had played the game long enough, and that I
 didn't care if I got banned. I rather have fun my way, than just play normally
-to avoid getting banned. I even took notes on writing this once I got banned.
+to avoid getting banned. I even took notes on writing this article once I got
+banned.
 
-I don't particularly enjoy /cheating/, as in getting an unfair advantage over
+I don't particularly enjoy /cheating/, as in, getting an unfair advantage over
 other players. I like reversing and making cheats because I enjoy the low-level
 aspect of understanding a game enough to do something that the developers are
 actively trying to prevent you from doing. That was a long sentence, by the way.
 
 And indeed, I started reversing the game on January 2024, and I didn't get
-banned until May of 2024. I think I saw a moderator in-game once... In my whole
-life. In the end, it was a jealous kid who reported my account. They immediately
-took it down exclusively based on my screenshots.
+banned until May of 2024. I think I saw a moderator in-game once... and it was
+before starting reversing the game. In the end, it was a jealous kid who
+reported my account because I wouldn't tell him how to [[https://en.wikipedia.org/wiki/T-pose][T-pose]] in game. They
+immediately banned me exclusively based on my screenshots.
 
 [[file:../img/mordhau4.png]]
 
 Anyhow, this is good news, since now I am able to explain the reverse
 engineering process without being worried about bans, which was something I have
-wanted since I started reversing the game, just like it was with [[file:devildaggers.org][Devil Daggers]]
-or [[file:reversing-tf2-bsendpacket.org][TF2]].
+wanted since I started reversing the game, just like I did with [[file:devildaggers.org][Devil Daggers]] or
+[[file:reversing-tf2-bsendpacket.org][TF2]].
 
 * Finding the necessary offsets with IDA Pro
 :PROPERTIES:
@@ -147,33 +149,157 @@ As I said, the game is made in Unreal Engine 4. There is an amazing tool called
 this is a "universal" dumper, and it needs some offsets. We are going to get
 them using [[https://en.wikipedia.org/wiki/Interactive_Disassembler][IDA Pro]].
 
-** =GNames=
+This is meant to be a quick guide for getting the needed offsets by =UEDumper=, so
+I won't be diving into too much detail. The general method for finding them is
+to look at the Unreal Engine 4 source code, find where these symbols are used,
+and look for cross references you can use. Try looking for close strings, and
+things you can easily find from IDA.
+
+** Important IDA notes
 :PROPERTIES:
-:CUSTOM_ID: gnames
+:CUSTOM_ID: important-ida-notes
 :END:
 
-TODO
+Remember to open the =Mordhau-Win64-Shipping.exe= file, not =Mordhau.exe= files. We
+will also use this executable with =UEDumper= bellow.
 
-** =GObjects=
+Also, you will need some settings in order to find the required offsets.
+
+First, open the /Strings/ subview with /View > Open subviews > Strings/, or by
+pressing =Shift+F12=. From there, right click on the string list and press
+/Setup/. Make sure all C-style string types are allowed.
+
+[[file:../img/mordhau5.png]]
+
+You can then press =Ctrl+F= in the /Strings/ view to search for strings.
+
+** Finding =GNames=
 :PROPERTIES:
-:CUSTOM_ID: gobjects
+:CUSTOM_ID: finding-gnames
 :END:
 
-TODO
+Search for the string =MulticastDelegateProperty=, and choose the one with C type,
+not 16-bits.
 
-** =UWorld=
+[[file:../img/mordhau6.png]]
+
+Double-click the string, then open the cross-references window by right-clicking
+the =aMulticastdeleg= symbol, or by pressing the =x= key. Jump to its only xref.
+
+[[file:../img/mordhau7.png]]
+
+You are now in a big subroutine that handles a lot of strings. I opened the
+decompiler window so it's easier to tell what's going on, but it's not
+necessary. From the assembly view, scroll to the top of the subroutine and list
+its cross references.
+
+[[file:../img/mordhau8.png]]
+
+Jump to the first one, the /Direction/ of the xref should be /Up/. The function
+where the =MulticastDelegateProperty= string was located is being called with the
+=GNames= structure as its argument, so we should be looking for something like
+this.
+
+[[file:../img/mordhau9.png]]
+
+As you can see, the address of =stru_57BEE80= is being loaded into =rcx=, which
+according to the Windows x64 calling convention, is used for the first parameter
+when calling a function. Note that the function call appears highlighted because
+I marked the location from IDA.
+
+However, =0x57BEE80= is not the /real/ offset of =GNames=. This is the "absolute"
+offset that IDA shows us, which would be accurate if we were loaded at
+=0x0=. However, we want to get the relative offset to where the executable was
+mapped in memory. To get this relative offset, we will need to subtract the
+=ImageBase=, which we can obtain by typing =get_imagebase()= in the IDA command
+prompt.
+
+#+begin_comment
+NOTE: Feel free to make a PR if the information about absolute/relative offsets
+and the ImageBase is not accurate.
+#+end_comment
+
+[[file:../img/mordhau10.png]]
+
+** Finding =GObjects=
 :PROPERTIES:
-:CUSTOM_ID: uworld
+:CUSTOM_ID: finding-gobjects
 :END:
 
-TODO
+Search for the string =CloseDisregardForGC=, and jump to its only xref. In the
+assembly, you will see that the string is being used as a function
+parameter.
 
-* Dumping and exploring the game with UEDumper
+[[file:../img/mordhau11.png]]
+
+Right before that function call, you can see that it's checking for a
+=byte_57D7AEC= value. This is the assembly generated when compiling the following
+Unreal Engine code.
+
+#+begin_src C++
+if (GUObjectArray.OpenForDisregardForGC())
+{
+    SCOPED_BOOT_TIMING("CloseDisregardForGC");
+    GUObjectArray.CloseDisregardForGC();
+}
+#+end_src
+
+The =OpenForDisregardForGC= value being checked is a 4-byte padded boolean. In the
+=GUObjectArray= structure, it's located right before the =ObjObjects=
+array. Therefore, we can simply add 4 bytes to that =byte_57D7AEC= value, and we
+will get the offset of =GObjects=. Again, remember to also subtract the =ImageBase=.
+
+** Finding =UWorld=
+:PROPERTIES:
+:CUSTOM_ID: finding-uworld
+:END:
+
+Search for the string =Failed to load package '%s' into a new game world.=, and
+jump to its only xref. Once you are in the subroutine, press =F5= to decompile it.
+
+[[file:../img/mordhau12.png]]
+
+In this case, we were lucky and the function call with our string has no labels
+near it, and the the decompiled subroutine looks pretty clean.
+
+We are looking for that =qword_590DC40= line at the bottom. That's the =UWorld=
+global variable, but remember that we still need to subtract the =ImageBase=.
+
+Although this was the ideal scenario, the decompiler might not always interpret
+the branches this way, and might show a bunch of jumps across labels. The
+function might look something like this:
+
+#+begin_src C
+  // ...
+  // Label mess, qword gets assigned somewhere over here
+
+LABEL_123:
+  sub_1822B30(&PerformanceCount, L"Failed to load package '%s' into a new game world.", v124);
+  if ( v6 == &PerformanceCount )
+  {
+      v7 = PerformanceCount;
+  }
+  else
+  {
+      // ...
+  }
+
+  // ...
+  // Subroutine returns, qword assigment is not here
+
+  return 0;
+}
+#+end_src
+
+In that case, we would have to jump to the xref of that =LABEL_123= and look for
+the same =qword= assignment bellow the jump.
+
+* Dumping and exploring the game with =UEDumper=
 :PROPERTIES:
 :CUSTOM_ID: dumping-and-exploring-the-game-with-uedumper
 :END:
 
-As I mentioned, you will first need to edit some files, and compile the UEDumper
+As I mentioned, you will first need to edit some files, and compile the =UEDumper=
 project itself.
 
 You will have to edit =UEDumper-1.8/UEDumper/Engine/Userdefined/Offsets.h=, and
@@ -195,26 +321,122 @@ inline std::vector<Offset> setOffsets()
 #+end_src
 
 The first offset should be =GNames=, the second =GObjects= and the third
-=UWorld=. Again, remember adding the imagebase! TODO
+=UWorld=. Again, make sure you have subtracted the =ImageBase=!
 
 Then, you can save the file and compile the project using the "Release" version
 in the top bar of Visual Studio. Unfortunately I can't insert a screenshot
-because I compiled the project once, back when I had Windows installed. Imagine
-how often the developers update their game.
+because I compiled the project once, back when I had Windows installed. Just
+imagine how often the developers update their game.
+
+TODO
 
 * Magic hexadecimal tree
 :PROPERTIES:
 :CUSTOM_ID: magic-hexadecimal-tree
 :END:
 
-If you have been following until now, you might realize what these numbers mean,
-and what to do with them.
+These are the most interesting values I have found. If you have been following
+until now, you might realize what these numbers mean, and what to do with them.
 
-#+begin_example xml
+#+begin_src C
 <UWorld>
-0x123
-TODO
-#+end_example
+ |
+ |- 0x120
+ |  |
+ |  |- 0x689  // Try 0
+ |  |- 0x697  // Try 1
+ |
+ |- 0x180, 0x38, 0x0, 0x30
+    |
+    |- 0x2B8, 0x23C
+    |- 0x28C  // Not useful
+    |- 0xA28  // Try fixing
+    |- 0xDB1  // Try 1
+    |- 0x260
+       |
+       |- 0x8A0  // Next 2 are client-sided, unfortunately
+       |- 0x8A4
+       |- 0x8A8  // Vehicle. Others can use, carefuly
+       |- 0x8C4
+       |- 0x8CC  // Vehicle too
+       |- 0xDE8
+       |- 0x6A0
+       |  |- 0xC8  // Try fixing, with next one
+       |  |- 0xEC  // Try 9999, not client-sided
+       |
+       |- 0x2A0
+          |
+          |- 0xB80, 0x128  // Not useful
+          |- 0xF09         // Try 2, new gameplay
+          |- 0xB78, 0x830  // Careful
+          |- 0x6A0, 0xF8   // Client-sided, unfortunately
+          |- 0xB08
+          |  |
+          |  |- 0x61  // Try kick, etc.
+          |  |- 0x6C
+          |  |- 0x6D
+          |  |- 0x6C  // TODO: Wrong, should be close
+          |
+          |- 0x288
+          |  |
+          |  |- 0xC49  // Not useful
+          |  |- 0xD1C  // Try 1, very OP
+          |
+          |- 0xE66   // Try 1
+          |- 0xEA4   // Try increasing
+          |- 0xEA8   // Try -1
+          |- 0xE94   // Not sure if it does anything
+          |- 0x1029  // Needs another option to be useful
+          |- 0x8C4   // Try -1
+          |- 0x8CC   // Try -1
+          |
+          |- 0x1200
+          |  |
+          |  |- 0xCEC   // Next 3 will feel weird
+          |  |- 0xCF4   // Try... non ranged?
+          |  |- 0xD00
+          |  |- 0xD1F   // Not useful
+          |  |- 0xCC8   // Try ranged
+          |  |- 0xEF8   // Useful in very few weapons
+          |  |- 0xCBC   // Try throw
+          |  |- 0xD23   // Extremelly goofy one, personal favorite
+          |  |- 0x1A0C  // Needed for a previous option
+          |  |- 0xCB9   // Try pavise
+          |  |- 0x1C98  // Very goofy, pavise again
+          |
+          |- 0x11F8
+             |
+             |- 0xCEC   // Most are shared with 0x1200
+             |- 0xCF4
+             |- 0xD00
+             |- 0xD1F
+             |- 0xD40   // Try heal, unfortunately not shared
+             |- 0xCC8
+             |- 0xEF8
+             |- 0xCBC
+             |- 0xD23
+             |- 0x1A0C
+             |- 0xCB9
+             |- 0x1C98
+             |- 0xF40   // Try polehammer, for example
+             |- 0xF41   // Should be always 1
+             |- 0xF54   // Try 0
+             |- 0xF58   // Try 0
+             |- 0x13E0  // Try maul, for example
+             |- 0x13E1  // Should be always 1
+             |- 0x13F0  // Try lowering a bit, combine with next 2
+             |- 0x13F4  // Try 0
+             |- 0x13F8  // Try 0
+             |- 0xD40, 0xB0
+                |
+                |- 0x14  // Be creative
+                |- 0x18
+                |- 0x1C
+                |- 0x7C  // Try 0 for next 3
+                |- 0x80
+                |- 0x84
+                |- ...   // Groups of 6 repeat
+#+end_src
 
 I am sorry if someone was expecting a quick guide on how to break X
 animation. You can do everything I did with the numbers above. I intentionally

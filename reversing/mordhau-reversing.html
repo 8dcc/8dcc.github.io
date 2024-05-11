@@ -217,12 +217,13 @@
 </li>
 <li><a href="#finding-the-necessary-offsets-with-ida-pro">2. Finding the necessary offsets with IDA Pro</a>
 <ul>
-<li><a href="#gnames">2.1. <code>GNames</code></a></li>
-<li><a href="#gobjects">2.2. <code>GObjects</code></a></li>
-<li><a href="#uworld">2.3. <code>UWorld</code></a></li>
+<li><a href="#important-ida-notes">2.1. Important IDA notes</a></li>
+<li><a href="#finding-gnames">2.2. Finding <code>GNames</code></a></li>
+<li><a href="#finding-gobjects">2.3. Finding <code>GObjects</code></a></li>
+<li><a href="#finding-uworld">2.4. Finding <code>UWorld</code></a></li>
 </ul>
 </li>
-<li><a href="#dumping-and-exploring-the-game-with-uedumper">3. Dumping and exploring the game with UEDumper</a></li>
+<li><a href="#dumping-and-exploring-the-game-with-uedumper">3. Dumping and exploring the game with <code>UEDumper</code></a></li>
 <li><a href="#magic-hexadecimal-tree">4. Magic hexadecimal tree</a></li>
 <li><a href="#gallery">5. Gallery</a></li>
 </ul>
@@ -250,7 +251,7 @@ was so broken that you could fly anywhere, clip into stuff, and do much more.
 </p>
 
 
-<div id="org2a40a4d" class="figure">
+<div id="org3382635" class="figure">
 <p><img src="../img/mordhau1.jpg" alt="mordhau1.jpg" />
 </p>
 </div>
@@ -269,7 +270,7 @@ since the developers did such a bad job, but it was not the same.
 </p>
 
 
-<div id="org54ff2f1" class="figure">
+<div id="org1852bea" class="figure">
 <p><img src="../img/mordhau2.jpg" alt="mordhau2.jpg" />
 </p>
 </div>
@@ -313,7 +314,7 @@ let's have a look at the binaries folder now.
 </p>
 
 
-<div id="orgd417a5a" class="figure">
+<div id="org48f1570" class="figure">
 <p><img src="../img/mordhau3.png" alt="mordhau3.png" />
 </p>
 </div>
@@ -343,14 +344,14 @@ shipping the debug version or not.
 <p>
 In any case, this is very funny, and it reminded me of how I didn't know what
 object files were when I first started with C/C++, so I was not sure about
-including them on my git project or not.
+including them on my git projects or not.
 </p>
 
 <p>
-Note that this article was written in May of 2024, so keep in mind that they
-might have actually fixed this after I spoon-fed this information to them. If
-it's still there, you can import this <code>.pdb</code> file from IDA Pro, although the rest
-of this article doesn't asume you have imported it.
+This article was been written in May of 2024, so keep in mind that they might
+have actually removed the <code>.pdb</code> file after I spoon-fed this information to
+them. If it's still there, you can import it from IDA Pro, although the rest of
+this article doesn't asume you have imported it.
 </p>
 </div>
 </div>
@@ -378,11 +379,12 @@ developers were clueless.
 I knew I could get banned, because I found things that I had never seen anyone
 do before, but I decided that I had played the game long enough, and that I
 didn't care if I got banned. I rather have fun my way, than just play normally
-to avoid getting banned. I even took notes on writing this once I got banned.
+to avoid getting banned. I even took notes on writing this article once I got
+banned.
 </p>
 
 <p>
-I don't particularly enjoy <i>cheating</i>, as in getting an unfair advantage over
+I don't particularly enjoy <i>cheating</i>, as in, getting an unfair advantage over
 other players. I like reversing and making cheats because I enjoy the low-level
 aspect of understanding a game enough to do something that the developers are
 actively trying to prevent you from doing. That was a long sentence, by the way.
@@ -390,13 +392,14 @@ actively trying to prevent you from doing. That was a long sentence, by the way.
 
 <p>
 And indeed, I started reversing the game on January 2024, and I didn't get
-banned until May of 2024. I think I saw a moderator in-game once&#x2026; In my whole
-life. In the end, it was a jealous kid who reported my account. They immediately
-took it down exclusively based on my screenshots.
+banned until May of 2024. I think I saw a moderator in-game once&#x2026; and it was
+before starting reversing the game. In the end, it was a jealous kid who
+reported my account because I wouldn't tell him how to <a href="https://en.wikipedia.org/wiki/T-pose">T-pose</a> in game. They
+immediately banned me exclusively based on my screenshots.
 </p>
 
 
-<div id="org6cd4344" class="figure">
+<div id="orgb1f43a7" class="figure">
 <p><img src="../img/mordhau4.png" alt="mordhau4.png" />
 </p>
 </div>
@@ -404,8 +407,8 @@ took it down exclusively based on my screenshots.
 <p>
 Anyhow, this is good news, since now I am able to explain the reverse
 engineering process without being worried about bans, which was something I have
-wanted since I started reversing the game, just like it was with <a href="devildaggers.html">Devil Daggers</a>
-or <a href="reversing-tf2-bsendpacket.html">TF2</a>.
+wanted since I started reversing the game, just like I did with <a href="devildaggers.html">Devil Daggers</a> or
+<a href="reversing-tf2-bsendpacket.html">TF2</a>.
 </p>
 </div>
 </div>
@@ -420,41 +423,226 @@ As I said, the game is made in Unreal Engine 4. There is an amazing tool called
 this is a "universal" dumper, and it needs some offsets. We are going to get
 them using <a href="https://en.wikipedia.org/wiki/Interactive_Disassembler">IDA Pro</a>.
 </p>
+
+<p>
+This is meant to be a quick guide for getting the needed offsets by <code>UEDumper</code>, so
+I won't be diving into too much detail. The general method for finding them is
+to look at the Unreal Engine 4 source code, find where these symbols are used,
+and look for cross references you can use. Try looking for close strings, and
+things you can easily find from IDA.
+</p>
 </div>
 
-<div id="outline-container-gnames" class="outline-3">
-<h3 id="gnames"><span class="section-number-3">2.1.</span> <code>GNames</code></h3>
-<div class="outline-text-3" id="text-gnames">
+<div id="outline-container-important-ida-notes" class="outline-3">
+<h3 id="important-ida-notes"><span class="section-number-3">2.1.</span> Important IDA notes</h3>
+<div class="outline-text-3" id="text-important-ida-notes">
 <p>
-TODO
+Remember to open the <code>Mordhau-Win64-Shipping.exe</code> file, not <code>Mordhau.exe</code> files. We
+will also use this executable with <code>UEDumper</code> bellow.
+</p>
+
+<p>
+Also, you will need some settings in order to find the required offsets.
+</p>
+
+<p>
+First, open the <i>Strings</i> subview with <i>View &gt; Open subviews &gt; Strings</i>, or by
+pressing <code>Shift+F12</code>. From there, right click on the string list and press
+<i>Setup</i>. Make sure all C-style string types are allowed.
+</p>
+
+
+<div id="org651ca94" class="figure">
+<p><img src="../img/mordhau5.png" alt="mordhau5.png" />
+</p>
+</div>
+
+<p>
+You can then press <code>Ctrl+F</code> in the <i>Strings</i> view to search for strings.
 </p>
 </div>
 </div>
 
-<div id="outline-container-gobjects" class="outline-3">
-<h3 id="gobjects"><span class="section-number-3">2.2.</span> <code>GObjects</code></h3>
-<div class="outline-text-3" id="text-gobjects">
+<div id="outline-container-finding-gnames" class="outline-3">
+<h3 id="finding-gnames"><span class="section-number-3">2.2.</span> Finding <code>GNames</code></h3>
+<div class="outline-text-3" id="text-finding-gnames">
 <p>
-TODO
+Search for the string <code>MulticastDelegateProperty</code>, and choose the one with C type,
+not 16-bits.
+</p>
+
+
+<div id="orgfd42673" class="figure">
+<p><img src="../img/mordhau6.png" alt="mordhau6.png" />
+</p>
+</div>
+
+<p>
+Double-click the string, then open the cross-references window by right-clicking
+the <code>aMulticastdeleg</code> symbol, or by pressing the <code>x</code> key. Jump to its only xref.
+</p>
+
+
+<div id="org2c00cae" class="figure">
+<p><img src="../img/mordhau7.png" alt="mordhau7.png" />
+</p>
+</div>
+
+<p>
+You are now in a big subroutine that handles a lot of strings. I opened the
+decompiler window so it's easier to tell what's going on, but it's not
+necessary. From the assembly view, scroll to the top of the subroutine and list
+its cross references.
+</p>
+
+
+<div id="org39bc7b4" class="figure">
+<p><img src="../img/mordhau8.png" alt="mordhau8.png" />
+</p>
+</div>
+
+<p>
+Jump to the first one, the <i>Direction</i> of the xref should be <i>Up</i>. The function
+where the <code>MulticastDelegateProperty</code> string was located is being called with the
+<code>GNames</code> structure as its argument, so we should be looking for something like
+this.
+</p>
+
+
+<div id="org0338c9c" class="figure">
+<p><img src="../img/mordhau9.png" alt="mordhau9.png" />
+</p>
+</div>
+
+<p>
+As you can see, the address of <code>stru_57BEE80</code> is being loaded into <code>rcx</code>, which
+according to the Windows x64 calling convention, is used for the first parameter
+when calling a function. Note that the function call appears highlighted because
+I marked the location from IDA.
+</p>
+
+<p>
+However, <code>0x57BEE80</code> is not the <i>real</i> offset of <code>GNames</code>. This is the "absolute"
+offset that IDA shows us, which would be accurate if we were loaded at
+<code>0x0</code>. However, we want to get the relative offset to where the executable was
+mapped in memory. To get this relative offset, we will need to subtract the
+<code>ImageBase</code>, which we can obtain by typing <code>get_imagebase()</code> in the IDA command
+prompt.
+</p>
+
+
+<div id="org89168f2" class="figure">
+<p><img src="../img/mordhau10.png" alt="mordhau10.png" />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-finding-gobjects" class="outline-3">
+<h3 id="finding-gobjects"><span class="section-number-3">2.3.</span> Finding <code>GObjects</code></h3>
+<div class="outline-text-3" id="text-finding-gobjects">
+<p>
+Search for the string <code>CloseDisregardForGC</code>, and jump to its only xref. In the
+assembly, you will see that the string is being used as a function
+parameter.
+</p>
+
+
+<div id="org51ffd29" class="figure">
+<p><img src="../img/mordhau11.png" alt="mordhau11.png" />
+</p>
+</div>
+
+<p>
+Right before that function call, you can see that it's checking for a
+<code>byte_57D7AEC</code> value. This is the assembly generated when compiling the following
+Unreal Engine code.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #ff6f9f;">if</span> (GUObjectArray.OpenForDisregardForGC())
+{
+    SCOPED_BOOT_TIMING(<span style="color: #00d3d0;">"CloseDisregardForGC"</span>);
+    GUObjectArray.CloseDisregardForGC();
+}
+</pre>
+</div>
+
+<p>
+The <code>OpenForDisregardForGC</code> value being checked is a 4-byte padded boolean. In the
+<code>GUObjectArray</code> structure, it's located right before the <code>ObjObjects</code>
+array. Therefore, we can simply add 4 bytes to that <code>byte_57D7AEC</code> value, and we
+will get the offset of <code>GObjects</code>. Again, remember to also subtract the <code>ImageBase</code>.
 </p>
 </div>
 </div>
 
-<div id="outline-container-uworld" class="outline-3">
-<h3 id="uworld"><span class="section-number-3">2.3.</span> <code>UWorld</code></h3>
-<div class="outline-text-3" id="text-uworld">
+<div id="outline-container-finding-uworld" class="outline-3">
+<h3 id="finding-uworld"><span class="section-number-3">2.4.</span> Finding <code>UWorld</code></h3>
+<div class="outline-text-3" id="text-finding-uworld">
 <p>
-TODO
+Search for the string <code>Failed to load package '%s' into a new game world.</code>, and
+jump to its only xref. Once you are in the subroutine, press <code>F5</code> to decompile it.
+</p>
+
+
+<div id="orgf5a549d" class="figure">
+<p><img src="../img/mordhau12.png" alt="mordhau12.png" />
+</p>
+</div>
+
+<p>
+In this case, we were lucky and the function call with our string has no labels
+near it, and the the decompiled subroutine looks pretty clean.
+</p>
+
+<p>
+We are looking for that <code>qword_590DC40</code> line at the bottom. That's the <code>UWorld</code>
+global variable, but remember that we still need to subtract the <code>ImageBase</code>.
+</p>
+
+<p>
+Although this was the ideal scenario, the decompiler might not always interpret
+the branches this way, and might show a bunch of jumps across labels. The
+function might look something like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C">  <span style="color: #989898;">// </span><span style="color: #989898;">...</span>
+  <span style="color: #989898;">// </span><span style="color: #989898;">Label mess, qword gets assigned somewhere over here</span>
+
+<span style="color: #88ca9f;">LABEL_123</span>:
+  sub_1822B30(&amp;PerformanceCount, L<span style="color: #00d3d0;">"Failed to load package '%s' into a new game world."</span>, v124);
+  <span style="color: #ff6f9f;">if</span> ( v6 == &amp;PerformanceCount )
+  {
+      v7 = PerformanceCount;
+  }
+  <span style="color: #ff6f9f;">else</span>
+  {
+      <span style="color: #989898;">// </span><span style="color: #989898;">...</span>
+  }
+
+  <span style="color: #989898;">// </span><span style="color: #989898;">...</span>
+  <span style="color: #989898;">// </span><span style="color: #989898;">Subroutine returns, qword assigment is not here</span>
+
+  <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+}
+</pre>
+</div>
+
+<p>
+In that case, we would have to jump to the xref of that <code>LABEL_123</code> and look for
+the same <code>qword</code> assignment bellow the jump.
 </p>
 </div>
 </div>
 </div>
 
 <div id="outline-container-dumping-and-exploring-the-game-with-uedumper" class="outline-2">
-<h2 id="dumping-and-exploring-the-game-with-uedumper"><span class="section-number-2">3.</span> Dumping and exploring the game with UEDumper</h2>
+<h2 id="dumping-and-exploring-the-game-with-uedumper"><span class="section-number-2">3.</span> Dumping and exploring the game with <code>UEDumper</code></h2>
 <div class="outline-text-2" id="text-dumping-and-exploring-the-game-with-uedumper">
 <p>
-As I mentioned, you will first need to edit some files, and compile the UEDumper
+As I mentioned, you will first need to edit some files, and compile the <code>UEDumper</code>
 project itself.
 </p>
 
@@ -481,14 +669,18 @@ should be the following.
 
 <p>
 The first offset should be <code>GNames</code>, the second <code>GObjects</code> and the third
-<code>UWorld</code>. Again, remember adding the imagebase! TODO
+<code>UWorld</code>. Again, make sure you have subtracted the <code>ImageBase</code>!
 </p>
 
 <p>
 Then, you can save the file and compile the project using the "Release" version
 in the top bar of Visual Studio. Unfortunately I can't insert a screenshot
-because I compiled the project once, back when I had Windows installed. Imagine
-how often the developers update their game.
+because I compiled the project once, back when I had Windows installed. Just
+imagine how often the developers update their game.
+</p>
+
+<p>
+TODO
 </p>
 </div>
 </div>
@@ -497,15 +689,110 @@ how often the developers update their game.
 <h2 id="magic-hexadecimal-tree"><span class="section-number-2">4.</span> Magic hexadecimal tree</h2>
 <div class="outline-text-2" id="text-magic-hexadecimal-tree">
 <p>
-If you have been following until now, you might realize what these numbers mean,
-and what to do with them.
+These are the most interesting values I have found. If you have been following
+until now, you might realize what these numbers mean, and what to do with them.
 </p>
 
-<pre class="example" id="org53fdce4">
-&lt;UWorld&gt;
-0x123
-TODO
+<div class="org-src-container">
+<pre class="src src-C">&lt;UWorld&gt;
+ |
+ |- <span style="color: #88ca9f;">0x120</span>
+ |  |
+ |  |- <span style="color: #88ca9f;">0x689</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
+ |  |- <span style="color: #88ca9f;">0x697</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 1</span>
+ |
+ |- <span style="color: #88ca9f;">0x180</span>, <span style="color: #88ca9f;">0x38</span>, <span style="color: #88ca9f;">0x0</span>, <span style="color: #88ca9f;">0x30</span>
+    |
+    |- <span style="color: #88ca9f;">0x2B8</span>, <span style="color: #88ca9f;">0x23C</span>
+    |- <span style="color: #88ca9f;">0x28C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
+    |- <span style="color: #88ca9f;">0xA28</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try fixing</span>
+    |- <span style="color: #88ca9f;">0xDB1</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 1</span>
+    |- <span style="color: #88ca9f;">0x260</span>
+       |
+       |- <span style="color: #88ca9f;">0x8A0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Next 2 are client-sided, unfortunately</span>
+       |- <span style="color: #88ca9f;">0x8A4</span>
+       |- <span style="color: #88ca9f;">0x8A8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Vehicle. Others can use, carefuly</span>
+       |- <span style="color: #88ca9f;">0x8C4</span>
+       |- <span style="color: #88ca9f;">0x8CC</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Vehicle too</span>
+       |- <span style="color: #88ca9f;">0xDE8</span>
+       |- <span style="color: #88ca9f;">0x6A0</span>
+       |  |- <span style="color: #88ca9f;">0xC8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try fixing, with next one</span>
+       |  |- <span style="color: #88ca9f;">0xEC</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 9999, not client-sided</span>
+       |
+       |- <span style="color: #88ca9f;">0x2A0</span>
+          |
+          |- <span style="color: #88ca9f;">0xB80</span>, <span style="color: #88ca9f;">0x128</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
+          |- <span style="color: #88ca9f;">0xF09</span>         <span style="color: #989898;">// </span><span style="color: #989898;">Try 2, new gameplay</span>
+          |- <span style="color: #88ca9f;">0xB78</span>, <span style="color: #88ca9f;">0x830</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Careful</span>
+          |- <span style="color: #88ca9f;">0x6A0</span>, <span style="color: #88ca9f;">0xF8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Client-sided, unfortunately</span>
+          |- <span style="color: #88ca9f;">0xB08</span>
+          |  |
+          |  |- <span style="color: #88ca9f;">0x61</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try kick, etc.</span>
+          |  |- <span style="color: #88ca9f;">0x6C</span>
+          |  |- <span style="color: #88ca9f;">0x6D</span>
+          |  |- <span style="color: #88ca9f;">0x6C</span>  <span style="color: #989898;">// </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Wrong, should be close</span>
+          |
+          |- <span style="color: #88ca9f;">0x288</span>
+          |  |
+          |  |- <span style="color: #88ca9f;">0xC49</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
+          |  |- <span style="color: #88ca9f;">0xD1C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 1, very OP</span>
+          |
+          |- <span style="color: #88ca9f;">0xE66</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 1</span>
+          |- <span style="color: #88ca9f;">0xEA4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try increasing</span>
+          |- <span style="color: #88ca9f;">0xEA8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
+          |- <span style="color: #88ca9f;">0xE94</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Not sure if it does anything</span>
+          |- <span style="color: #88ca9f;">0x1029</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Needs another option to be useful</span>
+          |- <span style="color: #88ca9f;">0x8C4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
+          |- <span style="color: #88ca9f;">0x8CC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
+          |
+          |- <span style="color: #88ca9f;">0x1200</span>
+          |  |
+          |  |- <span style="color: #88ca9f;">0xCEC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Next 3 will feel weird</span>
+          |  |- <span style="color: #88ca9f;">0xCF4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try... non ranged?</span>
+          |  |- <span style="color: #88ca9f;">0xD00</span>
+          |  |- <span style="color: #88ca9f;">0xD1F</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
+          |  |- <span style="color: #88ca9f;">0xCC8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try ranged</span>
+          |  |- <span style="color: #88ca9f;">0xEF8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Useful in very few weapons</span>
+          |  |- <span style="color: #88ca9f;">0xCBC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try throw</span>
+          |  |- <span style="color: #88ca9f;">0xD23</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Extremelly goofy one, personal favorite</span>
+          |  |- <span style="color: #88ca9f;">0x1A0C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Needed for a previous option</span>
+          |  |- <span style="color: #88ca9f;">0xCB9</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try pavise</span>
+          |  |- <span style="color: #88ca9f;">0x1C98</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Very goofy, pavise again</span>
+          |
+          |- <span style="color: #88ca9f;">0x11F8</span>
+             |
+             |- <span style="color: #88ca9f;">0xCEC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Most are shared with 0x1200</span>
+             |- <span style="color: #88ca9f;">0xCF4</span>
+             |- <span style="color: #88ca9f;">0xD00</span>
+             |- <span style="color: #88ca9f;">0xD1F</span>
+             |- <span style="color: #88ca9f;">0xD40</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try heal, unfortunately not shared</span>
+             |- <span style="color: #88ca9f;">0xCC8</span>
+             |- <span style="color: #88ca9f;">0xEF8</span>
+             |- <span style="color: #88ca9f;">0xCBC</span>
+             |- <span style="color: #88ca9f;">0xD23</span>
+             |- <span style="color: #88ca9f;">0x1A0C</span>
+             |- <span style="color: #88ca9f;">0xCB9</span>
+             |- <span style="color: #88ca9f;">0x1C98</span>
+             |- <span style="color: #88ca9f;">0xF40</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try polehammer, for example</span>
+             |- <span style="color: #88ca9f;">0xF41</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Should be always 1</span>
+             |- <span style="color: #88ca9f;">0xF54</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
+             |- <span style="color: #88ca9f;">0xF58</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
+             |- <span style="color: #88ca9f;">0x13E0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try maul, for example</span>
+             |- <span style="color: #88ca9f;">0x13E1</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Should be always 1</span>
+             |- <span style="color: #88ca9f;">0x13F0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try lowering a bit, combine with next 2</span>
+             |- <span style="color: #88ca9f;">0x13F4</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
+             |- <span style="color: #88ca9f;">0x13F8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
+             |- <span style="color: #88ca9f;">0xD40</span>, <span style="color: #88ca9f;">0xB0</span>
+                |
+                |- <span style="color: #88ca9f;">0x14</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Be creative</span>
+                |- <span style="color: #88ca9f;">0x18</span>
+                |- <span style="color: #88ca9f;">0x1C</span>
+                |- <span style="color: #88ca9f;">0x7C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0 for next 3</span>
+                |- <span style="color: #88ca9f;">0x80</span>
+                |- <span style="color: #88ca9f;">0x84</span>
+                |- ...   <span style="color: #989898;">// </span><span style="color: #989898;">Groups of 6 repeat</span>
 </pre>
+</div>
 
 <p>
 I am sorry if someone was expecting a quick guide on how to break X
