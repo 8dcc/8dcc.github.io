@@ -186,6 +186,13 @@ TODO
 
 TODO
 
+** C macro expansion
+:PROPERTIES:
+:CUSTOM_ID: c-macro-expansion
+:END:
+
+TODO
+
 ** Calculator
 :PROPERTIES:
 :CUSTOM_ID: calculator
