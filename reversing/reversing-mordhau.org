@@ -469,8 +469,8 @@ wanted to make this misleading to inexperienced programmers, so the game
 developers couldn't figure out how I did my magic.
 
 When the game updates, you just need to find and change the =UWorld= offset, and
-you will be good to go most of the times. If something bigger changes, but you
-can update the values easily.
+you will be good to go most of the times. If something bigger changes, you can
+just update the values easily.
 
 And more importantly, get creative. I found all this stuff by trial and error.
 
