@@ -142,7 +142,56 @@ TODO
 :CUSTOM_ID: gdb
 :END:
 
-TODO
+Emacs has an excellent integration with [[https://www.sourceware.org/gdb/][gdb]]. You can run =M-x gud-gdb=, and you can
+get basically what you would get by running =gdb= on a terminal.
+
+The good part, however, is when you integrate =gdb= with your entire editor. Try
+setting the following variables, and then running =M-x gdb=.
+
+#+begin_src emacs-lisp
+; Launch in the Many Windows layout.
+(setq gdb-many-windows t)
+
+; Restore previous windows when GDB stops
+(setq gdb-restore-window-configuration-after-quit 'if-gdb-many-windows)
+#+end_src
+
+Behold, the beauty of GNU Emacs.
+
+[[file:../img/emacs-gdb.png]]
+
+All 6 windows have been opened by =gdb=, but don't worry, your previous layout
+will be restored when you quit out of =gdb=. Let's briefly look at what each
+window is doing:
+
+1. In the top left, you can see the =gud-gdb= prompt you would get when simply
+   running =M-x gud-gdb=. From there, you can run your usual =gdb= commands, like
+   =break=, =run= and =continue=.
+2. On the top right, you can see how your variables are updated in real
+   time. You can also click on the "Registers" tab to switch to that view.
+3. On the middle left, you can see the source where the current instruction is,
+   which obviously gets updated whenever your program jumps to an instruction in
+   a different file.
+4. On the middle right, you can write the input and see the output of your
+   program.
+5. On the bottom left, you can see the call stack of the instruction being
+   debugged. You can click on each line to jump to that position.
+6. On the bottom right, you can see and interact with your breakpoints and
+   threads. You can enable and disable breakpoints, jump at their positions in
+   the code, etc.
+
+If you look closely at the =gud= window, you can see that the third breakpoint was
+added without a =break= command. That's because you can click the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Fringes.html][fringes]] of
+source buffers to add breakpoints on those lines. The red dots represent
+breakpoints, and the gray arrow represents the current instruction. If you are
+wondering about the green and blue lines, they show the [[https://github.com/emacsorphanage/git-gutter-fringe][git changes]] of the
+current file.
+
+Are you [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Other-GDB-Buffers.html][missing]] the assembly window? In that case, you have my respect. From the
+=gud= window (top left), you can replace the /source/ buffer (middle left) with the
+/assembly/ buffer by running =M-x gdb-display-disassembly-buffer=.
+
+You messed the windows up? No problem, simply run =M-x gdb-restore-windows=.
 
 ** Eshell
 :PROPERTIES:

@@ -468,7 +468,75 @@ TODO
 <h3 id="gdb"><span class="section-number-3">3.2.</span> GDB</h3>
 <div class="outline-text-3" id="text-gdb">
 <p>
-TODO
+Emacs has an excellent integration with <a href="https://www.sourceware.org/gdb/">gdb</a>. You can run <code>M-x gud-gdb</code>, and you can
+get basically what you would get by running <code>gdb</code> on a terminal.
+</p>
+
+<p>
+The good part, however, is when you integrate <code>gdb</code> with your entire editor. Try
+setting the following variables, and then running <code>M-x gdb</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span style="color: #989898;">; </span><span style="color: #989898;">Launch in the Many Windows layout.</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">setq</span> gdb-many-windows t<span style="color: #ff5f59;">)</span>
+
+<span style="color: #989898;">; </span><span style="color: #989898;">Restore previous windows when GDB stops</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">setq</span> gdb-restore-window-configuration-after-quit 'if-gdb-many-windows<span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+Behold, the beauty of GNU Emacs.
+</p>
+
+
+<div id="orge77503c" class="figure">
+<p><img src="../img/emacs-gdb.png" alt="emacs-gdb.png" />
+</p>
+</div>
+
+<p>
+All 6 windows have been opened by <code>gdb</code>, but don't worry, your previous layout
+will be restored when you quit out of <code>gdb</code>. Let's briefly look at what each
+window is doing:
+</p>
+
+<ol class="org-ol">
+<li>In the top left, you can see the <code>gud-gdb</code> prompt you would get when simply
+running <code>M-x gud-gdb</code>. From there, you can run your usual <code>gdb</code> commands, like
+<code>break</code>, <code>run</code> and <code>continue</code>.</li>
+<li>On the top right, you can see how your variables are updated in real
+time. You can also click on the "Registers" tab to switch to that view.</li>
+<li>On the middle left, you can see the source where the current instruction is,
+which obviously gets updated whenever your program jumps to an instruction in
+a different file.</li>
+<li>On the middle right, you can write the input and see the output of your
+program.</li>
+<li>On the bottom left, you can see the call stack of the instruction being
+debugged. You can click on each line to jump to that position.</li>
+<li>On the bottom right, you can see and interact with your breakpoints and
+threads. You can enable and disable breakpoints, jump at their positions in
+the code, etc.</li>
+</ol>
+
+<p>
+If you look closely at the <code>gud</code> window, you can see that the third breakpoint was
+added without a <code>break</code> command. That's because you can click the <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Fringes.html">fringes</a> of
+source buffers to add breakpoints on those lines. The red dots represent
+breakpoints, and the gray arrow represents the current instruction. If you are
+wondering about the green and blue lines, they show the <a href="https://github.com/emacsorphanage/git-gutter-fringe">git changes</a> of the
+current file.
+</p>
+
+<p>
+Are you <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Other-GDB-Buffers.html">missing</a> the assembly window? In that case, you have my respect. From the
+<code>gud</code> window (top left), you can replace the <i>source</i> buffer (middle left) with the
+<i>assembly</i> buffer by running <code>M-x gdb-display-disassembly-buffer</code>.
+</p>
+
+<p>
+You messed the windows up? No problem, simply run <code>M-x gdb-restore-windows</code>.
 </p>
 </div>
 </div>
