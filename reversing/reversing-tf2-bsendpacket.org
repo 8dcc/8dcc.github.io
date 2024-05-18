@@ -108,9 +108,9 @@ to decompile the function.
 
 I renamed the variables on the decompiler window (right split), but it should be
 pretty clear what does what by comparing it with the source. As we can see by
-the opcode bytes on the left split (/Options > General > Number of opcode bytes/),
-it's setting =esi= (=bSendPacket=) to true by moving the /immediate/ value =0x00000001=
-(note that this is [[https://en.wikipedia.org/wiki/Endianness][little endian]]).
+the instruction bytes on the left split (/Options > General > Number of opcode
+bytes/), it's setting =esi= (=bSendPacket=) to true by moving the /immediate/ value
+=0x00000001= (note that this is [[https://en.wikipedia.org/wiki/Endianness][little endian]]).
 
 We could get a pointer to where those =01 00 00 00= bytes are in memory, and then
 cast it to a =bool*=. To do this, we could, for example, look for a signature in
