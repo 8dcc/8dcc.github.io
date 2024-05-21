@@ -29,6 +29,10 @@ projects here, but until then, make sure to check out:
 - [[https://github.com/8dcc/bms-cheat/wiki/Hooking-CreateMove][Hooking CreateMove]] in [[https://en.wikipedia.org/wiki/Source_(game_engine)][source]] games.
 - Finding the offsets and [[https://github.com/8dcc/tf2-cheat/wiki/Getting-SDL-offsets][hooking SDL functions]].
 
+If you are interested in LaTeX, you might like these links too:
+
+- The [[https://github.com/8dcc/scratch/tree/main/LaTeX][LaTeX folder]] inside my [[https://github.com/8dcc/scratch][scratch]] GitHub repository.
+
 * External links
 :PROPERTIES:
 :CUSTOM_ID: external-links
