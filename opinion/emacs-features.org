@@ -75,6 +75,33 @@ For example:
 Note that =M-x ... RET= is a common pattern, since =M-x= opens the "execute command"
 menu.
 
+** Small Emacs glosary
+:PROPERTIES:
+:CUSTOM_ID: small-emacs-glosary
+:END:
+
+In case anyone is very new to emacs, this list might help understanding the
+difference between some terms used in this page.
+
+*** Frames, windows and buffers
+:PROPERTIES:
+:CUSTOM_ID: frames-windows-and-buffers
+:END:
+
+These terms have other meanings in other contexts, so it's normal to confuse
+these when starting with Emacs.
+
+- *Frame*: Top-level Emacs display element. In the DE/WM context, this would be
+  referred to as a "Window", but this term has another meaning within Emacs.
+- *Window*: Contained within a Frame. Basically, the splits in which your Frame is
+  divided. Each Window contains a Buffer.
+- *Buffer*: The actual content of a Window. It's usually an interface between
+  Emacs and a file, but it's not always the case. You can have hundreds of them
+  open, but you will probably be working with only a couple at a time through
+  your Windows.
+
+For more information and visual examples, see: [[https://www.emacswiki.org/emacs/WindowsAndFrames][EmacsWiki]], [[https://smythp.com/emacs_buffers/][smythp.com]].
+
 * General design choices
 :PROPERTIES:
 :CUSTOM_ID: general-design-choices
@@ -135,15 +162,54 @@ the case in older versions, so keep that in mind.
 :CUSTOM_ID: org-mode
 :END:
 
-TODO
+From the [[https://www.emacswiki.org/emacs/OrgMode][EmacsWiki]]:
+
+#+begin_quote
+Org-mode is an Emacs mode for note keeping, project planning, TODO lists and
+authoring. It is included from Emacs 22.1 onward as default.
+
+Features:
+- Outlines: headlines, TODO items, checklists, numbered lists, searching,
+  filtering
+- Filing: outlines, tagging, refiling, archiving, sorting, flexible enough to
+  build a “getting things done” workflow
+- Timestamp: deadlines, clocking in/out, scheduled items, repeating items,
+  optionally integrated with emacs calendar and diary
+- Markup: bold, italic, lists, links, images, math (via LaTeX), code
+  highlighting
+- Links to URLs, files, gnus, rmail, vm, news, wanderlust, bbdb, irc, shell
+  commands, bookmarks, images, attachments
+- Table: editing, spreadsheets, formulas
+- Export: HTML, LaTeX, Markdown, iCalendar, OpenDocument, Beamer slides, PDF,
+  and more via an extensible exporting system
+- Babel: Literate programming, reproducible research, OrgModeSQL
+- Agenda: Overview of scheduled and TODO items across files
+#+end_quote
+
+It is an extremely useful markdown format, and it can be used for a variety of
+things. For example, this blog itself is written in Org, and it's exported to
+HTML from within Emacs.
+
+Org-mode can also be used for [[https://en.wikipedia.org/wiki/Literate_programming][literate programming]]. Just like in other markdown
+formats, you can embed code blocks within Org files. The interesting part is
+that you can [[https://orgmode.org/org.html#Evaluating-Code-Blocks-1][evaluate them]] from Emacs, and [[https://orgmode.org/org.html#Results-of-Evaluation-1][write their output]] to the same file,
+for example. Or you can choose to [[https://orgmode.org/org.html#Extracting-Source-Code-1][export the code blocks]] of your Org file to
+different sources, filtering by language. I use this for my [[https://github.com/8dcc/emacs-dotfiles][emacs configuration]],
+and it allows me to put the code snippets between the markdown text, rather than
+using very long plain comments within a single source.
+
+[[file:../img/emacs-org.png]]
+
+See also: [[https://orgmode.org/manuals.html][Org-mode manual]].
 
 ** GDB
 :PROPERTIES:
 :CUSTOM_ID: gdb
 :END:
 
-Emacs has an excellent integration with [[https://www.sourceware.org/gdb/][gdb]]. You can run =M-x gud-gdb=, and you can
-get basically what you would get by running =gdb= on a terminal.
+Emacs has an excellent integration with the GNU Debugger, [[https://www.sourceware.org/gdb/][gdb]]. You can run =M-x
+gud-gdb=, and you can get basically what you would get by running =gdb= on a
+terminal.
 
 The good part, however, is when you integrate =gdb= with your entire editor. Try
 setting the following variables, and then running =M-x gdb=.
@@ -156,7 +222,7 @@ setting the following variables, and then running =M-x gdb=.
 (setq gdb-restore-window-configuration-after-quit 'if-gdb-many-windows)
 #+end_src
 
-Behold, the beauty of GNU Emacs.
+Behold, the beauty of GNU Emacs (at least since version 22.1).
 
 [[file:../img/emacs-gdb.png]]
 
@@ -198,16 +264,40 @@ You messed the windows up? No problem, simply run =M-x gdb-restore-windows=.
 :CUSTOM_ID: eshell
 :END:
 
-TODO
+[[https://www.gnu.org/software/emacs/manual/html_mono/eshell.html][Eshell]] is a shell written in Emacs Lisp. It was added officially to Emacs 21.
 
-At first I didnt like it
+When I first tried it, I didn't like it, because it was a bit different from
+other shells like [[https://github.com/akermu/emacs-libvterm/][vterm]]. The general feeling and some particular keybinds
+(e.g. =M-r= instead of =^R= for accessing the history) might feel weird at first,
+but it's really nice once you get the hang of it.
+
+Since it's a normal Emacs [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Buffers.html][buffer]], you can yank text, paste it, delete it, write
+it anywhere, etc. Eshell allows you to re-run commands by pressing =RET= on a
+previous line where it was called (by checking against the =eshell-prompt-regex=
+variable). This also allows you to save the output of an eshell session into a
+file, for example.
+
+It's capable of running Emacs Lisp code, and calling Emacs functions. So you can
+not only call normal system programs, but you can also use, for example,
+=find-file a.txt= to open a file in that window.
 
 ** Grep
 :PROPERTIES:
 :CUSTOM_ID: grep
 :END:
 
-TODO
+You can run =grep= commands from within Emacs. The basic form is with =M-x grep=,
+which simply runs a grep command (or a command with a similar output) and
+displays the matches in an interactive buffer.
+
+[[file:../img/emacs-grep.png]]
+
+You can jump to each of those lines.
+
+The =M-x rgrep= command is one of my favorites, because it allows you to grep for
+a term recursively in the specified folder.
+
+See also [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Grep-Searching.html][GNU Emacs Manual]].
 
 ** Compilation
 :PROPERTIES:
