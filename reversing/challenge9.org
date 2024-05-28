@@ -28,30 +28,30 @@ changes to fit the [[https://nasm.us/][nasm]] syntax.
 .LC0:
     .string "error!"
 func:
-    sub	rsp, 8
-    movzx	eax, BYTE [rdi]
-    cmp	al, 89
-    je	.L3
-    jle	.L21
-    cmp	al, 110
-    je	.L6
-    cmp	al, 121
-    jne	.L2
+    sub   rsp, 8
+    movzx eax, BYTE [rdi]
+    cmp   al, 89
+    je    .L3
+    jle   .L21
+    cmp   al, 110
+    je    .L6
+    cmp   al, 121
+    jne   .L2
 .L3:
-    mov	eax, 1
-    add	rsp, 8
+    mov   eax, 1
+    add   rsp, 8
     ret
 .L21:
-    cmp	al, 78
-    je	.L6
+    cmp   al, 78
+    je    .L6
 .L2:
-    mov	edi, .LC0
-    call	puts
-    xor	edi, edi
-    call	exit
+    mov   edi, .LC0
+    call  puts
+    xor   edi, edi
+    call  exit
 .L6:
-    xor	eax, eax
-    add	rsp, 8
+    xor   eax, eax
+    add   rsp, 8
     ret
 #+end_src
 
@@ -63,7 +63,7 @@ func:
 Literal translation preserving the branching.
 
 #+begin_src C
-void func(char* str) {
+int func(char* str) {
     if (*str == 'Y') {
         /* .L3 */
         return 1;
@@ -90,12 +90,12 @@ void func(char* str) {
 Simplified into this.
 
 #+begin_src C
-void func(char* str) {
+bool func(char* str) {
     if (*str == 'Y' || *str == 'y')
-        return 1;
+        return true;
 
     if (*str == 'N' || *str == 'n')
-        return 0;
+        return false;
 
     puts("error!");
     exit(0);
