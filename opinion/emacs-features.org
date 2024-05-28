@@ -385,6 +385,16 @@ TODO
 
 Integration with magit
 
+** Vundo
+:PROPERTIES:
+:CUSTOM_ID: vundo
+:END:
+
+TODO
+
+Just a graph for the Emacs undo system, I can keep the old undo-redo with =u= and
+=C-r=.
+
 * Honorable mentions
 :PROPERTIES:
 :CUSTOM_ID: honorable-mentions
