@@ -11,7 +11,15 @@
 
 * List of articles
 
-List of my articles solving RE challenges:
+List of articles related to general reversing:
+
+- [[file:understanding-call-stack.org][Understanding and traversing the call stack]]
+- [[file:reversing-tf2-bsendpacket.org][Reversing TF2's bSendPacket]]
+- [[file:reversing-mordhau.org][Mordhau: From reversing Unreal Engine 4 to breaking animations]]
+- [[file:devildaggers.org][Reversing Devil Daggers]]
+- [[file:reversing-keygen.org][Reversing a simple keygen]]
+
+List of my articles solving [[https://yurichev.com/][Dennis Yurichev]]'s RE [[https://challenges.re/][challenges]]:
 
 - [[file:challenge2.org][Challenge 2]]
 - [[file:challenge3.org][Challenge 3]]
@@ -21,14 +29,6 @@ List of my articles solving RE challenges:
 - [[file:challenge7.org][Challenge 7]]
 - [[file:challenge8.org][Challenge 8]]
 - [[file:challenge9.org][Challenge 9]]
-
-My other articles about reverse engineering:
-
-- [[file:understanding-call-stack.org][Understanding and traversing the call stack]]
-- [[file:reversing-tf2-bsendpacket.org][Reversing TF2's bSendPacket]]
-- [[file:reversing-mordhau.org][Mordhau: From reversing Unreal Engine 4 to breaking animations]]
-- [[file:devildaggers.org][Reversing Devil Daggers]]
-- [[file:reversing-keygen.org][Reversing a simple keygen]]
 
 * External resources
 
