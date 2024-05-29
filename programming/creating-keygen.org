@@ -11,6 +11,16 @@
 
 #+TOC: headlines 2
 
+* Brief warning
+:PROPERTIES:
+:CUSTOM_ID: brief-warning
+:END:
+
+I am not an expert on cryptography, so this article should be interpreted as
+just some notes about keygens, written by someone who hasn't worked on
+real-world keygens. I was just interested on the topic, and decided to write
+about it. Don't rely to hard on the information in this article.
+
 * What is a keygen?
 :PROPERTIES:
 :CUSTOM_ID: what-is-a-keygen
