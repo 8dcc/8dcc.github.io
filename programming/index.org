@@ -16,4 +16,5 @@ List of my articles about programming:
 - [[file:signature-scanning.org][Signature scanning in C]]
 - [[file:detour-hooking.org][Detour hooking]]
 - [[file:understanding-y-combinator.org][Understanding the Y combinator]]
+- [[file:asm-loop-conditionals.org][Optimizing loop conditions in assembly]]
 - [[file:creating-keygen.org][Creating a simple keygen]]
