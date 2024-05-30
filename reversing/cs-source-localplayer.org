@@ -1,0 +1,152 @@
+#+TITLE: Finding the local player offset in source games
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+Quick article on getting the local player offset in source 1 games.
+
+This has been tested in the GNU/Linux version of Counter-Strike: Source, but it
+should be the case for most source 1 games, like the old CS:GO.
+
+* Finding the offset
+:PROPERTIES:
+:CUSTOM_ID: finding-the-offset
+:END:
+
+First, open the =client.so= file located at =<game-dir>/cstrike/bin/= with IDA Pro,
+because it's where the local player pointer is located.
+
+Open the "Strings" sub-view in IDA with /Shift+F12/, and search for the string
+=localplayer_changeteam=. Double click it and jump to its first x-ref. It should
+look something like this.
+
+[[file:../img/cs-source-localplayer1.png]]
+
+This corresponds to the =CAchievementMgr::FireGameEvent= function, as you can see
+in the [[https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/achievementmgr.cpp#L1636][leaked CS:GO source code]].
+
+The call to =C_BasePlayer::GetLocalPlayer= is sometimes optimized to a simple =mov=
+instruction. If that's the case, you can use that offset directly. Otherwise,
+double-click on the function (=sub_5723E0=) and you will see the offset there.
+
+[[file:../img/cs-source-localplayer2.png]]
+
+That =0xBD0750= is your offset. Make sure you subtract the =ImageBase= returned by
+=get_imagebase()=, in my case it was zero.
+
+[[file:../img/cs-source-localplayer3.png]]
+
+* Reading from an external process
+:PROPERTIES:
+:CUSTOM_ID: reading-from-an-external-process
+:END:
+
+I will be doing this from GNU/Linux, because it's what I used for this tutorial.
+
+First, you will need to get the real virtual address used by the =hl2_linux=
+process. You can use my =libsigscan_get_module_bounds= function from my [[https://github.com/8dcc/libsigscan][libsigscan]]
+repository, which parses the =/proc/PID/maps= file. Once you get the base address
+for =client.so=, you can add the offset we found in the previous step.
+
+To read from that address, since we are in an external process, you will need to
+use a function like =process_vm_readv=.
+
+#+begin_src C
+#include <stdlib.h>  /* exit() */
+#include <sys/uio.h> /* process_vm_readv() */
+#include <errno.h>   /* errno */
+
+void readProcessMemory(pid_t pid, void* addr, void* out, size_t sz) {
+    /* The function expects an array, even though our array has one element */
+    struct iovec local[1];
+    struct iovec remote[1];
+
+    local[0].iov_base  = out;
+    local[0].iov_len   = sz;
+    remote[0].iov_base = addr;
+    remote[0].iov_len  = sz;
+
+    if (process_vm_readv(pid, local, 1, remote, 1, 0) == -1) {
+        fprintf(stderr, "Error reading memory of process with ID %d. Errno: %d",
+                pid, errno);
+        exit(1);
+    }
+}
+#+end_src
+
+You can then call it with the following.
+
+#+begin_src C
+void* localPlayer_ptr = BASE + OFFSET;
+uintptr_t localPlayer;
+readProcessMemory(PID, localPlayer_ptr, &out, sizeof(uintptr_t));
+#+end_src
+
+To get the PID of the game, you can use my =libsigscan_pidof= function.
+
+#+begin_src C
+int pidof(const char* process_name) {
+    static char filename[50];
+    static char cmdline[256];
+
+    DIR* dir = opendir("/proc");
+    if (dir == NULL)
+        return -1;
+
+    struct dirent* de;
+    while ((de = readdir(dir)) != NULL) {
+        /* The name of each folder inside /proc/ is a PID */
+        int pid = atoi(de->d_name);
+        if (pid <= 0)
+            continue;
+
+        /* See proc_cmdline(5). You can also try:
+         *   cat /proc/self/maps | xxd   */
+        sprintf(filename, "/proc/%d/cmdline", pid);
+
+        FILE* fd = fopen(filename, "r");
+        if (fd == NULL)
+            continue;
+
+        char* fgets_ret = fgets(cmdline, sizeof(cmdline), fd);
+        fclose(fd);
+
+        if (fgets_ret == NULL)
+            continue;
+
+        /* We found the PID */
+        if (strstr(cmdline, process_name)) {
+            closedir(dir);
+            return pid;
+        }
+    }
+
+    /* We checked all /proc/.../cmdline's and we didn't find the process */
+    closedir(dir);
+    return -1;
+}
+#+end_src
+
+The complete and updated functions can be found in my [[https://github.com/8dcc/cs-source-external/blob/main/src/util.c][cs-source-external]]
+repository.
+
+* Credits
+:PROPERTIES:
+:CUSTOM_ID: credits
+:END:
+
+- *MarkHC* for his [[https://www.unknowncheats.me/forum/counterstrike-global-offensive/223720-localplayer-sig.html][post in UnknownCheats]] about getting the local player.
+- My [[https://github.com/8dcc/libsigscan][libsigscan]] library for the functions.
