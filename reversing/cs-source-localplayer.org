@@ -16,27 +16,30 @@
 :CUSTOM_ID: introduction
 :END:
 
-Quick article on getting the local player offset in source 1 games.
-
-This has been tested in the GNU/Linux version of Counter-Strike: Source, but it
-should be the case for most source 1 games, like the old CS:GO.
+This short article shows how to get the offset for the local player in Source 1
+games. This has been tested in the GNU/Linux version of Counter-Strike: Source,
+but it should be work in most Source 1 games.
 
 * Finding the offset
 :PROPERTIES:
 :CUSTOM_ID: finding-the-offset
 :END:
 
-First, open the =client.so= file located at =<game-dir>/cstrike/bin/= with IDA Pro,
-because it's where the local player pointer is located.
+The offset is located inside the =client.so= shared object, located in
+=<GAME-DIR>/cstrike/bin/=. In this case I will use [[https://en.wikipedia.org/wiki/Interactive_Disassembler][IDA Pro]] to analyze it, but you
+should be able to follow these steps with most reverse engineering tools.
 
 Open the "Strings" sub-view in IDA with /Shift+F12/, and search for the string
-=localplayer_changeteam=. Double click it and jump to its first x-ref. It should
-look something like this.
+=localplayer_changeteam= with /Ctrl+F/. Double click the result, press /X/ and jump
+through its x-refs until you see something like this.
 
 [[file:../img/cs-source-localplayer1.png]]
 
-This corresponds to the =CAchievementMgr::FireGameEvent= function, as you can see
-in the [[https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/achievementmgr.cpp#L1636][leaked CS:GO source code]].
+The left split shows the disassembly in text mode, and the right split shows the
+decompiler, which you can open with /F5/.
+
+This code corresponds to the =CAchievementMgr::FireGameEvent= function, as you can
+see in the [[https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/achievementmgr.cpp#L1636][leaked CS:GO source code]].
 
 The call to =C_BasePlayer::GetLocalPlayer= is sometimes optimized to a simple =mov=
 instruction. If that's the case, you can use that offset directly. Otherwise,
@@ -98,6 +101,11 @@ readProcessMemory(PID, localPlayer_ptr, &out, sizeof(uintptr_t));
 To get the PID of the game, you can use my =libsigscan_pidof= function.
 
 #+begin_src C
+#include <stdio.h>  /* fopen(), FILE* */
+#include <stdlib.h> /* atoi() */
+#include <string.h> /* strstr() */
+#include <dirent.h> /* readdir() */
+
 int pidof(const char* process_name) {
     static char filename[50];
     static char cmdline[256];
@@ -114,7 +122,7 @@ int pidof(const char* process_name) {
             continue;
 
         /* See proc_cmdline(5). You can also try:
-         *   cat /proc/self/maps | xxd   */
+         ,*   cat /proc/self/maps | xxd   */
         sprintf(filename, "/proc/%d/cmdline", pid);
 
         FILE* fd = fopen(filename, "r");

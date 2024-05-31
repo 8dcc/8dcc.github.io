@@ -220,12 +220,9 @@
 <h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-introduction">
 <p>
-Quick article on getting the local player offset in source 1 games.
-</p>
-
-<p>
-This has been tested in the GNU/Linux version of Counter-Strike: Source, but it
-should be the case for most source 1 games, like the old CS:GO.
+This short article shows how to get the offset for the local player in Source 1
+games. This has been tested in the GNU/Linux version of Counter-Strike: Source,
+but it should be work in most Source 1 games.
 </p>
 </div>
 </div>
@@ -234,25 +231,31 @@ should be the case for most source 1 games, like the old CS:GO.
 <h2 id="finding-the-offset"><span class="section-number-2">2.</span> Finding the offset</h2>
 <div class="outline-text-2" id="text-finding-the-offset">
 <p>
-First, open the <code>client.so</code> file located at <code>&lt;game-dir&gt;/cstrike/bin/</code> with IDA Pro,
-because it's where the local player pointer is located.
+The offset is located inside the <code>client.so</code> shared object, located in
+<code>&lt;GAME-DIR&gt;/cstrike/bin/</code>. In this case I will use <a href="https://en.wikipedia.org/wiki/Interactive_Disassembler">IDA Pro</a> to analyze it, but you
+should be able to follow these steps with most reverse engineering tools.
 </p>
 
 <p>
 Open the "Strings" sub-view in IDA with <i>Shift+F12</i>, and search for the string
-<code>localplayer_changeteam</code>. Double click it and jump to its first x-ref. It should
-look something like this.
+<code>localplayer_changeteam</code> with <i>Ctrl+F</i>. Double click the result, press <i>X</i> and jump
+through its x-refs until you see something like this.
 </p>
 
 
-<div id="org6ed5ae1" class="figure">
+<div id="org99e2571" class="figure">
 <p><img src="../img/cs-source-localplayer1.png" alt="cs-source-localplayer1.png" />
 </p>
 </div>
 
 <p>
-This corresponds to the <code>CAchievementMgr::FireGameEvent</code> function, as you can see
-in the <a href="https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/achievementmgr.cpp#L1636">leaked CS:GO source code</a>.
+The left split shows the disassembly in text mode, and the right split shows the
+decompiler, which you can open with <i>F5</i>.
+</p>
+
+<p>
+This code corresponds to the <code>CAchievementMgr::FireGameEvent</code> function, as you can
+see in the <a href="https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/achievementmgr.cpp#L1636">leaked CS:GO source code</a>.
 </p>
 
 <p>
@@ -262,7 +265,7 @@ double-click on the function (<code>sub_5723E0</code>) and you will see the offs
 </p>
 
 
-<div id="org5ee8d20" class="figure">
+<div id="orgc4e133e" class="figure">
 <p><img src="../img/cs-source-localplayer2.png" alt="cs-source-localplayer2.png" />
 </p>
 </div>
@@ -273,7 +276,7 @@ That <code>0xBD0750</code> is your offset. Make sure you subtract the <code>Imag
 </p>
 
 
-<div id="orgdaacbdb" class="figure">
+<div id="org416e881" class="figure">
 <p><img src="../img/cs-source-localplayer3.png" alt="cs-source-localplayer3.png" />
 </p>
 </div>
@@ -339,7 +342,12 @@ To get the PID of the game, you can use my <code>libsigscan_pidof</code> functio
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">pidof</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">process_name</span>) {
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">fopen(), FILE*</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdlib.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">atoi()</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;string.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">strstr()</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;dirent.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">readdir()</span><span style="color: #989898;"> */</span>
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">pidof</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">process_name</span>) {
     <span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">filename</span>[<span style="color: #88ca9f;">50</span>];
     <span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">cmdline</span>[<span style="color: #88ca9f;">256</span>];
 
