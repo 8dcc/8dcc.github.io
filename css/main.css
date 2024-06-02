@@ -24,6 +24,7 @@ p, li {
 pre.src {
     background: #111111;
     color: white;
+    border: 1px solid #000000;
 }
 
 pre.src::before {
