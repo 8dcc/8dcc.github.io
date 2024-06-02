@@ -30,6 +30,7 @@ List of my articles solving [[https://yurichev.com/][Dennis Yurichev]]'s RE [[ht
 - [[file:challenge7.org][Challenge 7]]
 - [[file:challenge8.org][Challenge 8]]
 - [[file:challenge9.org][Challenge 9]]
+- [[file:challenge10.org][Challenge 10]]
 
 * External resources
 

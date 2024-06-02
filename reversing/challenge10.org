@@ -1,0 +1,168 @@
+#+TITLE: Challenge 10
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Original assembly
+:PROPERTIES:
+:CUSTOM_ID: original-assembly
+:END:
+
+Original challenge link: [[https://challenges.re/10/][Click me]].
+
+As the author says, this snippet is short but tricky.
+
+#+begin_src nasm
+func:
+    lea     eax, [rdi - 1 + rsi]
+    neg     esi
+    and     eax, esi
+    ret
+#+end_src
+
+* Assembly notes
+:PROPERTIES:
+:CUSTOM_ID: assembly-notes
+:END:
+
+Remember that the =lea= instruction ([[https://www.felixcloutier.com/x86/lea][Load Effective Address]]) is often used by
+compilers for basic arithmetic. That =lea= instruction is equivalent to the
+following.
+
+#+begin_src nasm
+; eax = rdi - 1 + rsi
+mov eax, edi
+sub eax, 1
+add eax, esi
+#+end_src
+
+* C translation
+:PROPERTIES:
+:CUSTOM_ID: c-translation
+:END:
+
+I had trouble figuring out this challenge because I was *focusing on
+understanding the assembly*, before trying to translate it to C. By looking at
+those individual instructions, it's hard to see the relationship between
+them. However, if I had looked at the C code, I might have been able to figure
+out what it does.
+
+#+begin_src C
+int func(int a, int b) {
+    return (a - 1 + b) & (-b);
+}
+#+end_src
+
+This might look a bit more familiar. I used similar code in my [[https://github.com/8dcc/libdetour/blob/f333a583ef74d37f6e1e764e3fc56fc8cd1e6198/src/libdetour.c#L45-L46][libdetour]] hooking
+library for calculating the address of the page where an address is located, and
+then passing that to =mprotect()=. I had to ask [[https://yurichev.com/][Dennis Yurichev]], the author of the
+challenges, and I felt a bit ashamed because I tried to understand the assembly
+directly before translating it into C code.
+
+The function aligns a number /n/ to a /boundary/, as long as that boundary is a
+power of 2. The original C code would be something like this:
+
+#+begin_src C
+int align2boundary(int n, int boundary) {
+    return (n + boundary - 1) & ~(boundary - 1);
+}
+#+end_src
+
+For example, if we have an address 0x123, and we want to know where the next
+4KiB-page starts, we could use our =align2boundary= function as like this:
+
+#+begin_src C
+align2boundary(0x0123, 0x1000); /* Result: 0x1000 */
+align2boundary(0x2345, 0x1000); /* Result: 0x3000 */
+#+end_src
+
+* Missing subtraction
+:PROPERTIES:
+:CUSTOM_ID: missing-subtraction
+:END:
+
+However, the C translation and the real C code is not quite the same. Where did
+the =~(boundary - 1)= go? The compiler optimized this to a =neg= instruction because
+subtracting one and then doing a bit-wise NOT is the same as negating the
+number.
+
+#+begin_example
+   -1   0b1111111111111111
+   -2   0b1111111111111110
+   -3   0b1111111111111101
+   -4   0b1111111111111100
+   -5   0b1111111111111011
+
+    4   0b0000000000000100
+  4-1   0b0000000000000011
+~(4-1)  0b1111111111111100
+
+    5   0b0000000000000101
+  5-1   0b0000000000000100
+~(5-1)  0b1111111111111011
+#+end_example
+
+As you can see, =~(n-1)= and =(-n)= is the same.
+
+* Why does the alignment work?
+:PROPERTIES:
+:CUSTOM_ID: why-does-the-alignment-work
+:END:
+
+Let's try to reduce an example first.
+
+#+begin_src C
+/* align2boundary(0x3456, 0x1000) */
+0x3456 + 0x1000 - 1 & ~(0x1000 - 1)
+         0x4456 - 1 & ~(0x1000 - 1)
+             0x4455 & ~(0x1000 - 1)
+             0x4455 & ~(0x0FFF)
+             0x4455 & 0xFFFFF000
+             0x4000
+#+end_src
+
+You might be wondering, why do we need the subtractions? Each subtraction serves
+a different purpose. Let's start with the right-most subtraction, the second
+one. It ensures that we can use an input bigger than the boundary itself.
+
+If you subtract one to any power of 2, you will set to 1 all the bytes to the
+right of the one that was set previously. For example:
+
+#+begin_src
+   0x8  0b0001000
+   0x7  0b0000111
+
+  0x10  0b10000
+   0xF  0b01111
+
+0x2000  0b10000000000000
+0x1FFF  0b01111111111111
+#+end_src
+
+What about the first subtraction? The left-most subtraction ensures we don't
+allocate an extra "page" if we are already aligned to the boundary. For example,
+in the following example, the input =0x4000= is already aligned to the =0x1000=
+boundary, so we should return the untouched =0x4000=.
+
+#+begin_src C
+0x4000 + 0x1000 & ~(0x1000 - 1)
+         0x5000 & ~(0x1000 - 1)
+         0x5000
+#+end_src
+
+However, if we subtract one:
+
+#+begin_src C
+0x4000 + 0x1000 - 1 & ~(0x1000 - 1)
+         0x5000 - 1 & ~(0x1000 - 1)
+             0x4FFF & ~(0x1000 - 1)
+             0x4000
+#+end_src
