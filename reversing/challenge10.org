@@ -77,7 +77,7 @@ int align2boundary(int n, int boundary) {
 #+end_src
 
 For example, if we have an address 0x123, and we want to know where the next
-4KiB-page starts, we could use our =align2boundary= function as like this:
+4KiB-page starts, we could use our =align2boundary= function like this:
 
 #+begin_src C
 align2boundary(0x0123, 0x1000); /* Result: 0x1000 */
@@ -136,16 +136,34 @@ one. It ensures that we can use an input bigger than the boundary itself.
 If you subtract one to any power of 2, you will set to 1 all the bytes to the
 right of the one that was set previously. For example:
 
-#+begin_src
-   0x8  0b0001000
-   0x7  0b0000111
+#+begin_example
+   0x8  0b1000
+   0x7  0b0111
 
   0x10  0b10000
    0xF  0b01111
 
 0x2000  0b10000000000000
 0x1FFF  0b01111111111111
-#+end_src
+#+end_example
+
+If we do a bit-wise NOT to this value, we will set to 1 all the bytes to the
+left of the bit that was originally set, including that bit itself:
+
+#+begin_example
+Original:     0x8  0b0001000
+Subtraction:  0x7  0b0000111
+NOT:         ~0x7  0b1111000
+#+end_example
+
+We can then do a bit-wise AND with this value for essentially discarding all
+bits to the left of the set bit. The following two examples will discard the
+lower 8 bits (=0..7=) of =x=:
+
+#+begin_example
+x & ~(0x100 - 1)
+x & ~((1 << 8) - 1)
+#+end_example
 
 What about the first subtraction? The left-most subtraction ensures we don't
 allocate an extra "page" if we are already aligned to the boundary. For example,
