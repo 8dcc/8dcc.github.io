@@ -304,55 +304,163 @@ See also [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Grep-Search
 :CUSTOM_ID: compilation
 :END:
 
-TODO
+In Emacs, you can run compilers and build tools, feeding the output into an
+Emacs buffer that can be used, for example, for jumping to the lines of errors
+and warnings inside the source buffer. See also [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Compilation.html][Emacs manual]].
 
-Links to errors in files
+With the [[https://github.com/bbatsov/projectile][projectile]] package, you can use the =projectile-compile-project= command
+to compile (e.g. run =make=) from the root of your project, instead of running it
+from the directory of the current buffer. The projectile package has many
+similar commands, so make sure you check it out.
 
 ** Browser and external documentation
 :PROPERTIES:
 :CUSTOM_ID: browser-and-external-documentation
 :END:
 
-TODO
+Emacs has many commands related to documentation, but one of the most useful
+ones is =man=. It provides an interface for the =man(1)= command, and it can be used
+to view manual pages for various commands and C functions, while working on your
+main buffer. See also [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Man-Page.html][Emacs manual]].
 
-- eww (not a replacement for browsers)
-- man
+I decided to include in this section the Emacs browser, [[https://www.gnu.org/software/emacs/manual/html_mono/eww.html][eww]], since one of my
+main usages is for online documentation. The Emacs browser is not meant to be a
+replacement for modern standalone browsers, since it doesn't have have support
+for CSS or JavaScript. However, if a website is built properly (e.g. this blog),
+you should be able to render it without issues.
 
 ** ERC
 :PROPERTIES:
 :CUSTOM_ID: erc
 :END:
 
-TODO
+[[https://www.gnu.org/software/emacs/manual/html_mono/erc.html][ERC]] is a powerful [[https://es.wikipedia.org/wiki/Internet_Relay_Chat][IRC]] client for Emacs, and it's included since version 22.3. I
+don't have much to say about ERC, so I will just quote the list of features
+from the manual:
+- Flood control.
+- Timestamps.
+- Join channels automatically.
+- Buttonize URLs, nicknames, and other text.
+- Wrap long lines.
+- Highlight or remove IRC control characters.
+- Highlight pals, fools, and other keywords.
+- Detect netsplits.
+- Complete nicknames and commands in a programmable fashion.
+- Make displayed lines read-only.
+- Input history.
+- Track channel activity in the mode-line.
 
 ** C macro expansion
 :PROPERTIES:
 :CUSTOM_ID: c-macro-expansion
 :END:
 
-TODO
+Emacs allows you to expand C macros with =M-x c-macro-expand=. This is very useful
+for complex and nested macros.
+
+For example, if you had this C code:
+
+#+begin_src C
+#include <stdlib.h>
+
+#define MY_PATH "file.txt"
+#define MY_MACRO(X, Y)                          \
+    do {                                        \
+        func(0x10, MY_PATH, NULL);              \
+    } while (X++ < Y)
+
+MY_MACRO(i, 30);
+#+end_src
+
+You could select the last line and use =M-x c-macro-expand= to expand the macros
+in the region recursively (in this case =MY_MACRO=, =MY_PATH= and =NULL=):
+
+#+begin_src C
+do {
+    func(0x10, "file.txt", ((void*)0));
+} while (i++ < 30);
+#+end_src
+
+Discovering this feature was a magical moment. I was writing a C program which
+used some complex macros, so I wanted to make sure that they were expanding to
+what I thought. I thought that someone could have made an Emacs package about
+this, but then I typed =M-x macro= and saw that this is already a feature in
+Emacs.
 
 ** Calculator
 :PROPERTIES:
 :CUSTOM_ID: calculator
 :END:
 
-TODO
+You can open the Emacs calculator with =M-x calc=. It uses [[https://en.wikipedia.org/wiki/Reverse_Polish_notation][Reverse Polish Notation]]
+(RPN), which might be a bit tricky to get used to, but it's very worth it.
 
-I dont know much about it, but its very interesting
+Some of the features include:
+- Choice of algebraic or Reverse Polish notation (RPN), i.e. stack-based, entry
+  of calculations.
+- Arbitrary precision integers and floating-point numbers.
+- Arithmetic on rational numbers, complex numbers (rectangular and polar), error
+  forms with standard deviations, open and closed intervals, vectors and
+  matrices, dates and times, infinities, sets, quantities with units, and
+  algebraic formulas.
+- Mathematical operations such as logarithms and trigonometric functions.
+- Programmer’s features (bitwise operations, non-decimal numbers).
+- Financial functions such as future value and internal rate of return.
+- Number theoretical features such as prime factorization and arithmetic modulo
+  m for any m.
+- Algebraic manipulation features, including symbolic calculus.
+- Moving data to and from regular editing buffers.
+- Embedded mode for manipulating Calc formulas and data directly inside any
+  editing buffer.
+- Graphics using GNUPLOT, a versatile (and free) plotting program.
+- Easy programming using keyboard macros, algebraic formulas, algebraic rewrite
+  rules, or extended Emacs Lisp.
 
-** Misc
+I don't have a lot of experience with the calculator, but I can assure you that
+it's worth learning. See also the [[https://www.gnu.org/software/emacs/manual/html_mono/calc.html][calc manual]].
+
+*** Quick calculator
 :PROPERTIES:
-:CUSTOM_ID: misc
+:CUSTOM_ID: quick-calculator
 :END:
 
-TODO
+If you find this overwhelming, you might want to at least consider using
+=M-x quick-calc= for quick (but not necesarily simple) calculations. For example:
 
-Games:
-- Zone
-- ...
+#+begin_example
+M-x quick-calc RET
+Quick calc: 632+56-32*4+2^3
+Result: 632 + 56 - 32 4 + 2^3 =>  568  (16#238, 8#1070, 2#1000111000)
 
-Emms.
+M-x quick-calc RET
+Quick calc: 16#7F33
+Result: 32563 =>  32563  (16#7F33, 8#77463, 2#111111100110011)
+
+M-x quick-calc RET
+Quick calc: 3x=2x+18
+Result: 3 x = 2 x + 18 =>  x = 18
+#+end_example
+
+*** Personal reference card
+:PROPERTIES:
+:CUSTOM_ID: personal-reference-card
+:END:
+
+These are some keybinds that I use often, appart from the basic operations and
+insertion commands:
+
+| Key       | Description                                        |
+|-----------+----------------------------------------------------|
+| ~C-u~ + /n/   | Run the next command /n/ times, edit /n/ entries, etc. |
+| ~`~ (tilde) | Edit the top of the stack (Combine with =C-u=).      |
+| ~D r~       | Change the radix used when displaying.             |
+
+Some other keybinds, related to the trail:
+
+| Key      | Description                                                   |
+|----------+---------------------------------------------------------------|
+| ~t p~, ~t n~ | Move up and down in the trail, from the main calc window.     |
+| ~t y~      | Copy the selected value in the trail to the main calc window. |
 
 * External packages
 :PROPERTIES:

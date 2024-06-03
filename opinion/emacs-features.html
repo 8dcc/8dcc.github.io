@@ -232,7 +232,6 @@
 <li><a href="#erc">3.7. ERC</a></li>
 <li><a href="#c-macro-expansion">3.8. C macro expansion</a></li>
 <li><a href="#calculator">3.9. Calculator</a></li>
-<li><a href="#misc">3.10. Misc</a></li>
 </ul>
 </li>
 <li><a href="#external-packages">4. External packages</a>
@@ -544,7 +543,7 @@ using very long plain comments within a single source.
 </p>
 
 
-<div id="org454e34a" class="figure">
+<div id="orgb59eb72" class="figure">
 <p><img src="../img/emacs-org.png" alt="emacs-org.png" />
 </p>
 </div>
@@ -583,7 +582,7 @@ Behold, the beauty of GNU Emacs (at least since version 22.1).
 </p>
 
 
-<div id="orgd87f44c" class="figure">
+<div id="org478bd30" class="figure">
 <p><img src="../img/emacs-gdb.png" alt="emacs-gdb.png" />
 </p>
 </div>
@@ -673,7 +672,7 @@ displays the matches in an interactive buffer.
 </p>
 
 
-<div id="org99ec104" class="figure">
+<div id="orgdaccc0f" class="figure">
 <p><img src="../img/emacs-grep.png" alt="emacs-grep.png" />
 </p>
 </div>
@@ -697,11 +696,16 @@ See also <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Grep
 <h3 id="compilation"><span class="section-number-3">3.5.</span> Compilation</h3>
 <div class="outline-text-3" id="text-compilation">
 <p>
-TODO
+In Emacs, you can run compilers and build tools, feeding the output into an
+Emacs buffer that can be used, for example, for jumping to the lines of errors
+and warnings inside the source buffer. See also <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Compilation.html">Emacs manual</a>.
 </p>
 
 <p>
-Links to errors in files
+With the <a href="https://github.com/bbatsov/projectile">projectile</a> package, you can use the <code>projectile-compile-project</code> command
+to compile (e.g. run <code>make</code>) from the root of your project, instead of running it
+from the directory of the current buffer. The projectile package has many
+similar commands, so make sure you check it out.
 </p>
 </div>
 </div>
@@ -710,13 +714,19 @@ Links to errors in files
 <h3 id="browser-and-external-documentation"><span class="section-number-3">3.6.</span> Browser and external documentation</h3>
 <div class="outline-text-3" id="text-browser-and-external-documentation">
 <p>
-TODO
+Emacs has many commands related to documentation, but one of the most useful
+ones is <code>man</code>. It provides an interface for the <code>man(1)</code> command, and it can be used
+to view manual pages for various commands and C functions, while working on your
+main buffer. See also <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Man-Page.html">Emacs manual</a>.
 </p>
 
-<ul class="org-ul">
-<li>eww (not a replacement for browsers)</li>
-<li>man</li>
-</ul>
+<p>
+I decided to include in this section the Emacs browser, <a href="https://www.gnu.org/software/emacs/manual/html_mono/eww.html">eww</a>, since one of my
+main usages is for online documentation. The Emacs browser is not meant to be a
+replacement for modern standalone browsers, since it doesn't have have support
+for CSS or JavaScript. However, if a website is built properly (e.g. this blog),
+you should be able to render it without issues.
+</p>
 </div>
 </div>
 
@@ -724,8 +734,24 @@ TODO
 <h3 id="erc"><span class="section-number-3">3.7.</span> ERC</h3>
 <div class="outline-text-3" id="text-erc">
 <p>
-TODO
+<a href="https://www.gnu.org/software/emacs/manual/html_mono/erc.html">ERC</a> is a powerful <a href="https://es.wikipedia.org/wiki/Internet_Relay_Chat">IRC</a> client for Emacs, and it's included since version 22.3. I
+don't have much to say about ERC, so I will just quote the list of features
+from the manual:
 </p>
+<ul class="org-ul">
+<li>Flood control.</li>
+<li>Timestamps.</li>
+<li>Join channels automatically.</li>
+<li>Buttonize URLs, nicknames, and other text.</li>
+<li>Wrap long lines.</li>
+<li>Highlight or remove IRC control characters.</li>
+<li>Highlight pals, fools, and other keywords.</li>
+<li>Detect netsplits.</li>
+<li>Complete nicknames and commands in a programmable fashion.</li>
+<li>Make displayed lines read-only.</li>
+<li>Input history.</li>
+<li>Track channel activity in the mode-line.</li>
+</ul>
 </div>
 </div>
 
@@ -733,7 +759,45 @@ TODO
 <h3 id="c-macro-expansion"><span class="section-number-3">3.8.</span> C macro expansion</h3>
 <div class="outline-text-3" id="text-c-macro-expansion">
 <p>
-TODO
+Emacs allows you to expand C macros with <code>M-x c-macro-expand</code>. This is very useful
+for complex and nested macros.
+</p>
+
+<p>
+For example, if you had this C code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdlib.h&gt;</span>
+
+<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">MY_PATH</span> <span style="color: #00d3d0;">"file.txt"</span>
+<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">MY_MACRO</span>(<span style="color: #6ae4b9;">X</span>, <span style="color: #6ae4b9;">Y</span>)                          \
+    <span style="color: #ff6f9f;">do</span> {                                        \
+        func(<span style="color: #88ca9f;">0x10</span>, MY_PATH, <span style="color: #88ca9f;">NULL</span>);              \
+    } <span style="color: #ff6f9f;">while</span> (X++ &lt; Y)
+
+<span style="color: #4ae2ff;">MY_MACRO</span>(i, <span style="color: #88ca9f;">30</span>);
+</pre>
+</div>
+
+<p>
+You could select the last line and use <code>M-x c-macro-expand</code> to expand the macros
+in the region recursively (in this case <code>MY_MACRO</code>, <code>MY_PATH</code> and <code>NULL</code>):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">do</span> {
+    func(<span style="color: #88ca9f;">0x10</span>, <span style="color: #00d3d0;">"file.txt"</span>, ((<span style="color: #79a8ff;">void</span>*)<span style="color: #88ca9f;">0</span>));
+} <span style="color: #ff6f9f;">while</span> (i++ &lt; <span style="color: #88ca9f;">30</span>);
+</pre>
+</div>
+
+<p>
+Discovering this feature was a magical moment. I was writing a C program which
+used some complex macros, so I wanted to make sure that they were expanding to
+what I thought. I thought that someone could have made an Emacs package about
+this, but then I typed <code>M-x macro</code> and saw that this is already a feature in
+Emacs.
 </p>
 </div>
 </div>
@@ -742,33 +806,136 @@ TODO
 <h3 id="calculator"><span class="section-number-3">3.9.</span> Calculator</h3>
 <div class="outline-text-3" id="text-calculator">
 <p>
-TODO
+You can open the Emacs calculator with <code>M-x calc</code>. It uses <a href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">Reverse Polish Notation</a>
+(RPN), which might be a bit tricky to get used to, but it's very worth it.
 </p>
 
 <p>
-I dont know much about it, but its very interesting
-</p>
-</div>
-</div>
-
-<div id="outline-container-misc" class="outline-3">
-<h3 id="misc"><span class="section-number-3">3.10.</span> Misc</h3>
-<div class="outline-text-3" id="text-misc">
-<p>
-TODO
-</p>
-
-<p>
-Games:
+Some of the features include:
 </p>
 <ul class="org-ul">
-<li>Zone</li>
-<li>&#x2026;</li>
+<li>Choice of algebraic or Reverse Polish notation (RPN), i.e. stack-based, entry
+of calculations.</li>
+<li>Arbitrary precision integers and floating-point numbers.</li>
+<li>Arithmetic on rational numbers, complex numbers (rectangular and polar), error
+forms with standard deviations, open and closed intervals, vectors and
+matrices, dates and times, infinities, sets, quantities with units, and
+algebraic formulas.</li>
+<li>Mathematical operations such as logarithms and trigonometric functions.</li>
+<li>Programmer’s features (bitwise operations, non-decimal numbers).</li>
+<li>Financial functions such as future value and internal rate of return.</li>
+<li>Number theoretical features such as prime factorization and arithmetic modulo
+m for any m.</li>
+<li>Algebraic manipulation features, including symbolic calculus.</li>
+<li>Moving data to and from regular editing buffers.</li>
+<li>Embedded mode for manipulating Calc formulas and data directly inside any
+editing buffer.</li>
+<li>Graphics using GNUPLOT, a versatile (and free) plotting program.</li>
+<li>Easy programming using keyboard macros, algebraic formulas, algebraic rewrite
+rules, or extended Emacs Lisp.</li>
 </ul>
 
 <p>
-Emms.
+I don't have a lot of experience with the calculator, but I can assure you that
+it's worth learning. See also the <a href="https://www.gnu.org/software/emacs/manual/html_mono/calc.html">calc manual</a>.
 </p>
+</div>
+
+<div id="outline-container-quick-calculator" class="outline-4">
+<h4 id="quick-calculator"><span class="section-number-4">3.9.1.</span> Quick calculator</h4>
+<div class="outline-text-4" id="text-quick-calculator">
+<p>
+If you find this overwhelming, you might want to at least consider using
+<code>M-x quick-calc</code> for quick (but not necesarily simple) calculations. For example:
+</p>
+
+<pre class="example" id="org5c8ea26">
+M-x quick-calc RET
+Quick calc: 632+56-32*4+2^3
+Result: 632 + 56 - 32 4 + 2^3 =&gt;  568  (16#238, 8#1070, 2#1000111000)
+
+M-x quick-calc RET
+Quick calc: 16#7F33
+Result: 32563 =&gt;  32563  (16#7F33, 8#77463, 2#111111100110011)
+
+M-x quick-calc RET
+Quick calc: 3x=2x+18
+Result: 3 x = 2 x + 18 =&gt;  x = 18
+</pre>
+</div>
+</div>
+
+<div id="outline-container-personal-reference-card" class="outline-4">
+<h4 id="personal-reference-card"><span class="section-number-4">3.9.2.</span> Personal reference card</h4>
+<div class="outline-text-4" id="text-personal-reference-card">
+<p>
+These are some keybinds that I use often, appart from the basic operations and
+insertion commands:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Key</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>C-u</code> + <i>n</i></td>
+<td class="org-left">Run the next command <i>n</i> times, edit <i>n</i> entries, etc.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>`</code> (tilde)</td>
+<td class="org-left">Edit the top of the stack (Combine with <code>C-u</code>).</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>D r</code></td>
+<td class="org-left">Change the radix used when displaying.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Some other keybinds, related to the trail:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Key</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>t p</code>, <code>t n</code></td>
+<td class="org-left">Move up and down in the trail, from the main calc window.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>t y</code></td>
+<td class="org-left">Copy the selected value in the trail to the main calc window.</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
