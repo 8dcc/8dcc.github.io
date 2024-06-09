@@ -1,0 +1,325 @@
+#+TITLE: Switch statements from a low-level perspective
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+Since I started learning C, I have heard that =switch= statements are faster and
+essentially better than else-if blocks, and that you should use them whenever
+possible. I always heard this is because the program jumps to the =case= label
+directly, without checking all previous possibilities one by one. A lot of
+people ignore this advice, and decide to use nested if-else blocks.
+
+This article was motivated because a friend asked me about =switch= statements,
+and although I have kind of known the reason why they are better for a long
+time, I never actually thought about how I would implement the compiler
+optimizations myself from assembly. I wrote [[https://github.com/8dcc/scratch/blob/d6367ed75cb2e08f5db7301f6dcbb8af847625f6/Assembly/misc/15-switch-statement/jump_table.asm][this code]], but I decided to comments
+were big enough to turn them into an article.
+
+I will to try to explain the following in this article:
+
+1. How a compiler optimizes =switch= statements, and how they can be faster than
+   multiple if-else blocks.
+2. Why the different cases of the =switch= statement need to be known at compile
+   time in most programming languages.
+
+Since I am going to explain this from a low-level perspective, you will need a
+bit of =x86= assembly knowledge.
+
+* If-else blocks
+:PROPERTIES:
+:CUSTOM_ID: if-else-blocks
+:END:
+
+Let's first have a look at a normal if-else conditional.
+
+#+begin_src C
+if (my_var == 11) {
+    /* Block 1 */
+} else if (my_var == 12) {
+    /* Block 2 */
+} else if (my_var == 15) {
+    /* Block 3 */
+} else {
+    /* Block 4 */
+}
+#+end_src
+
+Keep in mind that this is the same as:
+
+#+begin_src C
+if (my_var == 11) {
+    /* Block 1 */
+} else {
+    if (my_var == 12) {
+        /* Block 2 */
+    } else {
+        if (my_var == 15) {
+            /* Block 3 */
+        } else {
+            /* Block 4 */
+        }
+    }
+}
+#+end_src
+
+Now let's look at the assembly at a compiler (without optimizations) could have
+generated:
+
+#+begin_src nasm
+    mov eax, [my_var]
+
+    cmp eax, 11
+    jne else_one
+    ; Block 1...
+    jmp done
+
+else_one:
+    cmp eax, 12
+    jne else_two
+    ; Block 2...
+    jmp done
+
+else_two:
+    cmp eax, 15
+    jne else_three
+    ; Block 3...
+    jmp done
+
+else_three:
+    ; Block 4...
+
+done:
+    ; Continue after conditionals...
+#+end_src
+
+As expected, the conditions are checked sequentially.
+
+* Switch statements
+:PROPERTIES:
+:CUSTOM_ID: switch-statement
+:END:
+
+** Simple switch
+:PROPERTIES:
+:CUSTOM_ID: simple-switch
+:END:
+
+Let's look at a =switch= statement equivalent to the previous if conditionals.
+
+#+begin_src C
+switch (my_var) {
+    case 11:
+        /* Block 1 */
+        break;
+    case 12:
+        /* Block 2 */
+        break;
+    case 15:
+        /* Block 3 */
+        break;
+    default:
+        /* Block 4 */
+        break;
+}
+#+end_src
+
+For this specific switch statement, since it's pretty small, the compiler might
+produce something similar to the previous if-else example:
+
+#+begin_src nasm
+    mov eax, [my_var]
+
+    cmp eax, 11
+    je  case_11
+    cmp eax, 12
+    je  case_12
+    cmp eax, 15
+    je  case_15
+    jmp case_default
+
+case_11:
+    ; Block 1...
+    jmp done
+
+case_12:
+    ; Block 2...
+    jmp done
+
+case_15:
+    ; Block 3...
+    jmp done
+
+case_default:
+    ; Block 4...
+
+done:
+    ; Continue after conditionals...
+#+end_src
+
+However, if there are a lot of switch statements, and they are not too apart
+from each other, the compiler will probably use a *jump table*.
+
+** Jump tables
+:PROPERTIES:
+:CUSTOM_ID: jump-tables
+:END:
+
+The idea behind the jump table is using the value of =my_var= as an *index* in an
+array of pointers (the jump table). Each element in the jump table will contain
+the address of a procedure corresponding to the label of the =switch=.
+
+The assembly needs to do the following:
+
+1. Define the jump table, in our case in the =.data= section.
+2. In the location of the =switch=, somehow convert the value inside =my_var= to the
+   index of the jump table, and jump to the stored address at that index (more
+   on this below).
+3. After the jump instruction, add a "done" label that each =case= will use for
+   returning.
+4. Define the =case= labels somewhere in the =.text= section, with the blocks that
+   the user defined in the =switch=. At the end of the blocks, jump to the "done"
+   label that we declared inside the main function.
+
+For example:
+
+#+begin_src nasm
+section .data
+jump_table:
+    ; TODO: Handle cases smaller than 11
+    dq case_11
+    dq case_12
+    dq case_default ; case 13, not specified
+    dq case_default ; case 14, not specified
+    dq case_15
+    ; TODO: Handle cases greater than 15
+
+; ------------------------------------------------------------------------------
+
+section .text
+my_func:
+    ; Code before the switch...
+
+    mov eax, [my_var]
+
+    ; TODO: Get index in the jump table from the value in `eax'
+    jmp ???
+
+.switch_done:
+    ; Code after the switch...
+    ret
+
+; ------------------------------------------------------------------------------
+
+case_11:
+    ; Block 1...
+    jmp my_func.switch_done
+
+case_12:
+    ; Block 2...
+    jmp my_func.switch_done
+
+case_15:
+    ; Block 3...
+    jmp my_func.switch_done
+
+case_default:
+    ; Block 4...
+    jmp my_func.switch_done
+#+end_src
+
+The addresses of all those =case_*= labels at the bottom will be stored in the
+jump table inside the =.data= section. Since this is =x86_64= assembly, each element
+of the jump table is a /quad-word/ because it needs to be able to hold these
+64-bit addresses. For 32-bits, we would use =dd= for declaring a 32-bit
+/double-word/.
+
+Note how the third and fourth elements in the jump table correspond to the 13
+and 14 values that the user did not specify in the =switch= statement. Since they
+are just two, we can fill them with the address of the =case_default= label.
+
+As you can see, the only thing left is making sure the value is within the first
+and last element of the array, and then calculating the index in the array from
+there.
+
+The first part is simple, just compare =eax= against the value of the lowest and
+biggest =case= values. If it's not within those bounds, jump to the =case_default=
+label.
+
+#+begin_src nasm
+; if (eax < 11 || eax > 15)
+;     goto case_default
+cmp eax, 11
+jl  case_default
+cmp eax, 15
+jg  case_default
+#+end_src
+
+To calculate the index in the array, we simply subtract the value of the lowest
+=case= (in this case 11) to the value in =my_var=. However, we also need to multiply
+this index by the size of each element in =jump_table= (in this case 8-byte
+/quad-words/) to get the real offset. For example:
+
+#+begin_src nasm
+; Subtract the lowest case
+sub  eax, 11
+
+; Multiply by 8 (quad-word) to get the byte offset
+imul eax, eax, 8
+
+; Store the address of the jump table
+mov  rdx, jump_table
+
+; Add the byte offset to the address, and dereference it to get the address of
+; this `case'
+mov  rdx, [rdx]
+
+; Jump to the label itself
+jmp  rdx
+#+end_src
+
+If you are actually going to try this code, you might want to use =lea= when
+loading the address of =jump_table=. For more information, see my note in
+[[file:../reversing/understanding-call-stack.org::#note-about-position-independent-executables][Understanding and traversing the call stack]].
+
+In this case, I used the =imul= instruction, which multiplies the second operand
+by the third operand and saves the result in the first operand. Since we are
+multiplying by 8 (a power of 2) we could have used a more optimal bit shift:
+
+#+begin_src nasm
+imul rax, rax, 8
+; The same as:
+shl  rax, 3
+#+end_src
+
+* Conclusion
+:PROPERTIES:
+:CUSTOM_ID: conclusion
+:END:
+
+The compiler doesn't always use a jump table for =switch= statements, because if
+the values are too separated from each other, the array would be too big and it
+wouldn't be worth it. If the jump table is too small, the compiler might also
+decide to treat the =switch= as a series of nested =if-else= blocks, just like we
+saw before.
+
+With this in mind, it's more clear why the values in the =case= statements have to
+be *known at compile time*. The compiler needs to know the specific values of all
+the cases just to decide if it's worth it to generate a jump table. Then, it
+also uses them for filling default cases, making sure the value is between the
+lowest and greatest values, for indexing, etc.
+
+If you reached this far, I hope you learned something. For the full source code,
+see my [[https://github.com/8dcc/scratch/blob/d6367ed75cb2e08f5db7301f6dcbb8af847625f6/Assembly/misc/15-switch-statement/jump_table.asm][scratch repository]].

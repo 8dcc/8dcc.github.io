@@ -17,4 +17,5 @@ List of my articles about programming:
 - [[file:detour-hooking.org][Detour hooking]]
 - [[file:understanding-y-combinator.org][Understanding the Y combinator]]
 - [[file:asm-loop-conditionals.org][Optimizing loop conditions in assembly]]
+- [[file:switch-statement.org][Switch statements from a low-level perspective]]
 - [[file:creating-keygen.org][Creating a simple keygen]]
