@@ -9,6 +9,13 @@ h1, h2, h3, h4 {
     color: #333333;
 }
 
+hr {
+  border: none;
+  height: 1px;
+  color: #aaaaaa;
+  background-color: #aaaaaa;
+}
+
 /*----------------------------------------------------------------------------*/
 
 p, li {
