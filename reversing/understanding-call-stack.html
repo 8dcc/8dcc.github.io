@@ -429,7 +429,7 @@ typically organized.
 </p>
 
 
-<div id="orgaca2557" class="figure">
+<div id="org65c96a6" class="figure">
 <p><img src="../img/callstack1.png" alt="callstack1.png" />
 </p>
 </div>
@@ -480,7 +480,7 @@ version, where the top of the stack is in a lower address than the bottom.
 </p>
 
 
-<div id="org9362d35" class="figure">
+<div id="org968f44a" class="figure">
 <p><img src="../img/callstack2.png" alt="callstack2.png" />
 </p>
 </div>
@@ -613,7 +613,7 @@ Let's look at some example C code.
 The call stack for <code>DrawPoint()</code> would be the following:
 </p>
 
-<pre class="example" id="orge890eab">
+<pre class="example" id="org051d09a">
 (???)  -&gt;  DrawSquare()  -&gt;  DrawLine()  -&gt;  DrawPoint()
 </pre>
 </div>
@@ -753,7 +753,7 @@ I chose to use the second option, so I can explain how it works. If we just used
 following warnings:
 </p>
 
-<pre class="example" id="org6088dba">
+<pre class="example" id="org29785c5">
 /usr/bin/ld: obj/callstack.asm.o: warning: relocation in read-only section `.text'
 /usr/bin/ld: obj/callstack.asm.o: relocation R_X86_64_PC32 against symbol `printf@@GLIBC_2.2.5' can not be used when making a PIE object; recompile with -fPIE
 /usr/bin/ld: final link failed: bad value
@@ -809,7 +809,7 @@ assemble it, and <a href="https://defuse.ca/online-x86-assembler.htm">look</a> a
 <div class="org-src-container">
 <pre class="src src-nasm"><span style="color: #88ca9f;">48</span> b8 <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">02</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">08</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>  movabs <span style="color: #6ae4b9;">rax</span>, <span style="color: #88ca9f;">0x8000200</span>
 <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">04</span> <span style="color: #88ca9f;">25</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">02</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">08</span>        <span style="color: #feacd0;">lea</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">ds</span>:<span style="color: #88ca9f;">0x8000200</span>
-<span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> e7 ff ff ff           <span style="color: #feacd0;">lea</span>    <span style="color: #6ae4b9;">rax</span>, [rip+<span style="color: #88ca9f;">0xffffffffffffffe7</span>] <span style="color: #989898;">; </span><span style="color: #989898;">[rip-0x19]</span>
+<span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> e7 ff ff ff           <span style="color: #feacd0;">lea</span>    <span style="color: #6ae4b9;">rax</span>, [rip + <span style="color: #88ca9f;">0xffffffffffffffe7</span>] <span style="color: #989898;">; </span><span style="color: #989898;">[rip - 0x19]</span>
 </pre>
 </div>
 
@@ -934,7 +934,7 @@ what I mentioned in <a href="#note-about-position-independent-executables">Note 
 Then, we can just run <code>make</code> and check the output:
 </p>
 
-<pre class="example" id="orgca04174">
+<pre class="example" id="orgaf82f0e">
 (main) Address of DrawPoint:  0x5a1e3d78e139
 (main) Address of DrawLine:   0x5a1e3d78e170
 (main) Address of DrawSquare: 0x5a1e3d78e1bf
@@ -976,7 +976,7 @@ look.
 </p>
 
 
-<div id="orge5e9291" class="figure">
+<div id="org8d94f23" class="figure">
 <p><img src="../img/callstack3.png" alt="callstack3.png" />
 </p>
 </div>
@@ -987,7 +987,7 @@ Indeed, the call to <code>DrawPoint</code> is at <code>+0x2e</code>, and the nex
 </p>
 
 
-<div id="orgee6b8e4" class="figure">
+<div id="orgd5457c9" class="figure">
 <p><img src="../img/callstack4.png" alt="callstack4.png" />
 </p>
 </div>

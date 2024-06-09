@@ -99,20 +99,20 @@ could also use =s location= (seek) and then =command=.
 
 #+begin_src nasm
 [0x00001090]> pdf @ entry0
-│         entry0                      ;-- section..text:
-┌         entry0                     entry0(int64_t arg3);
-│         entry0                     ; arg int64_t arg3 @ rdx
-│         entry0                          31 ed                       xor   ebp, ebp                ; [13] -r-x section size 1492 named .text
-│         entry0+0x2                      49 89 d1                    mov   r9, rdx                 ; arg3
-│         entry0+0x5                      5e                          pop   rsi
-│         entry0+0x6                      48 89 e2                    mov   rdx, rsp
-│         entry0+0x9                      48 83 e4 f0                 and   rsp, 0xfffffffffffffff0
-│         entry0+0xd                      50                          push  rax
-│         entry0+0xe                      54                          push  rsp
-│         entry0+0xf                      45 31 c0                    xor   r8d, r8d
-│         entry0+0x12                     31 c9                       xor   ecx, ecx
-│         entry0+0x14                     48 8d 3d 4e 03 00 00        lea   rdi, data.0000140d      ; 0x140d
-└         entry0+0x1f                     ff 15 0b 2f 00 00           call  qword [rip + __libc_start_main] ; [reloc.__libc_start_main:8]=0x41d0 reloc.target.__libc_start_main
+entry0           ;-- section..text:
+entry0          entry0(int64_t arg3);
+entry0          ; arg int64_t arg3 @ rdx
+entry0               31 ed                       xor   ebp, ebp                ; [13] -r-x section size 1492 named .text
+entry0+0x2           49 89 d1                    mov   r9, rdx                 ; arg3
+entry0+0x5           5e                          pop   rsi
+entry0+0x6           48 89 e2                    mov   rdx, rsp
+entry0+0x9           48 83 e4 f0                 and   rsp, 0xfffffffffffffff0
+entry0+0xd           50                          push  rax
+entry0+0xe           54                          push  rsp
+entry0+0xf           45 31 c0                    xor   r8d, r8d
+entry0+0x12          31 c9                       xor   ecx, ecx
+entry0+0x14          48 8d 3d 4e 03 00 00        lea   rdi, data.0000140d      ; 0x140d
+entry0+0x1f          ff 15 0b 2f 00 00           call  qword [rip + __libc_start_main] ; [reloc.__libc_start_main:8]=0x41d0 reloc.target.__libc_start_main
 #+end_src
 
 The address being loaded into =rdi= at =entry0+0x14= should be our main function
@@ -133,56 +133,56 @@ use =pd 100 @ location= instead, where 100 is the number of bytes to disassemble
 
 #+begin_src nasm
 [0x00001090]> pdf @ main
-          ; DATA XREF from entry0 @ 0x10a8
-┌         main                     int main(int argc, char **argv, char **envp);
-│         main                     ; var uint64_t var_9h @ stack - 0x9
-│         main                          55                          push    rbp
-│         main+0x1                      48 89 e5                    mov     rbp, rsp
-│         main+0x4                      48 83 ec 10                 sub     rsp, 0x10
-│         main+0x8                      48 8d 05 f1 0b 00 00        lea     rax, [rip + str.Username:] ; 0x2009
-│         main+0xf                      48 89 c7                    mov     rdi, rax ; const char *format
-│         main+0x12                     b8 00 00 00 00              mov     eax, 0
-│         main+0x17                     e8 3b fc ff ff              call    printf ; sym.imp.printf ; int printf(const char *format)
-│         main+0x1c                     48 8d 05 34 2c 00 00        lea     rax, [rip + data.00004060] ; 0x4060
-│         main+0x23                     48 89 c6                    mov     rsi, rax
-│         main+0x26                     48 8d 05 de 0b 00 00        lea     rax, [rip + str.255s] ; 0x2014
-│         main+0x2d                     48 89 c7                    mov     rdi, rax ; const char *format
-│         main+0x30                     b8 00 00 00 00              mov     eax, 0
-│         main+0x35                     e8 3d fc ff ff              call    __isoc99_scanf ; sym.imp.__isoc99_scanf ; int scanf(const char *format)
-│         main+0x3a                     48 8d 05 d0 0b 00 00        lea     rax, [rip + str.Key:] ; 0x201a
-│         main+0x41                     48 89 c7                    mov     rdi, rax ; const char *format
-│         main+0x44                     b8 00 00 00 00              mov     eax, 0
-│         main+0x49                     e8 09 fc ff ff              call    printf ; sym.imp.printf ; int printf(const char *format)
-│         main+0x4e                     48 8d 05 02 2d 00 00        lea     rax, [rip + data.00004160] ; 0x4160
-│         main+0x55                     48 89 c7                    mov     rdi, rax ; int64_t arg1
-│         main+0x58                     e8 41 fe ff ff              call    fcn.000012a7 ; fcn.000012a7
-│         main+0x5d                     48 8d 05 13 2d 00 00        lea     rax, [rip + data.00004180] ; 0x4180
-│         main+0x64                     48 89 c6                    mov     rsi, rax ; int64_t arg2
-│         main+0x67                     48 8d 05 e9 2b 00 00        lea     rax, [rip + data.00004060] ; 0x4060
-│         main+0x6e                     48 89 c7                    mov     rdi, rax ; const char *arg1
-│         main+0x71                     e8 0a fd ff ff              call    fcn.00001189 ; fcn.00001189
-│         main+0x76                     ba 14 00 00 00              mov     edx, 0x14 ; size_t n
-│         main+0x7b                     48 8d 05 f5 2c 00 00        lea     rax, [rip + data.00004180] ; 0x4180
-│         main+0x82                     48 89 c6                    mov     rsi, rax ; const void *s2
-│         main+0x85                     48 8d 05 cb 2c 00 00        lea     rax, [rip + data.00004160] ; 0x4160
-│         main+0x8c                     48 89 c7                    mov     rdi, rax ; const void *s1
-│         main+0x8f                     e8 d3 fb ff ff              call    memcmp ; sym.imp.memcmp ; int memcmp(const void *s1, const void *s2, size_t n)
-│         main+0x94                     85 c0                       test    eax, eax
-│         main+0x96                     0f 94 c0                    sete    al
-│         main+0x99                     88 45 ff                    mov     byte [rbp - 1], al
-│         main+0x9c                     80 7d ff 00                 cmp     byte [rbp - 1], 0
-│     ┌─< main+0xa0                     74 11                       je      0x14bc
-│     │   main+0xa2                     48 8d 05 6e 0b 00 00        lea     rax, [rip + str.Correct_key.] ; 0x2020
-│     │   main+0xa9                     48 89 c7                    mov     rdi, rax ; const char *s
-│     │   main+0xac                     e8 76 fb ff ff              call    puts ; sym.imp.puts ; int puts(const char *s)
-│    ┌──< main+0xb1                     eb 0f                       jmp     0x14cb
-│    │└─> main+0xb3                     48 8d 05 6a 0b 00 00        lea     rax, [rip + str.Invalid_key.] ; 0x202d
-│    │    main+0xba                     48 89 c7                    mov     rdi, rax ; const char *s
-│    │    main+0xbd                     e8 65 fb ff ff              call    puts ; sym.imp.puts ; int puts(const char *s)
-│    │    ; CODE XREF from main @ 0x14ba
-│    └──> main+0xc2                     b8 00 00 00 00              mov     eax, 0
-│         main+0xc7                     c9                          leave
-└         main+0xc8                     c3                          ret
+     ; DATA XREF from entry0 @ 0x10a8
+     main            int main(int argc, char **argv, char **envp);
+     main            ; var uint64_t var_9h @ stack - 0x9
+     main                 55                          push    rbp
+     main+0x1             48 89 e5                    mov     rbp, rsp
+     main+0x4             48 83 ec 10                 sub     rsp, 0x10
+     main+0x8             48 8d 05 f1 0b 00 00        lea     rax, [rip + str.Username:] ; 0x2009
+     main+0xf             48 89 c7                    mov     rdi, rax ; const char *format
+     main+0x12            b8 00 00 00 00              mov     eax, 0
+     main+0x17            e8 3b fc ff ff              call    printf ; sym.imp.printf ; int printf(const char *format)
+     main+0x1c            48 8d 05 34 2c 00 00        lea     rax, [rip + data.00004060] ; 0x4060
+     main+0x23            48 89 c6                    mov     rsi, rax
+     main+0x26            48 8d 05 de 0b 00 00        lea     rax, [rip + str.255s] ; 0x2014
+     main+0x2d            48 89 c7                    mov     rdi, rax ; const char *format
+     main+0x30            b8 00 00 00 00              mov     eax, 0
+     main+0x35            e8 3d fc ff ff              call    __isoc99_scanf ; sym.imp.__isoc99_scanf ; int scanf(const char *format)
+     main+0x3a            48 8d 05 d0 0b 00 00        lea     rax, [rip + str.Key:] ; 0x201a
+     main+0x41            48 89 c7                    mov     rdi, rax ; const char *format
+     main+0x44            b8 00 00 00 00              mov     eax, 0
+     main+0x49            e8 09 fc ff ff              call    printf ; sym.imp.printf ; int printf(const char *format)
+     main+0x4e            48 8d 05 02 2d 00 00        lea     rax, [rip + data.00004160] ; 0x4160
+     main+0x55            48 89 c7                    mov     rdi, rax ; int64_t arg1
+     main+0x58            e8 41 fe ff ff              call    fcn.000012a7 ; fcn.000012a7
+     main+0x5d            48 8d 05 13 2d 00 00        lea     rax, [rip + data.00004180] ; 0x4180
+     main+0x64            48 89 c6                    mov     rsi, rax ; int64_t arg2
+     main+0x67            48 8d 05 e9 2b 00 00        lea     rax, [rip + data.00004060] ; 0x4060
+     main+0x6e            48 89 c7                    mov     rdi, rax ; const char *arg1
+     main+0x71            e8 0a fd ff ff              call    fcn.00001189 ; fcn.00001189
+     main+0x76            ba 14 00 00 00              mov     edx, 0x14 ; size_t n
+     main+0x7b            48 8d 05 f5 2c 00 00        lea     rax, [rip + data.00004180] ; 0x4180
+     main+0x82            48 89 c6                    mov     rsi, rax ; const void *s2
+     main+0x85            48 8d 05 cb 2c 00 00        lea     rax, [rip + data.00004160] ; 0x4160
+     main+0x8c            48 89 c7                    mov     rdi, rax ; const void *s1
+     main+0x8f            e8 d3 fb ff ff              call    memcmp ; sym.imp.memcmp ; int memcmp(const void *s1, const void *s2, size_t n)
+     main+0x94            85 c0                       test    eax, eax
+     main+0x96            0f 94 c0                    sete    al
+     main+0x99            88 45 ff                    mov     byte [rbp - 1], al
+     main+0x9c            80 7d ff 00                 cmp     byte [rbp - 1], 0
+ ┌─< main+0xa0            74 11                       je      0x14bc
+ │   main+0xa2            48 8d 05 6e 0b 00 00        lea     rax, [rip + str.Correct_key.] ; 0x2020
+ │   main+0xa9            48 89 c7                    mov     rdi, rax ; const char *s
+ │   main+0xac            e8 76 fb ff ff              call    puts ; sym.imp.puts ; int puts(const char *s)
+┌──< main+0xb1            eb 0f                       jmp     0x14cb
+│└─> main+0xb3            48 8d 05 6a 0b 00 00        lea     rax, [rip + str.Invalid_key.] ; 0x202d
+│    main+0xba            48 89 c7                    mov     rdi, rax ; const char *s
+│    main+0xbd            e8 65 fb ff ff              call    puts ; sym.imp.puts ; int puts(const char *s)
+│    ; CODE XREF from main @ 0x14ba
+└──> main+0xc2            b8 00 00 00 00              mov     eax, 0
+     main+0xc7            c9                          leave
+     main+0xc8            c3                          ret
 #+end_src
 
 In here, we can see that it matches the pattern we saw when running the program.
@@ -223,82 +223,82 @@ function at =0x1189=.
 
 #+begin_src nasm
 [0x00001090]> pdf @ fcn.00001189
-          ; CALL XREF from main @ 0x147a
-┌         fcn.00001189                     fcn.00001189(const char *arg1, int64_t arg2);
-│         fcn.00001189                     ; arg const char *arg1 @ rdi
-│         fcn.00001189                     ; arg int64_t arg2 @ rsi
-│         fcn.00001189                     ; var int64_t var_28h @ stack - 0x28
-│         fcn.00001189                     ; var const char *s @ stack - 0x20
-│         fcn.00001189                     ; var int64_t var_15h @ stack - 0x15
-│         fcn.00001189                     ; var int64_t var_14h @ stack - 0x14
-│         fcn.00001189                     ; var int64_t var_10h @ stack - 0x10
-│         fcn.00001189                     ; var int64_t var_ch @ stack - 0xc
-│         fcn.00001189                          55                          push    rbp
-│         fcn.00001189+0x1                      48 89 e5                    mov     rbp, rsp
-│         fcn.00001189+0x4                      48 83 ec 20                 sub     rsp, 0x20
-│         fcn.00001189+0x8                      48 89 7d e8                 mov     qword [rbp - 0x18], rdi ; arg1
-│         fcn.00001189+0xc                      48 89 75 e0                 mov     qword [rbp - 0x20], rsi ; arg2
-│         fcn.00001189+0x10                     48 8b 45 e8                 mov     rax, qword [rbp - 0x18]
-│         fcn.00001189+0x14                     48 89 c7                    mov     rdi, rax ; const char *s
-│         fcn.00001189+0x17                     e8 9b fe ff ff              call    strlen ; sym.imp.strlen ; size_t strlen(const char *s)
-│         fcn.00001189+0x1c                     89 45 fc                    mov     dword [rbp - 4], eax
-│         fcn.00001189+0x1f                     c7 45 f4 00 00 00 00        mov     dword [rbp - 0xc], 0
-│         fcn.00001189+0x26                     c7 45 f8 00 00 00 00        mov     dword [rbp - 8], 0
-│     ┌─< fcn.00001189+0x2d                     e9 8f 00 00 00              jmp     0x124a
-│    ┌──> fcn.00001189+0x32                     8b 45 f4                    mov     eax, dword [rbp - 0xc]
-│    ╎│   fcn.00001189+0x35                     48 63 d0                    movsxd  rdx, eax
-│    ╎│   fcn.00001189+0x38                     48 8b 45 e8                 mov     rax, qword [rbp - 0x18]
-│    ╎│   fcn.00001189+0x3c                     48 01 d0                    add     rax, rdx
-│    ╎│   fcn.00001189+0x3f                     0f b6 00                    movzx   eax, byte [rax]
-│    ╎│   fcn.00001189+0x42                     88 45 f3                    mov     byte [rbp - 0xd], al
-│    ╎│   fcn.00001189+0x45                     0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
-│    ╎│   fcn.00001189+0x49                     c1 e0 04                    shl     eax, 4
-│    ╎│   fcn.00001189+0x4c                     89 c2                       mov     edx, eax
-│    ╎│   fcn.00001189+0x4e                     0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
-│    ╎│   fcn.00001189+0x52                     c0 e8 04                    shr     al, 4
-│    ╎│   fcn.00001189+0x55                     09 d0                       or      eax, edx
-│    ╎│   fcn.00001189+0x57                     88 45 f3                    mov     byte [rbp - 0xd], al
-│    ╎│   fcn.00001189+0x5a                     8b 45 f8                    mov     eax, dword [rbp - 8]
-│    ╎│   fcn.00001189+0x5d                     0f af 45 f4                 imul    eax, dword [rbp - 0xc]
-│    ╎│   fcn.00001189+0x61                     48 63 d0                    movsxd  rdx, eax
-│    ╎│   fcn.00001189+0x64                     48 69 d2 81 80 80 80        imul    rdx, rdx, 0xffffffff80808081
-│    ╎│   fcn.00001189+0x6b                     48 c1 ea 20                 shr     rdx, 0x20
-│    ╎│   fcn.00001189+0x6f                     01 c2                       add     edx, eax
-│    ╎│   fcn.00001189+0x71                     89 d1                       mov     ecx, edx
-│    ╎│   fcn.00001189+0x73                     c1 f9 07                    sar     ecx, 7
-│    ╎│   fcn.00001189+0x76                     99                          cdq
-│    ╎│   fcn.00001189+0x77                     29 d1                       sub     ecx, edx
-│    ╎│   fcn.00001189+0x79                     89 ca                       mov     edx, ecx
-│    ╎│   fcn.00001189+0x7b                     c1 e2 08                    shl     edx, 8
-│    ╎│   fcn.00001189+0x7e                     29 ca                       sub     edx, ecx
-│    ╎│   fcn.00001189+0x80                     29 d0                       sub     eax, edx
-│    ╎│   fcn.00001189+0x82                     89 c1                       mov     ecx, eax
-│    ╎│   fcn.00001189+0x84                     89 c8                       mov     eax, ecx
-│    ╎│   fcn.00001189+0x86                     00 45 f3                    add     byte [rbp - 0xd], al
-│    ╎│   fcn.00001189+0x89                     8b 45 fc                    mov     eax, dword [rbp - 4]
-│    ╎│   fcn.00001189+0x8c                     89 c2                       mov     edx, eax
-│    ╎│   fcn.00001189+0x8e                     0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
-│    ╎│   fcn.00001189+0x92                     31 d0                       xor     eax, edx
-│    ╎│   fcn.00001189+0x94                     88 45 f3                    mov     byte [rbp - 0xd], al
-│    ╎│   fcn.00001189+0x97                     8b 45 f8                    mov     eax, dword [rbp - 8]
-│    ╎│   fcn.00001189+0x9a                     48 63 d0                    movsxd  rdx, eax
-│    ╎│   fcn.00001189+0x9d                     48 8b 45 e0                 mov     rax, qword [rbp - 0x20]
-│    ╎│   fcn.00001189+0xa1                     48 01 c2                    add     rdx, rax
-│    ╎│   fcn.00001189+0xa4                     0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
-│    ╎│   fcn.00001189+0xa8                     88 02                       mov     byte [rdx], al
-│    ╎│   fcn.00001189+0xaa                     83 45 f4 01                 add     dword [rbp - 0xc], 1
-│    ╎│   fcn.00001189+0xae                     8b 45 f4                    mov     eax, dword [rbp - 0xc]
-│    ╎│   fcn.00001189+0xb1                     3b 45 fc                    cmp     eax, dword [rbp - 4]
-│   ┌───< fcn.00001189+0xb4                     7c 07                       jl      0x1246
-│   │╎│   fcn.00001189+0xb6                     c7 45 f4 00 00 00 00        mov     dword [rbp - 0xc], 0
-│   └───> fcn.00001189+0xbd                     83 45 f8 01                 add     dword [rbp - 8], 1
-│    ╎│   ; CODE XREF from fcn.00001189 @ 0x11b6
-│    ╎└─> fcn.00001189+0xc1                     83 7d f8 13                 cmp     dword [rbp - 8], 0x13
-│    └──< fcn.00001189+0xc5                     0f 8e 67 ff ff ff           jle     0x11bb
-│         fcn.00001189+0xcb                     90                          nop
-│         fcn.00001189+0xcc                     90                          nop
-│         fcn.00001189+0xcd                     c9                          leave
-└         fcn.00001189+0xce                     c3                          ret
+      ; CALL XREF from main @ 0x147a
+      fcn.00001189            fcn.00001189(const char *arg1, int64_t arg2);
+      fcn.00001189            ; arg const char *arg1 @ rdi
+      fcn.00001189            ; arg int64_t arg2 @ rsi
+      fcn.00001189            ; var int64_t var_28h @ stack - 0x28
+      fcn.00001189            ; var const char *s @ stack - 0x20
+      fcn.00001189            ; var int64_t var_15h @ stack - 0x15
+      fcn.00001189            ; var int64_t var_14h @ stack - 0x14
+      fcn.00001189            ; var int64_t var_10h @ stack - 0x10
+      fcn.00001189            ; var int64_t var_ch @ stack - 0xc
+      fcn.00001189                 55                          push    rbp
+      fcn.00001189+0x1             48 89 e5                    mov     rbp, rsp
+      fcn.00001189+0x4             48 83 ec 20                 sub     rsp, 0x20
+      fcn.00001189+0x8             48 89 7d e8                 mov     qword [rbp - 0x18], rdi ; arg1
+      fcn.00001189+0xc             48 89 75 e0                 mov     qword [rbp - 0x20], rsi ; arg2
+      fcn.00001189+0x10            48 8b 45 e8                 mov     rax, qword [rbp - 0x18]
+      fcn.00001189+0x14            48 89 c7                    mov     rdi, rax ; const char *s
+      fcn.00001189+0x17            e8 9b fe ff ff              call    strlen ; sym.imp.strlen ; size_t strlen(const char *s)
+      fcn.00001189+0x1c            89 45 fc                    mov     dword [rbp - 4], eax
+      fcn.00001189+0x1f            c7 45 f4 00 00 00 00        mov     dword [rbp - 0xc], 0
+      fcn.00001189+0x26            c7 45 f8 00 00 00 00        mov     dword [rbp - 8], 0
+  ┌─< fcn.00001189+0x2d            e9 8f 00 00 00              jmp     0x124a
+ ┌──> fcn.00001189+0x32            8b 45 f4                    mov     eax, dword [rbp - 0xc]
+ ╎│   fcn.00001189+0x35            48 63 d0                    movsxd  rdx, eax
+ ╎│   fcn.00001189+0x38            48 8b 45 e8                 mov     rax, qword [rbp - 0x18]
+ ╎│   fcn.00001189+0x3c            48 01 d0                    add     rax, rdx
+ ╎│   fcn.00001189+0x3f            0f b6 00                    movzx   eax, byte [rax]
+ ╎│   fcn.00001189+0x42            88 45 f3                    mov     byte [rbp - 0xd], al
+ ╎│   fcn.00001189+0x45            0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
+ ╎│   fcn.00001189+0x49            c1 e0 04                    shl     eax, 4
+ ╎│   fcn.00001189+0x4c            89 c2                       mov     edx, eax
+ ╎│   fcn.00001189+0x4e            0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
+ ╎│   fcn.00001189+0x52            c0 e8 04                    shr     al, 4
+ ╎│   fcn.00001189+0x55            09 d0                       or      eax, edx
+ ╎│   fcn.00001189+0x57            88 45 f3                    mov     byte [rbp - 0xd], al
+ ╎│   fcn.00001189+0x5a            8b 45 f8                    mov     eax, dword [rbp - 8]
+ ╎│   fcn.00001189+0x5d            0f af 45 f4                 imul    eax, dword [rbp - 0xc]
+ ╎│   fcn.00001189+0x61            48 63 d0                    movsxd  rdx, eax
+ ╎│   fcn.00001189+0x64            48 69 d2 81 80 80 80        imul    rdx, rdx, 0xffffffff80808081
+ ╎│   fcn.00001189+0x6b            48 c1 ea 20                 shr     rdx, 0x20
+ ╎│   fcn.00001189+0x6f            01 c2                       add     edx, eax
+ ╎│   fcn.00001189+0x71            89 d1                       mov     ecx, edx
+ ╎│   fcn.00001189+0x73            c1 f9 07                    sar     ecx, 7
+ ╎│   fcn.00001189+0x76            99                          cdq
+ ╎│   fcn.00001189+0x77            29 d1                       sub     ecx, edx
+ ╎│   fcn.00001189+0x79            89 ca                       mov     edx, ecx
+ ╎│   fcn.00001189+0x7b            c1 e2 08                    shl     edx, 8
+ ╎│   fcn.00001189+0x7e            29 ca                       sub     edx, ecx
+ ╎│   fcn.00001189+0x80            29 d0                       sub     eax, edx
+ ╎│   fcn.00001189+0x82            89 c1                       mov     ecx, eax
+ ╎│   fcn.00001189+0x84            89 c8                       mov     eax, ecx
+ ╎│   fcn.00001189+0x86            00 45 f3                    add     byte [rbp - 0xd], al
+ ╎│   fcn.00001189+0x89            8b 45 fc                    mov     eax, dword [rbp - 4]
+ ╎│   fcn.00001189+0x8c            89 c2                       mov     edx, eax
+ ╎│   fcn.00001189+0x8e            0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
+ ╎│   fcn.00001189+0x92            31 d0                       xor     eax, edx
+ ╎│   fcn.00001189+0x94            88 45 f3                    mov     byte [rbp - 0xd], al
+ ╎│   fcn.00001189+0x97            8b 45 f8                    mov     eax, dword [rbp - 8]
+ ╎│   fcn.00001189+0x9a            48 63 d0                    movsxd  rdx, eax
+ ╎│   fcn.00001189+0x9d            48 8b 45 e0                 mov     rax, qword [rbp - 0x20]
+ ╎│   fcn.00001189+0xa1            48 01 c2                    add     rdx, rax
+ ╎│   fcn.00001189+0xa4            0f b6 45 f3                 movzx   eax, byte [rbp - 0xd]
+ ╎│   fcn.00001189+0xa8            88 02                       mov     byte [rdx], al
+ ╎│   fcn.00001189+0xaa            83 45 f4 01                 add     dword [rbp - 0xc], 1
+ ╎│   fcn.00001189+0xae            8b 45 f4                    mov     eax, dword [rbp - 0xc]
+ ╎│   fcn.00001189+0xb1            3b 45 fc                    cmp     eax, dword [rbp - 4]
+┌───< fcn.00001189+0xb4            7c 07                       jl      0x1246
+│╎│   fcn.00001189+0xb6            c7 45 f4 00 00 00 00        mov     dword [rbp - 0xc], 0
+└───> fcn.00001189+0xbd            83 45 f8 01                 add     dword [rbp - 8], 1
+ ╎│   ; CODE XREF from fcn.00001189 @ 0x11b6
+ ╎└─> fcn.00001189+0xc1            83 7d f8 13                 cmp     dword [rbp - 8], 0x13
+ └──< fcn.00001189+0xc5            0f 8e 67 ff ff ff           jle     0x11bb
+      fcn.00001189+0xcb            90                          nop
+      fcn.00001189+0xcc            90                          nop
+      fcn.00001189+0xcd            c9                          leave
+      fcn.00001189+0xce            c3                          ret
 #+end_src
 
 Since we saw how it was called, we can determine the number of parameters and

@@ -480,7 +480,7 @@ assemble it, and [[https://defuse.ca/online-x86-assembler.htm][look]] at the ins
 #+begin_src nasm
 48 b8 00 02 00 08 00 00 00 00  movabs rax, 0x8000200
 48 8d 04 25 00 02 00 08        lea    rax, ds:0x8000200
-48 8d 05 e7 ff ff ff           lea    rax, [rip+0xffffffffffffffe7] ; [rip-0x19]
+48 8d 05 e7 ff ff ff           lea    rax, [rip + 0xffffffffffffffe7] ; [rip - 0x19]
 #+end_src
 
 The linker doesn't like runtime relocations in =.text=, hence the "relocation in
