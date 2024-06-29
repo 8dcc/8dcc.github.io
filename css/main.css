@@ -49,11 +49,12 @@ pre.src-nasm::before { content: 'Assembler (NASM)'; }
 /*----------------------------------------------------------------------------*/
 
 a {
-    text-decoration-color: RGBA(0, 0, 255, 0.2);
+    color: RGB(0, 70, 200);
+    text-decoration-color: RGBA(0, 70, 200, 0.2);
 }
 
 a:hover {
-    text-decoration-color: RGB(0, 0, 255);
+    text-decoration-color: RGB(0, 70, 200);
 }
 
 /*----------------------------------------------------------------------------*/
