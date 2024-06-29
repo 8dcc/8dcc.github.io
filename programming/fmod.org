@@ -1,0 +1,240 @@
+#+TITLE: Implementing the modulus operator for floating-point numbers
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Motivation
+:PROPERTIES:
+:CUSTOM_ID: motivation
+:END:
+
+This article was very remotely inspired by [[https://jacobwsmith.xyz/stories/color_schemes.html][Jacob Smith's article]] about color
+palettes. I started writing some Scheme code for [[https://github.com/8dcc/scratch/tree/main/Lisp/misc/color-palettes][generating color palettes]], and
+I decided to first write some functions for [[https://github.com/8dcc/scratch/tree/main/Lisp/misc/color-conversion][converting between RGB and HSV]]
+formats. Then, I realized that Scheme (unlike Emacs Lisp, for example) doesn't
+support floating-point inputs in its =modulus= function.
+
+I decided to write my own =fmod= function, starting with a simple version that
+only supported positive values, and eventually adding support for negative
+values, even though this was not needed when converting between RGB and HSV. I
+started writing the process in my [[https://github.com/8dcc/scratch/tree/main/Lisp/misc/fmod][scratch repository]], but I think it became
+interesting enough to fit this blog.
+
+* Simple version for positive values
+:PROPERTIES:
+:CUSTOM_ID: simple-version-for-positive-values
+:END:
+
+The first function I wrote simply keeps subtracting the divisor to the dividend
+until the dividend is smaller than the divisor.
+
+#+begin_src scheme
+;; Calculate remainder of X by Y. Supports floating-point, as long as they are
+;; positive.
+(define (basic-fmod x y)
+  (if (< x y)
+      x
+      (basic-fmod (- x y) y)))
+#+end_src
+
+I also wrote an iterative C version.
+
+#+begin_src C
+/* Calculate remainder of X and Y, as long as they are positive. */
+double basic_fmod(double x, double y) {
+    while (x >= y)
+        x -= y;
+    return x;
+}
+#+end_src
+
+* Supporting negative values
+:PROPERTIES:
+:CUSTOM_ID: supporting-negative-values
+:END:
+
+There two main approaches for supporting negative values: the one used by the
+=fmod= function in the C =math.h= header and the one used by the =mod= function in
+Emacs Lisp. Let's have a look at the outputs of both functions, and how they can
+be implemented.
+
+** C's =fmod=
+:PROPERTIES:
+:CUSTOM_ID: cs-fmod
+:END:
+
+Let's have a look at some outputs from the =fmod= function in the math header.
+
+|    X |    Y | Result |
+|------+------+--------|
+|  9.5 |  2.5 |   2.00 |
+|  9.5 | -2.5 |   2.00 |
+| -9.5 |  2.5 |  -2.00 |
+| -9.5 | -2.5 |  -2.00 |
+
+As you can see, the result is always the modulus of the absolute values, but
+with the same sign as =x=. We can easily implement this by adding some calls to
+=abs= and wrapping our previous function with a sign conditional.
+
+#+begin_src scheme
+;; Scheme equivalent of C's `fmod'.
+(define (c-fmod x y)
+  (define (basic-fmod x y)
+    (if (< x y)
+        x
+        (basic-fmod (- x y) y)))
+
+  (let ((result (basic-fmod (abs x) (abs y))))
+    (if (negative? x)
+        (- result)
+        result)))
+#+end_src
+
+And the iterative C version:
+
+#+begin_src C :results output
+#include <math.h> /* fabs() */
+
+/* Equivalent of `fmod' from math.h  */
+double my_fmod(double x, double y) {
+    int bNegativeResult = x < 0;
+
+    x = fabs(x);
+    y = fabs(y);
+
+    while (x >= y)
+        x -= y;
+
+    return bNegativeResult ? -x : x;
+}
+#+end_src
+
+** Emacs' =mod=
+:PROPERTIES:
+:CUSTOM_ID: emacs-mod
+:END:
+
+Now let's compare the previous results with the ones from Emacs.
+
+|    X |    Y | Result |
+|------+------+--------|
+|  9.5 |  2.5 |   2.00 |
+|  9.5 | -2.5 |  -0.50 |
+| -9.5 |  2.5 |   0.50 |
+| -9.5 | -2.5 |  -2.00 |
+
+This results are better in my opinion, since they satisfy the following formula.
+
+\begin{equation*}
+  a = \lfloor a / b \rfloor \times b + a \bmod b
+\end{equation*}
+
+Where $\lfloor a / b \rfloor$ indicates the integer division of $a$ and $b$.
+
+Before explaining my approach, I want to show how Emacs' =mod= actually works. The
+actual C function is called =fmod_float= and is located in the [[https://github.com/emacs-mirror/emacs/blob/2119cd52cdb58221a850360bf65c91cf3bf4b47e/src/floatfns.c#L569-L582][src/floatfns.c]]
+file. Omitting the emacs-specific functions, we get the following function.
+
+#+begin_src C
+#include <math.h> /* fmod() */
+
+double my_emacs_fmod(double x, double y) {
+    x = fmod(x, y);
+
+    /* If the "remainder" comes out with the wrong sign, fix it. */
+    if (y < 0 ? x > 0 : x < 0)
+        x += y;
+
+    return x;
+}
+#+end_src
+
+I want to note that, although Emacs' obviously uses the real =fmod= from =math.h=,
+the previous =my_fmod= function can be used here as well.
+
+As you can see, the only part that differences the emacs modulus from the C
+modulus is that conditional in the middle. We could simply implement this
+behavior in Scheme by adding the missing conditional, but I think it's better if
+we adapt our previous function.
+
+** My approach
+:PROPERTIES:
+:CUSTOM_ID: my-approach
+:END:
+
+If we look again at the outputs from Emacs' =mod=, we can see that the changes in
+the output match the following table.
+
+| X        | Y        | Result           |
+|----------+----------+------------------|
+| Positive | Positive | ~AbsMod(x, y)~     |
+| Positive | Negative | ~y + AbsMod(x, y)~ |
+| Negative | Positive | ~y - AbsMod(x, y)~ |
+| Negative | Negative | ~-AbsMod(x, y)~    |
+
+Where =AbsMod= represents the modulus of $|x|$ and $|y|$:
+
+\begin{equation*}
+  \text{AbsMod}(x, y) = |x| \bmod |y|
+\end{equation*}
+
+This table can also be expressed as a conditional formula, if you are into that.
+
+\begin{equation*}
+  a \bmod b =
+  \begin{cases}
+    \text{AbsMod}(a, b),     & a \geq 0 \land b \geq 0 \\
+    b + \text{AbsMod}(a, b), & a \geq 0 \land b < 0 \\
+    b - \text{AbsMod}(a, b), & a < 0 \land b \geq 0 \\
+    -\text{AbsMod}(a, b),    & a < 0 \land b < 0
+  \end{cases}
+\end{equation*}
+
+With this, we can make a final =fmod= version.
+
+#+begin_src scheme
+;; Calculate remainder of X by Y, supporting floating point and negative values.
+(define (fmod x y)
+  (define (basic-fmod x y)
+    (if (< x y)
+        x
+        (basic-fmod (- x y) y)))
+
+  (let ((abs-result (fmod-positive (abs x) (abs y))))
+    (cond ((and (positive? x) (positive? y))
+           abs-result)
+          ((and (positive? x) (negative? y))
+           (+ y abs-result))
+          ((and (negative? x) (positive? y))
+           (- y abs-result))
+          ((and (negative? x) (negative? y))
+           (- abs-result)))))
+#+end_src
+
+There are some unnecessary calls to =positive?= and =negative?=, but I think it's
+clearer this way. This issue does not happen in the following C version.
+
+#+begin_src C
+#include <math.h> /* fabs() */
+
+double emacs_fmod(double x, double y) {
+    const double abs_x = fabs(x);
+    const double abs_y = fabs(y);
+
+    /* Calculate fmod(fabs(x), fabs(y)) */
+    double abs_result = abs_x;
+    while (abs_result >= abs_y)
+        abs_result -= abs_y;
+
+    return (x >= 0) ? ((y >= 0) ? abs_result : y + abs_result)
+                    : ((y >= 0) ? y - abs_result : -abs_result);
+}
+#+end_src

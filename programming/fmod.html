@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Implementing the modulus operator for floating-point numbers</title>
+<meta name="author" content="8dcc" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Implementing the modulus operator for floating-point numbers</h1>
+<p>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
+</p>
+
+<hr />
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#motivation">1. Motivation</a></li>
+<li><a href="#simple-version-for-positive-values">2. Simple version for positive values</a></li>
+<li><a href="#supporting-negative-values">3. Supporting negative values</a>
+<ul>
+<li><a href="#cs-fmod">3.1. C's <code>fmod</code></a></li>
+<li><a href="#emacs-mod">3.2. Emacs' <code>mod</code></a></li>
+<li><a href="#my-approach">3.3. My approach</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-motivation" class="outline-2">
+<h2 id="motivation"><span class="section-number-2">1.</span> Motivation</h2>
+<div class="outline-text-2" id="text-motivation">
+<p>
+This article was very remotely inspired by <a href="https://jacobwsmith.xyz/stories/color_schemes.html">Jacob Smith's article</a> about color
+palettes. I started writing some Scheme code for <a href="https://github.com/8dcc/scratch/tree/main/Lisp/misc/color-palettes">generating color palettes</a>, and
+I decided to first write some functions for <a href="https://github.com/8dcc/scratch/tree/main/Lisp/misc/color-conversion">converting between RGB and HSV</a>
+formats. Then, I realized that Scheme (unlike Emacs Lisp, for example) doesn't
+support floating-point inputs in its <code>modulus</code> function.
+</p>
+
+<p>
+I decided to write my own <code>fmod</code> function, starting with a simple version that
+only supported positive values, and eventually adding support for negative
+values, even though this was not needed when converting between RGB and HSV. I
+started writing the process in my <a href="https://github.com/8dcc/scratch/tree/main/Lisp/misc/fmod">scratch repository</a>, but I think it became
+interesting enough to fit this blog.
+</p>
+</div>
+</div>
+
+<div id="outline-container-simple-version-for-positive-values" class="outline-2">
+<h2 id="simple-version-for-positive-values"><span class="section-number-2">2.</span> Simple version for positive values</h2>
+<div class="outline-text-2" id="text-simple-version-for-positive-values">
+<p>
+The first function I wrote simply keeps subtracting the divisor to the dividend
+until the dividend is smaller than the divisor.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">Calculate remainder of X by Y. Supports floating-point, as long as they are</span>
+<span style="color: #989898;">;; </span><span style="color: #989898;">positive.</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #2fafff;">(</span><span style="color: #4ae2ff;">basic-fmod</span> x y<span style="color: #2fafff;">)</span>
+  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #cabf00;">(</span>&lt; x y<span style="color: #cabf00;">)</span>
+      x
+      <span style="color: #cabf00;">(</span>basic-fmod <span style="color: #44bc44;">(</span>- x y<span style="color: #44bc44;">)</span> y<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+I also wrote an iterative C version.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Calculate remainder of X and Y, as long as they are positive.</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">basic_fmod</span>(<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">y</span>) {
+    <span style="color: #ff6f9f;">while</span> (x &gt;= y)
+        x -= y;
+    <span style="color: #ff6f9f;">return</span> x;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-supporting-negative-values" class="outline-2">
+<h2 id="supporting-negative-values"><span class="section-number-2">3.</span> Supporting negative values</h2>
+<div class="outline-text-2" id="text-supporting-negative-values">
+<p>
+There two main approaches for supporting negative values: the one used by the
+<code>fmod</code> function in the C <code>math.h</code> header and the one used by the <code>mod</code> function in
+Emacs Lisp. Let's have a look at the outputs of both functions, and how they can
+be implemented.
+</p>
+</div>
+
+<div id="outline-container-cs-fmod" class="outline-3">
+<h3 id="cs-fmod"><span class="section-number-3">3.1.</span> C's <code>fmod</code></h3>
+<div class="outline-text-3" id="text-cs-fmod">
+<p>
+Let's have a look at some outputs from the <code>fmod</code> function in the math header.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">X</th>
+<th scope="col" class="org-right">Y</th>
+<th scope="col" class="org-right">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">9.5</td>
+<td class="org-right">2.5</td>
+<td class="org-right">2.00</td>
+</tr>
+
+<tr>
+<td class="org-right">9.5</td>
+<td class="org-right">-2.5</td>
+<td class="org-right">2.00</td>
+</tr>
+
+<tr>
+<td class="org-right">-9.5</td>
+<td class="org-right">2.5</td>
+<td class="org-right">-2.00</td>
+</tr>
+
+<tr>
+<td class="org-right">-9.5</td>
+<td class="org-right">-2.5</td>
+<td class="org-right">-2.00</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+As you can see, the result is always the modulus of the absolute values, but
+with the same sign as <code>x</code>. We can easily implement this by adding some calls to
+<code>abs</code> and wrapping our previous function with a sign conditional.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">Scheme equivalent of C's `fmod'.</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #2fafff;">(</span><span style="color: #4ae2ff;">c-fmod</span> x y<span style="color: #2fafff;">)</span>
+  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #cabf00;">(</span><span style="color: #4ae2ff;">basic-fmod</span> x y<span style="color: #cabf00;">)</span>
+    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>&lt; x y<span style="color: #44bc44;">)</span>
+        x
+        <span style="color: #44bc44;">(</span>basic-fmod <span style="color: #ff5f59;">(</span>- x y<span style="color: #ff5f59;">)</span> y<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span>
+
+  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>result <span style="color: #ff5f59;">(</span>basic-fmod <span style="color: #2fafff;">(</span>abs x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>abs y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>negative? x<span style="color: #44bc44;">)</span>
+        <span style="color: #44bc44;">(</span>- result<span style="color: #44bc44;">)</span>
+        result<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+And the iterative C version:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;math.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">fabs()</span><span style="color: #989898;"> */</span>
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Equivalent of `fmod' from math.h</span><span style="color: #989898;">  */</span>
+<span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">my_fmod</span>(<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">y</span>) {
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">bNegativeResult</span> = x &lt; <span style="color: #88ca9f;">0</span>;
+
+    x = fabs(x);
+    y = fabs(y);
+
+    <span style="color: #ff6f9f;">while</span> (x &gt;= y)
+        x -= y;
+
+    <span style="color: #ff6f9f;">return</span> bNegativeResult ? -x : x;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-emacs-mod" class="outline-3">
+<h3 id="emacs-mod"><span class="section-number-3">3.2.</span> Emacs' <code>mod</code></h3>
+<div class="outline-text-3" id="text-emacs-mod">
+<p>
+Now let's compare the previous results with the ones from Emacs.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">X</th>
+<th scope="col" class="org-right">Y</th>
+<th scope="col" class="org-right">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">9.5</td>
+<td class="org-right">2.5</td>
+<td class="org-right">2.00</td>
+</tr>
+
+<tr>
+<td class="org-right">9.5</td>
+<td class="org-right">-2.5</td>
+<td class="org-right">-0.50</td>
+</tr>
+
+<tr>
+<td class="org-right">-9.5</td>
+<td class="org-right">2.5</td>
+<td class="org-right">0.50</td>
+</tr>
+
+<tr>
+<td class="org-right">-9.5</td>
+<td class="org-right">-2.5</td>
+<td class="org-right">-2.00</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+This results are better in my opinion, since they satisfy the following formula.
+</p>
+
+\begin{equation*}
+  a = \lfloor a / b \rfloor \times b + a \bmod b
+\end{equation*}
+
+<p>
+Where \(\lfloor a / b \rfloor\) indicates the integer division of \(a\) and \(b\).
+</p>
+
+<p>
+Before explaining my approach, I want to show how Emacs' <code>mod</code> actually works. The
+actual C function is called <code>fmod_float</code> and is located in the <a href="https://github.com/emacs-mirror/emacs/blob/2119cd52cdb58221a850360bf65c91cf3bf4b47e/src/floatfns.c#L569-L582">src/floatfns.c</a>
+file. Omitting the emacs-specific functions, we get the following function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;math.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">fmod()</span><span style="color: #989898;"> */</span>
+
+<span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">my_emacs_fmod</span>(<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">y</span>) {
+    x = fmod(x, y);
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">If the "remainder" comes out with the wrong sign, fix it.</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">if</span> (y &lt; <span style="color: #88ca9f;">0</span> ? x &gt; <span style="color: #88ca9f;">0</span> : x &lt; <span style="color: #88ca9f;">0</span>)
+        x += y;
+
+    <span style="color: #ff6f9f;">return</span> x;
+}
+</pre>
+</div>
+
+<p>
+I want to note that, although Emacs' obviously uses the real <code>fmod</code> from <code>math.h</code>,
+the previous <code>my_fmod</code> function can be used here as well.
+</p>
+
+<p>
+As you can see, the only part that differences the emacs modulus from the C
+modulus is that conditional in the middle. We could simply implement this
+behavior in Scheme by adding the missing conditional, but I think it's better if
+we adapt our previous function.
+</p>
+</div>
+</div>
+
+<div id="outline-container-my-approach" class="outline-3">
+<h3 id="my-approach"><span class="section-number-3">3.3.</span> My approach</h3>
+<div class="outline-text-3" id="text-my-approach">
+<p>
+If we look again at the outputs from Emacs' <code>mod</code>, we can see that the changes in
+the output match the following table.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">X</th>
+<th scope="col" class="org-left">Y</th>
+<th scope="col" class="org-left">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Positive</td>
+<td class="org-left">Positive</td>
+<td class="org-left"><code>AbsMod(x, y)</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Positive</td>
+<td class="org-left">Negative</td>
+<td class="org-left"><code>y + AbsMod(x, y)</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Negative</td>
+<td class="org-left">Positive</td>
+<td class="org-left"><code>y - AbsMod(x, y)</code></td>
+</tr>
+
+<tr>
+<td class="org-left">Negative</td>
+<td class="org-left">Negative</td>
+<td class="org-left"><code>-AbsMod(x, y)</code></td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Where <code>AbsMod</code> represents the modulus of \(|x|\) and \(|y|\):
+</p>
+
+\begin{equation*}
+  \text{AbsMod}(x, y) = |x| \bmod |y|
+\end{equation*}
+
+<p>
+This table can also be expressed as a conditional formula, if you are into that.
+</p>
+
+\begin{equation*}
+  a \bmod b =
+  \begin{cases}
+    \text{AbsMod}(a, b),     & a \geq 0 \land b \geq 0 \\
+    b + \text{AbsMod}(a, b), & a \geq 0 \land b < 0 \\
+    b - \text{AbsMod}(a, b), & a < 0 \land b \geq 0 \\
+    -\text{AbsMod}(a, b),    & a < 0 \land b < 0
+  \end{cases}
+\end{equation*}
+
+<p>
+With this, we can make a final <code>fmod</code> version.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">Calculate remainder of X by Y, supporting floating point and negative values.</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #2fafff;">(</span><span style="color: #4ae2ff;">fmod</span> x y<span style="color: #2fafff;">)</span>
+  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #cabf00;">(</span><span style="color: #4ae2ff;">basic-fmod</span> x y<span style="color: #cabf00;">)</span>
+    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>&lt; x y<span style="color: #44bc44;">)</span>
+        x
+        <span style="color: #44bc44;">(</span>basic-fmod <span style="color: #ff5f59;">(</span>- x y<span style="color: #ff5f59;">)</span> y<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span>
+
+  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>abs-result <span style="color: #ff5f59;">(</span>fmod-positive <span style="color: #2fafff;">(</span>abs x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>abs y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">cond</span> <span style="color: #44bc44;">(</span><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #2fafff;">(</span>positive? x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>positive? y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+           abs-result<span style="color: #44bc44;">)</span>
+          <span style="color: #44bc44;">(</span><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #2fafff;">(</span>positive? x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>negative? y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+           <span style="color: #ff5f59;">(</span>+ y abs-result<span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span>
+          <span style="color: #44bc44;">(</span><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #2fafff;">(</span>negative? x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>positive? y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+           <span style="color: #ff5f59;">(</span>- y abs-result<span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span>
+          <span style="color: #44bc44;">(</span><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #2fafff;">(</span>negative? x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>negative? y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+           <span style="color: #ff5f59;">(</span>- abs-result<span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+There are some unnecessary calls to <code>positive?</code> and <code>negative?</code>, but I think it's
+clearer this way. This issue does not happen in the following C version.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;math.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">fabs()</span><span style="color: #989898;"> */</span>
+
+<span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">emacs_fmod</span>(<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">y</span>) {
+    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">abs_x</span> = fabs(x);
+    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">abs_y</span> = fabs(y);
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Calculate fmod(fabs(x), fabs(y))</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">abs_result</span> = abs_x;
+    <span style="color: #ff6f9f;">while</span> (abs_result &gt;= abs_y)
+        abs_result -= abs_y;
+
+    <span style="color: #ff6f9f;">return</span> (x &gt;= <span style="color: #88ca9f;">0</span>) ? ((y &gt;= <span style="color: #88ca9f;">0</span>) ? abs_result : y + abs_result)
+                    : ((y &gt;= <span style="color: #88ca9f;">0</span>) ? y - abs_result : -abs_result);
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
