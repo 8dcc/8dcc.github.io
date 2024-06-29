@@ -17,10 +17,17 @@ spreading it across the wikis of the different projects.
 - [[file:programming/index.org][Programming]]
 - [[file:opinion/index.org][Opinion]]
 
-* External documentations
+* External articles and documentations
 :PROPERTIES:
-:CUSTOM_ID: external-documentations
+:CUSTOM_ID: external-articles-and-documentations
 :END:
+
+If you are interested in LaTeX, you might like these links too:
+
+- The [[https://github.com/8dcc/scratch/tree/main/LaTeX][LaTeX folder]] inside my [[https://github.com/8dcc/scratch][scratch]] GitHub repository, has some other articles
+  I have written, and also contains some of my [[https://github.com/8dcc/scratch/blob/main/LaTeX/math/math.pdf][math notes]].
+- The [[https://github.com/8dcc/scratch][scratch]] repository itself is full of small but interesting projects in
+  various languages. All the code is documented.
 
 I will probably end up moving other documentations I have written for my
 projects here, but until then, make sure to check out:
@@ -28,10 +35,6 @@ projects here, but until then, make sure to check out:
 - The [[https://github.com/fs-os/fs-os/wiki][fs-os wiki]], explaining the details of [[https://github.com/fs-os/fs-os][my operating system]].
 - [[https://github.com/8dcc/bms-cheat/wiki/Hooking-CreateMove][Hooking CreateMove]] in [[https://en.wikipedia.org/wiki/Source_(game_engine)][source]] games.
 - Finding the offsets and [[https://github.com/8dcc/tf2-cheat/wiki/Getting-SDL-offsets][hooking SDL functions]].
-
-If you are interested in LaTeX, you might like these links too:
-
-- The [[https://github.com/8dcc/scratch/tree/main/LaTeX][LaTeX folder]] inside my [[https://github.com/8dcc/scratch][scratch]] GitHub repository.
 
 * External links
 :PROPERTIES:
