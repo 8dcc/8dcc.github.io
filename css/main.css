@@ -1,7 +1,7 @@
 /* Used to modify the styles of org-mode HTML export. */
 
 body {
-    margin-bottom: 3em;
+    margin-bottom: 4em;
     background-color: #FFFFFF;
 }
 
@@ -49,18 +49,18 @@ pre.src-nasm::before { content: 'Assembler (NASM)'; }
 /*----------------------------------------------------------------------------*/
 
 a {
-    color: RGB(0, 70, 200);
-    text-decoration-color: RGBA(0, 70, 200, 0.2);
+    color: rgb(0, 70, 200);
+    text-decoration-color: rgba(0, 70, 200, 0.2);
 }
 
 a:hover {
-    text-decoration-color: RGB(0, 70, 200);
+    text-decoration-color: rgb(0, 70, 200);
 }
 
 /*----------------------------------------------------------------------------*/
 
 code {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.10) 0 0);
+    background-color: rgba(0, 0, 0, 0.10);
     border-radius: 2px;
     padding: 1px 3px;
 }
