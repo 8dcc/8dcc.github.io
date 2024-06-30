@@ -17,7 +17,7 @@
 :END:
 
 *Lambda calculus* (\lambda-calculus) is a mathematical system for computation
-based on _function abstraction_ and _application_, using _variable binding_ and
+based on *function abstraction* and *application*, using *variable binding* and
 substitution.[fn:1]
 
 ** Rules
@@ -227,8 +227,8 @@ point is.
 
 A fixed point of function $f$ is a value that is mapped to itself by the
 function.[fn:4] In other words, $x$ is a fixed point of $f$ if $f(x) = x$. For
-this to be possible, $x$ has to belong to both the _domain_ of $f$ (set of values
-that it can take), and the _codomain_ of $f$ (set of values that it can return).
+this to be possible, $x$ has to belong to both the /domain/ of $f$ (set of values
+that it can take), and the /codomain/ of $f$ (set of values that it can return).
 
 For example, if $f(x) = x!$, 1 and 2 are fixed points, since $f(1) = 1$ and
 $f(2) = 2$.
