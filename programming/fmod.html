@@ -249,6 +249,7 @@
 <li><a href="#my-approach">3.3. My approach</a></li>
 </ul>
 </li>
+<li><a href="#final-note">4. Final note</a></li>
 </ul>
 </div>
 </div>
@@ -268,8 +269,8 @@ support floating-point inputs in its <code>modulus</code> function.
 I decided to write my own <code>fmod</code> function, starting with a simple version that
 only supported positive values, and eventually adding support for negative
 values, even though this was not needed when converting between RGB and HSV. I
-started writing the process in my <a href="https://github.com/8dcc/scratch/tree/main/Lisp/misc/fmod">scratch repository</a>, but I think it became
-interesting enough to fit this blog.
+started writing the process in my <a href="https://github.com/8dcc/scratch/tree/main/Lisp/misc/fmod">scratch repository</a>, but I think it has become
+interesting enough to deserve its own place in this blog.
 </p>
 </div>
 </div>
@@ -312,8 +313,8 @@ I also wrote an iterative C version.
 <h2 id="supporting-negative-values"><span class="section-number-2">3.</span> Supporting negative values</h2>
 <div class="outline-text-2" id="text-supporting-negative-values">
 <p>
-There two main approaches for supporting negative values: the one used by the
-<code>fmod</code> function in the C <code>math.h</code> header and the one used by the <code>mod</code> function in
+There are two main approaches for handling negative values: the one used by the
+<code>fmod</code> function in the <code>math.h</code> C header and the one used by the <code>mod</code> function in
 Emacs Lisp. Let's have a look at the outputs of both functions, and how they can
 be implemented.
 </p>
@@ -371,9 +372,9 @@ Let's have a look at some outputs from the <code>fmod</code> function in the mat
 </table>
 
 <p>
-As you can see, the result is always the modulus of the absolute values, but
-with the same sign as <code>x</code>. We can easily implement this by adding some calls to
-<code>abs</code> and wrapping our previous function with a sign conditional.
+As you can see, the result is always the modulus of the absolute values, while
+keeping the original sign of <code>x</code>. We can easily implement this by adding some
+calls to <code>abs</code> and wrapping our previous function with a sign conditional.
 </p>
 
 <div class="org-src-container">
@@ -392,7 +393,9 @@ with the same sign as <code>x</code>. We can easily implement this by adding som
 </div>
 
 <p>
-And the iterative C version:
+This is the iterative C version. I decided to use an <code>int</code> instead of a <code>bool</code> for
+the <code>bNegativeResult</code> variable because I didn't want to include <code>stdbool.h</code> just for
+this. I used <a href="https://en.wikipedia.org/wiki/Hungarian_notation">hungarian notation</a> to emphasize that it acts as a boolean.
 </p>
 
 <div class="org-src-container">
@@ -467,11 +470,12 @@ Now let's compare the previous results with the ones from Emacs.
 </table>
 
 <p>
-This results are better in my opinion, since they satisfy the following formula.
+These results are better in my opinion, since they satisfy the following
+formula.
 </p>
 
 \begin{equation*}
-  a = \lfloor a / b \rfloor \times b + a \bmod b
+  \lfloor a / b \rfloor \times b + a \bmod b = a
 \end{equation*}
 
 <p>
@@ -481,7 +485,7 @@ Where \(\lfloor a / b \rfloor\) indicates the integer division of \(a\) and \(b\
 <p>
 Before explaining my approach, I want to show how Emacs' <code>mod</code> actually works. The
 actual C function is called <code>fmod_float</code> and is located in the <a href="https://github.com/emacs-mirror/emacs/blob/2119cd52cdb58221a850360bf65c91cf3bf4b47e/src/floatfns.c#L569-L582">src/floatfns.c</a>
-file. Omitting the emacs-specific functions, we get the following function.
+file. Omitting the emacs-specific parts, we get the following function.
 </p>
 
 <div class="org-src-container">
@@ -505,8 +509,8 @@ the previous <code>my_fmod</code> function can be used here as well.
 </p>
 
 <p>
-As you can see, the only part that differences the emacs modulus from the C
-modulus is that conditional in the middle. We could simply implement this
+As you can see, the only part that differences the Emacs modulus from the C
+modulus is the conditional in the middle. We could simply implement this
 behavior in Scheme by adding the missing conditional, but I think it's better if
 we adapt our previous function.
 </p>
@@ -574,16 +578,16 @@ Where <code>AbsMod</code> represents the modulus of \(|x|\) and \(|y|\):
 \end{equation*}
 
 <p>
-This table can also be expressed as a conditional formula, if you are into that.
+The table can also be expressed as a conditional formula, if you are into that.
 </p>
 
 \begin{equation*}
-  a \bmod b =
+  x \bmod b =
   \begin{cases}
-    \text{AbsMod}(a, b),     & a \geq 0 \land b \geq 0 \\
-    b + \text{AbsMod}(a, b), & a \geq 0 \land b < 0 \\
-    b - \text{AbsMod}(a, b), & a < 0 \land b \geq 0 \\
-    -\text{AbsMod}(a, b),    & a < 0 \land b < 0
+    \text{AbsMod}(x, y),     & x \geq 0 \land y \geq 0 \\
+    y + \text{AbsMod}(x, y), & x \geq 0 \land y < 0 \\
+    y - \text{AbsMod}(x, y), & x < 0 \land y \geq 0 \\
+    -\text{AbsMod}(x, y),    & x < 0 \land y < 0
   \end{cases}
 \end{equation*}
 
@@ -634,6 +638,18 @@ clearer this way. This issue does not happen in the following C version.
 </pre>
 </div>
 </div>
+</div>
+</div>
+
+<div id="outline-container-final-note" class="outline-2">
+<h2 id="final-note"><span class="section-number-2">4.</span> Final note</h2>
+<div class="outline-text-2" id="text-final-note">
+<p>
+Most of these functions were made just by observing the output of already
+existing functions, so I don't know if this is the most optimal or mathematical
+approach. If you have any suggestions or improvements, feel free to <a href="https://github.com/8dcc/8dcc.github.io">contribute</a>
+to this page.
+</p>
 </div>
 </div>
 </div>
