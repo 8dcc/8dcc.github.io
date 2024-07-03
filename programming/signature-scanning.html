@@ -234,7 +234,7 @@
 <h2 id="what-is-signature-scanning"><span class="section-number-2">1.</span> What is signature scanning?</h2>
 <div class="outline-text-2" id="text-what-is-signature-scanning">
 <p>
-First, let's have a look at a sample program:
+First, let&rsquo;s have a look at a sample program:
 </p>
 
 <div class="org-src-container">
@@ -284,8 +284,8 @@ In our case, we would want to look for the bytes of the binary corresponding to
 <div class="outline-text-2" id="text-finding-the-function-inside-the-binary">
 <p>
 I will compile the previous source with <code>gcc 13.2.1</code>. We need to use <code>-O0</code> so the
-function call doesn't get optimized. I also used <code>strip</code> to "simulate" a real
-world scenario where we can't just look at the symbols.
+function call doesn&rsquo;t get optimized. I also used <code>strip</code> to &ldquo;simulate&rdquo; a real
+world scenario where we can&rsquo;t just look at the symbols.
 </p>
 
 <pre class="example">
@@ -294,16 +294,16 @@ strip example.out
 </pre>
 
 <p>
-Let's have a look at the generated binary using <a href="https://cutter.re/">cutter</a>, in my case version
+Let&rsquo;s have a look at the generated binary using <a href="https://cutter.re/">cutter</a>, in my case version
 2.3.1. First, we need to change some settings. Go to <code>Edit &gt; Preferences</code> and make
 sure the following settings are enabled in the disassembly tab:
 </p>
 
 <ul class="org-ul">
-<li><i>Display the bytes of each instruction:</i> Enabled</li>
-<li><i>Number of bytes of each instruction:</i> 8</li>
-<li><i>Align bytes to the left:</i> Enabled</li>
-<li><i>Separate bytes with whitespace:</i> Enabled</li>
+<li>Display the bytes of each instruction: <i>Enabled</i></li>
+<li>Number of bytes of each instruction: <i>8</i></li>
+<li>Align bytes to the left: <i>Enabled</i></li>
+<li>Separate bytes with whitespace: <i>Enabled</i></li>
 </ul>
 
 <p>
@@ -324,7 +324,7 @@ This is the disassembly of the main function:
 </p>
 
 
-<div id="orgc65c623" class="figure">
+<div id="org37e92e1" class="figure">
 <p><img src="../img/signature-scanning1.png" alt="signature-scanning1.png" />
 </p>
 </div>
@@ -333,11 +333,11 @@ This is the disassembly of the main function:
 As you can see, in <code>main+0x8</code> we are loading <code>0x100</code> and <code>4</code> into the local
 variables, and in <code>main+0x1c</code> we are loading them into the registers used for
 function parameters according to the AMD64 System V ABI. In <code>main+0x20</code>, we are
-calling <code>my_func</code>. Let's double-click it to have a look at the assembly:
+calling <code>my_func</code>. Let&rsquo;s double-click it to have a look at the assembly:
 </p>
 
 
-<div id="orge2f5c77" class="figure">
+<div id="org99a8a60" class="figure">
 <p><img src="../img/signature-scanning2.png" alt="signature-scanning2.png" />
 </p>
 </div>
@@ -364,13 +364,13 @@ identify it.
 </p>
 
 <p>
-Some plugins like <a href="https://hex-rays.com/ida-pro/">IDA</a>'s <a href="https://github.com/ajkhoury/SigMaker-x64">sigmaker</a> are able to generate the signatures from a
+Some plugins like <a href="https://hex-rays.com/ida-pro/">IDA</a>&rsquo;s <a href="https://github.com/ajkhoury/SigMaker-x64">sigmaker</a> are able to generate the signatures from a
 selection. I decided to use cutter just to show that you only need a
 disassembler.
 </p>
 
 
-<div id="org37f731b" class="figure">
+<div id="orgdeb77db" class="figure">
 <p><img src="../img/signature-scanning3.png" alt="signature-scanning3.png" />
 </p>
 </div>
@@ -378,10 +378,10 @@ disassembler.
 <p>
 For our signature, we should use enough bytes to make sure they are unique for
 the function/variable we are looking for. Here is a signature of the whole
-function, but in practice, we shouldn't need more than 10 instructions.
+function, but in practice, we shouldn&rsquo;t need more than 10 instructions.
 </p>
 
-<pre class="example" id="org89c43db">
+<pre class="example" id="org7b1f11a">
 55 48 89 E5 48 83 EC 10 89 7D FC 89 75 F8 8B 45 F8 3B 45 FC 7F 0C 83 7D F8 00 78
 06 83 7D F8 20 7E 07 B8 ? ? ? ? EB 1F 48 8D 05 ? ? ? ? 48 89 C7 E8 ? ? ? ? 8B 45
 F8 8B 55 FC 89 C1 D3 FA 89 D0 01 C0 01 D0 C9 C3
@@ -609,14 +609,14 @@ as the first parameter to <code>sigscan</code>, so it gets passed to <code>dlope
 
 <p>
 If filename is NULL, then the returned handle is for the main program. If
-filename contains a slash ("/"), then it is interpreted as a (relative or
+filename contains a slash (&ldquo;/&rdquo;), then it is interpreted as a (relative or
 absolute) pathname.
 </p>
 </blockquote>
 
 <p>
 I say <i>in theory</i> because in my experience, this is not the case. Usually
-<code>link-&gt;phdr</code> is <code>NULL</code>, so the program crashes. That's why I am going to show a more
+<code>link-&gt;phdr</code> is <code>NULL</code>, so the program crashes. That&rsquo;s why I am going to show a more
 reliable way.
 </p>
 </div>
@@ -631,7 +631,7 @@ The <code>/proc/&lt;pid&gt;/</code> folder contains many useful files, one of th
 access permissions in the following format (without the column names):
 </p>
 
-<pre class="example" id="org807e0a7">
+<pre class="example" id="org1aba440">
 address           perms offset  dev   inode       pathname
 ----------------------------------------------------------------------
 00400000-00452000 r-xp 00000000 08:02 173521      /usr/bin/dbus-daemon
@@ -655,8 +655,8 @@ resolves to the PID of the current process. See also <code>proc(5)</code>.
 
 <p>
 Of course, now comes the tedious part, parsing it. Fortunately for you, I made a
-function that returns a linked list of all these regions. It's a pretty long
-function but since it's well commented, I won't dive into too much detail.
+function that returns a linked list of all these regions. It&rsquo;s a pretty long
+function but since it&rsquo;s well commented, I won&rsquo;t dive into too much detail.
 </p>
 
 <div class="org-src-container">
@@ -925,7 +925,7 @@ signature scanning library in pure C for GNU/Linux. This is the <a href="https:/
 </p>
 
 <p>
-Since it's a simple single-header library, you just need to copy the
+Since it&rsquo;s a simple single-header library, you just need to copy the
 <code>libsigscan.h</code> file to your project and <code>#include</code> it on your sources.
 </p>
 
@@ -940,7 +940,7 @@ syntax, so keep that in mind before escaping certain characters like <code>+</co
 <p>
 The second function is just a wrapper for passing <code>NULL</code> to the first one,
 therefore searching in all loaded modules. Depending on the memory being used by
-the process, calling this function might take a few seconds, so it's better to
+the process, calling this function might take a few seconds, so it&rsquo;s better to
 filter the module name with <code>sigscan_module()</code> whenever possible.
 </p>
 </div>
