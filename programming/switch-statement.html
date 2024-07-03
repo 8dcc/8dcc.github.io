@@ -261,7 +261,7 @@ bit of <code>x86</code> assembly knowledge.
 <h2 id="if-else-blocks"><span class="section-number-2">2.</span> If-else blocks</h2>
 <div class="outline-text-2" id="text-if-else-blocks">
 <p>
-Let's first have a look at a normal if-else conditional.
+Let&rsquo;s first have a look at a normal if-else conditional.
 </p>
 
 <div class="org-src-container">
@@ -299,7 +299,7 @@ Keep in mind that this is the same as:
 </div>
 
 <p>
-Now let's look at the assembly at a compiler (without optimizations) could have
+Now let&rsquo;s look at the assembly at a compiler (without optimizations) could have
 generated:
 </p>
 
@@ -346,7 +346,7 @@ As expected, the conditions are checked sequentially.
 <h3 id="simple-switch"><span class="section-number-3">3.1.</span> Simple switch</h3>
 <div class="outline-text-3" id="text-simple-switch">
 <p>
-Let's look at a <code>switch</code> statement equivalent to the previous if conditionals.
+Let&rsquo;s look at a <code>switch</code> statement equivalent to the previous if conditionals.
 </p>
 
 <div class="org-src-container">
@@ -368,7 +368,7 @@ Let's look at a <code>switch</code> statement equivalent to the previous if cond
 </div>
 
 <p>
-For this specific switch statement, since it's pretty small, the compiler might
+For this specific switch statement, since it&rsquo;s pretty small, the compiler might
 produce something similar to the previous if-else example:
 </p>
 
@@ -428,10 +428,10 @@ The assembly needs to do the following:
 <li>In the location of the <code>switch</code>, somehow convert the value inside <code>my_var</code> to the
 index of the jump table, and jump to the stored address at that index (more
 on this below).</li>
-<li>After the jump instruction, add a "done" label that each <code>case</code> will use for
+<li>After the jump instruction, add a &ldquo;done&rdquo; label that each <code>case</code> will use for
 returning.</li>
 <li>Define the <code>case</code> labels somewhere in the <code>.text</code> section, with the blocks that
-the user defined in the <code>switch</code>. At the end of the blocks, jump to the "done"
+the user defined in the <code>switch</code>. At the end of the blocks, jump to the &ldquo;done&rdquo;
 label that we declared inside the main function.</li>
 </ol>
 
@@ -507,7 +507,7 @@ there.
 
 <p>
 The first part is simple, just compare <code>eax</code> against the value of the lowest and
-biggest <code>case</code> values. If it's not within those bounds, jump to the <code>case_default</code>
+biggest <code>case</code> values. If it&rsquo;s not within those bounds, jump to the <code>case_default</code>
 label.
 </p>
 
@@ -573,17 +573,17 @@ multiplying by 8 (a power of 2) we could have used a more optimal bit shift:
 <h2 id="conclusion"><span class="section-number-2">4.</span> Conclusion</h2>
 <div class="outline-text-2" id="text-conclusion">
 <p>
-The compiler doesn't always use a jump table for <code>switch</code> statements, because if
+The compiler doesn&rsquo;t always use a jump table for <code>switch</code> statements, because if
 the values are too separated from each other, the array would be too big and it
-wouldn't be worth it. If the jump table is too small, the compiler might also
+wouldn&rsquo;t be worth it. If the jump table is too small, the compiler might also
 decide to treat the <code>switch</code> as a series of nested <code>if-else</code> blocks, just like we
 saw before.
 </p>
 
 <p>
-With this in mind, it's more clear why the values in the <code>case</code> statements have to
+With this in mind, it&rsquo;s more clear why the values in the <code>case</code> statements have to
 be <b>known at compile time</b>. The compiler needs to know the specific values of all
-the cases just to decide if it's worth it to generate a jump table. Then, it
+the cases just to decide if it&rsquo;s worth it to generate a jump table. Then, it
 also uses them for filling default cases, making sure the value is between the
 lowest and greatest values, for indexing, etc.
 </p>

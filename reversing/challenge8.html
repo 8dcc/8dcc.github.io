@@ -339,7 +339,7 @@ code.
 <div class="outline-text-3" id="text-second-parameter-array-or-struct">
 <p>
 The second parameter of the function is loaded into <code>rbx</code>, and is dereferenced
-throughout the function. By that we can tell that it's a pointer, and all the
+throughout the function. By that we can tell that it&rsquo;s a pointer, and all the
 used elements are 64 bits long (<a href="https://en.wikipedia.org/wiki/Word_(computer_architecture)#Size_families">QWORD</a>).
 </p>
 
@@ -352,7 +352,7 @@ increased, and the function only works with <code>rbx[0]</code>, <code>rbx[2]</c
 
 <p>
 I was talking about this with a friend, and he told me that this might be
-related to linked lists, and that's when I realized that instead of an array, it
+related to linked lists, and that&rsquo;s when I realized that instead of an array, it
 might be accessing a structure, and accessing the pointers at <code>[rbx + 0x10]</code> and
 <code>[rbx + 0x18]</code> to jump to the previous and next elements in the linked list.
 </p>
@@ -371,7 +371,7 @@ of our function.
 </p>
 
 <p>
-For the return value, we can see that it's signed, and likely 32-bits because we
+For the return value, we can see that it&rsquo;s signed, and likely 32-bits because we
 not only <code>test eax</code>, but we also check if the sign flag (SF) is set with a <code>js</code> jump
 (Jump if less than zero). See <i>Intel SDM, Vol. 1, Chapter 3.4.3.1</i> and <i>Intel SDM,
 Vol.2, Jcc</i> (Pg. 3-537).
@@ -394,7 +394,7 @@ messy when it comes to branching.
 </p>
 
 <p>
-Note how the assembly calls the <code>r12</code> function in <code>unk2</code>, and then checks if it's
+Note how the assembly calls the <code>r12</code> function in <code>unk2</code>, and then checks if it&rsquo;s
 not zero <b>directly before jumping</b> to <code>unk1</code> with the <code>jne</code> instruction (which is
 equivalent to <code>jnz</code>). This is the same check that is made at the bottom of <code>unk0</code>,
 and overlooking this <code>jne</code> detail was making me think that it was <b>unconditionally</b>
@@ -498,7 +498,7 @@ starting at <i>node</i>, moving left or right depending on the return value of a
 </p>
 
 <p>
-The <code>prev</code> and <code>next</code> members of <code>MyNode</code> don't have to be in that order, but they are
+The <code>prev</code> and <code>next</code> members of <code>MyNode</code> don&rsquo;t have to be in that order, but they are
 traversed like they appear in the function. Note how the first member of <code>node</code> is
 passed to <code>callback</code>, not the node itself.
 </p>
@@ -524,15 +524,15 @@ recursion, and that it was a slightly different algorithm.
 
 <p>
 This function is for <b>searching a node in a binary tree</b>. I have never used it
-personally, but I knew about it. The reason he says "usually hidden from
-programmers" is because this algorithm is used in many map/dictionary
+personally, but I knew about it. The reason he says &ldquo;usually hidden from
+programmers&rdquo; is because this algorithm is used in many map/dictionary
 implementations for different languages.
 </p>
 
 <p>
 In his code, the structure had an extra <code>parent</code> member which was not used. The
 <i>callback</i> function is supposed to indicate if we should continue left or right in
-the tree, and in his code, it's called recursively, rather than iteratively. I
+the tree, and in his code, it&rsquo;s called recursively, rather than iteratively. I
 also renamed some symbols to match my last example.
 </p>
 

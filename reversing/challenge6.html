@@ -230,7 +230,7 @@ Original challenge link: <a href="https://challenges.re/6/">Click me</a>.
 
 <p>
 This challenge had two versions for <code>x86_64</code>, an optimized one and a
-non-optimizing one. Let's have a look at the non-optimizing one, size it's
+non-optimizing one. Let&rsquo;s have a look at the non-optimizing one, size it&rsquo;s
 usually easier to reverse.
 </p>
 
@@ -309,7 +309,7 @@ into <code>[rbp - N]</code>. Keep in mind that the stack grows downwards, so the
 (relative to <code>RBP</code>) would be the following:
 </p>
 
-<pre class="example" id="org7e3db6e">
+<pre class="example" id="org95189f5">
 +-----+-------+------+---------+---------+----------------+-----+
 |     | -0x10 | -0x8 |   RBP   |  +0x8   |     +0x10      |     |
 |-----+-------+------+---------+---------+----------------+-----|
@@ -329,7 +329,7 @@ Just like in <a href="challenge5.html">challenge 5</a>, we can conclude that the
 
 <p>
 We can also asume that the second argument, <code>rsi</code> is a <code>int16_t</code> pointer because
-after moving it to <code>[rbp - 0x10]</code>, and then to <code>rax</code>, it's accessing its contents
+after moving it to <code>[rbp - 0x10]</code>, and then to <code>rax</code>, it&rsquo;s accessing its contents
 with <code>WORD [...]</code>.
 </p>
 </div>
@@ -391,13 +391,13 @@ After changing the symbol names, and optimizing.
 </div>
 
 <p>
-As we can see, it's a function for copying the zero-terminated bytes in a <code>char*</code>
+As we can see, it&rsquo;s a function for copying the zero-terminated bytes in a <code>char*</code>
 to a <code>int16_t</code> array.
 </p>
 
 <p>
-We can't put the condition directly in the loop, because according to the
-assembly, it always transfers the byte, before checking if it's zero.
+We can&rsquo;t put the condition directly in the loop, because according to the
+assembly, it always transfers the byte, before checking if it&rsquo;s zero.
 </p>
 </div>
 </div>
@@ -406,7 +406,7 @@ assembly, it always transfers the byte, before checking if it's zero.
 <h2 id="optimized-version"><span class="section-number-2">4.</span> Optimized version</h2>
 <div class="outline-text-2" id="text-optimized-version">
 <p>
-Now, let's compare it to the optimized version provided in the website. I
+Now, let&rsquo;s compare it to the optimized version provided in the website. I
 changed the label names again.
 </p>
 
@@ -428,7 +428,7 @@ changed the label names again.
 </div>
 
 <p>
-Note how it doesn't use any local variables in the stack now, and uses the <code>rdi</code>
+Note how it doesn&rsquo;t use any local variables in the stack now, and uses the <code>rdi</code>
 and <code>rsi</code> registers directly.
 </p>
 
@@ -439,7 +439,7 @@ Some important notes about <code>nop</code> and <code>xchg</code>:
 <ol class="org-ol">
 <li>The <a href="https://www.felixcloutier.com/x86/nop">nop</a> instruction performs no operation.</li>
 <li>You can also use it with operands, making it a <b>multi-byte NOP instruction</b>,
-which doesn't alter it's behavior, but takes up more bytes.</li>
+which doesn&rsquo;t alter it&rsquo;s behavior, but takes up more bytes.</li>
 <li>The <a href="https://www.felixcloutier.com/x86/xchg">xchg</a> instruction exchanges values.</li>
 <li>The <code>nop</code> instruction is an alias mnemonic for the <code>xchg (e)ax, (e)ax</code>
 instruction. Exchanging something with itself, does nothing.</li>
@@ -470,7 +470,7 @@ or until the indicated condition of the ZF flag is no longer met.
 
 <p>
 So we are&#x2026; returning while the counter register (<code>rcx</code>) is zero? Of course this
-didn't make sense to me, so I searched around and came across <a href="https://repzret.org/p/repzret/">repzret.org</a>, which
+didn&rsquo;t make sense to me, so I searched around and came across <a href="https://repzret.org/p/repzret/">repzret.org</a>, which
 definitely looked interesting. From there, we can read:
 </p>
 
@@ -492,9 +492,9 @@ was taken or not, it should have a <code>rep</code> prefix.
 </p>
 
 <p>
-Why? Because "The processor is unable to apply a branch prediction to the
-single-byte near-return form (opcode <code>0xC3</code>) of the <code>ret</code> instruction." Thus, "Use
-of a two-byte near-return can improve performance".
+Why? Because &ldquo;The processor is unable to apply a branch prediction to the
+single-byte near-return form (opcode <code>0xC3</code>) of the <code>ret</code> instruction.&rdquo; Thus, &ldquo;Use
+of a two-byte near-return can improve performance&rdquo;.
 </p>
 </blockquote>
 

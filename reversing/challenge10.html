@@ -264,7 +264,7 @@ following.
 <p>
 I had trouble figuring out this challenge because I was <b>focusing on
 understanding the assembly</b>, before trying to translate it to C. By looking at
-those individual instructions, it's hard to see the relationship between
+those individual instructions, it&rsquo;s hard to see the relationship between
 them. However, if I had looked at the C code, I might have been able to figure
 out what it does.
 </p>
@@ -319,7 +319,7 @@ subtracting one and then doing a bit-wise NOT is the same as negating the
 number.
 </p>
 
-<pre class="example" id="org59641f9">
+<pre class="example" id="org17569c7">
    -1   0b1111111111111111
    -2   0b1111111111111110
    -3   0b1111111111111101
@@ -345,7 +345,7 @@ As you can see, <code>~(n-1)</code> and <code>(-n)</code> is the same.
 <h2 id="why-does-the-alignment-work"><span class="section-number-2">5.</span> Why does the alignment work?</h2>
 <div class="outline-text-2" id="text-why-does-the-alignment-work">
 <p>
-Let's try to reduce an example first.
+Let&rsquo;s try to reduce an example first.
 </p>
 
 <div class="org-src-container">
@@ -361,7 +361,7 @@ Let's try to reduce an example first.
 
 <p>
 You might be wondering, why do we need the subtractions? Each subtraction serves
-a different purpose. Let's start with the right-most subtraction, the second
+a different purpose. Let&rsquo;s start with the right-most subtraction, the second
 one. It ensures that we can use an input bigger than the boundary itself.
 </p>
 
@@ -370,7 +370,7 @@ If you subtract one to any power of 2, you will set to 1 all the bytes to the
 right of the one that was set previously. For example:
 </p>
 
-<pre class="example" id="orge9b5f77">
+<pre class="example" id="org6d6bad0">
    0x8  0b1000
    0x7  0b0111
 
@@ -386,7 +386,7 @@ If we do a bit-wise NOT to this value, we will set to 1 all the bytes to the
 left of the bit that was originally set, including that bit itself:
 </p>
 
-<pre class="example" id="org6ec23fc">
+<pre class="example" id="org742f373">
 Original:     0x8  0b0001000
 Subtraction:  0x7  0b0000111
 NOT:         ~0x7  0b1111000
@@ -398,14 +398,14 @@ bits to the left of the set bit. The following two examples will discard the
 lower 8 bits (<code>0..7</code>) of <code>x</code>:
 </p>
 
-<pre class="example" id="org8a2a871">
+<pre class="example" id="org0e19bcb">
 x &amp; ~(0x100 - 1)
 x &amp; ~((1 &lt;&lt; 8) - 1)
 </pre>
 
 <p>
-What about the first subtraction? The left-most subtraction ensures we don't
-allocate an extra "page" if we are already aligned to the boundary. For example,
+What about the first subtraction? The left-most subtraction ensures we don&rsquo;t
+allocate an extra &ldquo;page&rdquo; if we are already aligned to the boundary. For example,
 in the following example, the input <code>0x4000</code> is already aligned to the <code>0x1000</code>
 boundary, so we should return the untouched <code>0x4000</code>.
 </p>

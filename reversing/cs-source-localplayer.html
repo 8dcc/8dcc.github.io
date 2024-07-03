@@ -237,13 +237,13 @@ should be able to follow these steps with most reverse engineering tools.
 </p>
 
 <p>
-Open the "Strings" sub-view in IDA with <i>Shift+F12</i>, and search for the string
+Open the &ldquo;Strings&rdquo; sub-view in IDA with <i>Shift+F12</i>, and search for the string
 <code>localplayer_changeteam</code> with <i>Ctrl+F</i>. Double click the result, press <i>X</i> and jump
 through its x-refs until you see something like this.
 </p>
 
 
-<div id="org99e2571" class="figure">
+<div id="orga6b1345" class="figure">
 <p><img src="../img/cs-source-localplayer1.png" alt="cs-source-localplayer1.png" />
 </p>
 </div>
@@ -260,12 +260,12 @@ see in the <a href="https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/g
 
 <p>
 The call to <code>C_BasePlayer::GetLocalPlayer</code> is sometimes optimized to a simple <code>mov</code>
-instruction. If that's the case, you can use that offset directly. Otherwise,
+instruction. If that&rsquo;s the case, you can use that offset directly. Otherwise,
 double-click on the function (<code>sub_5723E0</code>) and you will see the offset there.
 </p>
 
 
-<div id="orgc4e133e" class="figure">
+<div id="orgfc475b6" class="figure">
 <p><img src="../img/cs-source-localplayer2.png" alt="cs-source-localplayer2.png" />
 </p>
 </div>
@@ -276,7 +276,7 @@ That <code>0xBD0750</code> is your offset. Make sure you subtract the <code>Imag
 </p>
 
 
-<div id="org416e881" class="figure">
+<div id="org3b9486d" class="figure">
 <p><img src="../img/cs-source-localplayer3.png" alt="cs-source-localplayer3.png" />
 </p>
 </div>
@@ -287,7 +287,7 @@ That <code>0xBD0750</code> is your offset. Make sure you subtract the <code>Imag
 <h2 id="reading-from-an-external-process"><span class="section-number-2">3.</span> Reading from an external process</h2>
 <div class="outline-text-2" id="text-reading-from-an-external-process">
 <p>
-I will be doing this from GNU/Linux, because it's what I used for this tutorial.
+I will be doing this from GNU/Linux, because it&rsquo;s what I used for this tutorial.
 </p>
 
 <p>

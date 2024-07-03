@@ -394,13 +394,13 @@ provide all examples in both lambda notation, Scheme and JavaScript.
 
 <p>
 At one point, in section 1.3.3, they talk about finding fixed points of
-functions. This was the first time I heard about this, and it's what mainly
+functions. This was the first time I heard about this, and it&rsquo;s what mainly
 motivated me to write this article. If you are interested on the general Lisp
 approach, and not on the Y combinator itself, I recommend you check it out.
 </p>
 
 <p>
-One of the most valuable things that SICP has taught me is that sometimes it's
+One of the most valuable things that SICP has taught me is that sometimes it&rsquo;s
 extremely useful to treat functions as black boxes that are able to transform
 some inputs into some outputs. They call this <i>wishful thinking</i>, and it has been
 useful not only when using functions, but also when designing them.
@@ -461,8 +461,8 @@ expressing processes.
 </p>
 
 <p>
-In any case, we don't have those name-defining commodities in lambda calculus. A
-function can't call itself by name, so we will have to find an alternative way.
+In any case, we don&rsquo;t have those name-defining commodities in lambda calculus. A
+function can&rsquo;t call itself by name, so we will have to find an alternative way.
 </p>
 </div>
 </div>
@@ -471,7 +471,7 @@ function can't call itself by name, so we will have to find an alternative way.
 <h2 id="simple-recursion-with-anonymous-functions"><span class="section-number-2">4.</span> Simple recursion with anonymous functions</h2>
 <div class="outline-text-2" id="text-simple-recursion-with-anonymous-functions">
 <p>
-Before trying to understand the Y combinator, let's have a look at an example of
+Before trying to understand the Y combinator, let&rsquo;s have a look at an example of
 how an anonymous function might call itself without the need for symbols.
 </p>
 
@@ -494,7 +494,7 @@ Or in Scheme:
 <blockquote>
 <p>
 <b>Note:</b> Depending on the Lisp, you might need to use <code>(funcall x x)</code> instead of
-<code>(x x)</code>, since variables and functions don't share the same namespace. You can
+<code>(x x)</code>, since variables and functions don&rsquo;t share the same namespace. You can
 search about the differences between Lisp-1 and Lisp-2.
 </p>
 </blockquote>
@@ -510,14 +510,14 @@ Or in JavaScript:
 
 <p>
 We can see that the two parenthesized expressions are identical, and that the
-first is applied to the second one. Let's try to simplify it by
+first is applied to the second one. Let&rsquo;s try to simplify it by
 &beta;-reduction. The first parenthesized expression, is applied to the second
 one. We replace each occurrence of \(x\) in the body of the first expression with
 the whole second parenthesized expression.
 </p>
 
 
-<div id="orgb8128d4" class="figure">
+<div id="org5310748" class="figure">
 <p><img src="../img/ycombinator1.png" alt="ycombinator1.png" />
 </p>
 </div>
@@ -549,7 +549,7 @@ For example, if \(f(x) = x!\), 1 and 2 are fixed points, since \(f(1) = 1\) and
 </p>
 
 
-<div id="org88e7d50" class="figure">
+<div id="orgadff62a" class="figure">
 <p><img src="../img/ycombinator2.png" alt="ycombinator2.png" width="250px" />
 </p>
 </div>
@@ -571,7 +571,7 @@ f(x),\quad f(f(x)),\quad f(f(f(x))),\quad \dots,
 </p>
 
 <p>
-We would do that until the value doesn't change very much, and we are satisfied
+We would do that until the value doesn&rsquo;t change very much, and we are satisfied
 with the result.
 </p>
 </div>
@@ -647,19 +647,19 @@ Or in JavaScript:
 </div>
 
 <p>
-Since it's a fixed-point combinator, calling \(Y\) with a function as its
+Since it&rsquo;s a fixed-point combinator, calling \(Y\) with a function as its
 argument would be reduced to \(Y\ f = f(Y\ f)\). This is a very interesting and
-useful concept, and it's where this image comes from.
+useful concept, and it&rsquo;s where this image comes from.
 </p>
 
 
-<div id="orgd117490" class="figure">
+<div id="orgb3c3aa8" class="figure">
 <p><img src="../img/ycombinator3.png" alt="ycombinator3.png" width="250px" />
 </p>
 </div>
 
 <p>
-Let's try to understand what it does, and why it's a fixed-point combinator. We
+Let&rsquo;s try to understand what it does, and why it&rsquo;s a fixed-point combinator. We
 are saying that \(Y\) is a function that takes one parameter \(f\). The body
 consists of the same lambda term applied to itself: \((\lambda x. f(x\ x))\). You
 may realize why we explained how to do <a href="#simple-recursion-with-anonymous-functions">recursion with anonymous functions</a>
@@ -668,7 +668,7 @@ function.
 </p>
 
 <p>
-Let's simplify it with &beta;-reduction step by step:
+Let&rsquo;s simplify it with &beta;-reduction step by step:
 </p>
 
 \begin{align*}
@@ -684,7 +684,7 @@ Y\ g &= \lambda f. \big(\lambda x. f (x\ x)\big) \big(\lambda x. f (x\ x)\big) g
 
 <p>
 Note how the reduction on the third step is applying \(g\) to the same expression
-in the second step, which we know is equal to \(Y\ g\). That's how we can verify
+in the second step, which we know is equal to \(Y\ g\). That&rsquo;s how we can verify
 that \(Y\ g = g(Y\ g)\).
 </p>
 
@@ -711,8 +711,8 @@ Notice how the first call to \(f\) was not necessary, since this expression also
 <div class="outline-text-2" id="text-applications-of-the-y-combinator">
 <p>
 You might be wondering what makes the Y combinator so special. As we said,
-lambda calculus doesn't have any kind of "global symbols", therefore a function
-can't reference itself by name. Let's go back to the factorial example in
+lambda calculus doesn&rsquo;t have any kind of &ldquo;global symbols&rdquo;, therefore a function
+can&rsquo;t reference itself by name. Let&rsquo;s go back to the factorial example in
 Scheme.
 </p>
 
@@ -731,7 +731,7 @@ This recursive form is possible because <code>fact</code> can call itself using 
 
 <p>
 The Y combinator allows us to call a function recursively in a language which
-<b>doesn't implement recursion</b>. Let's have a look at an alternative form of <code>fact</code>.
+<b>doesn&rsquo;t implement recursion</b>. Let&rsquo;s have a look at an alternative form of <code>fact</code>.
 </p>
 
 <div class="org-src-container">
@@ -745,7 +745,7 @@ The Y combinator allows us to call a function recursively in a language which
 </div>
 
 <p>
-Let's carefully look at what' we just defined. We are defining <code>fact-generator</code> as
+Let&rsquo;s carefully look at what&rsquo; we just defined. We are defining <code>fact-generator</code> as
 a function that <b>does not</b> return the factorial of a number, but instead returns
 another <b>another lambda function</b> that will take a number <code>n</code>, and return its
 factorial. This inner lambda is able to use recursion <i>without</i> referencing itself
@@ -753,9 +753,9 @@ by name because it can access the <code>self</code> parameter of the outer lambd
 </p>
 
 <p>
-Let's look at how this generator should be used. We want to define <code>fact</code>, which
+Let&rsquo;s look at how this generator should be used. We want to define <code>fact</code>, which
 is the actual factorial function that takes a number as its parameter and
-returns the factorial. That's what the inner lambda does, the one returned by
+returns the factorial. That&rsquo;s what the inner lambda does, the one returned by
 <code>fact-generator</code>. However, the generator expects to receive the <code>fact</code> function as
 its <code>self</code> parameter, so the inner lambda can reference itself. At first sight, we
 could try something like this.
@@ -769,9 +769,9 @@ could try something like this.
 </div>
 
 <p>
-Here, we would pass the <code>fact</code> function to the <code>fact-generator</code> so it's able to
-return a <code>fact</code> that can reference itself. Unfortunately, we can't pass <code>fact</code> to
-the <code>fact-generator</code> because we still haven't defined what <code>fact</code> is (we are doing
+Here, we would pass the <code>fact</code> function to the <code>fact-generator</code> so it&rsquo;s able to
+return a <code>fact</code> that can reference itself. Unfortunately, we can&rsquo;t pass <code>fact</code> to
+the <code>fact-generator</code> because we still haven&rsquo;t defined what <code>fact</code> is (we are doing
 just that). Instead, since <code>fact-generator</code> returns <code>fact</code> but also expects it, we
 are looking for something like:
 </p>
@@ -792,7 +792,7 @@ However, our Scheme version of the Y combinator was not really correct. In
 Scheme (and in most Lisps), the parameters are evaluated <b>before</b> applying the
 function, so defining <code>Y</code> like we did before would cause infinite recursion when
 trying to apply the <code>(x x)</code> expressions. This will be more obvious when analyzing
-the combinator bellow, so let's look at a possible solution first.
+the combinator bellow, so let&rsquo;s look at a possible solution first.
 </p>
 
 <p>
@@ -814,7 +814,7 @@ delay the evaluation of its body, just what the doctor ordered.
 
 <p>
 We can add this beta abstraction to the <code>(x x)</code> applications, effectively acting
-as a "proxy".
+as a &ldquo;proxy&rdquo;.
 </p>
 
 <div class="org-src-container">
@@ -826,13 +826,13 @@ as a "proxy".
 </div>
 
 <p>
-This might be hard to understand at first, so let's try to understand it
+This might be hard to understand at first, so let&rsquo;s try to understand it
 visually. This diagram represents the process of the inner lambdas in the
 function.
 </p>
 
 
-<div id="orgfa4a588" class="figure">
+<div id="org0bacc96" class="figure">
 <p><img src="../img/ycombinator4.svg" alt="ycombinator4.svg" class="org-svg" />
 </p>
 </div>
@@ -869,13 +869,13 @@ Now that you know what the expression returns, you can verify that the second
 point was true. The <code>(x x)</code> expression is calling <code>x</code> with a copy of the expression
 as argument (the gray expression at the top). That argument will be used
 exclusively for looping, as mentioned in point one. Therefore <code>x</code>, which is a
-lambda just like us, returns <code>fact</code>. That's why we were able to replace <code>(x x)</code> with
+lambda just like us, returns <code>fact</code>. That&rsquo;s why we were able to replace <code>(x x)</code> with
 <code>fact</code> on point two.
 </p>
 
 <p>
 We know the <code>(x x)</code> call returns <code>fact</code>, but Scheme will try to evaluate the call to
-<code>x</code>, which also contains another call to <code>x</code>, etc. That's what the <code>fact-proxy</code> is
+<code>x</code>, which also contains another call to <code>x</code>, etc. That&rsquo;s what the <code>fact-proxy</code> is
 for.
 </p>
 

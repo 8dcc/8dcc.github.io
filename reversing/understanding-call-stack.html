@@ -245,7 +245,7 @@ should be familiar with basic assembly.
 <p>
 First, a brief description of the <a href="https://en.wikipedia.org/wiki/Call_stack">stack</a>. The stack is a data structure used for
 storing various kinds of information required by the active procedures of a
-computer program. The stack is obviously a <a href="https://en.wikipedia.org/wiki/Stack_(abstract_data_type)">LIFO</a> system, and it's usually
+computer program. The stack is obviously a <a href="https://en.wikipedia.org/wiki/Stack_(abstract_data_type)">LIFO</a> system, and it&rsquo;s usually
 accessed by <i>pushing</i> or <i>popping</i> data (although this is not always the case, as we
 will see). The stack usually <b>grows downwards</b>, which is a key detail that might
 be easy to forget at first.
@@ -291,7 +291,7 @@ etc.).</li>
 When function <code>foo</code> wants to call function <code>bar</code>, it will push some of the arguments
 on the stack (this depends on the architecture). Then, it will push the address
 of the next instruction (<code>rip</code> register) onto the stack, so <code>bar</code> knows where to
-return once it's done. Then, after <code>foo</code> calls <code>bar</code>, <code>bar</code> might push some of the
+return once it&rsquo;s done. Then, after <code>foo</code> calls <code>bar</code>, <code>bar</code> might push some of the
 registers that need to be preserved by the callee, like <code>rbp</code> or <code>r12</code>, and it will
 allocate some space for storing its data, if needed. This will be explained in
 more detail bellow, with an example.
@@ -354,7 +354,7 @@ call, it must save the value in its local stack frame.
 <h3 id="implicit-push-and-pop-instructions"><span class="section-number-3">2.1.</span> Implicit <code>push</code> and <code>pop</code> instructions</h3>
 <div class="outline-text-3" id="text-implicit-push-and-pop-instructions">
 <p>
-About the return address, it's important to note that it is usually pushed
+About the return address, it&rsquo;s important to note that it is usually pushed
 <b>implicitly</b> by the <code>call</code> instruction. The rough translation would be the
 following.
 </p>
@@ -370,7 +370,7 @@ following.
 </div>
 
 <p>
-Note that the example above is not strictly correct. First, we can't write or
+Note that the example above is not strictly correct. First, we can&rsquo;t write or
 read from <code>rip</code> directly, and second, <code>rip</code> would point to the <code>jmp</code> instruction
 itself, which is not accurate. The correct form would be:
 </p>
@@ -384,7 +384,7 @@ itself, which is not accurate. The correct form would be:
 </div>
 
 <p>
-Just like the return address is pushed implicitly, it's also popped implicitly
+Just like the return address is pushed implicitly, it&rsquo;s also popped implicitly
 by the <code>ret</code> instruction.
 </p>
 
@@ -410,15 +410,15 @@ by the <code>ret</code> instruction.
 <p>
 The term <i>stack frame</i> has been mentioned, so let me explain exactly what it
 is. Stack frames are used to <b>divide the stack</b> depending on the subroutine that
-owns/needs the information. It's used to indicate, for example, that the region
-that <code>foo</code> reserved on the stack belongs to <code>foo</code>, and not <code>bar</code> (since it's on <code>foo</code>'s
+owns/needs the information. It&rsquo;s used to indicate, for example, that the region
+that <code>foo</code> reserved on the stack belongs to <code>foo</code>, and not <code>bar</code> (since it&rsquo;s on <code>foo</code>&rsquo;s
 stack frame).
 </p>
 
 <p>
 You also have to understand that the specifics about who owns <i>X</i> kind of
 information vary depending on the <b>convention</b>. For example, the two diagrams in
-this section use different conventions when it comes to who "owns" the
+this section use different conventions when it comes to who &ldquo;owns&rdquo; the
 parameters when calling a function. This is not important for understanding the
 concept of the stack frame itself.
 </p>
@@ -429,7 +429,7 @@ typically organized.
 </p>
 
 
-<div id="org65c96a6" class="figure">
+<div id="org0fe48ad" class="figure">
 <p><img src="../img/callstack1.png" alt="callstack1.png" />
 </p>
 </div>
@@ -452,7 +452,7 @@ I mentioned, the <code>call</code> instruction will push the return address onto
 Usually, one of the first things a function does is preserve the <code>rbp</code> register
 (containing the base pointer of the caller) by pushing it onto the stack
 itself. Then, the current value of <code>rsp</code> is saved there throughout the execution
-of our procedure. That's why the following pattern is a common way of
+of our procedure. That&rsquo;s why the following pattern is a common way of
 identifying functions from assembly.
 </p>
 
@@ -480,7 +480,7 @@ version, where the top of the stack is in a lower address than the bottom.
 </p>
 
 
-<div id="org968f44a" class="figure">
+<div id="org35e3431" class="figure">
 <p><img src="../img/callstack2.png" alt="callstack2.png" />
 </p>
 </div>
@@ -497,18 +497,18 @@ the <b>caller</b>, not the callee.
 <h3 id="detailed-drawline-example"><span class="section-number-3">3.2.</span> Detailed <code>DrawLine</code> example</h3>
 <div class="outline-text-3" id="text-detailed-drawline-example">
 <p>
-As an example, let's write some of the assembly that <code>DrawLine</code> could be using. To
+As an example, let&rsquo;s write some of the assembly that <code>DrawLine</code> could be using. To
 avoid cluttering the code with comments, I moved the explanation of each part to
 the legend bellow.
 </p>
 
 <p>
 In the following code, <code>DrawLine</code> pushes the base pointer (<code>rbp</code>) for <b>preserving the
-caller's stack frame</b>. Then, it saves the value of <code>rsp</code> in <code>rbp</code>, creating its own
+caller&rsquo;s stack frame</b>. Then, it saves the value of <code>rsp</code> in <code>rbp</code>, creating its own
 stack frame. This allows us to freely change <code>rsp</code>, while being able to access
 function arguments and local variables with offsets relative to <code>rbp</code>. This might
-seem a bit confusing at first, but it's a key detail since it essentially
-creates a <b>linked list</b>, where you can follow <code>rbp</code>'s to traverse stack frames.
+seem a bit confusing at first, but it&rsquo;s a key detail since it essentially
+creates a <b>linked list</b>, where you can follow <code>rbp</code>&rsquo;s to traverse stack frames.
 </p>
 
 <div class="org-src-container">
@@ -547,28 +547,28 @@ creates a <b>linked list</b>, where you can follow <code>rbp</code>'s to travers
 the <code>DrawLine</code> arguments are right bellow it, from <code>[RSP+0x8]</code> to
 <code>[RSP+(n*0x8)]</code>. Note that they are lower on the stack, but higher in memory.</li>
 <li>The first thing we usually do is push the old <code>RBP</code> value that <code>DrawSquare</code> was
-using. After pushing it, <code>RSP</code> will point to the old <code>RBP</code>, hence the "linked
-list" of <code>RBP</code>'s. The return address will be at <code>[RSP+8]</code> after the push.</li>
+using. After pushing it, <code>RSP</code> will point to the old <code>RBP</code>, hence the &ldquo;linked
+list&rdquo; of <code>RBP</code>&rsquo;s. The return address will be at <code>[RSP+8]</code> after the push.</li>
 <li>The current value of <code>RSP</code> is saved into <code>RBP</code>, creating our stack frame. This
 way, we can freely change <code>RSP</code>, and access parameters with stack offsets
 relative to <code>RBP</code>.</li>
 <li>Now <code>DrawLine</code> needs to push some registers that must be preserved by the
-callee (according to the ABI). After this, the "real" body of the procedure
-will be able to safely use these registers without overwriting the caller's
+callee (according to the ABI). After this, the &ldquo;real&rdquo; body of the procedure
+will be able to safely use these registers without overwriting the caller&rsquo;s
 values.</li>
 <li>The procedure subtracts from <code>RSP</code> to allocate <code>0x20</code> bytes some space for local
 variables.</li>
 <li>From the procedure body, it might access the function arguments by <b>adding</b> to
 <code>RBP</code>, or it might need to store values in the reserved stack space, and access
 them by <b>subtracting</b> to <code>RBP</code> (e.g. for local variables).</li>
-<li>Here, it adds <code>0x16</code> to the base pointer for "jumping" over both the pushed <code>RBP</code>
+<li>Here, it adds <code>0x16</code> to the base pointer for &ldquo;jumping&rdquo; over both the pushed <code>RBP</code>
 and the return address, accessing some argument, and saving it into <code>r12</code>.</li>
 <li>Then, it saves that value into some of the stack space that we reserved when
 subtracting from <code>RSP</code>.</li>
 <li>When we are done, we add back the space previously subtracted from <code>RSP</code>.</li>
 <li>We pop back the registers that had to be preserved by the callee.</li>
 <li>We restore the base pointer into <code>RSP</code>.</li>
-<li>We pop the caller's <code>RBP</code> register.</li>
+<li>We pop the caller&rsquo;s <code>RBP</code> register.</li>
 <li>Finally, <code>RSP</code> points to the return address from <code>DrawSquare</code>, which was pushed
 by the <code>call</code> instruction. As I said, the <code>ret</code> instruction will pop it and jump
 to it.</li>
@@ -581,7 +581,7 @@ to it.</li>
 <h2 id="traversing-the-call-stack"><span class="section-number-2">4.</span> Traversing the call stack</h2>
 <div class="outline-text-2" id="text-traversing-the-call-stack">
 <p>
-Let's look at some example C code.
+Let&rsquo;s look at some example C code.
 </p>
 
 <div class="org-src-container">
@@ -613,7 +613,7 @@ Let's look at some example C code.
 The call stack for <code>DrawPoint()</code> would be the following:
 </p>
 
-<pre class="example" id="org051d09a">
+<pre class="example" id="org8dab530">
 (???)  -&gt;  DrawSquare()  -&gt;  DrawLine()  -&gt;  DrawPoint()
 </pre>
 </div>
@@ -622,7 +622,7 @@ The call stack for <code>DrawPoint()</code> would be the following:
 <h3 id="the-asmprintcallstack-function"><span class="section-number-3">4.1.</span> The <code>AsmPrintCallStack</code> function</h3>
 <div class="outline-text-3" id="text-the-asmprintcallstack-function">
 <p>
-Since we now have a deep understanding of the stack, let's write some assembly
+Since we now have a deep understanding of the stack, let&rsquo;s write some assembly
 code that prints the backtrace of where we were called.
 </p>
 
@@ -676,7 +676,7 @@ code that prints the backtrace of where we were called.
 </div>
 
 <p>
-Let me briefly explain what's going on. First, we use <code>default rel</code> to enable
+Let me briefly explain what&rsquo;s going on. First, we use <code>default rel</code> to enable
 <a href="https://www.nasm.us/xdoc/2.13.02rc2/html/nasmdoc6.html#section-6.2.1">RIP-relative addressing</a> (See also <a href="https://www.nasm.us/xdoc/2.13.02rc2/html/nasmdoc3.html#section-3.3">section 3.3</a> of the NASM manual). More of this
 is explained in the next section. We also declare <code>printf</code> as an <code>extern</code> symbol.
 </p>
@@ -735,7 +735,7 @@ The rough C translation of the loop would be the following:
 <h3 id="note-about-position-independent-executables"><span class="section-number-3">4.2.</span> Note about Position Independent Executables</h3>
 <div class="outline-text-3" id="text-note-about-position-independent-executables">
 <p>
-You might be wondering why we had to use <code>wrt ..plt</code> when calling <code>printf</code>. It's for
+You might be wondering why we had to use <code>wrt ..plt</code> when calling <code>printf</code>. It&rsquo;s for
 the same reason why we have to use <code>lea rdi, [rel fmt]</code> instead of
 <code>mov rdi, fmt</code>. Our GCC has <a href="https://en.wikipedia.org/wiki/Position-independent_code"><code>-fPIE</code></a> (Position Independent Executable) enabled by
 default. That means that our addresses and calls have to be relative. We have
@@ -753,7 +753,7 @@ I chose to use the second option, so I can explain how it works. If we just used
 following warnings:
 </p>
 
-<pre class="example" id="org29785c5">
+<pre class="example" id="org8a382b8">
 /usr/bin/ld: obj/callstack.asm.o: warning: relocation in read-only section `.text'
 /usr/bin/ld: obj/callstack.asm.o: relocation R_X86_64_PC32 against symbol `printf@@GLIBC_2.2.5' can not be used when making a PIE object; recompile with -fPIE
 /usr/bin/ld: final link failed: bad value
@@ -762,22 +762,22 @@ following warnings:
 <p>
 Before trying to understand this <i>terrible</i> error message, you need to understand
 that the linker asumes <b>all</b> of our object files have been <b>compiled</b>, and not
-assembled by hand. Therefore, when it says "recompile with <code>-fPIE</code>", it's not
+assembled by hand. Therefore, when it says &ldquo;recompile with <code>-fPIE</code>&rdquo;, it&rsquo;s not
 necessarily referring to our C object files, but also our hand-written assembly
-ones. You should read the error as "Whoever made this ASM (human or compiler),
-make it PIE compatible".
+ones. You should read the error as &ldquo;Whoever made this ASM (human or compiler),
+make it PIE compatible&rdquo;.
 </p>
 
 <p>
 So, how do we make our assembly PIE compatible? The most important part is that
 we need to call <code>printf</code> through the <a href="https://en.wikipedia.org/wiki/Position-independent_code#Technical_details">Procedure Linkage Table</a> (PLT), instead of
-using a direct call. That's exactly what <code>wrt ..plt</code> is doing.
+using a direct call. That&rsquo;s exactly what <code>wrt ..plt</code> is doing.
 </p>
 
 <p>
 That would fix the second linker error, but what about the first warning? That
 happens because we are using the <code>mov</code> instruction with the absolute address of
-<code>fmt</code>. This creates a 64-bit relocation, since this absolute address isn't known
+<code>fmt</code>. This creates a 64-bit relocation, since this absolute address isn&rsquo;t known
 until run time, and the dynamic linker has to fill it out. Have a look at the
 following assembly.
 </p>
@@ -814,10 +814,10 @@ assemble it, and <a href="https://defuse.ca/online-x86-assembler.htm">look</a> a
 </div>
 
 <p>
-The linker doesn't like runtime relocations in <code>.text</code>, hence the "relocation in
-read-only section <code>.text</code>" warning. Since <code>printf</code> needs an absolute address, we can
+The linker doesn&rsquo;t like runtime relocations in <code>.text</code>, hence the &ldquo;relocation in
+read-only section <code>.text</code>&rdquo; warning. Since <code>printf</code> needs an absolute address, we can
 convert the RIP-relative address to an absolute one with <code>lea rdi, [rel fmt]</code>. The
-<code>rel</code> stands for relative, and although we don't need it since we specified
+<code>rel</code> stands for relative, and although we don&rsquo;t need it since we specified
 <code>default rel</code> at the top, I chose to emphasize it anyway.
 </p>
 
@@ -934,7 +934,7 @@ what I mentioned in <a href="#note-about-position-independent-executables">Note 
 Then, we can just run <code>make</code> and check the output:
 </p>
 
-<pre class="example" id="orgaf82f0e">
+<pre class="example" id="orgb1e83c5">
 (main) Address of DrawPoint:  0x5a1e3d78e139
 (main) Address of DrawLine:   0x5a1e3d78e170
 (main) Address of DrawSquare: 0x5a1e3d78e1bf
@@ -958,25 +958,25 @@ Drawing point: 5, 5
 </pre>
 
 <p>
-That looks about right. The only address that's changing is the second one,
+That looks about right. The only address that&rsquo;s changing is the second one,
 since each call to <code>DrawLine</code> from <code>DrawSquare</code> increments the <code>RIP</code> register by some
 bytes.
 </p>
 
 <p>
-If we really want to make sure it's accurate, let's disassemble the binary and
+If we really want to make sure it&rsquo;s accurate, let&rsquo;s disassemble the binary and
 look at the offsets inside the functions. I will be using <a href="https://rizin.re/">rizin</a>, but any similar
 tool will do.
 </p>
 
 <p>
 According to our output, the next instruction to the call to <code>DrawPoint</code> should be
-at offset <code>+0x33</code> (<code>0x5a1e3d78e1a3-0x5a1e3d78e170</code>) inside <code>DrawLine</code>. Let's have a
+at offset <code>+0x33</code> (<code>0x5a1e3d78e1a3-0x5a1e3d78e170</code>) inside <code>DrawLine</code>. Let&rsquo;s have a
 look.
 </p>
 
 
-<div id="org8d94f23" class="figure">
+<div id="org3debd47" class="figure">
 <p><img src="../img/callstack3.png" alt="callstack3.png" />
 </p>
 </div>
@@ -987,7 +987,7 @@ Indeed, the call to <code>DrawPoint</code> is at <code>+0x2e</code>, and the nex
 </p>
 
 
-<div id="orgd5457c9" class="figure">
+<div id="org6cfc06d" class="figure">
 <p><img src="../img/callstack4.png" alt="callstack4.png" />
 </p>
 </div>

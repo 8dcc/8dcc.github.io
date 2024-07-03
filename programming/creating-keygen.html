@@ -233,9 +233,9 @@
 <div class="outline-text-2" id="text-brief-warning">
 <p>
 I am not an expert on cryptography, so this article should be interpreted as
-just some notes about keygens, written by someone who hasn't worked on
+just some notes about keygens, written by someone who hasn&rsquo;t worked on
 real-world keygens. I was just interested on the topic, and decided to write
-about it. Don't rely to hard on the information in this article.
+about it. Don&rsquo;t rely to hard on the information in this article.
 </p>
 </div>
 </div>
@@ -285,8 +285,8 @@ We could use two main formats for the license keys:
 </p>
 
 <ol class="org-ol">
-<li><b>Username is embedded in the key</b>: The user doesn't need to introduce his user,
-as it's already embedded in the key. We would need to validate if the key is
+<li><b>Username is embedded in the key</b>: The user doesn&rsquo;t need to introduce his user,
+as it&rsquo;s already embedded in the key. We would need to validate if the key is
 valid, and extract (decode) the username from it. This is not the case on
 most commercial products since, as I mentioned, they use the internet to get
 the user associated to that key from a remote database.</li>
@@ -304,17 +304,17 @@ with the key provided by the user.
 </p>
 
 <p>
-The second validation method I explained is basically what it's used to validate
+The second validation method I explained is basically what it&rsquo;s used to validate
 passwords against the hashes in a database when a user tries to log-in, but the
-key difference is that, although <a href="https://en.wikipedia.org/wiki/Cryptographic_hash_function">hashing</a> can't be reverted, we are <a href="https://en.wikipedia.org/wiki/Code">encoding</a> the
+key difference is that, although <a href="https://en.wikipedia.org/wiki/Cryptographic_hash_function">hashing</a> can&rsquo;t be reverted, we are <a href="https://en.wikipedia.org/wiki/Code">encoding</a> the
 username. The hashing algorithm used to generate a hash is not enough to revert
-it (since it's a one-way algorithm), but <b>the algorithm used to encode a key is
+it (since it&rsquo;s a one-way algorithm), but <b>the algorithm used to encode a key is
 the only thing needed to decode it</b>.
 </p>
 
 <p>
 Since the goal here is to keep it simple, we will be using the second method for
-our program, although it's not very secure since the encoding algorithm is
+our program, although it&rsquo;s not very secure since the encoding algorithm is
 embedded in the program itself, and it can be easily reversed. We are going to
 make a simple key generation function, and an application that uses it to
 validate an input key from the user.
@@ -327,7 +327,7 @@ validate an input key from the user.
 <h2 id="things-to-avoid-when-making-the-function"><span class="section-number-2">3.</span> Things to avoid when making the function</h2>
 <div class="outline-text-2" id="text-things-to-avoid-when-making-the-function">
 <p>
-When generating a program like this, it's a good idea to asume that there is
+When generating a program like this, it&rsquo;s a good idea to asume that there is
 going to be someone attempting to reverse our program and figure out how our key
 generation algorithm works.
 </p>
@@ -353,8 +353,8 @@ in the key.
 </p>
 
 <p>
-His problem transforms from "how did this string turn into this other string"
-into "how did this character turn into this other character", which is obviously
+His problem transforms from &ldquo;how did this string turn into this other string&rdquo;
+into &ldquo;how did this character turn into this other character&rdquo;, which is obviously
 easier to find.
 </p>
 </div>
@@ -368,7 +368,7 @@ Imagine we had the algorithm from the last example. The user is also able to
 tell that the lengths of the strings are proportional, for example:
 </p>
 
-<pre class="example" id="org994b29d">
+<pre class="example" id="org4426021">
 abcd  -&gt; 1234
 abcde -&gt; 12345
 ab    -&gt; 12
@@ -385,7 +385,7 @@ the user. Here are some examples on what to avoid, assuming our key length is
 9:
 </p>
 
-<pre class="example" id="orgf63b9b6">
+<pre class="example" id="org26b0443">
 abcd       -&gt; 123400000 (Same as previous example)
 abcd       -&gt; 123412341 (Repetition is easy to tell)
 abcdefghij -&gt; 123456789 (Last character is ignored, produces same output as abcdefghi)
@@ -403,7 +403,7 @@ of hashes is that they should produce unique outputs.
 </p>
 
 <p>
-In our case, we should try to avoid collisions as much as possible, but I won't
+In our case, we should try to avoid collisions as much as possible, but I won&rsquo;t
 be focusing on this too much on this article.
 </p>
 </div>
@@ -414,7 +414,7 @@ be focusing on this too much on this article.
 <h2 id="the-key-generation-function"><span class="section-number-2">4.</span> The key generation function</h2>
 <div class="outline-text-2" id="text-the-key-generation-function">
 <p>
-This is a simple keygen function I came up with, but it's far from perfect so
+This is a simple keygen function I came up with, but it&rsquo;s far from perfect so
 feel free to contribute with a better version, as I said above.
 </p>
 

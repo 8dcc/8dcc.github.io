@@ -262,7 +262,7 @@ target function (<code>foo</code>) to introduce a jump to our <code>hook</code> 
 </p>
 
 <p>
-First, let's have a look at the disassembly of this <code>foo</code> function using <a href="https://rizin.re/">rizin</a>.
+First, let&rsquo;s have a look at the disassembly of this <code>foo</code> function using <a href="https://rizin.re/">rizin</a>.
 </p>
 
 <div class="org-src-container">
@@ -305,8 +305,8 @@ those <code>push</code> and <code>mov</code> instructions, we jump to our functi
 </p>
 
 <p>
-Let's see how we can do that from assembly. Note that the byte order of the
-addresses is "reversed" because of <a href="https://en.wikipedia.org/wiki/Endianness">endianness</a>.
+Let&rsquo;s see how we can do that from assembly. Note that the byte order of the
+addresses is &ldquo;reversed&rdquo; because of <a href="https://en.wikipedia.org/wiki/Endianness">endianness</a>.
 </p>
 
 <div class="org-src-container">
@@ -412,12 +412,12 @@ you are on windows you should use something like <code>VirtualProtect</code> (<a
 <p>
 First, we get the next page by masking the address plus the page size minus one
 with <code>~(page_size - 1)</code>. We need to add the page size minus one to make sure we
-don't align an already aligned address. Then we subtract the page size to get
+don&rsquo;t align an already aligned address. Then we subtract the page size to get
 the address of the previous page. For more information see <a href="https://stackoverflow.com/a/22971450/11715554">this StackOverflow
 answer</a>.
 </p>
 
-<pre class="example" id="orgcb6af85">
+<pre class="example" id="org5f4d54c">
 Ptr:                 0x12345    0b10010001101000101
 Page size:           0x01000    0b00001000000000000
 Page size - 1:       0x00FFF    0b00000111111111111
@@ -428,7 +428,7 @@ Minus page size:     0x12000    0b10010000000000000
 </pre>
 
 <p>
-Let's declare our sample hook.
+Let&rsquo;s declare our sample hook.
 </p>
 
 <div class="org-src-container">

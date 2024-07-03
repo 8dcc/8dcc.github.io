@@ -220,7 +220,7 @@
 <li><a href="#alternative-decompiling-with-ida-or-ghidra">5. Alternative: Decompiling with IDA or ghidra</a>
 <ul>
 <li><a href="#ida-pro">5.1. IDA Pro</a></li>
-<li><a href="#rizins-version-of-ghidra">5.2. Rizin's version of ghidra</a></li>
+<li><a href="#rizins-version-of-ghidra">5.2. Rizin&rsquo;s version of ghidra</a></li>
 </ul>
 </li>
 </ul>
@@ -232,7 +232,7 @@
 <div class="outline-text-2" id="text-introduction">
 <p>
 I created a simple keygen program that takes a user and a key, and prints a
-message if the key is valid. Let's try to figure out how to make a keygen for
+message if the key is valid. Let&rsquo;s try to figure out how to make a keygen for
 it. I made an article explaining how keygens work, and how to make your own. I
 will not be using the same code, but feel free to check <a href="../programming/creating-keygen.html">Creating a simple keygen</a>
 in case you are interested.
@@ -244,10 +244,10 @@ in case you are interested.
 <h2 id="trying-out-the-program"><span class="section-number-2">2.</span> Trying out the program</h2>
 <div class="outline-text-2" id="text-trying-out-the-program">
 <p>
-First, let's try running the program to see what it's asking.
+First, let&rsquo;s try running the program to see what it&rsquo;s asking.
 </p>
 
-<pre class="example" id="org1af7e3f">
+<pre class="example" id="org532880d">
 Username: test
 Key: test
 Invalid key.
@@ -271,7 +271,7 @@ From this, we can at least expect:
 <h2 id="the-main-function"><span class="section-number-2">3.</span> The main function</h2>
 <div class="outline-text-2" id="text-the-main-function">
 <p>
-Let's start by having a look at the main function with <a href="https://rizin.re/">rizin</a> 0.6.3 (you can also
+Let&rsquo;s start by having a look at the main function with <a href="https://rizin.re/">rizin</a> 0.6.3 (you can also
 use <a href="https://cutter.re">cutter</a> or <a href="https://hex-rays.com/ida-pro/">IDA</a>, if you prefer a GUI program).
 </p>
 </div>
@@ -280,8 +280,8 @@ use <a href="https://cutter.re">cutter</a> or <a href="https://hex-rays.com/ida-
 <h3 id="finding-the-main-function"><span class="section-number-3">3.1.</span> Finding the main function</h3>
 <div class="outline-text-3" id="text-finding-the-main-function">
 <p>
-We start by running the <code>aaa</code> rizin command, which is used to "Analyze all calls,
-references, emulation and apply signatures".
+We start by running the <code>aaa</code> rizin command, which is used to &ldquo;Analyze all calls,
+references, emulation and apply signatures&rdquo;.
 </p>
 
 <div class="org-src-container">
@@ -306,7 +306,7 @@ We can list the symbols (flags) with <code>fl</code>.
 
 <blockquote>
 <p>
-<b>Note:</b> With <code>command~text</code>, we can filter rizin's output.
+<b>Note:</b> With <code>command~text</code>, we can filter rizin&rsquo;s output.
 </p>
 </blockquote>
 
@@ -353,7 +353,7 @@ entry0+0x1f          ff <span style="color: #88ca9f;">15</span> <span style="col
 
 <p>
 The address being loaded into <code>rdi</code> at <code>entry0+0x14</code> should be our main function
-(<code>0x140d</code>). Then, you could rename the function to "main" with
+(<code>0x140d</code>). Then, you could rename the function to &ldquo;main&rdquo; with
 <code>f+ main 0xc8 @ 0x140d</code>.
 </p>
 </div>
@@ -363,7 +363,7 @@ The address being loaded into <code>rdi</code> at <code>entry0+0x14</code> shoul
 <h3 id="disassembling-the-main-function"><span class="section-number-3">3.2.</span> Disassembling the main function</h3>
 <div class="outline-text-3" id="text-disassembling-the-main-function">
 <p>
-Let's have a look at the disassembly of the main function.
+Let&rsquo;s have a look at the disassembly of the main function.
 </p>
 
 <blockquote>
@@ -452,14 +452,14 @@ reason, we will call this function <code>generate_key()</code> and the second pa
 
 <p>
 From <code>main+0x76</code> to <code>main+0xbd</code> it calls <code>memcmp(user_key, real_key, 0x14)</code> and prints
-"Correct key." or "Invalid key." depending on the returned value by <code>memcmp</code>. From
+&ldquo;Correct key.&rdquo; or &ldquo;Invalid key.&rdquo; depending on the returned value by <code>memcmp</code>. From
 this call we also know that the key size should be 0x14 (20).
 </p>
 
 <p>
 This is obviously an ideal environment, since the main function is the one
 responsible for validating the key. Since this is not normally the case, we
-could try to look for those success and fail messages in the program's string
+could try to look for those success and fail messages in the program&rsquo;s string
 list, and check the xrefs to find the key validation function. In this specific
 program, we could also just patch the bytes to either show us the real key, or
 change the conditional jump so it always jumps to the code that gets executed
@@ -473,7 +473,7 @@ when the key is correct.
 <h2 id="disassembling-the-key-generator"><span class="section-number-2">4.</span> Disassembling the key generator</h2>
 <div class="outline-text-2" id="text-disassembling-the-key-generator">
 <p>
-Now that we understand the main logic, let's have a look at the <code>generate_key()</code>
+Now that we understand the main logic, let&rsquo;s have a look at the <code>generate_key()</code>
 function at <code>0x1189</code>.
 </p>
 
@@ -560,12 +560,12 @@ function at <code>0x1189</code>.
 
 <p>
 Since we saw how it was called, we can determine the number of parameters and
-the types. We also know that the first argument is the user, and that it's
+the types. We also know that the first argument is the user, and that it&rsquo;s
 calculating the string length once at <code>f+0x17</code>.
 </p>
 
 <p>
-We also know that the second parameter is a <code>char*</code> because it's storing <code>rsi</code> in
+We also know that the second parameter is a <code>char*</code> because it&rsquo;s storing <code>rsi</code> in
 <code>[rbp - 0x20]</code>, and from <code>f+0x9d</code> to <code>f+0xa8</code> it moves that value to <code>rax</code>, adds it to
 <code>rdx</code> (probably using <code>rdx</code> as an index) and finally it access its contents with
 <code>byte [rdx]</code>.
@@ -576,16 +576,16 @@ We can also identify a <code>for</code> loop, since at <code>f+0x26</code> it se
 before jumping to <code>f+0xc1</code>, where it checks if this value is less or equal than
 <code>0x13</code> (19) and jumps back to the top. Right before this conditional jump, we can
 see that the value at <code>[rbp - 8]</code> is increased by one. Note how the value in the
-loop's condition is the same as the one we saw being used as the <i>size</i> parameter
+loop&rsquo;s condition is the same as the one we saw being used as the <i>size</i> parameter
 when calling <code>memcmp</code> from <code>main</code> (Since <code>i&lt;=19</code> is the same as <code>i&lt;20</code>).
 </p>
 
 <p>
 We see some local variable (<code>[rbp - 0xc]</code>) being initialized to 0 in <code>f+0x1f</code>, that
-will be incremented by one in <code>f+0xaa</code>, and that will be set to zero if it's
+will be incremented by one in <code>f+0xaa</code>, and that will be set to zero if it&rsquo;s
 greater or equal than the user length (<code>f+0xaa</code> to <code>f+0xb6</code>). We can determine that
 this is some kind of index being used for the <code>user</code> string, that will be
-incremented each iteration unless it's out of bounds, in which case it will be
+incremented each iteration unless it&rsquo;s out of bounds, in which case it will be
 set back to 0.
 </p>
 
@@ -611,7 +611,7 @@ From this, we can identify a basic structure:
 </div>
 
 <p>
-Let's take a look at the body of the loop. We can see how it's loading the
+Let&rsquo;s take a look at the body of the loop. We can see how it&rsquo;s loading the
 <code>user_pos</code> into <code>rdx</code>, and the first argument into <code>rax</code>, before adding them together
 and dereferencing the address into <code>[rbp - 0xd]</code>.
 </p>
@@ -756,7 +756,7 @@ This is the final key generation function:
 <h2 id="alternative-decompiling-with-ida-or-ghidra"><span class="section-number-2">5.</span> Alternative: Decompiling with IDA or ghidra</h2>
 <div class="outline-text-2" id="text-alternative-decompiling-with-ida-or-ghidra">
 <p>
-This option is not always reliable or not always available, so it's important to
+This option is not always reliable or not always available, so it&rsquo;s important to
 understand how the actual assembly works before jumping into the decompiler.
 </p>
 
@@ -769,7 +769,7 @@ has <a href="https://github.com/rizinorg/rz-ghidra">its own ghidra</a> plugin ma
 
 <p>
 I will show a comparison between these two decompilers, but keep in mind that
-decompiling a single program doesn't provide nearly enough data to judge the two
+decompiling a single program doesn&rsquo;t provide nearly enough data to judge the two
 decompilers.
 </p>
 
@@ -819,7 +819,7 @@ equivalent and the second is more likely to be used.
 </div>
 
 <div id="outline-container-rizins-version-of-ghidra" class="outline-3">
-<h3 id="rizins-version-of-ghidra"><span class="section-number-3">5.2.</span> Rizin's version of ghidra</h3>
+<h3 id="rizins-version-of-ghidra"><span class="section-number-3">5.2.</span> Rizin&rsquo;s version of ghidra</h3>
 <div class="outline-text-3" id="text-rizins-version-of-ghidra">
 <p>
 This is the generated C code by <i>rizin 0.6.1 @ linux-x86-64</i>.
@@ -859,12 +859,12 @@ This is the generated C code by <i>rizin 0.6.1 @ linux-x86-64</i>.
 </div>
 
 <p>
-I am not sure why it's throwing all those warnings, and why it's using <code>var_14h</code>
+I am not sure why it&rsquo;s throwing all those warnings, and why it&rsquo;s using <code>var_14h</code>
 all the time instead of using <code>var_ch</code>, for example.
 </p>
 
 <p>
-I manually removed the type casts from rizin's output since I disabled them for
+I manually removed the type casts from rizin&rsquo;s output since I disabled them for
 IDA.
 </p>
 </div>

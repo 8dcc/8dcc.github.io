@@ -260,7 +260,7 @@ bit to fit the <a href="https://www.nasm.us/">nasm</a> syntax.
 <h2 id="analysis"><span class="section-number-2">2.</span> Analysis</h2>
 <div class="outline-text-2" id="text-analysis">
 <p>
-Let's try to figure this out step by step.
+Let&rsquo;s try to figure this out step by step.
 </p>
 
 <p>
@@ -276,7 +276,7 @@ compiled with <code>-m32</code>, it follows the <a href="https://www.sco.com/dev
 <p>
 Argument words are pushed onto the stack in reverse order (that is, the
 rightmost argument in C call syntax has the highest address), preserving the
-stack's word alignment. All incoming arguments appear on the stack, residing in
+stack&rsquo;s word alignment. All incoming arguments appear on the stack, residing in
 the stack frame of the caller.
 </p>
 </blockquote>
@@ -294,7 +294,7 @@ to the <code>esp</code> register to skip over the return address and get the par
 
 <p>
 Note that we are <b>not</b> using the <code>ebp</code> register to preserve the stack frame. If the
-function started like this, we would also have to "skip" over the pushed <code>ebp</code> to
+function started like this, we would also have to &ldquo;skip&rdquo; over the pushed <code>ebp</code> to
 access the parameters:
 </p>
 
@@ -349,7 +349,7 @@ lower part in <code>edx</code>.
 </div>
 
 <p>
-After that, it shifts <code>eax</code> 4 bits to the left, <code>edx</code> 4 bits to the right, and OR's
+After that, it shifts <code>eax</code> 4 bits to the left, <code>edx</code> 4 bits to the right, and OR&rsquo;s
 them back together.
 </p>
 
@@ -361,10 +361,10 @@ them back together.
 </div>
 
 <p>
-Let's try to visualize these last steps with an example:
+Let&rsquo;s try to visualize these last steps with an example:
 </p>
 
-<pre class="example" id="org6e794de">
+<pre class="example" id="org39218fa">
 Base number:    0xDEADBEEF  0b11011110101011011011111011101111
 
 After masking:  0x0E0D0E0F  0b00001110000011010000111000001111 (eax)
@@ -437,7 +437,7 @@ Which matches the previous operations.
 </p>
 
 <p>
-The final OR'd result will be saved to <code>eax</code> and returned.
+The final OR&rsquo;d result will be saved to <code>eax</code> and returned.
 </p>
 </div>
 </div>

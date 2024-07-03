@@ -251,7 +251,7 @@ was so broken that you could fly anywhere, clip into stuff, and do much more.
 </p>
 
 
-<div id="org54e3202" class="figure">
+<div id="orgbe314b1" class="figure">
 <p><img src="../img/mordhau1.jpg" alt="mordhau1.jpg" />
 </p>
 </div>
@@ -270,7 +270,7 @@ since the developers did such a bad job, but it was not the same.
 </p>
 
 
-<div id="org5f903aa" class="figure">
+<div id="org267d178" class="figure">
 <p><img src="../img/mordhau2.jpg" alt="mordhau2.jpg" />
 </p>
 </div>
@@ -278,7 +278,7 @@ since the developers did such a bad job, but it was not the same.
 <p>
 The game is only available for Windows (and consoles), but you can still run it
 on GNU/Linux through <a href="https://github.com/ValveSoftware/Proton">Proton</a>. A friend I met while playing told me about this,
-and it's in fact what made me definitely switch from Windows to GNU/Linux on my
+and it&rsquo;s in fact what made me definitely switch from Windows to GNU/Linux on my
 main computer.
 </p>
 
@@ -310,11 +310,11 @@ Not only do they lack an anti-cheat, but they look like <b>they want people to
 cheat</b> in their game. Years ago I noticed that they published an update with a
 <a href="https://en.wikipedia.org/wiki/Program_database">PDB</a> file, which contains very useful debugging information. I remember copying
 it quickly after noticing, because I <i>obviously</i> thought it was a mistake. Well,
-let's have a look at the binaries folder now.
+let&rsquo;s have a look at the binaries folder now.
 </p>
 
 
-<div id="orged5078c" class="figure">
+<div id="org1a72f04" class="figure">
 <p><img src="../img/mordhau3.png" alt="mordhau3.png" />
 </p>
 </div>
@@ -323,7 +323,7 @@ let's have a look at the binaries folder now.
 There it is, the third file on the list. They have been shipping the debugging
 information along the game for <b>years</b>. This is a big mistake, that allows anyone
 (with some reversing knowledge) to basically browse the source code of the
-game. I am assuming they don't know what the file is, so they just leave it in
+game. I am assuming they don&rsquo;t know what the file is, so they just leave it in
 the output folder because they assume that the game needs it.
 </p>
 
@@ -334,15 +334,15 @@ covered bellow.
 </p>
 
 <p>
-As a side note, I think it's very funny that this could happen to the developers
-to begin with. I don't know what they used to compile this program, but I think
+As a side note, I think it&rsquo;s very funny that this could happen to the developers
+to begin with. I don&rsquo;t know what they used to compile this program, but I think
 the compiler/IDE should only generate this <code>.pdb</code> file when compiling in <i>debug
 mode</i>, and not in <i>release mode</i>. I am not sure if this means that they are
 shipping the debug version or not.
 </p>
 
 <p>
-In any case, this is very funny, and it reminded me of how I didn't know what
+In any case, this is very funny, and it reminded me of how I didn&rsquo;t know what
 object files were when I first started with C/C++, so I was not sure about
 including them on my git projects or not.
 </p>
@@ -350,8 +350,8 @@ including them on my git projects or not.
 <p>
 This article was been written in May of 2024, so keep in mind that they might
 have actually removed the <code>.pdb</code> file after I spoon-fed this information to
-them. If it's still there, you can import it from IDA Pro, although the rest of
-this article doesn't asume you have imported it.
+them. If it&rsquo;s still there, you can import it from IDA Pro, although the rest of
+this article doesn&rsquo;t asume you have imported it.
 </p>
 </div>
 </div>
@@ -360,7 +360,7 @@ this article doesn't asume you have imported it.
 <h3 id="my-motives"><span class="section-number-3">1.3.</span> My motives</h3>
 <div class="outline-text-3" id="text-my-motives">
 <p>
-I like reverse engineering, and I enjoy a few video-games. That's why, if I
+I like reverse engineering, and I enjoy a few video-games. That&rsquo;s why, if I
 really enjoy playing a game, I might try to reverse engineer it, to see how it
 was done. Since I use GNU/Linux, I mainly enjoy reversing native Linux programs
 and games. Even if I really enjoy a Windows video-game, the reversing interest
@@ -378,28 +378,28 @@ developers were clueless.
 <p>
 I knew I could get banned, because I found things that I had never seen anyone
 do before, but I decided that I had played the game long enough, and that I
-didn't care if I got banned. I rather have fun my way, than just play normally
+didn&rsquo;t care if I got banned. I rather have fun my way, than just play normally
 to avoid getting banned. I even took notes on writing this article once I got
 banned.
 </p>
 
 <p>
-I don't particularly enjoy <i>cheating</i>, as in, getting an unfair advantage over
+I don&rsquo;t particularly enjoy <i>cheating</i>, as in, getting an unfair advantage over
 other players. I like reversing and making cheats because I enjoy the low-level
 aspect of understanding a game enough to do something that the developers are
 actively trying to prevent you from doing. That was a long sentence, by the way.
 </p>
 
 <p>
-And indeed, I started reversing the game on January 2024, and I didn't get
+And indeed, I started reversing the game on January 2024, and I didn&rsquo;t get
 banned until May of 2024. I think I saw a moderator in-game once&#x2026; and it was
 before starting reversing the game. In the end, it was a jealous kid who
-reported my account because I wouldn't tell him how to <a href="https://en.wikipedia.org/wiki/T-pose">T-pose</a> in game. They
+reported my account because I wouldn&rsquo;t tell him how to <a href="https://en.wikipedia.org/wiki/T-pose">T-pose</a> in game. They
 immediately banned me exclusively based on my screenshots.
 </p>
 
 
-<div id="orga01b045" class="figure">
+<div id="orge131a90" class="figure">
 <p><img src="../img/mordhau4.png" alt="mordhau4.png" />
 </p>
 </div>
@@ -419,14 +419,14 @@ wanted since I started reversing the game, just like I did with <a href="devilda
 <div class="outline-text-2" id="text-finding-the-necessary-offsets-with-ida-pro">
 <p>
 As I said, the game is made in Unreal Engine 4. There is an amazing tool called
-<a href="https://github.com/Spuckwaffel/UEDumper">UEDumper</a>, which allows you to explore the game's structures, even live. However,
-this is a "universal" dumper, and it needs some offsets. We are going to get
+<a href="https://github.com/Spuckwaffel/UEDumper">UEDumper</a>, which allows you to explore the game&rsquo;s structures, even live. However,
+this is a &ldquo;universal&rdquo; dumper, and it needs some offsets. We are going to get
 them using <a href="https://en.wikipedia.org/wiki/Interactive_Disassembler">IDA Pro</a>.
 </p>
 
 <p>
 This is meant to be a quick guide for getting the needed offsets by <code>UEDumper</code>, so
-I won't be diving into too much detail. The general method for finding them is
+I won&rsquo;t be diving into too much detail. The general method for finding them is
 to look at the Unreal Engine 4 source code, find where these symbols are used,
 and look for cross references you can use. Try looking for close strings, and
 things you can easily find from IDA.
@@ -452,7 +452,7 @@ pressing <code>Shift+F12</code>. From there, right click on the string list and 
 </p>
 
 
-<div id="org92fcd84" class="figure">
+<div id="org6def638" class="figure">
 <p><img src="../img/mordhau5.png" alt="mordhau5.png" />
 </p>
 </div>
@@ -472,7 +472,7 @@ not 16-bits.
 </p>
 
 
-<div id="orgfe469dd" class="figure">
+<div id="org335028b" class="figure">
 <p><img src="../img/mordhau6.png" alt="mordhau6.png" />
 </p>
 </div>
@@ -483,20 +483,20 @@ the <code>aMulticastdeleg</code> symbol, or by pressing the <code>x</code> key. 
 </p>
 
 
-<div id="org9254f3d" class="figure">
+<div id="orgff443a4" class="figure">
 <p><img src="../img/mordhau7.png" alt="mordhau7.png" />
 </p>
 </div>
 
 <p>
 You are now in a big subroutine that handles a lot of strings. I opened the
-decompiler window so it's easier to tell what's going on, but it's not
+decompiler window so it&rsquo;s easier to tell what&rsquo;s going on, but it&rsquo;s not
 necessary. From the assembly view, scroll to the top of the subroutine and list
 its cross references.
 </p>
 
 
-<div id="orged652e3" class="figure">
+<div id="org1e2c973" class="figure">
 <p><img src="../img/mordhau8.png" alt="mordhau8.png" />
 </p>
 </div>
@@ -509,7 +509,7 @@ this.
 </p>
 
 
-<div id="orgef0ab2d" class="figure">
+<div id="org6696de8" class="figure">
 <p><img src="../img/mordhau9.png" alt="mordhau9.png" />
 </p>
 </div>
@@ -522,7 +522,7 @@ I marked the location from IDA.
 </p>
 
 <p>
-However, <code>0x57BEE80</code> is not the <i>real</i> offset of <code>GNames</code>. This is the "absolute"
+However, <code>0x57BEE80</code> is not the <i>real</i> offset of <code>GNames</code>. This is the &ldquo;absolute&rdquo;
 offset that IDA shows us, which would be accurate if we were loaded at
 <code>0x0</code>. However, we want to get the relative offset to where the executable was
 mapped in memory. To get this relative offset, we will need to subtract the
@@ -531,7 +531,7 @@ prompt.
 </p>
 
 
-<div id="orgaf79933" class="figure">
+<div id="org7dd6cf7" class="figure">
 <p><img src="../img/mordhau10.png" alt="mordhau10.png" />
 </p>
 </div>
@@ -548,13 +548,13 @@ parameter.
 </p>
 
 
-<div id="orgfc068c0" class="figure">
+<div id="org3f40654" class="figure">
 <p><img src="../img/mordhau11.png" alt="mordhau11.png" />
 </p>
 </div>
 
 <p>
-Right before that function call, you can see that it's checking for a
+Right before that function call, you can see that it&rsquo;s checking for a
 <code>byte_57D7AEC</code> value. This is the assembly generated when compiling the following
 Unreal Engine code.
 </p>
@@ -570,7 +570,7 @@ Unreal Engine code.
 
 <p>
 The <code>OpenForDisregardForGC</code> value being checked is a 4-byte padded boolean. In the
-<code>GUObjectArray</code> structure, it's located right before the <code>ObjObjects</code>
+<code>GUObjectArray</code> structure, it&rsquo;s located right before the <code>ObjObjects</code>
 array. Therefore, we can simply add 4 bytes to that <code>byte_57D7AEC</code> value, and we
 will get the offset of <code>GObjects</code>. Again, remember to also subtract the <code>ImageBase</code>.
 </p>
@@ -586,7 +586,7 @@ jump to its only xref. Once you are in the subroutine, press <code>F5</code> to 
 </p>
 
 
-<div id="org8f549bf" class="figure">
+<div id="org1e0cc32" class="figure">
 <p><img src="../img/mordhau12.png" alt="mordhau12.png" />
 </p>
 </div>
@@ -597,7 +597,7 @@ near it, and the the decompiled subroutine looks pretty clean.
 </p>
 
 <p>
-We are looking for that <code>qword_590DC40</code> line at the bottom. That's the <code>UWorld</code>
+We are looking for that <code>qword_590DC40</code> line at the bottom. That&rsquo;s the <code>UWorld</code>
 global variable, but remember that we still need to subtract the <code>ImageBase</code>.
 </p>
 
@@ -673,8 +673,8 @@ The first offset should be <code>GNames</code>, the second <code>GObjects</code>
 </p>
 
 <p>
-Then, you can save the file and compile the project using the "Release" version
-in the top bar of Visual Studio. Unfortunately I can't insert a screenshot
+Then, you can save the file and compile the project using the &ldquo;Release&rdquo; version
+in the top bar of Visual Studio. Unfortunately I can&rsquo;t insert a screenshot
 because I compiled the project once, back when I had Windows installed. Just
 imagine how often the developers update their game.
 </p>
@@ -687,7 +687,7 @@ as Mordhau.
 </p>
 
 
-<div id="org5450bc9" class="figure">
+<div id="org1b3c6e4" class="figure">
 <p><img src="../img/mordhau13.png" alt="mordhau13.png" />
 </p>
 </div>
@@ -695,33 +695,33 @@ as Mordhau.
 <p>
 Enter any project name and the name of the Mordhau executable. Again, remember
 this is not <code>Mordhau.exe</code> but <code>Mordhau-Win64-Shipping.exe</code>. When you have done this,
-press "Dump Game". If your offsets were correct, you should see something like
+press &ldquo;Dump Game&rdquo;. If your offsets were correct, you should see something like
 this.
 </p>
 
 
-<div id="org7acf910" class="figure">
+<div id="org95933a1" class="figure">
 <p><img src="../img/mordhau14.png" alt="mordhau14.png" />
 </p>
 </div>
 
 <p>
-Once it's done loading, you can start inspecting the game live. Press "Live
-editor" on the top bar, then the "Add Inspector" button, then switch to the "Add
-Offset" tab, select <code>UWorld</code>, and enter any display name.
+Once it&rsquo;s done loading, you can start inspecting the game live. Press &ldquo;Live
+editor&rdquo; on the top bar, then the &ldquo;Add Inspector&rdquo; button, then switch to the &ldquo;Add
+Offset&rdquo; tab, select <code>UWorld</code>, and enter any display name.
 </p>
 
 
-<div id="org3fc60bc" class="figure">
+<div id="org364ec43" class="figure">
 <p><img src="../img/mordhau15.png" alt="mordhau15.png" />
 </p>
 </div>
 
 <p>
-After pressing "Add", you should be able to see the structures in a nice
-format. Expand "UWorld", and you will be able to navigate the game's structures
+After pressing &ldquo;Add&rdquo;, you should be able to see the structures in a nice
+format. Expand &ldquo;UWorld&rdquo;, and you will be able to navigate the game&rsquo;s structures
 by name. Each <code>+0030</code> value in red represents an offset relative to the parent. If
-you expand a structure, you are "dereferencing" it, and its offsets will be
+you expand a structure, you are &ldquo;dereferencing&rdquo; it, and its offsets will be
 relative to that parent. In other words, you are traversing a chain (or tree) of
 pointers.
 </p>
@@ -841,7 +841,7 @@ until now, you might realize what these numbers mean, and what to do with them.
 I am sorry if someone was expecting a quick guide on how to break X
 animation. You can do everything I did with the numbers above. I intentionally
 wanted to make this misleading to inexperienced programmers, so the game
-developers couldn't figure out how I did my magic.
+developers couldn&rsquo;t figure out how I did my magic.
 </p>
 
 <p>
