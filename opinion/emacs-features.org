@@ -313,6 +313,16 @@ to compile (e.g. run =make=) from the root of your project, instead of running i
 from the directory of the current buffer. The projectile package has many
 similar commands, so make sure you check it out.
 
+** Ediff
+:PROPERTIES:
+:CUSTOM_ID: ediff
+:END:
+
+This package allows you to compare files, buffers and much more. It's similar to
+the =diff= command, but much more interactive and integrated with Emacs and Magit.
+
+[[file:../img/emacs-ediff.png]]
+
 ** Browser and external documentation
 :PROPERTIES:
 :CUSTOM_ID: browser-and-external-documentation
@@ -475,39 +485,29 @@ change in the future, so keep that in mind.
 :CUSTOM_ID: evil-mode
 :END:
 
-TODO
+This package allows you to use vi's keybinds in Emacs. I would not use emacs if
+it wasn't for this package. Not much else to be said. This is its [[https://github.com/emacs-evil/evil][GitHub
+repository]].
 
 ** Magit
 :PROPERTIES:
 :CUSTOM_ID: magit
 :END:
 
-TODO
+This package provides a great interface for Git, and is very well integrated
+with Emacs.
 
-** Ediff
-:PROPERTIES:
-:CUSTOM_ID: ediff
-:END:
+[[file:../img/emacs-magit.png]]
 
-TODO
-
-Integration with magit
+It's a very well known package, but this is it's [[https://magit.vc/][homepage]].
 
 ** Vundo
 :PROPERTIES:
 :CUSTOM_ID: vundo
 :END:
 
-TODO
+The Emacs undo system is great because, unlike many other editors, treats the
+change history as a /tree/ rather than a /linear history/. This makes it a bit
+harder to get used to (tip: use =undo-redo=), but ensures that no change is lost.
 
-Just a graph for the Emacs undo system, I can keep the old undo-redo with =u= and
-=C-r=.
-
-* Honorable mentions
-:PROPERTIES:
-:CUSTOM_ID: honorable-mentions
-:END:
-
-TODO
-
-Which-key, consult packages, etc.
+The [[https://github.com/casouri/vundo][vundo]] package provides a (navigable) graph for the Emacs undo system.

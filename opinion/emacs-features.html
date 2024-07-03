@@ -228,21 +228,20 @@
 <li><a href="#eshell">3.3. Eshell</a></li>
 <li><a href="#grep">3.4. Grep</a></li>
 <li><a href="#compilation">3.5. Compilation</a></li>
-<li><a href="#browser-and-external-documentation">3.6. Browser and external documentation</a></li>
-<li><a href="#erc">3.7. ERC</a></li>
-<li><a href="#c-macro-expansion">3.8. C macro expansion</a></li>
-<li><a href="#calculator">3.9. Calculator</a></li>
+<li><a href="#ediff">3.6. Ediff</a></li>
+<li><a href="#browser-and-external-documentation">3.7. Browser and external documentation</a></li>
+<li><a href="#erc">3.8. ERC</a></li>
+<li><a href="#c-macro-expansion">3.9. C macro expansion</a></li>
+<li><a href="#calculator">3.10. Calculator</a></li>
 </ul>
 </li>
 <li><a href="#external-packages">4. External packages</a>
 <ul>
 <li><a href="#evil-mode">4.1. Evil mode</a></li>
 <li><a href="#magit">4.2. Magit</a></li>
-<li><a href="#ediff">4.3. Ediff</a></li>
-<li><a href="#vundo">4.4. Vundo</a></li>
+<li><a href="#vundo">4.3. Vundo</a></li>
 </ul>
 </li>
-<li><a href="#honorable-mentions">5. Honorable mentions</a></li>
 </ul>
 </div>
 </div>
@@ -543,7 +542,7 @@ using very long plain comments within a single source.
 </p>
 
 
-<div id="orgc3f8ac8" class="figure">
+<div id="org816c30c" class="figure">
 <p><img src="../img/emacs-org.png" alt="emacs-org.png" />
 </p>
 </div>
@@ -582,7 +581,7 @@ Behold, the beauty of GNU Emacs (at least since version 22.1).
 </p>
 
 
-<div id="orgf6ba2e0" class="figure">
+<div id="org9c8584f" class="figure">
 <p><img src="../img/emacs-gdb.png" alt="emacs-gdb.png" />
 </p>
 </div>
@@ -672,7 +671,7 @@ displays the matches in an interactive buffer.
 </p>
 
 
-<div id="org0267ec0" class="figure">
+<div id="org9d295fa" class="figure">
 <p><img src="../img/emacs-grep.png" alt="emacs-grep.png" />
 </p>
 </div>
@@ -710,8 +709,24 @@ similar commands, so make sure you check it out.
 </div>
 </div>
 
+<div id="outline-container-ediff" class="outline-3">
+<h3 id="ediff"><span class="section-number-3">3.6.</span> Ediff</h3>
+<div class="outline-text-3" id="text-ediff">
+<p>
+This package allows you to compare files, buffers and much more. It&rsquo;s similar to
+the <code>diff</code> command, but much more interactive and integrated with Emacs and Magit.
+</p>
+
+
+<div id="org5f2153a" class="figure">
+<p><img src="../img/emacs-ediff.png" alt="emacs-ediff.png" />
+</p>
+</div>
+</div>
+</div>
+
 <div id="outline-container-browser-and-external-documentation" class="outline-3">
-<h3 id="browser-and-external-documentation"><span class="section-number-3">3.6.</span> Browser and external documentation</h3>
+<h3 id="browser-and-external-documentation"><span class="section-number-3">3.7.</span> Browser and external documentation</h3>
 <div class="outline-text-3" id="text-browser-and-external-documentation">
 <p>
 Emacs has many commands related to documentation, but one of the most useful
@@ -731,7 +746,7 @@ you should be able to render it without issues.
 </div>
 
 <div id="outline-container-erc" class="outline-3">
-<h3 id="erc"><span class="section-number-3">3.7.</span> ERC</h3>
+<h3 id="erc"><span class="section-number-3">3.8.</span> ERC</h3>
 <div class="outline-text-3" id="text-erc">
 <p>
 <a href="https://www.gnu.org/software/emacs/manual/html_mono/erc.html">ERC</a> is a powerful <a href="https://es.wikipedia.org/wiki/Internet_Relay_Chat">IRC</a> client for Emacs, and it&rsquo;s included since version 22.3. I
@@ -756,7 +771,7 @@ from the manual:
 </div>
 
 <div id="outline-container-c-macro-expansion" class="outline-3">
-<h3 id="c-macro-expansion"><span class="section-number-3">3.8.</span> C macro expansion</h3>
+<h3 id="c-macro-expansion"><span class="section-number-3">3.9.</span> C macro expansion</h3>
 <div class="outline-text-3" id="text-c-macro-expansion">
 <p>
 Emacs allows you to expand C macros with <code>M-x c-macro-expand</code>. This is very useful
@@ -803,7 +818,7 @@ Emacs.
 </div>
 
 <div id="outline-container-calculator" class="outline-3">
-<h3 id="calculator"><span class="section-number-3">3.9.</span> Calculator</h3>
+<h3 id="calculator"><span class="section-number-3">3.10.</span> Calculator</h3>
 <div class="outline-text-3" id="text-calculator">
 <p>
 You can open the Emacs calculator with <code>M-x calc</code>. It uses <a href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">Reverse Polish Notation</a>
@@ -842,14 +857,14 @@ it&rsquo;s worth learning. See also the <a href="https://www.gnu.org/software/em
 </div>
 
 <div id="outline-container-quick-calculator" class="outline-4">
-<h4 id="quick-calculator"><span class="section-number-4">3.9.1.</span> Quick calculator</h4>
+<h4 id="quick-calculator"><span class="section-number-4">3.10.1.</span> Quick calculator</h4>
 <div class="outline-text-4" id="text-quick-calculator">
 <p>
 If you find this overwhelming, you might want to at least consider using
 <code>M-x quick-calc</code> for quick (but not necesarily simple) calculations. For example:
 </p>
 
-<pre class="example" id="orgc1102e2">
+<pre class="example" id="org6af66a0">
 M-x quick-calc RET
 Quick calc: 632+56-32*4+2^3
 Result: 632 + 56 - 32 4 + 2^3 =&gt;  568  (16#238, 8#1070, 2#1000111000)
@@ -866,7 +881,7 @@ Result: 3 x = 2 x + 18 =&gt;  x = 18
 </div>
 
 <div id="outline-container-personal-reference-card" class="outline-4">
-<h4 id="personal-reference-card"><span class="section-number-4">3.9.2.</span> Personal reference card</h4>
+<h4 id="personal-reference-card"><span class="section-number-4">3.10.2.</span> Personal reference card</h4>
 <div class="outline-text-4" id="text-personal-reference-card">
 <p>
 These are some keybinds that I use often, appart from the basic operations and
@@ -953,7 +968,9 @@ change in the future, so keep that in mind.
 <h3 id="evil-mode"><span class="section-number-3">4.1.</span> Evil mode</h3>
 <div class="outline-text-3" id="text-evil-mode">
 <p>
-TODO
+This package allows you to use vi&rsquo;s keybinds in Emacs. I would not use emacs if
+it wasn&rsquo;t for this package. Not much else to be said. This is its <a href="https://github.com/emacs-evil/evil">GitHub
+repository</a>.
 </p>
 </div>
 </div>
@@ -962,49 +979,35 @@ TODO
 <h3 id="magit"><span class="section-number-3">4.2.</span> Magit</h3>
 <div class="outline-text-3" id="text-magit">
 <p>
-TODO
-</p>
-</div>
-</div>
-
-<div id="outline-container-ediff" class="outline-3">
-<h3 id="ediff"><span class="section-number-3">4.3.</span> Ediff</h3>
-<div class="outline-text-3" id="text-ediff">
-<p>
-TODO
+This package provides a great interface for Git, and is very well integrated
+with Emacs.
 </p>
 
+
+<div id="orgb7eb953" class="figure">
+<p><img src="../img/emacs-magit.png" alt="emacs-magit.png" />
+</p>
+</div>
+
 <p>
-Integration with magit
+It&rsquo;s a very well known package, but this is it&rsquo;s <a href="https://magit.vc/">homepage</a>.
 </p>
 </div>
 </div>
 
 <div id="outline-container-vundo" class="outline-3">
-<h3 id="vundo"><span class="section-number-3">4.4.</span> Vundo</h3>
+<h3 id="vundo"><span class="section-number-3">4.3.</span> Vundo</h3>
 <div class="outline-text-3" id="text-vundo">
 <p>
-TODO
+The Emacs undo system is great because, unlike many other editors, treats the
+change history as a <i>tree</i> rather than a <i>linear history</i>. This makes it a bit
+harder to get used to (tip: use <code>undo-redo</code>), but ensures that no change is lost.
 </p>
 
 <p>
-Just a graph for the Emacs undo system, I can keep the old undo-redo with <code>u</code> and
-<code>C-r</code>.
+The <a href="https://github.com/casouri/vundo">vundo</a> package provides a (navigable) graph for the Emacs undo system.
 </p>
 </div>
-</div>
-</div>
-
-<div id="outline-container-honorable-mentions" class="outline-2">
-<h2 id="honorable-mentions"><span class="section-number-2">5.</span> Honorable mentions</h2>
-<div class="outline-text-2" id="text-honorable-mentions">
-<p>
-TODO
-</p>
-
-<p>
-Which-key, consult packages, etc.
-</p>
 </div>
 </div>
 </div>
