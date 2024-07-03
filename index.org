@@ -55,4 +55,12 @@ External links you might find interesting:
 Feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this blog if you find any errors or if you have any
 suggestions.
 
+* License and credits
+
+Copyright © 2024 8dcc. All Rights Reserved. The source code and content of this
+website is covered by GNU General Public License as published by the Free
+Software Foundation, version 3.
+
+Credits for the LaTeX theme idea: [[https://mell-o-tron.github.io/][Lorenzo Pace's blog]] and [[https://github.com/vincentdoerig/latex-css][LaTeX.css]].
+
 [[file:img/pepper.png]]
