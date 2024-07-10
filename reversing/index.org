@@ -11,7 +11,7 @@
 
 * List of articles
 
-List of articles related to general reversing:
+These articles are related to reverse engineering.
 
 - [[file:understanding-call-stack.org][Understanding and traversing the call stack]]
 - [[file:reversing-tf2-bsendpacket.org][Reversing TF2's bSendPacket]]
@@ -20,7 +20,8 @@ List of articles related to general reversing:
 - [[file:devildaggers.org][Reversing Devil Daggers]]
 - [[file:reversing-keygen.org][Reversing a simple keygen]]
 
-List of my articles solving [[https://yurichev.com/][Dennis Yurichev]]'s reverse engineering [[https://challenges.re/][challenges]]:
+These articles explain how to solve [[https://yurichev.com/][Dennis Yurichev]]'s reverse engineering
+[[https://challenges.re/][challenges]].
 
 - [[file:challenge2.org][Challenge 2]]
 - [[file:challenge3.org][Challenge 3]]
@@ -34,7 +35,7 @@ List of my articles solving [[https://yurichev.com/][Dennis Yurichev]]'s reverse
 
 * External resources
 
-Good resources for learning and practicing reverse engineering:
+These are some good resources for learning and practicing reverse engineering.
 
 - Félix Cloutier's [[https://www.felixcloutier.com/x86/][x86 and amd64 instruction reference]].
 - [[https://en.wikipedia.org/wiki/Reversing:_Secrets_of_Reverse_Engineering][Reversing: Secrets of Reverse Engineering]], by Eldad Eilam. Apart from RE, it's
