@@ -263,7 +263,7 @@ We can expand this formula with the last coin flip example.
 
 That is the correct entropy for our biased coin.
 
-** Entropy range
+* Entropy range
 :PROPERTIES:
 :CUSTOM_ID: entropy-range
 :END:
