@@ -1,0 +1,729 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Understanding entropy</title>
+<meta name="author" content="8dcc" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Understanding entropy</h1>
+<p>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
+</p>
+
+<hr />
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#introduction">1. Introduction</a></li>
+<li><a href="#what-is-entropy">2. What is entropy?</a></li>
+<li><a href="#calculating-entropy">3. Calculating entropy</a>
+<ul>
+<li><a href="#informational-value">3.1. Informational value</a></li>
+<li><a href="#averaging-the-informational-values">3.2. Averaging the &ldquo;informational values&rdquo;</a></li>
+<li><a href="#entropy-range">3.3. Entropy range</a></li>
+</ul>
+</li>
+<li><a href="#calculating-from-code">4. Calculating from code</a></li>
+<li><a href="#final-note">5. Final note</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-introduction" class="outline-2">
+<h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-introduction">
+<p>
+Some days ago I watched a talk by Christopher Domas titled <i>The future of RE
+Dynamic Binary Visualization</i> (<a href="https://www.youtube.com/watch?v=4bM3Gut1hIk">YouTube</a>). It showed a tool he made for visualizing
+various kinds of information in a binary. I was instantly intrigued by this, so
+I decided to check some of the other resources he mentioned in the talk. One of
+these resources was another talk by Greg Conti and Sergey Bratus titled <i>Voyage
+of the Reverser: A Visual Study of Binary Species</i> (<a href="https://www.youtube.com/watch?v=T3qqeP4TdPA">YouTube</a>). Another person
+that was mentioned in the first talk was <a href="https://corte.si">Aldo Cortesi</a>. I looked through his blog
+and found various good articles like <a href="https://corte.si/posts/visualisation/binvis/">Visualizing binaries with space-filling
+curves</a> and <a href="https://corte.si/posts/visualisation/entropy/">Visualizing entropy in binary files</a>.
+</p>
+
+<p>
+After watching those talks and reading those articles, I decided to make <a href="https://github.com/8dcc/bin-graph">my own
+tool</a> for generating PNG images based on binary information, similar to the
+ones used on those two talks. After adding various kind of graphs, I decided to
+add one for visualizing the entropy. This is specially useful, as I will explain
+below, for detecting compressed or encrypted regions, since they usually have a
+higher entropy.
+</p>
+
+<p>
+However, I wanted to make sure I understood what entropy is, and how it&rsquo;s
+calculated.
+</p>
+</div>
+</div>
+
+<div id="outline-container-what-is-entropy" class="outline-2">
+<h2 id="what-is-entropy"><span class="section-number-2">2.</span> What is entropy?</h2>
+<div class="outline-text-2" id="text-what-is-entropy">
+<p>
+<b>Entropy</b> refers to the average level of <i>information</i> or <i>surprise</i> in a set of
+values.
+</p>
+
+<p>
+For example, the bytes <code>12 12 12 12</code> have lower entropy than <code>A1 00 B7 12</code>. From now
+on, I will be referring to each one of those bytes as a <b>message</b>.
+</p>
+
+<p>
+To determine how <i>informative</i> a message is, we need to determine how likely it
+is. Messages with high probability are less informative, and messages with low
+probability are more informative. An example from <a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">Wikipedia</a>:
+</p>
+
+<blockquote>
+<p>
+The knowledge that some particular number will not be the winning number of a
+lottery provides very little information, because any particular chosen number
+will almost certainly not win. However, knowledge that a particular number will
+win a lottery has high informational value because it communicates the
+occurrence of a very low probability event.
+</p>
+</blockquote>
+
+<p>
+Another example that is normally used when talking about entropy is a coin
+flip. If the probability of a coin flip resulting in either heads or tails is
+50%, its entropy is very high, because all of its outcomes have the same
+probability. Each throw will be very informative/surprising. However, if the
+coin had a 100% chance of resulting in heads, the entropy will be zero because
+each throw has no &ldquo;informational value&rdquo;.
+</p>
+
+<p>
+The &ldquo;informational value&rdquo; of each possible message (e.g. getting heads) is
+somewhat inversely proportional to its probability. As you can see, the entropy
+is also related to how distributed the probabilities of each possible message
+are.
+</p>
+
+<p>
+This <a href="https://www.youtube.com/watch?v=YtebGVx-Fxw">YouTube video</a> has very good and simple explanations on entropy, and I will
+be using it as a sort of &ldquo;guide&rdquo; for part of this article.
+</p>
+</div>
+</div>
+
+<div id="outline-container-calculating-entropy" class="outline-2">
+<h2 id="calculating-entropy"><span class="section-number-2">3.</span> Calculating entropy</h2>
+<div class="outline-text-2" id="text-calculating-entropy">
+<p>
+I will start by showing the formula for calculating entropy according to what
+Claude Shannon wrote in his 1948 paper.
+</p>
+
+\begin{equation*}
+  H(X) = - \sum_{x \in \mathcal{X}} p(x) \log{p(x)}
+\end{equation*}
+
+<p>
+Where \(X\) is a <i>discrete random variable</i>, which takes values (i.e. messages) in
+the set \(\mathcal{X}\). The probability of each message is represented with
+\(p(x)\).
+</p>
+
+<p>
+As I explained in the introduction, my motivation for learning about entropy was
+measuring &ldquo;randomness&rdquo; in a list of bytes. In this example:
+</p>
+
+<ul class="org-ul">
+<li>The discrete random variable \(X\) would be the list of bytes itself (e.g.
+<code>A1 00 B7 12</code>).</li>
+<li>The set \(\mathcal{X}\) would be the possible range of each byte
+(i.e. \([0..255]\)). Each byte in \(X\) must belong to set \(\mathcal{X}\).</li>
+<li>The probability of each byte would be number of occurrences of that byte
+divided by the total number of bytes. For example, if the input is
+<code>41 41 AB 41</code>, the probability of &ldquo;randomly encountering&rdquo; the byte <code>41</code> is
+\(3/4=0.75\).</li>
+</ul>
+
+<p>
+The code for this example will be shown below, in case you are more familiar
+with that.
+</p>
+
+<p>
+I will explain each part of the formula in a way that could have helped me
+understand it when I was looking for information.
+</p>
+</div>
+
+<div id="outline-container-informational-value" class="outline-3">
+<h3 id="informational-value"><span class="section-number-3">3.1.</span> Informational value</h3>
+<div class="outline-text-3" id="text-informational-value">
+<p>
+As I said, the entropy can be defined as the average level of <i>information</i> in a
+set of messages. I also mentioned that the &ldquo;informational value&rdquo; of a possible
+message is somewhat inversely proportional to the probability of that
+message. Let&rsquo;s look at how this is really calculated.
+</p>
+
+<p>
+When calculating each surprise/informational value, it&rsquo;s tempting to just use
+the inverse of the probability of the message:
+</p>
+
+\begin{equation*}
+  \frac{1}{p(x)}
+\end{equation*}
+
+<p>
+Let&rsquo;s go back to the coin flip example. If our coin always results in heads, its
+probability is 1, and therefore the &ldquo;surprise&rdquo; should be zero. However,
+\(\frac{1}{1}\) is 1. This is one (but not the only) reason why the logarithm is
+used:
+</p>
+
+\begin{equation*}
+  \log \left( \frac{1}{p(x)} \right)
+\end{equation*}
+
+<p>
+Which can be simplified into:
+</p>
+
+\begin{equation*}
+  \log(1) - \log(p(x)) = - \log(p(x))
+\end{equation*}
+
+<p>
+This is how the two plots compare. The left one plots \(\frac{1}{x}\), and the
+right one plots \(\log_2(\frac{1}{x})\).
+</p>
+
+<p>
+<img src="../img/entropy1.png" alt="entropy1.png" />
+<img src="../img/entropy2.png" alt="entropy2.png" />
+</p>
+
+<p>
+The base of the logarithm doesn&rsquo;t usually matter but, since we are talking about
+bits and coin flips, base 2 is used.
+</p>
+
+<p>
+Now the &ldquo;surprise&rdquo; of getting heads will be 0, and and the &ldquo;surprise&rdquo; for
+getting tails will be <i>Undefined</i>. It makes sense that the surprise is <i>Undefined</i>
+when the probability is 0 because we should not be quantifying something that
+will never happen.
+</p>
+
+\begin{align*}
+  \text{surprise}(\text{Heads}) &=
+    \log_2 \left( \frac{1}{p(\text{Heads})} \right) =
+    \log_2 \left( \frac{1}{1} \right) =
+    \log_2 \left( 1 \right) = 0 \\
+  \text{surprise}(\text{Tails}) &=
+    \log_2 \left( \frac{1}{p(\text{Tails})} \right) =
+    \log_2 \left( \frac{1}{0} \right) = \text{Undefined}
+\end{align*}
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Message</th>
+<th scope="col" class="org-left">Probability</th>
+<th scope="col" class="org-left">Surprise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Heads</td>
+<td class="org-left">1.0</td>
+<td class="org-left">0.0</td>
+</tr>
+
+<tr>
+<td class="org-left">Tails</td>
+<td class="org-left">0.0</td>
+<td class="org-left"><i>Undefined</i></td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Let&rsquo;s look at another coin flip example where the probability of getting tails
+is not zero. Imagine the probability of the coin flip resulting in heads is 0.7
+and the probability of tails is 0.3. Note how the division is converted into
+subtraction using the properties of logarithms.
+</p>
+
+\begin{align*}
+  \text{surprise}(\text{Heads}) &=
+    \log_2 \left( \frac{1}{p(\text{Heads})} \right) =
+    \log_2 \left( \frac{1}{0.7} \right) =
+    \log_2(1) - \log_2(0.7) = 0.51 \\
+  \text{surprise}(\text{Tails}) &=
+    \log_2 \left( \frac{1}{p(\text{Tails})} \right) =
+    \log_2 \left( \frac{1}{0.3} \right) =
+    \log_2(1) - \log_2(0.3) = 1.73 \\
+\end{align*}
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Message</th>
+<th scope="col" class="org-left">Probability</th>
+<th scope="col" class="org-left">Surprise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Heads</td>
+<td class="org-left">0.7</td>
+<td class="org-left">0.51</td>
+</tr>
+
+<tr>
+<td class="org-left">Tails</td>
+<td class="org-left">0.3</td>
+<td class="org-left">1.73</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note how the entropy/surprise never depends on the messages themselves
+(i.e. coin results, byte values, etc.), it only depends on the <i>probability</i> of
+each message, \(p(x)\). As I mentioned before in the byte list example, the
+probability of encountering each byte would depend on the <i>number of occurrences</i>
+of that byte in the input set, relative to the total number of bytes.
+</p>
+</div>
+</div>
+
+<div id="outline-container-averaging-the-informational-values" class="outline-3">
+<h3 id="averaging-the-informational-values"><span class="section-number-3">3.2.</span> Averaging the &ldquo;informational values&rdquo;</h3>
+<div class="outline-text-3" id="text-averaging-the-informational-values">
+<p>
+Now that we have a way of calculating the &ldquo;informational value&rdquo; of each possible
+message, it seems like we just need to average all of these. Assuming \(N\) is the
+total number of messages, it might seem logical to do something like:
+</p>
+
+\begin{equation*}
+  H'(X) = \frac{ - \sum \log(p(x)) }{N}
+\end{equation*}
+
+<p>
+Using this formula in the last coin flip example, with probabilities of 0.7 and
+0.3, the result would be \(\approx 1.12\). This is not accurate.
+</p>
+
+<p>
+Let&rsquo;s take a look at the actual paper from Claude Shannon<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>.
+</p>
+
+<blockquote>
+<p>
+For each possible state \(i\) there will be a set of probabilities \(p_i(j)\) of
+producing the various possible symbols \(j\). Thus there is an entropy \(H_i\) for
+each state. The entropy of the source will be defined as the average of these
+\(H_i\) <b>weighted in accordance with the probability of occurrence of the states</b> in
+question.
+</p>
+</blockquote>
+
+<p>
+Just to be clear, let me compare Shannon&rsquo;s terms to the ones we have been using
+until now: \(i\) would be each element of the set \(\mathcal{X}\), \(p_i(j)\) would be
+\(p(x)\), \(j\) would be \(x\), and \(H_i\) is what we calculated in the previous
+section. Shannon also uses the term &ldquo;symbol&rdquo;, rather than &ldquo;message&rdquo;.
+</p>
+
+<p>
+The important part is that each &ldquo;informational value&rdquo; or state entropy must be
+weighted according to its probability. We can accomplish this by multiplying
+each entropy by its probability. With this, we get the entropy formula shown
+above.
+</p>
+
+\begin{equation*}
+  H(X) = - \sum_{x \in \mathcal{X}} p(x) \log_2{p(x)}
+\end{equation*}
+
+<p>
+Or alternatively, removing the negation:
+</p>
+
+\begin{equation*}
+  H(X) = \sum_{x \in \mathcal{X}} p(x) \log_2{\frac{1}{p(x)}}
+\end{equation*}
+
+<p>
+We can expand this formula with the last coin flip example.
+</p>
+
+\begin{align*}
+  H(\text{BiasedCoin})
+    &= \sum_{x \in \mathcal{X}} p(x) \log_2{\frac{1}{p(x)}} \\
+    &= p(\text{Heads}) \times \log_2(\frac{1}{p(\text{Heads})})
+     + p(\text{Tails}) \times \log_2(\frac{1}{p(\text{Tails})}) \\
+    &= 0.7 \times \log_2(\frac{1}{0.7}) + 0.3 \times \log_2(\frac{1}{0.3}) \\
+    &= 0.7 \times (\log_2(1) - \log_2(0.7))
+     + 0.3 \times (\log_2(1) - \log_2(0.3)) \\
+    &\approx 0.36 + 0.52 \\
+    &\approx 0.88
+\end{align*}
+
+<p>
+That is the correct entropy for our biased coin.
+</p>
+</div>
+</div>
+
+<div id="outline-container-entropy-range" class="outline-3">
+<h3 id="entropy-range"><span class="section-number-3">3.3.</span> Entropy range</h3>
+<div class="outline-text-3" id="text-entropy-range">
+<p>
+The range of the entropy depends on the maximum <b>number of possible distinct
+messages</b> in the input. In other words, the number of elements in the set
+\(\mathcal{X}\). Specifically, it&rsquo;s the logarithm of this number, and its base
+depends on the one used when calculating the entropy.
+</p>
+
+<p>
+For example, the entropy of a list of bytes will always be in the \([0..8]\)
+range, since the elements of \(\mathcal{X}\) are \([0..255]\) (number of possible
+states in a byte), and \(\log_2(256) = 8\).
+</p>
+
+<p>
+If you are having trouble understanding this, it might help to look at the
+entropy formula when \(N\) messages have the same \(\frac{1}{N}\) probability.
+</p>
+
+\begin{equation*}
+  -N \times \frac{1}{N} \times \log_2 \left( \frac{1}{N} \right) =
+  - \log_2 \left( \frac{1}{N} \right)
+\end{equation*}
+</div>
+</div>
+</div>
+
+<div id="outline-container-calculating-from-code" class="outline-2">
+<h2 id="calculating-from-code"><span class="section-number-2">4.</span> Calculating from code</h2>
+<div class="outline-text-2" id="text-calculating-from-code">
+<p>
+This C function shows how the entropy can be calculated from code.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #44bc44; font-weight: bold;">NOTE:</span><span style="color: #989898;"> Remember to link with -lm</span><span style="color: #989898;"> */</span>
+
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stddef.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">size_t</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">uint8_t</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;math.h&gt;</span>   <span style="color: #989898;">/* </span><span style="color: #989898;">log2()</span><span style="color: #989898;"> */</span>
+
+<span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">entropy</span>(<span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">data</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">data_sz</span>) {
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">occurrences</span>[<span style="color: #88ca9f;">256</span>];
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; <span style="color: #88ca9f;">256</span>; i++)
+        occurrences[i] = <span style="color: #88ca9f;">0</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Count the occurrences of each byte in the input</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; data_sz; i++) {
+        <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">byte</span> = data[i];
+        occurrences[byte]++;
+    }
+
+    <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">result</span> = <span style="color: #88ca9f;">0.0</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate each possible value in the [00..FF] range</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">byte</span> = <span style="color: #88ca9f;">0</span>; byte &lt; <span style="color: #88ca9f;">256</span>; byte++) {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Ignore this byte if there were no occurrences</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">if</span> (occurrences[byte] == <span style="color: #88ca9f;">0</span>)
+            <span style="color: #ff6f9f;">continue</span>;
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Probablity of encountering this byte on the input</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">probability</span> = (<span style="color: #79a8ff;">double</span>)occurrences[byte] / data_sz;
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">Since the log2 of [0..1] is always negative, we subtract from the</span>
+<span style="color: #989898;">         * total to increase its value.</span><span style="color: #989898;"> */</span>
+        result -= probability * log2(probability);
+    }
+
+    <span style="color: #ff6f9f;">return</span> result;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-final-note" class="outline-2">
+<h2 id="final-note"><span class="section-number-2">5.</span> Final note</h2>
+<div class="outline-text-2" id="text-final-note">
+<p>
+As I mentioned in many other articles, I am not an expert on this subject. I had
+a motivation for learning about entropy, and I decided to document my progress
+in case it could help someone. If you feel like some explanations could be
+improved, feel free to <a href="../index.html#contributing">contribute</a>.
+</p>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
+Claude Shannon. <i>A Mathematical Theory of Communication</i>. 1948.
+Section 7.
+</p></div></div>
+
+
+</div>
+</div></div>
+</body>
+</html>
