@@ -16,7 +16,7 @@
 :CUSTOM_ID: introduction
 :END:
 
-Some days ago I watched a talk by Christopher Domas titled /The future of RE
+Some days ago I watched a talk by Christopher Domas titled /The future of RE:
 Dynamic Binary Visualization/ ([[https://www.youtube.com/watch?v=4bM3Gut1hIk][YouTube]]). It showed a tool he made for visualizing
 various kinds of information in a binary. I was instantly intrigued by this, so
 I decided to check some of the other resources he mentioned in the talk. One of
@@ -28,10 +28,10 @@ curves]] and [[https://corte.si/posts/visualisation/entropy/][Visualizing entrop
 
 After watching those talks and reading those articles, I decided to make [[https://github.com/8dcc/bin-graph][my own
 tool]] for generating PNG images based on binary information, similar to the
-ones used on those two talks. After adding various kind of graphs, I decided to
-add one for visualizing the entropy. This is specially useful, as I will explain
-below, for detecting compressed or encrypted regions, since they usually have a
-higher entropy.
+ones used on those two talks. After adding various kinds of graphs, I decided to
+add one for visualizing the entropy. This is specially useful for reverse
+engineering, since compressed or encrypted regions usually have a higher
+entropy.
 
 However, I wanted to make sure I understood what entropy is, and how it's
 calculated.
@@ -44,12 +44,14 @@ calculated.
 *Entropy* refers to the average level of /information/ or /surprise/ in a set of
 values.
 
-For example, the bytes =12 12 12 12= have lower entropy than =A1 00 B7 12=. From now
-on, I will be referring to each one of those bytes as a *message*.
+For example, the list of bytes =12 12 12 12= has lower entropy than =A1 00 B7
+12=. From now on, the term *message* will be used to refer to each one of those
+elements of the list (in this case each byte).
 
-To determine how /informative/ a message is, we need to determine how likely it
-is. Messages with high probability are less informative, and messages with low
-probability are more informative. An example from [[https://en.wikipedia.org/wiki/Entropy_(information_theory)][Wikipedia]]:
+To determine how /informative/ a message is, we need to know how likely it
+is. Messages with a higher probability are less informative, and messages with a
+lower probability are more informative. I think this example from [[https://en.wikipedia.org/wiki/Entropy_(information_theory)][Wikipedia]] is
+very good:
 
 #+begin_quote
 The knowledge that some particular number will not be the winning number of a
@@ -61,8 +63,8 @@ occurrence of a very low probability event.
 
 Another example that is normally used when talking about entropy is a coin
 flip. If the probability of a coin flip resulting in either heads or tails is
-50%, its entropy is very high, because all of its outcomes have the same
-probability. Each throw will be very informative/surprising. However, if the
+50%, its entropy is very high because, since all of its outcomes have the same
+probability, each throw will be very informative/surprising. However, if the
 coin had a 100% chance of resulting in heads, the entropy will be zero because
 each throw has no "informational value".
 
@@ -72,18 +74,18 @@ is also related to how distributed the probabilities of each possible message
 are.
 
 This [[https://www.youtube.com/watch?v=YtebGVx-Fxw][YouTube video]] has very good and simple explanations on entropy, and I will
-be using it as a sort of "guide" for part of this article.
+be using some of its examples in this article.
 
 * Calculating entropy
 :PROPERTIES:
 :CUSTOM_ID: calculating-entropy
 :END:
 
-I will start by showing the formula for calculating entropy according to what
-Claude Shannon wrote in his 1948 paper.
+I will start by showing the formula for calculating entropy ($H$) according to
+what Claude Shannon wrote in his 1948 paper.
 
 \begin{equation*}
-  H(X) = - \sum_{x \in \mathcal{X}} p(x) \log{p(x)}
+  H(X) = - \sum_{x \in \mathcal{X}} p(x) \log_2(p(x))
 \end{equation*}
 
 Where $X$ is a /discrete random variable/, which takes values (i.e. messages) in
@@ -102,11 +104,11 @@ measuring "randomness" in a list of bytes. In this example:
   =41 41 AB 41=, the probability of "randomly encountering" the byte =41= is
   $3/4=0.75$.
 
-The code for this example will be shown below, in case you are more familiar
-with that.
+The code for this example (calculating the entropy of a list of bytes) will be
+shown [[*Calculating from code][below]], in case you are more familiar with that.
 
-I will explain each part of the formula in a way that could have helped me
-understand it when I was looking for information.
+I will try to explain each part of the formula as clearly as possible, in a way
+that could have helped me when I was trying to learn about this.
 
 ** Informational value
 :PROPERTIES:
@@ -127,8 +129,9 @@ the inverse of the probability of the message:
 
 Let's go back to the coin flip example. If our coin always results in heads, its
 probability is 1, and therefore the "surprise" should be zero. However,
-$\frac{1}{1}$ is 1. This is one (but not the only) reason why the logarithm is
-used:
+$\frac{1}{1}$ is 1.
+
+This is one (but not the only) reason why the logarithm is used:
 
 \begin{equation*}
   \log \left( \frac{1}{p(x)} \right)
@@ -147,10 +150,10 @@ right one plots $\log_2(\frac{1}{x})$.
 [[file:../img/entropy2.png]]
 
 The base of the logarithm doesn't usually matter but, since we are talking about
-bits and coin flips, base 2 is used.
+bits and coin flips, I will use base 2.
 
 Now the "surprise" of getting heads will be 0, and and the "surprise" for
-getting tails will be /Undefined/. It makes sense that the surprise is /Undefined/
+getting tails will be /undefined/. It makes sense that the surprise is /undefined/
 when the probability is 0 because we should not be quantifying something that
 will never happen.
 
@@ -179,11 +182,11 @@ subtraction using the properties of logarithms.
   \text{surprise}(\text{Heads}) &=
     \log_2 \left( \frac{1}{p(\text{Heads})} \right) =
     \log_2 \left( \frac{1}{0.7} \right) =
-    \log_2(1) - \log_2(0.7) = 0.51 \\
+    \log_2(1) - \log_2(0.7) \approx 0.51 \\
   \text{surprise}(\text{Tails}) &=
     \log_2 \left( \frac{1}{p(\text{Tails})} \right) =
     \log_2 \left( \frac{1}{0.3} \right) =
-    \log_2(1) - \log_2(0.3) = 1.73 \\
+    \log_2(1) - \log_2(0.3) \approx 1.73 \\
 \end{align*}
 
 | Message | Probability | Surprise |
@@ -212,7 +215,7 @@ total number of messages, it might seem logical to do something like:
 \end{equation*}
 
 Using this formula in the last coin flip example, with probabilities of 0.7 and
-0.3, the result would be $\approx 1.12$. This is not accurate.
+0.3, the result would be approximately 1.12, which is not accurate.
 
 Let's take a look at the actual paper from Claude Shannon[fn:shannon].
 
@@ -231,17 +234,17 @@ section. Shannon also uses the term "symbol", rather than "message".
 
 The important part is that each "informational value" or state entropy must be
 weighted according to its probability. We can accomplish this by multiplying
-each entropy by its probability. With this, we get the entropy formula shown
-above.
+each state entropy by its probability. With this, we get the entropy formula
+shown above.
 
 \begin{equation*}
-  H(X) = - \sum_{x \in \mathcal{X}} p(x) \log_2{p(x)}
+  H(X) = - \sum_{x \in \mathcal{X}} p(x) \log_2(p(x))
 \end{equation*}
 
 Or alternatively, removing the negation:
 
 \begin{equation*}
-  H(X) = \sum_{x \in \mathcal{X}} p(x) \log_2{\frac{1}{p(x)}}
+  H(X) = \sum_{x \in \mathcal{X}} p(x) \log_2 \left( \frac{1}{p(x)} \right)
 \end{equation*}
 
 We can expand this formula with the last coin flip example.
@@ -265,14 +268,16 @@ That is the correct entropy for our biased coin.
 :CUSTOM_ID: entropy-range
 :END:
 
-The range of the entropy depends on the maximum *number of possible distinct
-messages* in the input. In other words, the number of elements in the set
-$\mathcal{X}$. Specifically, it's the logarithm of this number, and its base
-depends on the one used when calculating the entropy.
+I wanted to briefly mention what determines the range of this entropy value.
 
-For example, the entropy of a list of bytes will always be in the $[0..8]$
-range, since the elements of $\mathcal{X}$ are $[0..255]$ (number of possible
-states in a byte), and $\log_2(256) = 8$.
+The possible range for the entropy of $X$ depends on the maximum *number of
+possible distinct messages* in the input. In other words, on the number of
+elements in the set $\mathcal{X}$. Specifically, it's the logarithm of this
+number, and its base depends on the one used when calculating the entropy.
+
+For example, assuming $\log_2$ is used, the entropy of a list of bytes will
+always be in the $[0..8]$ range, since the elements of $\mathcal{X}$ are
+$[0..255]$, and $\log_2(256) = 8$.
 
 If you are having trouble understanding this, it might help to look at the
 entropy formula when $N$ messages have the same $\frac{1}{N}$ probability.
@@ -287,7 +292,7 @@ entropy formula when $N$ messages have the same $\frac{1}{N}$ probability.
 :CUSTOM_ID: calculating-from-code
 :END:
 
-This C function shows how the entropy can be calculated from code.
+This C function shows how to calculate the entropy of an array of bytes.
 
 #+begin_src C
 /* NOTE: Remember to link with -lm */
