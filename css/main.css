@@ -9,9 +9,9 @@
     font-style: normal;
     font-weight: normal;
     font-display: swap;
-    src: url('../fonts/LM-regular.woff2') format('woff2'),
-         url('../fonts/LM-regular.woff') format('woff'),
-         url('../fonts/LM-regular.ttf') format('truetype');
+    src: url('../fonts/LM-regular.ttf') format('truetype'),
+         url('../fonts/LM-regular.woff2') format('woff2'),
+         url('../fonts/LM-regular.woff') format('woff');
 }
 
 @font-face {
@@ -19,9 +19,9 @@
     font-style: italic;
     font-weight: normal;
     font-display: swap;
-    src: url('../fonts/LM-italic.woff2') format('woff2'),
-         url('../fonts/LM-italic.woff') format('woff'),
-         url('../fonts/LM-italic.ttf') format('truetype');
+    src: url('../fonts/LM-italic.ttf') format('truetype'),
+         url('../fonts/LM-italic.woff2') format('woff2'),
+         url('../fonts/LM-italic.woff') format('woff');
 }
 
 @font-face {
@@ -29,9 +29,9 @@
     font-style: normal;
     font-weight: bold;
     font-display: swap;
-    src: url('../fonts/LM-bold.woff2') format('woff2'),
-         url('../fonts/LM-bold.woff') format('woff'),
-         url('../fonts/LM-bold.ttf') format('truetype');
+    src: url('../fonts/LM-bold.ttf') format('truetype'),
+         url('../fonts/LM-bold.woff2') format('woff2'),
+         url('../fonts/LM-bold.woff') format('woff');
 }
 
 @font-face {
@@ -39,9 +39,9 @@
     font-style: italic;
     font-weight: bold;
     font-display: swap;
-    src: url('../fonts/LM-bold-italic.woff2') format('woff2'),
-         url('../fonts/LM-bold-italic.woff') format('woff'),
-         url('../fonts/LM-bold-italic.ttf') format('truetype');
+    src: url('../fonts/LM-bold-italic.ttf') format('truetype'),
+         url('../fonts/LM-bold-italic.woff2') format('woff2'),
+         url('../fonts/LM-bold-italic.woff') format('woff');
 }
 
 /*----------------------------------------------------------------------------*/
@@ -124,7 +124,7 @@ a:hover {
 /*----------------------------------------------------------------------------*/
 
 blockquote {
-    background: #f9f9f9;
+    background: #F1F1F1;
     border-left: 5px solid #ccc;
     margin: 1.5em;
     padding: 0.5em 1.5em;
