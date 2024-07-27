@@ -143,11 +143,10 @@ Which can be simplified into:
   \log(1) - \log(p(x)) = - \log(p(x))
 \end{equation*}
 
-This is how the two plots compare. The left one plots $\frac{1}{x}$, and the
-right one plots $\log_2(\frac{1}{x})$.
+This is how the two plots compare.
 
+#+ATTR_HTML: :style max-width:400px
 [[file:../img/entropy1.png]]
-[[file:../img/entropy2.png]]
 
 The base of the logarithm doesn't usually matter but, since we are talking about
 bits and coin flips, I will use base 2.
