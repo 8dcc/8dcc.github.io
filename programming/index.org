@@ -20,4 +20,5 @@ These articles are about programming and math.
 - [[file:fmod.org][Implementing the modulus operator for floating-point numbers]]
 - [[file:asm-loop-conditionals.org][Optimizing loop conditions in assembly]]
 - [[file:switch-statement.org][Switch statements from a low-level perspective]]
+- [[file:color-transparency.org][Applying color transparencies]]
 - [[file:creating-keygen.org][Creating a simple keygen]]
