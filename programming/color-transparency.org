@@ -12,64 +12,85 @@
 #+TOC: headlines 2
 
 * The problem
+:PROPERTIES:
+:CUSTOM_ID: the-problem
+:END:
 
 Assume we have some RGB colors along with their transparencies, and we want to
-merge them together into a final RGB color, just like it would be displayed on a
+merge them together into the final RGB color that would be displayed on a
 screen.
 
-There are a few ways of accomplishing this depending on the inputs and the kind
-of transparency we want to apply. I chose two kinds of transparencies that I
-called /implicit/ and /explicit/.
+There are a few ways of accomplishing this depending on the input type and the
+kind of transparency we want to apply. I will show two kinds of transparencies
+that I chose to call /absolute/ and /relative/.
 
-** Explicit transparencies
+** Calculating absolute transparencies
+:PROPERTIES:
+:CUSTOM_ID: calculating-absolute-transparencies
+:END:
 
-Let's start with a simple example. We are given two RGB colors, and its
-transparencies. We also know that the transparencies add up to 1. We can simply
-multiply each R, G and B value by its transparency, and we add them together.
+By /absolute/ I mean that each transparency represents the direct proportion of
+each color in the result, and therefore the sum of all the transparencies is 1.
+
+Let's start with a simple example. We are given two RGB colors, and their
+absolute transparencies. To calculate the final RGB color, we can simply
+multiply each component (R, G and B) by the transparency, and add them together.
 
 $$
 f(C_1, t_1, C_2, t_2) = C_1 \times t_1 + C_2 \times t_2
 $$
 
 Where $C_n$ represents an RGB color, and $t_n$ represents its transparency. The
-result of the multiplication would be an RGB color whose components would have
-been multiplied by the transparency.
+result of the multiplication would be another RGB color, and each component
+would have been multiplied by the transparency.
 
-Since the transparencies add up to 1, this formula is valid for more than two
-colors:
+Since the transparencies must add up to 1, this formula is valid for more than
+two colors:
 
 $$
 f(C_1, t_1, \dots, C_n, t_n) = \sum_{i=1}^{n} C_i \times t_i
 $$
 
-** Implicit transparencies
+** Calculating relative transparencies
+:PROPERTIES:
+:CUSTOM_ID: calculating-relative-transparencies
+:END:
 
 Now let's imagine that the transparencies don't add up to 1. Instead, each
-transparency indicates the opacity of the color relative to the previous
-color. For example, if we want to "overlap" a color $C_2$ with transparency 0.7
-on top of an opaque color $C_1$ (with transparency 1), then each component of
-the final color should have 30% of $C_1$ and 70% of $C_2$. The formula for this
+transparency indicates the opacity of that color /relative/ to the previous one.
+
+For example, if we want to "overlap" a color $C_2$ with transparency 0.7 on top
+of an opaque color $C_1$ (with transparency 1), then each component of the final
+color should have 30% of $C_1$ and 70% of $C_2$. The formula for this
 calculation would be the following:
 
 $$
 f(C_1, C_2, t_2) = C_1 \times (1 - t_2) + C_2 \times t_2
 $$
 
-This always assumes that the first color is opaque. This makes sense, since a
-color with transparency smaller than one has to be "on top" of something, even
-if it's a black or white background.
+This always assumes that the first color is opaque, since a color with
+transparency smaller than one has to be applied "on top" of another color, even
+if it's an opaque black or white background.
 
-This formula can be used for more than two colors, but note that this formula is
-*not* associative, meaning the order of the colors or "layers" matters. I am
-honestly not sure how to represent this formula using mathematical notation, but
-feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this page.
+This can be used for more than two colors, but note that this formula is *not*
+associative, meaning the order of the colors or "layers" matters. I am honestly
+not sure how to represent this formula for $n$ inputs using mathematical
+notation, but feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this page.
 
 * Scheme implementation
+:PROPERTIES:
+:CUSTOM_ID: scheme-implementation
+:END:
 
-These functions can be used to calculate both explicit and implicit
-transparencies according to my previous definitions.
+The following Scheme functions can be used to calculate both absolute and
+relative transparencies according to my previous definitions.
 
-First, auxiliary functions for adding and scaling RGB colors.
+** Color arithmetic functions
+:PROPERTIES:
+:CUSTOM_ID: color-arithmetic-functions
+:END:
+
+First, some auxiliary functions for adding and scaling RGB colors.
 
 #+begin_src scheme
 (define (rgb-add a b)
@@ -85,60 +106,74 @@ First, auxiliary functions for adding and scaling RGB colors.
         (* scale (caddr rgb))))
 #+end_src
 
-The following function takes a list of colors and their respective
-transparencies and returns a solid RGB color. Assumes all transparencies add up
-to 1.
+For some other RGB functions, see my [[https://github.com/8dcc/scratch/tree/main/Lisp/misc/color-conversion][color conversion]] and [[https://github.com/8dcc/scratch/tree/main/Lisp/misc/color-palettes][color palettes]] folders
+inside my [[https://github.com/8dcc/scratch][scratch repo]].
+
+** Absolute transparencies
+:PROPERTIES:
+:CUSTOM_ID: absolute-transparencies
+:END:
+
+The following function takes a list of colors and their respective relative
+transparencies and returns a solid RGB color. Again, the sum of all
+transparencies is assumed to be 1.
 
 #+begin_src scheme
-(define (transparencies-explicit colors transparencies)
+(define (transparencies-absolute colors transparencies)
   (if (or (null? colors)
           (null? transparencies))
       '()
       (rgb-add (rgb-scale (car colors) (car transparencies))
-               (transparencies-explicit (cdr colors) (cdr transparencies)))))
+               (transparencies-absolute (cdr colors) (cdr transparencies)))))
 #+end_src
 
-Here's an example on how to use it.
+The following example uses the previous function with 3 transparent colors.
 
 #+begin_src scheme
 ;; (196 170 99)
-(transparencies-explicit '((255 110 66) (232 218 178) (75 238 104))
+(transparencies-absolute '((255 110 66) (232 218 178) (75 238 104))
                          '(0.5 0.2 0.3))
 #+end_src
 
+** Relative transparencies
+:PROPERTIES:
+:CUSTOM_ID: relative-transparencies
+:END:
+
 The following function takes a list of colors and their respective
-transparencies, but assumes they are /implicit/. The first transparency is
+transparencies, but assumes they are /relative/. The first transparency is
 ignored, and is assumed to be one.
 
 #+begin_src scheme
-(define (transparencies-implicit colors transparencies)
+(define (transparencies-relative colors transparencies)
   (define (apply-transparency c1 c2 t2)
     (rgb-add (rgb-scale c1 (- 1 t2))
              (rgb-scale c2 t2)))
 
-  (define (transparencies-implicit-reversed colors transparencies)
+  (define (transparencies-relative-reversed colors transparencies)
     (if (or (null? (cdr colors)))
         (car colors)
         (let ((cur-transparency (car transparencies)))
           (rgb-add (rgb-scale (car colors)
                               cur-transparency)
-                   (rgb-scale (transparencies-implicit-reversed (cdr colors) (cdr transparencies))
+                   (rgb-scale (transparencies-relative-reversed (cdr colors) (cdr transparencies))
                               (- 1 cur-transparency))))))
 
-  (transparencies-implicit-reversed (reverse colors)
+  (transparencies-relative-reversed (reverse colors)
                                     (reverse transparencies)))
 #+end_src
 
 Since the formula is not associative, we can't just use tail recursion on the
-original input. We reverse both =colors= and =transparencies= lists, and call an
-internal =transparencies-implicit-reversed= function that is able to call itself
-recursively with the rest of the input, effectively iterating from the end to
-the start of the lists.
+original inputs. The built-in =reverse= function is used on both =colors= and
+=transparencies= lists, and an internal =transparencies-relative-reversed= function
+is called. This internal function is able to call itself recursively with the
+rest of the input, effectively iterating from the end to the start of the lists.
 
-Here's an example on how to use it.
+This is an example on how to use the previous function. Note how the sum of the
+transparencies no longer has to be 1.
 
 #+begin_src scheme
 ;; (161 190 101)
-(transparencies-implicit '((255 110 66) (232 218 178) (75 238 104))
+(transparencies-relative '((255 110 66) (232 218 178) (75 238 104))
                          '(1 0.3 0.5))
 #+end_src
