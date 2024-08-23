@@ -194,38 +194,6 @@
 </style>
 <link rel="icon" type="image/x-icon" href="../img/favicon.png">
 <link rel="stylesheet" type="text/css" href="../css/main.css">
-<script>
-  window.MathJax = {
-    tex: {
-      ams: {
-        multlineWidth: '85%'
-      },
-      tags: 'ams',
-      tagSide: 'right',
-      tagIndent: '.8em'
-    },
-    chtml: {
-      scale: 1.0,
-      displayAlign: 'center',
-      displayIndent: '0em'
-    },
-    svg: {
-      scale: 1.0,
-      displayAlign: 'center',
-      displayIndent: '0em'
-    },
-    output: {
-      font: 'mathjax-modern',
-      displayOverflow: 'overflow'
-    }
-  };
-</script>
-
-<script
-  id="MathJax-script"
-  async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-</script>
 </head>
 <body>
 <div id="content" class="content">
@@ -243,6 +211,7 @@
 <li><a href="#introduction">1. Introduction</a></li>
 <li><a href="#pretested-and-posttested-loops">2. Pretested and posttested loops</a></li>
 <li><a href="#brainfuck-loops">3. Brainfuck loops</a></li>
+<li><a href="#compiler-generated-assembly">4. Compiler-generated assembly</a></li>
 </ul>
 </div>
 </div>
@@ -375,7 +344,7 @@ When the program encounters a loop start, the following assembly is generated:
 </div>
 
 <p>
-Where \(N\) is the loop counter.
+Where <i>N</i> is the loop counter.
 </p>
 
 <p>
@@ -383,6 +352,36 @@ That way, we even avoid the first comparison from the other example, and we jump
 directly to the &ldquo;end&rdquo; of the loop, where the condition is checked. Now we only
 make an &ldquo;extra&rdquo; unconditional jump once, for checking the condition the first
 time when entering the loop.
+</p>
+</div>
+</div>
+
+<div id="outline-container-compiler-generated-assembly" class="outline-2">
+<h2 id="compiler-generated-assembly"><span class="section-number-2">4.</span> Compiler-generated assembly</h2>
+<div class="outline-text-2" id="text-compiler-generated-assembly">
+<p>
+Some months after writing the first sections of this article, I was messing with
+an Emacs package called <a href="https://github.com/joaotavora/beardbolt">beardbolt</a>; an Emacs implementation of <a href="https://github.com/compiler-explorer/compiler-explorer">Godbolt, the
+Compiler Explorer</a>. I was looking at some sources, and found an example of the
+same <code>jmp</code> strategy that I used for brainfuck.
+</p>
+
+
+<div id="orga1fb8a3" class="figure">
+<p><img src="../img/asm-loop-conditionals1.png" alt="asm-loop-conditionals1.png" />
+</p>
+</div>
+
+<p>
+Note that there is a bug in the current version of GCC (14.2.1) when generating
+assembly with <code>gcc -S -masm=intel</code>, and the offsets are not shown inside of the
+square brackets (<code>-24[rbp]</code> instead of <code>[rbp-24]</code>).
+</p>
+
+<p>
+As you can see, the first highlighted assembly instruction jumps unconditionally
+to <code>.L2</code>, where the actual comparison is made. In this case it jumps to the start
+of the loop body (<code>.L3</code>) only if <code>[rbp-24]</code> is not zero.
 </p>
 </div>
 </div>

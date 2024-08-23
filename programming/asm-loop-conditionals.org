@@ -113,9 +113,29 @@ When the program encounters a loop start, the following assembly is generated:
     jnz .loop_N
 #+end_src
 
-Where $N$ is the loop counter.
+Where /N/ is the loop counter.
 
 That way, we even avoid the first comparison from the other example, and we jump
 directly to the "end" of the loop, where the condition is checked. Now we only
 make an "extra" unconditional jump once, for checking the condition the first
 time when entering the loop.
+
+* Compiler-generated assembly
+:PROPERTIES:
+:CUSTOM_ID: compiler-generated-assembly
+:END:
+
+Some months after writing the first sections of this article, I was messing with
+an Emacs package called [[https://github.com/joaotavora/beardbolt][beardbolt]]; an Emacs implementation of [[https://github.com/compiler-explorer/compiler-explorer][Godbolt, the
+Compiler Explorer]]. I was looking at some sources, and found an example of the
+same =jmp= strategy that I used for brainfuck.
+
+[[file:../img/asm-loop-conditionals1.png]]
+
+Note that there is a bug in the current version of GCC (14.2.1) when generating
+assembly with =gcc -S -masm=intel=, and the offsets are not shown inside of the
+square brackets (=-24[rbp]= instead of =[rbp-24]=).
+
+As you can see, the first highlighted assembly instruction jumps unconditionally
+to =.L2=, where the actual comparison is made. In this case it jumps to the start
+of the loop body (=.L3=) only if =[rbp-24]= is not zero.
