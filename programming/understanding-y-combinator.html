@@ -255,6 +255,14 @@
 <li><a href="#fixed-point-combinators">6. Fixed-point combinators</a></li>
 <li><a href="#y-combinator">7. Y combinator</a></li>
 <li><a href="#applications-of-the-y-combinator">8. Applications of the Y combinator</a></li>
+<li><a href="#implementation-in-scheme">9. Implementation in Scheme</a>
+<ul>
+<li><a href="#beta-abstraction-in-scheme">9.1. Delaying evaluation with beta abstraction</a></li>
+<li><a href="#evaluation-process-of-our-y-combinator">9.2. Evaluation process of our Y combinator</a></li>
+<li><a href="#complete-scheme-example">9.3. Complete Scheme example</a></li>
+</ul>
+</li>
+<li><a href="#final-note">10. Final note</a></li>
 </ul>
 </div>
 </div>
@@ -337,7 +345,7 @@ arguments.
 </p>
 
 <p>
-<a href="#applications-of-the-y-combinator">Later</a> we will also mention the opposite of the beta reduction, the <b>beta
+<a href="#implementation-in-scheme">Later</a> we will also mention the opposite of the beta reduction, the <b>beta
 abstraction</b>, which instead of simplifying an expression, it adds an extra
 function call that might be useful (e.g. in Lisps) for delaying the evaluation
 of the arguments.
@@ -517,7 +525,7 @@ the whole second parenthesized expression.
 </p>
 
 
-<div id="org5310748" class="figure">
+<div id="org769baa2" class="figure">
 <p><img src="../img/ycombinator1.png" alt="ycombinator1.png" />
 </p>
 </div>
@@ -528,6 +536,7 @@ indefinitely, and a similar form will be used for the Y combinator bellow.
 </p>
 </div>
 </div>
+
 <div id="outline-container-fixed-points" class="outline-2">
 <h2 id="fixed-points"><span class="section-number-2">5.</span> Fixed points</h2>
 <div class="outline-text-2" id="text-fixed-points">
@@ -549,7 +558,7 @@ For example, if \(f(x) = x!\), 1 and 2 are fixed points, since \(f(1) = 1\) and
 </p>
 
 
-<div id="orgadff62a" class="figure">
+<div id="org3eba7c5" class="figure">
 <p><img src="../img/ycombinator2.png" alt="ycombinator2.png" width="250px" />
 </p>
 </div>
@@ -631,7 +640,7 @@ Or in Scheme:
 
 <blockquote>
 <p>
-<b>Note:</b> This version is not accurate, see <a href="#applications-of-the-y-combinator">Applications of the Y combinator</a> bellow.
+<b>Note:</b> This version is not accurate, see <a href="#implementation-in-scheme">Implementation in Scheme</a> bellow.
 </p>
 </blockquote>
 
@@ -653,7 +662,7 @@ useful concept, and it&rsquo;s where this image comes from.
 </p>
 
 
-<div id="orgb3c3aa8" class="figure">
+<div id="orgd8d5b0e" class="figure">
 <p><img src="../img/ycombinator3.png" alt="ycombinator3.png" width="250px" />
 </p>
 </div>
@@ -726,18 +735,23 @@ Scheme.
 </div>
 
 <p>
-This recursive form is possible because <code>fact</code> can call itself using its name.
+This recursive form is possible because the <code>fact</code> function can reference itself
+by name. More specifically, because a lambda body is evaluated whenever a <i>call</i>
+is made, and by that time the <code>fact</code> symbol is already bound to the lambda, and
+therefore the body can reference it. In OCaml, for example, the <code>rec</code> keyword is
+needed when defining a recursive function to denote that it will reference
+itself, and not an external function with the same name.
 </p>
 
 <p>
-The Y combinator allows us to call a function recursively in a language which
-<b>doesn&rsquo;t implement recursion</b>. Let&rsquo;s have a look at an alternative form of <code>fact</code>.
+The Y combinator allows us to call a function recursively in a language that
+<i>doesn&rsquo;t implement recursion</i>. Let&rsquo;s have a look at an alternative form of <code>fact</code>.
 </p>
 
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact-generator</span>
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>self<span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>n<span style="color: #44bc44;">)</span>
+  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>self<span style="color: #cabf00;">)</span>        <span style="color: #989898;">; </span><span style="color: #989898;">Outer lambda (fact-generator)</span>
+    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>n<span style="color: #44bc44;">)</span>         <span style="color: #989898;">; </span><span style="color: #989898;">Inner lambda (returned by fact-generator)</span>
       <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #ff5f59;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #ff5f59;">)</span>
           <span style="color: #88ca9f;">1</span>
           <span style="color: #ff5f59;">(</span>* n <span style="color: #2fafff;">(</span>self <span style="color: #cabf00;">(</span>- n <span style="color: #88ca9f;">1</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
@@ -745,20 +759,25 @@ The Y combinator allows us to call a function recursively in a language which
 </div>
 
 <p>
-Let&rsquo;s carefully look at what&rsquo; we just defined. We are defining <code>fact-generator</code> as
-a function that <b>does not</b> return the factorial of a number, but instead returns
-another <b>another lambda function</b> that will take a number <code>n</code>, and return its
-factorial. This inner lambda is able to use recursion <i>without</i> referencing itself
-by name because it can access the <code>self</code> parameter of the outer lambda.
+Let&rsquo;s carefully look at what we just defined. We are defining <code>fact-generator</code> as
+the outer lambda, a function with one argument <code>self</code>. This function <i>does not</i>
+return the factorial of a number, but instead returns another <i>another lambda
+function</i> that will receive a number <code>n</code>, and return its factorial.
 </p>
 
 <p>
-Let&rsquo;s look at how this generator should be used. We want to define <code>fact</code>, which
-is the actual factorial function that takes a number as its parameter and
-returns the factorial. That&rsquo;s what the inner lambda does, the one returned by
-<code>fact-generator</code>. However, the generator expects to receive the <code>fact</code> function as
-its <code>self</code> parameter, so the inner lambda can reference itself. At first sight, we
-could try something like this.
+This inner lambda, the one that will be returned when calling <code>fact-generator</code>, is
+essentially the same as our previous <code>fact</code> function, but this time it&rsquo;s able to
+use recursion <i>without</i> referencing itself by name by accessing the <code>self</code> parameter
+of the outer lambda.
+</p>
+
+<p>
+The important detail is that <code>fact-generator</code> is supposed to <i>return</i> a factorial
+function, but also expects to <i>receive</i> a factorial function as its <code>self</code>
+parameter, which will be used whenever the inner lambda wants to make a
+&ldquo;recursive&rdquo; call. How could we accomplish this? At first sight, we could try
+something like this.
 </p>
 
 <div class="org-src-container">
@@ -769,11 +788,16 @@ could try something like this.
 </div>
 
 <p>
-Here, we would pass the <code>fact</code> function to the <code>fact-generator</code> so it&rsquo;s able to
-return a <code>fact</code> that can reference itself. Unfortunately, we can&rsquo;t pass <code>fact</code> to
-the <code>fact-generator</code> because we still haven&rsquo;t defined what <code>fact</code> is (we are doing
-just that). Instead, since <code>fact-generator</code> returns <code>fact</code> but also expects it, we
-are looking for something like:
+The code above is incorrect because of how Scheme evaluates the arguments. When
+evaluating the <code>define</code> expression, it will first try to evaluate the call to
+<code>fact-generator</code>, but before that it must evaluate its argument, the <code>fact</code>
+symbol. Since at this point <code>fact</code> isn&rsquo;t defined (we are trying to do just that),
+Scheme will show an &ldquo;Unbound variable&rdquo; error.
+</p>
+
+<p>
+Since the <code>fact-generator</code> function expects a function for calculating the
+factorial, but also returns one, we are looking for something like:
 </p>
 
 <div class="org-src-container">
@@ -786,20 +810,34 @@ are looking for something like:
 Does that look familiar? Indeed, this is just what the Y combinator allows us to
 do.
 </p>
+</div>
+</div>
 
+<div id="outline-container-implementation-in-scheme" class="outline-2">
+<h2 id="implementation-in-scheme"><span class="section-number-2">9.</span> Implementation in Scheme</h2>
+<div class="outline-text-2" id="text-implementation-in-scheme">
 <p>
-However, our Scheme version of the Y combinator was not really correct. In
-Scheme (and in most Lisps), the parameters are evaluated <b>before</b> applying the
-function, so defining <code>Y</code> like we did before would cause infinite recursion when
-trying to apply the <code>(x x)</code> expressions. This will be more obvious when analyzing
-the combinator bellow, so let&rsquo;s look at a possible solution first.
+Our Scheme version of the Y combinator was not really correct. Evaluation in
+Scheme (and most Lisps) is <i>strict</i>, meaning that each argument is evaluated
+<i>before</i> applying the function. This is not a problem in lambda calculus.
 </p>
+</div>
 
+<div id="outline-container-beta-abstraction-in-scheme" class="outline-3">
+<h3 id="beta-abstraction-in-scheme"><span class="section-number-3">9.1.</span> Delaying evaluation with beta abstraction</h3>
+<div class="outline-text-3" id="text-beta-abstraction-in-scheme">
 <p>
-We can fix our Y combinator by <b>beta abstracting</b> those two applications.<sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup>
+Defining <code>Y</code> like we did before would result in infinite recursive calls when
+trying to apply the <code>(x x)</code> expressions. This will be more obvious when analyzing
+the combinator bellow, so let&rsquo;s look at a possible solution first. We can fix
+our Y combinator by <b>beta abstracting</b><sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup> those two applications.
 </p>
 
 <blockquote>
+<p>
+<b>JAO&rsquo;s blog about the Y-combinator in Scheme (2014)</b>
+</p>
+
 <p>
 If you have a function <code>F</code> in Scheme, you can define a totally equivalent function
 <code>G</code> by <code>(define G (lambda (args) (F args)))</code>. We say that <code>G</code> is a <i>beta abstraction</i> of
@@ -826,57 +864,72 @@ as a &ldquo;proxy&rdquo;.
 </div>
 
 <p>
-This might be hard to understand at first, so let&rsquo;s try to understand it
-visually. This diagram represents the process of the inner lambdas in the
-function.
+Now, since the <code>(x x)</code> expression is inside the body of this &ldquo;proxy&rdquo; lambda, it
+will not be evaluated until the proxy is called. This is not easy to understand,
+so so let&rsquo;s try to visualize the evaluation process of a call to our <code>Y</code> function.
+</p>
+</div>
+</div>
+
+<div id="outline-container-evaluation-process-of-our-y-combinator" class="outline-3">
+<h3 id="evaluation-process-of-our-y-combinator"><span class="section-number-3">9.2.</span> Evaluation process of our Y combinator</h3>
+<div class="outline-text-3" id="text-evaluation-process-of-our-y-combinator">
+<p>
+The following diagram represents the evaluation of a call to our <code>Y</code>
+function. Specifically, applying the first inner lambda to its copy. Note that
+this isn&rsquo;t the actual process that a Scheme interpreter would follow, instead I
+have decided to make some changes to make it easier to understand.
 </p>
 
 
-<div id="org0bacc96" class="figure">
+<div id="org0cf48f3" class="figure">
 <p><img src="../img/ycombinator4.svg" alt="ycombinator4.svg" class="org-svg" />
 </p>
 </div>
 
 <p>
-Let me explain each step of the diagram.
+Let me explain briefly each step of the diagram.
 </p>
 
 <ol class="org-ol">
-<li>We know that the lambda will receive a copy of itself as the argument <code>x</code>, as
-we have seen <a href="#simple-recursion-with-anonymous-functions">above</a> with the \((\lambda x. x\ x)(\lambda x. x\ x)\) expression.</li>
-<li>With <i>wishful thinking</i>, you can think of the <code>(x x)</code> expressions as <code>fact</code>, since
-this is what the current expression will be returning. This will make more
-sense bellow, but for now you will have to trust that this will return <code>fact</code>.</li>
-<li>The <code>(lambda (n) (fact n))</code> expression acts as a proxy, receiving some
+<li>The black lambda receives a copy of itself (gray lambda) as the argument
+<code>x</code>. We have seen this <a href="#simple-recursion-with-anonymous-functions">above</a> with the \((\lambda x. x\ x)(\lambda x. x\ x)\)
+expression.</li>
+<li>With some <i>wishful thinking™</i>, since we know that <code>x</code> is a copy of the current
+expression, we can assume that the result of the green <code>(x x)</code> expression is
+whatever the current black expression returns. For now, it&rsquo;s better to assume
+that the value returned when calling <code>x</code> is <code>fact</code>, since this will be explained
+in more detail below.</li>
+<li>The blue <code>(lambda (n) (fact n))</code> expression acts as a proxy, receiving some
 arguments, in this case <code>n</code>, and calling <code>fact</code> with them. We name this simple
-lambda <code>fact-proxy</code>, and calling it is essentially the same as calling <code>fact</code>.</li>
+lambda <code>fact-proxy</code>, since calling it is essentially the same as calling <code>fact</code>.</li>
 <li>We know that <code>f</code> is the function that has been passed to <code>Y</code>, in this case
-<code>fact-generator</code>. We substitute the name for readability. We can also
-substitute <code>fact-proxy</code> with just <code>fact</code>.</li>
-<li>Finally, the expression returned by <code>(fact-generator fact)</code> gets passed to
-another lambda, or returned by <code>Y</code>, depending on whether or not we are the
-first call in the recursive cycle.</li>
+<code>fact-generator</code>. We substitute it for readability, along with substituting
+<code>fact-proxy</code> with just <code>fact</code>.</li>
+<li>Finally, the expression <code>(fact-generator fact)</code> gets passed to another lambda,
+or returned by <code>Y</code>, depending on whether or not we are the first call in the
+recursive cycle.</li>
 </ol>
 
 <p>
-With this, we can see that <code>(Y fact-generator)</code> will return <code>(fact-generator fact)</code>,
-which returns a recursive <code>fact</code> function, even though <code>fact</code> has not been defined
-yet.
+At this point, although there are some parts that might not be very clear, we
+can believe that <code>(Y fact-generator)</code> is the same as
+<code>(fact-generator (fact-generator ...))</code>, which returns a recursive <code>fact</code>
+function, even though <code>fact</code> has not been defined yet.
 </p>
 
 <p>
-Now that you know what the expression returns, you can verify that the second
-point was true. The <code>(x x)</code> expression is calling <code>x</code> with a copy of the expression
-as argument (the gray expression at the top). That argument will be used
-exclusively for looping, as mentioned in point one. Therefore <code>x</code>, which is a
-lambda just like us, returns <code>fact</code>. That&rsquo;s why we were able to replace <code>(x x)</code> with
-<code>fact</code> on point two.
+Now that we can see that the black expression effectively returns <code>fact</code>, you can
+verify that the second point was true. The <code>(x x)</code> expression is calling <code>x</code> with a
+copy of itself (the gray expression) as argument. That argument will be used for
+looping recursively, as mentioned in point one. Therefore, the call to <code>x</code> returns
+<code>fact</code>, and that&rsquo;s why we were able to replace it on point two.
 </p>
 
 <p>
-We know the <code>(x x)</code> call returns <code>fact</code>, but Scheme will try to evaluate the call to
-<code>x</code>, which also contains another call to <code>x</code>, etc. That&rsquo;s what the <code>fact-proxy</code> is
-for.
+By wishful thinking, we know the <code>(x x)</code> call returns <code>fact</code>, but since evaluation
+in Scheme is strict, it will try to evaluate the call to <code>x</code>, which also contains
+another call to <code>x</code>, and so on. That&rsquo;s what the <code>fact-proxy</code> is for.
 </p>
 
 <p>
@@ -898,7 +951,12 @@ Which is just what we wanted to achieve earlier.
   <span style="color: #2fafff;">(</span>fact-generator <span style="color: #cabf00;">(</span>fact-generator <span style="color: #44bc44;">(</span>fact-generator ...<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
+</div>
+</div>
 
+<div id="outline-container-complete-scheme-example" class="outline-3">
+<h3 id="complete-scheme-example"><span class="section-number-3">9.3.</span> Complete Scheme example</h3>
+<div class="outline-text-3" id="text-complete-scheme-example">
 <p>
 Finally, we can <a href="https://try.scheme.org/">try</a> our full example.
 </p>
@@ -922,10 +980,18 @@ Finally, we can <a href="https://try.scheme.org/">try</a> our full example.
 <span style="color: #ff5f59;">(</span>fact <span style="color: #88ca9f;">5</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
+</div>
+</div>
+</div>
 
+<div id="outline-container-final-note" class="outline-2">
+<h2 id="final-note"><span class="section-number-2">10.</span> Final note</h2>
+<div class="outline-text-2" id="text-final-note">
 <p>
-If you reached this far, I hope you have learned something. If you feel like
-some explanations could be improved, feel free to <a href="../index.html#contributing">contribute</a>.
+If you reached this far, I hope you have learned something. Everything in this
+article is based on what I found while trying to learn about the Y combinator,
+so if you feel like some explanations could be improved, feel free to
+<a href="../index.html#contributing">contribute</a>.
 </p>
 </div>
 </div>

@@ -71,7 +71,7 @@ There is also *eta reduction* (\eta-reduction), which expresses the idea of
 functions are the same if and only if they give the same result for all
 arguments.
 
-[[*Applications of the Y combinator][Later]] we will also mention the opposite of the beta reduction, the *beta
+[[*Implementation in Scheme][Later]] we will also mention the opposite of the beta reduction, the *beta
 abstraction*, which instead of simplifying an expression, it adds an extra
 function call that might be useful (e.g. in Lisps) for delaying the evaluation
 of the arguments.
@@ -217,6 +217,7 @@ the whole second parenthesized expression.
 
 We are right back where we started. This function would call itself
 indefinitely, and a similar form will be used for the Y combinator bellow.
+
 * Fixed points
 :PROPERTIES:
 :CUSTOM_ID: fixed-points
@@ -289,7 +290,7 @@ Or in Scheme:
 #+end_src
 
 #+begin_quote
-*Note:* This version is not accurate, see [[*Applications of the Y combinator][Applications of the Y combinator]] bellow.
+*Note:* This version is not accurate, see [[*Implementation in Scheme][Implementation in Scheme]] bellow.
 #+end_quote
 
 Or in JavaScript:
@@ -359,32 +360,40 @@ Scheme.
         (* n (fact (- n 1))))))
 #+end_src
 
-This recursive form is possible because =fact= can call itself using its name.
+This recursive form is possible because the =fact= function can reference itself
+by name. More specifically, because a lambda body is evaluated whenever a /call/
+is made, and by that time the =fact= symbol is already bound to the lambda, and
+therefore the body can reference it. In OCaml, for example, the =rec= keyword is
+needed when defining a recursive function to denote that it will reference
+itself, and not an external function with the same name.
 
-The Y combinator allows us to call a function recursively in a language which
-*doesn't implement recursion*. Let's have a look at an alternative form of =fact=.
+The Y combinator allows us to call a function recursively in a language that
+/doesn't implement recursion/. Let's have a look at an alternative form of =fact=.
 
 #+begin_src scheme
 (define fact-generator
-  (lambda (self)
-    (lambda (n)
+  (lambda (self)        ; Outer lambda (fact-generator)
+    (lambda (n)         ; Inner lambda (returned by fact-generator)
       (if (equal? n 0)
           1
           (* n (self (- n 1)))))))
 #+end_src
 
-Let's carefully look at what' we just defined. We are defining =fact-generator= as
-a function that *does not* return the factorial of a number, but instead returns
-another *another lambda function* that will take a number =n=, and return its
-factorial. This inner lambda is able to use recursion /without/ referencing itself
-by name because it can access the =self= parameter of the outer lambda.
+Let's carefully look at what we just defined. We are defining =fact-generator= as
+the outer lambda, a function with one argument =self=. This function /does not/
+return the factorial of a number, but instead returns another /another lambda
+function/ that will receive a number =n=, and return its factorial.
 
-Let's look at how this generator should be used. We want to define =fact=, which
-is the actual factorial function that takes a number as its parameter and
-returns the factorial. That's what the inner lambda does, the one returned by
-=fact-generator=. However, the generator expects to receive the =fact= function as
-its =self= parameter, so the inner lambda can reference itself. At first sight, we
-could try something like this.
+This inner lambda, the one that will be returned when calling =fact-generator=, is
+essentially the same as our previous =fact= function, but this time it's able to
+use recursion /without/ referencing itself by name by accessing the =self= parameter
+of the outer lambda.
+
+The important detail is that =fact-generator= is supposed to /return/ a factorial
+function, but also expects to /receive/ a factorial function as its =self=
+parameter, which will be used whenever the inner lambda wants to make a
+"recursive" call. How could we accomplish this? At first sight, we could try
+something like this.
 
 #+begin_src scheme
 ;; Wrong.
@@ -392,11 +401,14 @@ could try something like this.
   (fact-generator fact))
 #+end_src
 
-Here, we would pass the =fact= function to the =fact-generator= so it's able to
-return a =fact= that can reference itself. Unfortunately, we can't pass =fact= to
-the =fact-generator= because we still haven't defined what =fact= is (we are doing
-just that). Instead, since =fact-generator= returns =fact= but also expects it, we
-are looking for something like:
+The code above is incorrect because of how Scheme evaluates the arguments. When
+evaluating the =define= expression, it will first try to evaluate the call to
+=fact-generator=, but before that it must evaluate its argument, the =fact=
+symbol. Since at this point =fact= isn't defined (we are trying to do just that),
+Scheme will show an "Unbound variable" error.
+
+Since the =fact-generator= function expects a function for calculating the
+factorial, but also returns one, we are looking for something like:
 
 #+begin_src scheme
 (define fact
@@ -406,20 +418,28 @@ are looking for something like:
 Does that look familiar? Indeed, this is just what the Y combinator allows us to
 do.
 
-However, our Scheme version of the Y combinator was not really correct. In
-Scheme (and in most Lisps), the parameters are evaluated *before* applying the
-function, so defining =Y= like we did before would cause infinite recursion when
+* Implementation in Scheme
+:PROPERTIES:
+:CUSTOM_ID: implementation-in-scheme
+:END:
+
+Our Scheme version of the Y combinator was not really correct. Evaluation in
+Scheme (and most Lisps) is /strict/, meaning that each argument is evaluated
+/before/ applying the function. This is not a problem in lambda calculus.
+
+** Delaying evaluation with beta abstraction
+:PROPERTIES:
+:CUSTOM_ID: beta-abstraction-in-scheme
+:END:
+
+Defining =Y= like we did before would result in infinite recursive calls when
 trying to apply the =(x x)= expressions. This will be more obvious when analyzing
-the combinator bellow, so let's look at a possible solution first.
-
-#+begin_comment
-TODO: Add link to eval-apply cycle if I write an article about something
-similar.
-#+end_comment
-
-We can fix our Y combinator by *beta abstracting* those two applications.[fn:5]
+the combinator bellow, so let's look at a possible solution first. We can fix
+our Y combinator by *beta abstracting*[fn:5] those two applications.
 
 #+begin_quote
+*JAO's blog about the Y-combinator in Scheme (2014)*
+
 If you have a function =F= in Scheme, you can define a totally equivalent function
 =G= by =(define G (lambda (args) (F args)))=. We say that =G= is a /beta abstraction/ of
 =F=, or that =F= is a /beta reduction/ of =G=.
@@ -438,43 +458,56 @@ as a "proxy".
      (lambda (x) (f (lambda (n) ((x x) n)))))))
 #+end_src
 
-This might be hard to understand at first, so let's try to understand it
-visually. This diagram represents the process of the inner lambdas in the
-function.
+Now, since the =(x x)= expression is inside the body of this "proxy" lambda, it
+will not be evaluated until the proxy is called. This is not easy to understand,
+so so let's try to visualize the evaluation process of a call to our =Y= function.
+
+** Evaluation process of our Y combinator
+:PROPERTIES:
+:CUSTOM_ID: evaluation-process-of-our-y-combinator
+:END:
+
+The following diagram represents the evaluation of a call to our =Y=
+function. Specifically, applying the first inner lambda to its copy. Note that
+this isn't the actual process that a Scheme interpreter would follow, instead I
+have decided to make some changes to make it easier to understand.
 
 [[file:../img/ycombinator4.svg]]
 
-Let me explain each step of the diagram.
+Let me explain briefly each step of the diagram.
 
-1. We know that the lambda will receive a copy of itself as the argument =x=, as
-   we have seen [[*Simple recursion with anonymous functions][above]] with the $(\lambda x. x\ x)(\lambda x. x\ x)$ expression.
-2. With /wishful thinking/, you can think of the =(x x)= expressions as =fact=, since
-   this is what the current expression will be returning. This will make more
-   sense bellow, but for now you will have to trust that this will return =fact=.
-3. The =(lambda (n) (fact n))= expression acts as a proxy, receiving some
+1. The black lambda receives a copy of itself (gray lambda) as the argument
+   =x=. We have seen this [[*Simple recursion with anonymous functions][above]] with the $(\lambda x. x\ x)(\lambda x. x\ x)$
+   expression.
+2. With some /wishful thinking™/, since we know that =x= is a copy of the current
+   expression, we can assume that the result of the green =(x x)= expression is
+   whatever the current black expression returns. For now, it's better to assume
+   that the value returned when calling =x= is =fact=, since this will be explained
+   in more detail below.
+3. The blue =(lambda (n) (fact n))= expression acts as a proxy, receiving some
    arguments, in this case =n=, and calling =fact= with them. We name this simple
-   lambda =fact-proxy=, and calling it is essentially the same as calling =fact=.
+   lambda =fact-proxy=, since calling it is essentially the same as calling =fact=.
 4. We know that =f= is the function that has been passed to =Y=, in this case
-   =fact-generator=. We substitute the name for readability. We can also
-   substitute =fact-proxy= with just =fact=.
-5. Finally, the expression returned by =(fact-generator fact)= gets passed to
-   another lambda, or returned by =Y=, depending on whether or not we are the
-   first call in the recursive cycle.
+   =fact-generator=. We substitute it for readability, along with substituting
+   =fact-proxy= with just =fact=.
+5. Finally, the expression =(fact-generator fact)= gets passed to another lambda,
+   or returned by =Y=, depending on whether or not we are the first call in the
+   recursive cycle.
 
-With this, we can see that =(Y fact-generator)= will return =(fact-generator fact)=,
-which returns a recursive =fact= function, even though =fact= has not been defined
-yet.
+At this point, although there are some parts that might not be very clear, we
+can believe that =(Y fact-generator)= is the same as
+=(fact-generator (fact-generator ...))=, which returns a recursive =fact=
+function, even though =fact= has not been defined yet.
 
-Now that you know what the expression returns, you can verify that the second
-point was true. The =(x x)= expression is calling =x= with a copy of the expression
-as argument (the gray expression at the top). That argument will be used
-exclusively for looping, as mentioned in point one. Therefore =x=, which is a
-lambda just like us, returns =fact=. That's why we were able to replace =(x x)= with
-=fact= on point two.
+Now that we can see that the black expression effectively returns =fact=, you can
+verify that the second point was true. The =(x x)= expression is calling =x= with a
+copy of itself (the gray expression) as argument. That argument will be used for
+looping recursively, as mentioned in point one. Therefore, the call to =x= returns
+=fact=, and that's why we were able to replace it on point two.
 
-We know the =(x x)= call returns =fact=, but Scheme will try to evaluate the call to
-=x=, which also contains another call to =x=, etc. That's what the =fact-proxy= is
-for.
+By wishful thinking, we know the =(x x)= call returns =fact=, but since evaluation
+in Scheme is strict, it will try to evaluate the call to =x=, which also contains
+another call to =x=, and so on. That's what the =fact-proxy= is for.
 
 With this example, you can also realize that the following expression makes more
 sense now.
@@ -490,6 +523,11 @@ Which is just what we wanted to achieve earlier.
 (define fact
   (fact-generator (fact-generator (fact-generator ...))))
 #+end_src
+
+** Complete Scheme example
+:PROPERTIES:
+:CUSTOM_ID: complete-scheme-example
+:END:
 
 Finally, we can [[https://try.scheme.org/][try]] our full example.
 
@@ -512,8 +550,15 @@ Finally, we can [[https://try.scheme.org/][try]] our full example.
 (fact 5)
 #+end_src
 
-If you reached this far, I hope you have learned something. If you feel like
-some explanations could be improved, feel free to [[file:../index.org::#contributing][contribute]].
+* Final note
+:PROPERTIES:
+:CUSTOM_ID: final-note
+:END:
+
+If you reached this far, I hope you have learned something. Everything in this
+article is based on what I found while trying to learn about the Y combinator,
+so if you feel like some explanations could be improved, feel free to
+[[file:../index.org::#contributing][contribute]].
 
 # -----
 
