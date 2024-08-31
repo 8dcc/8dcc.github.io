@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reverse engineering</title>
+<title>Inspecting xorpd's assembly snippets</title>
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -197,86 +197,93 @@
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">Reverse engineering</h1>
+<h1 class="title">Inspecting xorpd&rsquo;s assembly snippets</h1>
 <p>
-<a href="../index.html">Index</a>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
 </p>
 
 <hr />
 
-<div id="outline-container-list-of-articles" class="outline-2">
-<h2 id="list-of-articles">List of articles</h2>
-<div class="outline-text-2" id="text-list-of-articles">
-<p>
-These articles are related to reverse engineering.
-</p>
-
-<ul class="org-ul">
-<li><a href="understanding-call-stack.html">Understanding and traversing the call stack</a></li>
-<li><a href="reversing-tf2-bsendpacket.html">Reversing TF2&rsquo;s bSendPacket</a></li>
-<li><a href="reversing-mordhau.html">Mordhau: From reversing Unreal Engine 4 to breaking animations</a></li>
-<li><a href="cs-source-localplayer.html">Finding the local player offset in source games</a></li>
-<li><a href="devildaggers.html">Reversing Devil Daggers</a></li>
-<li><a href="xorpd-book.html">Inspecting xorpd’s assembly snippets</a></li>
-<li><a href="reversing-keygen.html">Reversing a simple keygen</a></li>
-</ul>
-
-<p>
-These articles explain how to solve <a href="https://yurichev.com/">Dennis Yurichev</a>&rsquo;s reverse engineering
-<a href="https://challenges.re/">challenges</a>.
-</p>
-
-<ul class="org-ul">
-<li><a href="challenge2.html">Challenge 2</a></li>
-<li><a href="challenge3.html">Challenge 3</a></li>
-<li><a href="challenge4.html">Challenge 4</a></li>
-<li><a href="challenge5.html">Challenge 5</a></li>
-<li><a href="challenge6.html">Challenge 6</a></li>
-<li><a href="challenge7.html">Challenge 7</a></li>
-<li><a href="challenge8.html">Challenge 8</a></li>
-<li><a href="challenge9.html">Challenge 9</a></li>
-<li><a href="challenge10.html">Challenge 10</a></li>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org20535c1">1. Introduction</a></li>
+<li><a href="#org0b80727">2. Snippets</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-external-resources" class="outline-2">
-<h2 id="external-resources">External resources</h2>
-<div class="outline-text-2" id="text-external-resources">
+<div id="outline-container-org20535c1" class="outline-2">
+<h2 id="org20535c1"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
 <p>
-These are some good resources for learning and practicing reverse engineering.
+This is an analysis of each assembly snippet from the book &ldquo;<a href="https://www.xorpd.net/pages/xchg_rax/snip_00.html">xchg rax, rax</a>&rdquo; by
+<a href="https://www.xorpd.net/">xorpd</a>. The book consists of 64 very original assembly snippets. It can be bought
+physically for a low price and it can be a good gift for some assembly nerd you
+might know.
+</p>
+
+<p>
+If you want to try and figure out the snippets for yourself, I recommend you
+have the following manuals around:
 </p>
 
 <ul class="org-ul">
-<li><a href="https://en.wikipedia.org/wiki/Reversing:_Secrets_of_Reverse_Engineering">Reversing: Secrets of Reverse Engineering</a>, by Eldad Eilam. Apart from RE, it&rsquo;s
-a great resource to learn about assembly, compiler optimizations, operating
-system design, and much more.</li>
-<li>Dennis Yurichev&rsquo;s <a href="https://challenges.re/">challenges.re</a> website, which has a lot of interesting
-challenges with different difficulties.</li>
-<li><a href="https://www.xorpd.net/">xorpd&rsquo;s website</a>.</li>
-<li>Félix Cloutier&rsquo;s <a href="https://www.felixcloutier.com/x86/">x86 and amd64 instruction reference</a>. In case the volume 2 of
-the Intel SDM is too intimidating.</li>
+<li>Intel Software Developer Manual (SDM), specially volume 2. See the
+<a href="index.html#intel-manuals">Intel manuals</a> section on the reverse engineering index for more information.</li>
+<li>The <a href="https://www.nasm.us/doc/">NASM manual</a>, since it&rsquo;s the syntax used by the author of the book.</li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-intel-manuals" class="outline-2">
-<h2 id="intel-manuals">Intel manuals</h2>
-<div class="outline-text-2" id="text-intel-manuals">
+<div id="outline-container-org0b80727" class="outline-2">
+<h2 id="org0b80727"><span class="section-number-2">2.</span> Snippets</h2>
+<div class="outline-text-2" id="text-2">
 <p>
-Throughout this section, you might see some references to the <i>Intel Software
-Developer Manual</i> (Intel SDM). Since the manuals on the <a href="https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html">official website</a> are
-regularly updated, you can read and download the specific version I used for the
-references from the following links:
+Each subsection will correspond to a different snippet from the book.
 </p>
 
-<ul class="org-ul">
-<li>Intel SDM, Volume 1: <a href="../manuals/intel-sdm-vol-1.pdf">253665-sdm-vol-1.pdf</a></li>
-<li>Intel SDM, Volume 2: <a href="../manuals/intel-sdm-vol-2abcd.pdf">325383-sdm-vol-2abcd.pdf</a></li>
-<li>Intel SDM, Volume 3: <a href="../manuals/intel-sdm-vol-3abcd.pdf">325384-sdm-vol-3abcd.pdf</a></li>
-<li>Intel SDM, Volume 4: <a href="../manuals/intel-sdm-vol-4.pdf">335592-sdm-vol-4.pdf</a></li>
-<li>AMD Manual: <a href="../manuals/amd-manual.pdf">24593.pdf</a></li>
-</ul>
+<p>
+I took the liberty of modifying some indentation/spacing to fit my own
+preferences.
+</p>
+</div>
+
+<div id="outline-container-org2c154eb" class="outline-3">
+<h3 id="org2c154eb"><span class="section-number-3">2.1.</span> Snippet 00</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Different ways of setting a register to zero.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #feacd0;">xor</span>      <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
+<span style="color: #feacd0;">lea</span>      <span style="color: #6ae4b9;">rbx</span>, [<span style="color: #88ca9f;">0</span>]
+<span style="color: #feacd0;">loop</span>     $
+<span style="color: #feacd0;">mov</span>      <span style="color: #6ae4b9;">rdx</span>, <span style="color: #88ca9f;">0</span>
+<span style="color: #feacd0;">and</span>      <span style="color: #6ae4b9;">esi</span>, <span style="color: #88ca9f;">0</span>
+<span style="color: #feacd0;">sub</span>      <span style="color: #6ae4b9;">edi</span>, <span style="color: #6ae4b9;">edi</span>
+<span style="color: #feacd0;">push</span>     <span style="color: #88ca9f;">0</span>
+<span style="color: #feacd0;">pop</span>      <span style="color: #6ae4b9;">rbp</span>
+</pre>
+</div>
+
+<p>
+Note how <code>[0]</code> doesn&rsquo;t refer to the value at address 0, it simply indicates that 0
+is an <i>effective address</i>. Some instructions, like <code>mov</code>, operate on the value at
+the address (effectively &ldquo;dereferencing&rdquo; it); but some others, like <code>lea</code>, operate
+on the address itself, loading it into the specified register. See section 3.3
+(Effective Addresses) of the <a href="https://www.nasm.us/xdoc/2.14.02/html/nasmdoc3.html#section-3.3">NASM manual</a>.
+</p>
+
+<p>
+The <code>loop</code> instruction decrements the count register (<code>rcx</code>) and, if it&rsquo;s not zero,
+jumps to the target operand. In this case, the operand is <code>$</code>, which in NASM
+refers to the address of the current instruction. See section 3.5 (Expressions)
+of the <a href="https://www.nasm.us/doc/nasmdoc3.html#section-3.5">NASM manual</a>.
+</p>
+</div>
 </div>
 </div>
 </div>

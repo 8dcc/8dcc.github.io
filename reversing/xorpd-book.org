@@ -1,0 +1,915 @@
+#+TITLE: Inspecting xorpd's assembly snippets
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 1
+
+* Introduction
+
+This is an analysis of each assembly snippet from the book "[[https://www.xorpd.net/pages/xchg_rax/snip_00.html][xchg rax, rax]]" by
+[[https://www.xorpd.net/][xorpd]]. The book consists of 64 very original assembly snippets. It can be bought
+physically for a low price and it can be a good gift for some assembly nerd you
+might know.
+
+If you want to try and figure out the snippets for yourself, I recommend you
+have the following manuals around:
+
+- Intel Software Developer Manual (SDM), specially volume 2. See the
+  [[file:index.org::#intel-manuals][Intel manuals]] section on the reverse engineering index for more information.
+- The [[https://www.nasm.us/doc/][NASM manual]], since it's the syntax used by the author of the book.
+
+* Snippets
+
+Each subsection will correspond to a different snippet from the book.
+
+I took the liberty of modifying some indentation/spacing to fit my own
+preferences.
+
+** Snippet 00
+
+Different ways of setting a register to zero.
+
+#+begin_src nasm
+    xor      eax, eax
+    lea      rbx, [0]
+    loop     $
+    mov      rdx, 0
+    and      esi, 0
+    sub      edi, edi
+    push     0
+    pop      rbp
+#+end_src
+
+Note how =[0]= doesn't refer to the value at address 0, it simply indicates that 0
+is an /effective address/. Some instructions, like =mov=, operate on the value at
+the address (effectively "dereferencing" it); but some others, like =lea=, operate
+on the address itself, loading it into the specified register. See section 3.3
+(Effective Addresses) of the [[https://www.nasm.us/xdoc/2.14.02/html/nasmdoc3.html#section-3.3][NASM manual]].
+
+The =loop= instruction decrements the count register (=rcx=) and, if it's not zero,
+jumps to the target operand. In this case, the operand is =$=, which in NASM
+refers to the address of the current instruction. See section 3.5 (Expressions)
+of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
+
+* COMMENT TODO
+** Snippet 01
+
+#+begin_src nasm
+.loop:
+    xadd     rax, rdx
+    loop     .loop
+#+end_src
+
+** Snippet 02
+
+#+begin_src nasm
+    neg      rax
+    sbb      rax, rax
+    neg      rax
+#+end_src
+
+** Snippet 03
+
+#+begin_src nasm
+    sub      rdx, rax
+    sbb      rcx, rcx
+    and      rcx, rdx
+    add      rax, rcx
+#+end_src
+
+** Snippet 04
+
+#+begin_src nasm
+    xor      al, 0x20
+#+end_src
+
+** Snippet 05
+
+#+begin_src nasm
+    sub      rax, 5
+    cmp      rax, 4
+#+end_src
+
+** Snippet 06
+
+#+begin_src nasm
+    not      rax
+    inc      rax
+    neg      rax
+#+end_src
+
+** Snippet 07
+
+#+begin_src nasm
+    inc      rax
+    neg      rax
+    inc      rax
+    neg      rax
+#+end_src
+
+** Snippet 08
+
+#+begin_src nasm
+    add      rax, rdx
+    rcr      rax, 1
+#+end_src
+
+** Snippet 09
+
+#+begin_src nasm
+    shr      rax, 3
+    adc      rax, 0
+#+end_src
+
+** Snippet 0A
+
+#+begin_src nasm
+    add      byte [rdi], 1
+.loop:
+    inc      rdi
+    adc      byte [rdi], 0
+    loop     .loop
+#+end_src
+
+** Snippet 0B
+
+#+begin_src nasm
+    not      rdx
+    neg      rax
+    sbb      rdx, -1
+#+end_src
+
+** Snippet 0C
+
+#+begin_src nasm
+    mov      rcx, rax
+    xor      rcx, rbx
+    ror      rcx, 0xd
+
+    ror      rax, 0xd
+    ror      rbx, 0xd
+    xor      rax, rbx
+
+    cmp      rax, rcx
+#+end_src
+
+** Snippet 0D
+
+#+begin_src nasm
+    mov      rdx, rbx
+
+    xor      rbx, rcx
+    and      rbx, rax
+
+    and      rdx, rax
+    and      rax, rcx
+    xor      rax, rdx
+
+    cmp      rax, rbx
+#+end_src
+
+** Snippet 0E
+
+#+begin_src nasm
+    mov      rcx, rax
+    and      rcx, rbx
+    not      rcx
+
+    not      rax
+    not      rbx
+    or       rax, rbx
+
+    cmp      rax, rcx
+#+end_src
+
+** Snippet 0F
+
+#+begin_src nasm
+.loop:
+    xor      byte [rsi], al
+    lodsb
+    loop     .loop
+#+end_src
+
+** Snippet 10
+
+#+begin_src nasm
+    push     rax
+    push     rcx
+    pop      rax
+    pop      rcx
+
+    xor      rax, rcx
+    xor      rcx, rax
+    xor      rax, rcx
+
+    add      rax, rcx
+    sub      rcx, rax
+    add      rax, rcx
+    neg      rcx
+
+    xchg     rax, rcx
+#+end_src
+
+** Snippet 11
+
+#+begin_src nasm
+.loop:
+    mov      dl, byte [rsi]
+    xor      dl, byte [rdi]
+    inc      rsi
+    inc      rdi
+    or       al, dl
+    loop     .loop
+#+end_src
+
+** Snippet 12
+
+#+begin_src nasm
+    mov      rcx, rdx
+    and      rdx, rax
+    or       rax, rcx
+    add      rax, rdx
+#+end_src
+
+** Snippet 13
+
+#+begin_src nasm
+    mov      rcx, 0x40
+.loop:
+    mov      rdx, rax
+    xor      rax, rbx
+    and      rbx, rdx
+    shl      rbx, 0x1
+    loop     .loop
+#+end_src
+
+** Snippet 14
+
+#+begin_src nasm
+    mov      rcx, rax
+    and      rcx, rdx
+
+    xor      rax, rdx
+    shr      rax, 1
+
+    add      rax, rcx
+#+end_src
+
+** Snippet 15
+
+#+begin_src nasm
+    mov      rdx, 0xffffffff80000000
+    add      rax, rdx
+    xor      rax, rdx
+#+end_src
+
+** Snippet 16
+
+#+begin_src nasm
+    xor      rax, rbx
+    xor      rbx, rcx
+    mov      rsi, rax
+    add      rsi, rbx
+    cmovc    rax, rbx
+    xor      rax, rbx
+    cmp      rax, rsi
+#+end_src
+
+** Snippet 17
+
+#+begin_src nasm
+    cqo
+    xor      rax, rdx
+    sub      rax, rdx
+#+end_src
+
+** Snippet 18
+
+#+begin_src nasm
+    rdtsc
+    shl      rdx, 0x20
+    or       rax, rdx
+    mov      rcx, rax
+
+    rdtsc
+    shl      rdx, 0x20
+    or       rax, rdx
+
+    cmp      rcx, rax
+#+end_src
+
+** Snippet 19
+
+#+begin_src nasm
+    call     .skip
+    db       'hello world!', 0
+.skip:
+    call     printf  ; print_str
+    add      rsp, 8
+#+end_src
+
+** Snippet 1A
+
+#+begin_src nasm
+        call     .next
+    .next:
+        pop      rax
+#+end_src
+
+** Snippet 1B
+
+#+begin_src nasm
+    push     rax
+    ret
+#+end_src
+
+** Snippet 1C
+
+#+begin_src nasm
+    pop      rsp
+#+end_src
+
+** Snippet 1D
+
+#+begin_src nasm
+    mov      rsp, buff2 + N*8 + 8
+    mov      rbp, buff1 + N*8
+    enter    0, N+1
+#+end_src
+
+** Snippet 1E
+
+#+begin_src nasm
+    ; NOTE: The `das' instruction is not valid in 64-bit mode
+    cmp      al, 0x0a
+    sbb      al, 0x69
+    das
+#+end_src
+
+** Snippet 1F
+
+#+begin_src nasm
+.loop:
+    bsf      rcx, rax
+    shr      rax, cl
+    cmp      rax, 1
+    je       .exit_loop
+    lea      rax, [rax + 2*rax + 1]
+    jmp      .loop
+.exit_loop:
+#+end_src
+
+** Snippet 20
+
+#+begin_src nasm
+    mov      rcx, rax
+    shl      rcx, 2
+    add      rcx, rax
+    shl      rcx, 3
+    add      rcx, rax
+    shl      rcx, 1
+    add      rcx, rax
+    shl      rcx, 1
+    add      rcx, rax
+    shl      rcx, 3
+    add      rcx, rax
+#+end_src
+
+** Snippet 21
+
+#+begin_src nasm
+    mov      rsi, rax
+    add      rax, rbx
+    mov      rdi, rdx
+    sub      rdx, rcx
+    add      rdi, rcx
+
+    imul     rax, rcx
+    imul     rsi, rdx
+    imul     rdi, rbx
+
+    add      rsi, rax
+    mov      rbx, rsi
+    sub      rax, rdi
+#+end_src
+
+** Snippet 22
+
+#+begin_src nasm
+    mov      rdx, 0xaaaaaaaaaaaaaaab
+    mul      rdx
+    shr      rdx, 1
+    mov      rax, rdx
+#+end_src
+
+** Snippet 23
+
+#+begin_src nasm
+.loop:
+    cmp      rax, 5
+    jbe      .exit_loop
+    mov      rdx, rax
+    shr      rdx, 2
+    and      rax, 3
+    add      rax, rdx
+    jmp      .loop
+.exit_loop:
+
+    cmp      rax, 3
+    cmc
+    sbb      rdx, rdx
+    and      rdx, 3
+    sub      rax, rdx
+#+end_src
+
+** Snippet 24
+
+#+begin_src nasm
+    mov      rbx, rax
+    mov      rsi, rax
+.loop:
+    mul      rbx
+    mov      rcx, rax
+
+    sub      rax, 2
+    neg      rax
+    mul      rsi
+    mov      rsi, rax
+
+    cmp      rcx, 1
+    ja       .loop
+.exit_loop:
+#+end_src
+
+** Snippet 25
+
+#+begin_src nasm
+    xor      eax, eax
+    mov      rcx, 1
+    shl      rcx, 0x20
+.loop:
+    movzx    rbx, cx
+    imul     rbx, rbx
+
+    ror      rcx, 0x10
+    movzx    rdx, cx
+    imul     rdx, rdx
+    rol      rcx, 0x10
+
+    add      rbx, rdx
+    shr      rbx, 0x20
+    cmp      rbx, 1
+    adc      rax, 0
+    loop     .loop
+#+end_src
+
+** Snippet 26
+
+#+begin_src nasm
+    mov      rdx, rax
+    shr      rax, 7
+    shl      rdx, 0x39
+    or       rax, rdx
+#+end_src
+
+** Snippet 27
+
+#+begin_src nasm
+    mov      ch, cl
+    inc      ch
+    shr      ch, 1
+    shr      cl, 1
+    shr      rax, cl
+    xchg     ch, cl
+    shr      rax, cl
+#+end_src
+
+** Snippet 28
+
+#+begin_src nasm
+    clc
+.loop:
+    rcr      byte [rsi], 1
+    inc      rsi
+    loop     .loop
+#+end_src
+
+** Snippet 29
+
+#+begin_src nasm
+    lea      rdi, [rsi + 3]
+    rep movsb
+#+end_src
+
+** Snippet 2A
+
+#+begin_src nasm
+    mov      rsi, rbx
+    mov      rdi, rbx
+.loop:
+    lodsq
+    xchg     rax, qword [rbx]
+    stosq
+    loop     .loop
+#+end_src
+
+** Snippet 2B
+
+#+begin_src nasm
+    xor      eax, eax
+    xor      edx, edx
+.loop1:
+    xlatb
+    xchg     rax, rdx
+    xlatb
+    xlatb
+    xchg     rax, rdx
+    cmp      al, dl
+    jnz      .loop1
+
+    xor      eax, eax
+.loop2:
+    xlatb
+    xchg     rax, rdx
+    xlatb
+    xchg     rax, rdx
+    cmp      al, dl
+    jnz      .loop2
+#+end_src
+
+** Snippet 2C
+
+#+begin_src nasm
+    mov      qword [rbx + 8*rcx], 0
+    mov      qword [rbx + 8*rdx], 1
+    mov      rax, qword [rbx + 8*rcx]
+
+    mov      qword [rbx], rsi
+    mov      qword [rbx + 8], rdi
+    mov      rax, qword [rbx + 8*rax]
+#+end_src
+
+** Snippet 2D
+
+#+begin_src nasm
+    mov      rdx, rax
+    dec      rax
+    and      rax, rdx
+#+end_src
+
+** Snippet 2E
+
+#+begin_src nasm
+    mov      rdx, rax
+    dec      rdx
+    xor      rax, rdx
+    shr      rax, 1
+    cmp      rax, rdx
+#+end_src
+
+** Snippet 2F
+
+#+begin_src nasm
+        xor      eax, eax
+    .loop:
+        jrcxz    .exit_loop
+        inc      rax
+        mov      rdx, rcx
+        dec      rdx
+        and      rcx, rdx
+        jmp      .loop
+    .exit_loop:
+#+end_src
+
+** Snippet 30
+
+#+begin_src nasm
+    and      rax, rdx
+
+    sub      rax, rdx
+    and      rax, rdx
+
+    dec      rax
+    and      rax, rdx
+#+end_src
+
+** Snippet 31
+
+#+begin_src nasm
+    mov      rcx, rax
+    shr      rcx, 1
+    xor      rcx, rax
+
+    inc      rax
+
+    mov      rdx, rax
+    shr      rdx, 1
+    xor      rdx, rax
+
+    xor      rdx, rcx
+#+end_src
+
+** Snippet 32
+
+#+begin_src nasm
+    mov      rcx, rax
+
+    mov      rdx, rax
+    shr      rdx, 1
+    xor      rax, rdx
+
+    popcnt   rax, rax
+    xor      rax, rcx
+    and      rax, 1
+#+end_src
+
+** Snippet 33
+
+#+begin_src nasm
+    mov      rdx, rax
+    shr      rdx, 0x1
+    xor      rax, rdx
+
+    mov      rdx, rax
+    shr      rdx, 0x2
+    xor      rax, rdx
+
+    mov      rdx, rax
+    shr      rdx, 0x4
+    xor      rax, rdx
+
+    mov      rdx, rax
+    shr      rdx, 0x8
+    xor      rax, rdx
+
+    mov      rdx, rax
+    shr      rdx, 0x10
+    xor      rax, rdx
+
+    mov      rdx, rax
+    shr      rdx, 0x20
+    xor      rax, rdx
+#+end_src
+
+** Snippet 34
+
+#+begin_src nasm
+    mov      ecx, eax
+    and      ecx, 0xffff0000
+    shr      ecx, 0x10
+    and      eax, 0x0000ffff
+    shl      eax, 0x10
+    or       eax, ecx
+
+    mov      ecx, eax
+    and      ecx, 0xff00ff00
+    shr      ecx, 0x8
+    and      eax, 0x00ff00ff
+    shl      eax, 0x8
+    or       eax, ecx
+
+    mov      ecx, eax
+    and      ecx, 0xcccccccc
+    shr      ecx, 0x2
+    and      eax, 0x33333333
+    shl      eax, 0x2
+    or       eax, ecx
+
+    mov      ecx, eax
+    and      ecx, 0xf0f0f0f0
+    shr      ecx, 0x4
+    and      eax, 0x0f0f0f0f
+    shl      eax, 0x4
+    or       eax, ecx
+
+    mov      ecx, eax
+    and      ecx, 0xaaaaaaaa
+    shr      ecx, 0x1
+    and      eax, 0x55555555
+    shl      eax, 0x1
+    or       eax, ecx
+#+end_src
+
+** Snippet 35
+
+#+begin_src nasm
+    mov      edx, eax
+    and      eax, 0x55555555
+    shr      edx, 0x1
+    and      edx, 0x55555555
+    add      eax, edx
+
+    mov      edx, eax
+    and      eax, 0x33333333
+    shr      edx, 0x2
+    and      edx, 0x33333333
+    add      eax, edx
+
+    mov      edx, eax
+    and      eax, 0x0f0f0f0f
+    shr      edx, 0x4
+    and      edx, 0x0f0f0f0f
+    add      eax, edx
+
+    mov      edx, eax
+    and      eax, 0x00ff00ff
+    shr      edx, 0x8
+    and      edx, 0x00ff00ff
+    add      eax, edx
+
+    mov      edx, eax
+    and      eax, 0x0000ffff
+    shr      edx, 0x10
+    and      edx, 0x0000ffff
+    add      eax, edx
+#+end_src
+
+** Snippet 36
+
+#+begin_src nasm
+    dec      rax
+
+    mov      rdx, rax
+    shr      rdx, 0x1
+    or       rax, rdx
+
+    mov      rdx, rax
+    shr      rdx, 0x2
+    or       rax, rdx
+
+    mov      rdx, rax
+    shr      rdx, 0x4
+    or       rax, rdx
+
+    mov      rdx, rax
+    shr      rdx, 0x8
+    or       rax, rdx
+
+    mov      rdx, rax
+    shr      rdx, 0x10
+    or       rax, rdx
+
+    mov      rdx, rax
+    shr      rdx, 0x20
+    or       rax, rdx
+
+    inc      rax
+#+end_src
+
+** Snippet 37
+
+#+begin_src nasm
+    mov      rdx, rax
+    not      rdx
+    mov      rcx, 0x8080808080808080
+    and      rdx, rcx
+    mov      rcx, 0x0101010101010101
+    sub      rax, rcx
+    and      rax, rdx
+#+end_src
+
+** Snippet 38
+
+#+begin_src nasm
+    bsf      rcx, rax
+
+    mov      rdx, rax
+    dec      rdx
+    or       rdx, rax
+
+    mov      rax, rdx
+    inc      rax
+
+    mov      rbx, rdx
+    not      rbx
+    inc      rdx
+    and      rdx, rbx
+    dec      rdx
+
+    shr      rdx, cl
+    shr      rdx, 1
+
+    or       rax, rdx
+#+end_src
+
+** Snippet 39
+
+#+begin_src nasm
+    mov      rdx, 0xaaaaaaaaaaaaaaaa
+    add      rax, rdx
+    xor      rax, rdx
+#+end_src
+
+** Snippet 3A
+
+#+begin_src nasm
+    mov      rdx, rax
+    neg      rdx
+    and      rax, rdx
+
+    mov      rdx, 0x218a392cd3d5dbf
+    mul      rdx
+    shr      rax, 0x3a
+
+    xlatb
+#+end_src
+
+** Snippet 3B
+
+#+begin_src nasm
+    cdq
+    shl      eax, 1
+    and      edx, 0xc0000401
+    xor      eax, edx
+#+end_src
+
+** Snippet 3C
+
+#+begin_src nasm
+    mov      rbx, rax
+    mov      rdx, rbx
+    mov      rcx, 0xaaaaaaaaaaaaaaaa
+    and      rbx, rcx
+    shr      rbx, 1
+    and      rbx, rdx
+    popcnt   rbx, rbx
+    and      rbx, 1
+
+    neg      rax
+    mov      rdx, rax
+    mov      rcx, 0xaaaaaaaaaaaaaaaa
+    and      rax, rcx
+    shr      rax, 1
+    and      rax, rdx
+    popcnt   rax, rax
+    and      rax, 1
+
+    mov      rdx, rax
+    add      rax, rbx
+    dec      rax
+    neg      rax
+    sub      rdx, rbx
+#+end_src
+
+** Snippet 3D
+
+#+begin_src nasm
+    mov      rcx, 1
+.loop:
+    xor      rax, rcx
+    not      rax
+    and      rcx, rax
+    not      rax
+
+    xor      rdx, rcx
+    not      rdx
+    and      rcx, rdx
+    not      rdx
+
+    shl      rcx, 1
+    jnz      .loop
+#+end_src
+
+** Snippet 3E
+
+#+begin_src nasm
+    mov      rdx, rax
+    shr      rdx, 1
+    xor      rax, rdx
+
+    popcnt   rax, rax
+    and      rax, 0x3
+#+end_src
+
+** Snippet 3F
+
+#+begin_src nasm
+    mov      rbx, 3
+    mov      r8, rax
+    mov      rcx, rax
+    dec      rcx
+
+    and      rax, rcx
+    xor      edx, edx
+    div      rbx
+    mov      rsi, rdx
+
+    mov      rax, r8
+    or       rax, rcx
+    xor      edx, edx
+    div      rbx
+    inc      rdx
+    cmp      rdx, rbx
+    sbb      rdi, rdi
+    and      rdi, rdx
+
+    bsf      rax, r8
+#+end_src
