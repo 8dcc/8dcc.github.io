@@ -212,7 +212,7 @@
 <ul>
 <li><a href="#quick-note-about-vanilla-keybinds">1.1. Quick note about vanilla keybinds</a></li>
 <li><a href="#quick-note-about-keybind-notation">1.2. Quick note about keybind notation</a></li>
-<li><a href="#small-emacs-glosary">1.3. Small Emacs glosary</a></li>
+<li><a href="#small-emacs-glossary">1.3. Small Emacs glossary</a></li>
 </ul>
 </li>
 <li><a href="#general-design-choices">2. General design choices</a>
@@ -377,9 +377,9 @@ menu.
 </div>
 </div>
 
-<div id="outline-container-small-emacs-glosary" class="outline-3">
-<h3 id="small-emacs-glosary"><span class="section-number-3">1.3.</span> Small Emacs glosary</h3>
-<div class="outline-text-3" id="text-small-emacs-glosary">
+<div id="outline-container-small-emacs-glossary" class="outline-3">
+<h3 id="small-emacs-glossary"><span class="section-number-3">1.3.</span> Small Emacs glossary</h3>
+<div class="outline-text-3" id="text-small-emacs-glossary">
 <p>
 In case anyone is very new to emacs, this list might help understanding the
 difference between some terms used in this page.
@@ -542,7 +542,7 @@ using very long plain comments within a single source.
 </p>
 
 
-<div id="org816c30c" class="figure">
+<div id="orge93aa77" class="figure">
 <p><img src="../img/emacs-org.png" alt="emacs-org.png" />
 </p>
 </div>
@@ -581,7 +581,7 @@ Behold, the beauty of GNU Emacs (at least since version 22.1).
 </p>
 
 
-<div id="org9c8584f" class="figure">
+<div id="org91bf4b2" class="figure">
 <p><img src="../img/emacs-gdb.png" alt="emacs-gdb.png" />
 </p>
 </div>
@@ -671,7 +671,7 @@ displays the matches in an interactive buffer.
 </p>
 
 
-<div id="org9d295fa" class="figure">
+<div id="orgbb6f921" class="figure">
 <p><img src="../img/emacs-grep.png" alt="emacs-grep.png" />
 </p>
 </div>
@@ -718,7 +718,7 @@ the <code>diff</code> command, but much more interactive and integrated with Ema
 </p>
 
 
-<div id="org5f2153a" class="figure">
+<div id="orgad22ce8" class="figure">
 <p><img src="../img/emacs-ediff.png" alt="emacs-ediff.png" />
 </p>
 </div>
@@ -742,6 +742,24 @@ replacement for modern standalone browsers, since it doesn&rsquo;t have have sup
 for CSS or JavaScript. However, if a website is built properly (e.g. this blog),
 you should be able to render it without issues.
 </p>
+
+<p>
+Some time after initially writing this, I found a smart way to use <code>eww</code> that I
+think it&rsquo;s worth mentioning here. I wanted to save parts of different HTML files
+hosted in a website into a file, so I thought of making a Python script with the
+<a href="https://docs.python-requests.org/en/latest/index.html">requests</a> library that downloads each file, and then filter the section that I
+was interested in. However, I haven&rsquo;t used that library in a long time, so I
+knew it would have taken a bit to get working (just for using it once). What I
+did instead was open an empty buffer in Emacs, <code>eww</code> in another window, and record
+the following macro (in <a href="#evil-mode">my case</a> with <code>evil-record-macro</code>):
+</p>
+
+<ol class="org-ol">
+<li>Search what I need to copy on the <code>eww</code> buffer, and copy it.</li>
+<li>Navigate to the next HTML file from a link in the website.</li>
+<li>Switch to the other buffer, and paste the website contents, along with
+whatever text I wanted to add afterwards.</li>
+</ol>
 </div>
 </div>
 
@@ -864,7 +882,7 @@ If you find this overwhelming, you might want to at least consider using
 <code>M-x quick-calc</code> for quick (but not necesarily simple) calculations. For example:
 </p>
 
-<pre class="example" id="org6af66a0">
+<pre class="example" id="orgee07cdd">
 M-x quick-calc RET
 Quick calc: 632+56-32*4+2^3
 Result: 632 + 56 - 32 4 + 2^3 =&gt;  568  (16#238, 8#1070, 2#1000111000)
@@ -984,7 +1002,7 @@ with Emacs.
 </p>
 
 
-<div id="orgb7eb953" class="figure">
+<div id="org9a3abc4" class="figure">
 <p><img src="../img/emacs-magit.png" alt="emacs-magit.png" />
 </p>
 </div>

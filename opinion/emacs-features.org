@@ -75,9 +75,9 @@ For example:
 Note that =M-x ... RET= is a common pattern, since =M-x= opens the "execute command"
 menu.
 
-** Small Emacs glosary
+** Small Emacs glossary
 :PROPERTIES:
-:CUSTOM_ID: small-emacs-glosary
+:CUSTOM_ID: small-emacs-glossary
 :END:
 
 In case anyone is very new to emacs, this list might help understanding the
@@ -338,6 +338,20 @@ main usages is for online documentation. The Emacs browser is not meant to be a
 replacement for modern standalone browsers, since it doesn't have have support
 for CSS or JavaScript. However, if a website is built properly (e.g. this blog),
 you should be able to render it without issues.
+
+Some time after initially writing this, I found a smart way to use =eww= that I
+think it's worth mentioning here. I wanted to save parts of different HTML files
+hosted in a website into a file, so I thought of making a Python script with the
+[[https://docs.python-requests.org/en/latest/index.html][requests]] library that downloads each file, and then filter the section that I
+was interested in. However, I haven't used that library in a long time, so I
+knew it would have taken a bit to get working (just for using it once). What I
+did instead was open an empty buffer in Emacs, =eww= in another window, and record
+the following macro (in [[*Evil mode][my case]] with =evil-record-macro=):
+
+1. Search what I need to copy on the =eww= buffer, and copy it.
+2. Navigate to the next HTML file from a link in the website.
+3. Switch to the other buffer, and paste the website contents, along with
+   whatever text I wanted to add afterwards.
 
 ** ERC
 :PROPERTIES:
