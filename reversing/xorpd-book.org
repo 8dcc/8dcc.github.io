@@ -12,6 +12,9 @@
 #+TOC: headlines 1
 
 * Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
 
 This is an analysis of each assembly snippet from the book "[[https://www.xorpd.net/pages/xchg_rax/snip_00.html][xchg rax, rax]]" by
 [[https://www.xorpd.net/][xorpd]]. The book consists of 64 very original assembly snippets. It can be bought
@@ -26,6 +29,9 @@ have the following manuals around:
 - The [[https://www.nasm.us/doc/][NASM manual]], since it's the syntax used by the author of the book.
 
 * Snippets
+:PROPERTIES:
+:CUSTOM_ID: snippets
+:END:
 
 Each subsection will correspond to a different snippet from the book.
 
@@ -33,6 +39,9 @@ I took the liberty of modifying some indentation/spacing to fit my own
 preferences.
 
 ** Snippet 00
+:PROPERTIES:
+:CUSTOM_ID: snippet-00
+:END:
 
 Different ways of setting a register to zero.
 
@@ -58,8 +67,12 @@ jumps to the target operand. In this case, the operand is =$=, which in NASM
 refers to the address of the current instruction. See section 3.5 (Expressions)
 of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 
-* COMMENT TODO
 ** Snippet 01
+:PROPERTIES:
+:CUSTOM_ID: snippet-01
+:END:
+
+Calculate [[https://en.wikipedia.org/wiki/Fibonacci_sequence][Fibonacci]] or [[https://en.wikipedia.org/wiki/Lucas_number][Lucas]] sequences.
 
 #+begin_src nasm
 .loop:
@@ -67,7 +80,41 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
     loop     .loop
 #+end_src
 
+The =xadd= instruction exchanges values in the first and second operand (like
+=xchg=) and stores the sum of the two values in the first operand. In this case it
+will exchange the values at =rax= and =rdx=, and save the sum in =rax=. Because of the
+=loop= instruction, this process will be repeated =rcx= times.
+
+Using the =xadd= instruction on the same registers over and over can be used to
+generate Fibonacci or similar sequences. For example:
+
+| Iteration | =rax= | =rdx= |
+|-----------+-----+-----+
+|         0 |   1 |   0 |
+|         1 |   1 |   1 |
+|         2 |   2 |   1 |
+|         3 |   3 |   2 |
+|         4 |   5 |   3 |
+
+As you can see, the value in each register is the sum of the values that were in
+that register in the previous two iterations.
+
+By changing the initial state of the registers, the Lucas sequence can be
+generated:
+
+| Sequence  | Initial =rax= | Initial =rdx= |
+|-----------+-------------+-------------|
+| Fibonacci |           1 |           0 |
+| Lucas     |           1 |           2 |
+
+* COMMENT TODO
+:PROPERTIES:
+:CUSTOM_ID: comment-todo
+:END:
 ** Snippet 02
+:PROPERTIES:
+:CUSTOM_ID: snippet-02
+:END:
 
 #+begin_src nasm
     neg      rax
@@ -76,6 +123,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 03
+:PROPERTIES:
+:CUSTOM_ID: snippet-03
+:END:
 
 #+begin_src nasm
     sub      rdx, rax
@@ -85,12 +135,18 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 04
+:PROPERTIES:
+:CUSTOM_ID: snippet-04
+:END:
 
 #+begin_src nasm
     xor      al, 0x20
 #+end_src
 
 ** Snippet 05
+:PROPERTIES:
+:CUSTOM_ID: snippet-05
+:END:
 
 #+begin_src nasm
     sub      rax, 5
@@ -98,6 +154,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 06
+:PROPERTIES:
+:CUSTOM_ID: snippet-06
+:END:
 
 #+begin_src nasm
     not      rax
@@ -106,6 +165,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 07
+:PROPERTIES:
+:CUSTOM_ID: snippet-07
+:END:
 
 #+begin_src nasm
     inc      rax
@@ -115,6 +177,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 08
+:PROPERTIES:
+:CUSTOM_ID: snippet-08
+:END:
 
 #+begin_src nasm
     add      rax, rdx
@@ -122,6 +187,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 09
+:PROPERTIES:
+:CUSTOM_ID: snippet-09
+:END:
 
 #+begin_src nasm
     shr      rax, 3
@@ -129,6 +197,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 0A
+:PROPERTIES:
+:CUSTOM_ID: snippet-0a
+:END:
 
 #+begin_src nasm
     add      byte [rdi], 1
@@ -139,6 +210,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 0B
+:PROPERTIES:
+:CUSTOM_ID: snippet-0b
+:END:
 
 #+begin_src nasm
     not      rdx
@@ -147,6 +221,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 0C
+:PROPERTIES:
+:CUSTOM_ID: snippet-0c
+:END:
 
 #+begin_src nasm
     mov      rcx, rax
@@ -161,6 +238,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 0D
+:PROPERTIES:
+:CUSTOM_ID: snippet-0d
+:END:
 
 #+begin_src nasm
     mov      rdx, rbx
@@ -176,6 +256,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 0E
+:PROPERTIES:
+:CUSTOM_ID: snippet-0e
+:END:
 
 #+begin_src nasm
     mov      rcx, rax
@@ -190,6 +273,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 0F
+:PROPERTIES:
+:CUSTOM_ID: snippet-0f
+:END:
 
 #+begin_src nasm
 .loop:
@@ -199,6 +285,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 10
+:PROPERTIES:
+:CUSTOM_ID: snippet-10
+:END:
 
 #+begin_src nasm
     push     rax
@@ -219,6 +308,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 11
+:PROPERTIES:
+:CUSTOM_ID: snippet-11
+:END:
 
 #+begin_src nasm
 .loop:
@@ -231,6 +323,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 12
+:PROPERTIES:
+:CUSTOM_ID: snippet-12
+:END:
 
 #+begin_src nasm
     mov      rcx, rdx
@@ -240,6 +335,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 13
+:PROPERTIES:
+:CUSTOM_ID: snippet-13
+:END:
 
 #+begin_src nasm
     mov      rcx, 0x40
@@ -252,6 +350,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 14
+:PROPERTIES:
+:CUSTOM_ID: snippet-14
+:END:
 
 #+begin_src nasm
     mov      rcx, rax
@@ -264,6 +365,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 15
+:PROPERTIES:
+:CUSTOM_ID: snippet-15
+:END:
 
 #+begin_src nasm
     mov      rdx, 0xffffffff80000000
@@ -272,6 +376,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 16
+:PROPERTIES:
+:CUSTOM_ID: snippet-16
+:END:
 
 #+begin_src nasm
     xor      rax, rbx
@@ -284,6 +391,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 17
+:PROPERTIES:
+:CUSTOM_ID: snippet-17
+:END:
 
 #+begin_src nasm
     cqo
@@ -292,6 +402,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 18
+:PROPERTIES:
+:CUSTOM_ID: snippet-18
+:END:
 
 #+begin_src nasm
     rdtsc
@@ -307,6 +420,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 19
+:PROPERTIES:
+:CUSTOM_ID: snippet-19
+:END:
 
 #+begin_src nasm
     call     .skip
@@ -317,6 +433,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 1A
+:PROPERTIES:
+:CUSTOM_ID: snippet-1a
+:END:
 
 #+begin_src nasm
         call     .next
@@ -325,6 +444,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 1B
+:PROPERTIES:
+:CUSTOM_ID: snippet-1b
+:END:
 
 #+begin_src nasm
     push     rax
@@ -332,12 +454,18 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 1C
+:PROPERTIES:
+:CUSTOM_ID: snippet-1c
+:END:
 
 #+begin_src nasm
     pop      rsp
 #+end_src
 
 ** Snippet 1D
+:PROPERTIES:
+:CUSTOM_ID: snippet-1d
+:END:
 
 #+begin_src nasm
     mov      rsp, buff2 + N*8 + 8
@@ -346,6 +474,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 1E
+:PROPERTIES:
+:CUSTOM_ID: snippet-1e
+:END:
 
 #+begin_src nasm
     ; NOTE: The `das' instruction is not valid in 64-bit mode
@@ -355,6 +486,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 1F
+:PROPERTIES:
+:CUSTOM_ID: snippet-1f
+:END:
 
 #+begin_src nasm
 .loop:
@@ -368,6 +502,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 20
+:PROPERTIES:
+:CUSTOM_ID: snippet-20
+:END:
 
 #+begin_src nasm
     mov      rcx, rax
@@ -384,6 +521,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 21
+:PROPERTIES:
+:CUSTOM_ID: snippet-21
+:END:
 
 #+begin_src nasm
     mov      rsi, rax
@@ -402,6 +542,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 22
+:PROPERTIES:
+:CUSTOM_ID: snippet-22
+:END:
 
 #+begin_src nasm
     mov      rdx, 0xaaaaaaaaaaaaaaab
@@ -411,6 +554,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 23
+:PROPERTIES:
+:CUSTOM_ID: snippet-23
+:END:
 
 #+begin_src nasm
 .loop:
@@ -431,6 +577,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 24
+:PROPERTIES:
+:CUSTOM_ID: snippet-24
+:END:
 
 #+begin_src nasm
     mov      rbx, rax
@@ -450,6 +599,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 25
+:PROPERTIES:
+:CUSTOM_ID: snippet-25
+:END:
 
 #+begin_src nasm
     xor      eax, eax
@@ -472,6 +624,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 26
+:PROPERTIES:
+:CUSTOM_ID: snippet-26
+:END:
 
 #+begin_src nasm
     mov      rdx, rax
@@ -481,6 +636,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 27
+:PROPERTIES:
+:CUSTOM_ID: snippet-27
+:END:
 
 #+begin_src nasm
     mov      ch, cl
@@ -493,6 +651,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 28
+:PROPERTIES:
+:CUSTOM_ID: snippet-28
+:END:
 
 #+begin_src nasm
     clc
@@ -503,6 +664,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 29
+:PROPERTIES:
+:CUSTOM_ID: snippet-29
+:END:
 
 #+begin_src nasm
     lea      rdi, [rsi + 3]
@@ -510,6 +674,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 2A
+:PROPERTIES:
+:CUSTOM_ID: snippet-2a
+:END:
 
 #+begin_src nasm
     mov      rsi, rbx
@@ -522,6 +689,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 2B
+:PROPERTIES:
+:CUSTOM_ID: snippet-2b
+:END:
 
 #+begin_src nasm
     xor      eax, eax
@@ -546,6 +716,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 2C
+:PROPERTIES:
+:CUSTOM_ID: snippet-2c
+:END:
 
 #+begin_src nasm
     mov      qword [rbx + 8*rcx], 0
@@ -558,6 +731,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 2D
+:PROPERTIES:
+:CUSTOM_ID: snippet-2d
+:END:
 
 #+begin_src nasm
     mov      rdx, rax
@@ -566,6 +742,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 2E
+:PROPERTIES:
+:CUSTOM_ID: snippet-2e
+:END:
 
 #+begin_src nasm
     mov      rdx, rax
@@ -576,6 +755,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 2F
+:PROPERTIES:
+:CUSTOM_ID: snippet-2f
+:END:
 
 #+begin_src nasm
         xor      eax, eax
@@ -590,6 +772,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 30
+:PROPERTIES:
+:CUSTOM_ID: snippet-30
+:END:
 
 #+begin_src nasm
     and      rax, rdx
@@ -602,6 +787,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 31
+:PROPERTIES:
+:CUSTOM_ID: snippet-31
+:END:
 
 #+begin_src nasm
     mov      rcx, rax
@@ -618,6 +806,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 32
+:PROPERTIES:
+:CUSTOM_ID: snippet-32
+:END:
 
 #+begin_src nasm
     mov      rcx, rax
@@ -632,6 +823,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 33
+:PROPERTIES:
+:CUSTOM_ID: snippet-33
+:END:
 
 #+begin_src nasm
     mov      rdx, rax
@@ -660,6 +854,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 34
+:PROPERTIES:
+:CUSTOM_ID: snippet-34
+:END:
 
 #+begin_src nasm
     mov      ecx, eax
@@ -699,6 +896,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 35
+:PROPERTIES:
+:CUSTOM_ID: snippet-35
+:END:
 
 #+begin_src nasm
     mov      edx, eax
@@ -733,6 +933,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 36
+:PROPERTIES:
+:CUSTOM_ID: snippet-36
+:END:
 
 #+begin_src nasm
     dec      rax
@@ -765,6 +968,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 37
+:PROPERTIES:
+:CUSTOM_ID: snippet-37
+:END:
 
 #+begin_src nasm
     mov      rdx, rax
@@ -777,6 +983,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 38
+:PROPERTIES:
+:CUSTOM_ID: snippet-38
+:END:
 
 #+begin_src nasm
     bsf      rcx, rax
@@ -801,6 +1010,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 39
+:PROPERTIES:
+:CUSTOM_ID: snippet-39
+:END:
 
 #+begin_src nasm
     mov      rdx, 0xaaaaaaaaaaaaaaaa
@@ -809,6 +1021,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 3A
+:PROPERTIES:
+:CUSTOM_ID: snippet-3a
+:END:
 
 #+begin_src nasm
     mov      rdx, rax
@@ -823,6 +1038,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 3B
+:PROPERTIES:
+:CUSTOM_ID: snippet-3b
+:END:
 
 #+begin_src nasm
     cdq
@@ -832,6 +1050,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 3C
+:PROPERTIES:
+:CUSTOM_ID: snippet-3c
+:END:
 
 #+begin_src nasm
     mov      rbx, rax
@@ -860,6 +1081,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 3D
+:PROPERTIES:
+:CUSTOM_ID: snippet-3d
+:END:
 
 #+begin_src nasm
     mov      rcx, 1
@@ -879,6 +1103,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 3E
+:PROPERTIES:
+:CUSTOM_ID: snippet-3e
+:END:
 
 #+begin_src nasm
     mov      rdx, rax
@@ -890,6 +1117,9 @@ of the [[https://www.nasm.us/doc/nasmdoc3.html#section-3.5][NASM manual]].
 #+end_src
 
 ** Snippet 3F
+:PROPERTIES:
+:CUSTOM_ID: snippet-3f
+:END:
 
 #+begin_src nasm
     mov      rbx, 3

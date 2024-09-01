@@ -208,15 +208,15 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org20535c1">1. Introduction</a></li>
-<li><a href="#org0b80727">2. Snippets</a></li>
+<li><a href="#introduction">1. Introduction</a></li>
+<li><a href="#snippets">2. Snippets</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org20535c1" class="outline-2">
-<h2 id="org20535c1"><span class="section-number-2">1.</span> Introduction</h2>
-<div class="outline-text-2" id="text-1">
+<div id="outline-container-introduction" class="outline-2">
+<h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-introduction">
 <p>
 This is an analysis of each assembly snippet from the book &ldquo;<a href="https://www.xorpd.net/pages/xchg_rax/snip_00.html">xchg rax, rax</a>&rdquo; by
 <a href="https://www.xorpd.net/">xorpd</a>. The book consists of 64 very original assembly snippets. It can be bought
@@ -237,9 +237,9 @@ have the following manuals around:
 </div>
 </div>
 
-<div id="outline-container-org0b80727" class="outline-2">
-<h2 id="org0b80727"><span class="section-number-2">2.</span> Snippets</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-snippets" class="outline-2">
+<h2 id="snippets"><span class="section-number-2">2.</span> Snippets</h2>
+<div class="outline-text-2" id="text-snippets">
 <p>
 Each subsection will correspond to a different snippet from the book.
 </p>
@@ -250,9 +250,9 @@ preferences.
 </p>
 </div>
 
-<div id="outline-container-org2c154eb" class="outline-3">
-<h3 id="org2c154eb"><span class="section-number-3">2.1.</span> Snippet 00</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-snippet-00" class="outline-3">
+<h3 id="snippet-00"><span class="section-number-3">2.1.</span> Snippet 00</h3>
+<div class="outline-text-3" id="text-snippet-00">
 <p>
 Different ways of setting a register to zero.
 </p>
@@ -283,6 +283,126 @@ jumps to the target operand. In this case, the operand is <code>$</code>, which 
 refers to the address of the current instruction. See section 3.5 (Expressions)
 of the <a href="https://www.nasm.us/doc/nasmdoc3.html#section-3.5">NASM manual</a>.
 </p>
+</div>
+</div>
+
+<div id="outline-container-snippet-01" class="outline-3">
+<h3 id="snippet-01"><span class="section-number-3">2.2.</span> Snippet 01</h3>
+<div class="outline-text-3" id="text-snippet-01">
+<p>
+Calculate <a href="https://en.wikipedia.org/wiki/Fibonacci_sequence">Fibonacci</a> or <a href="https://en.wikipedia.org/wiki/Lucas_number">Lucas</a> sequences.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">.loop</span>:
+    <span style="color: #feacd0;">xadd</span>     <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rdx</span>
+    <span style="color: #feacd0;">loop</span>     .loop
+</pre>
+</div>
+
+<p>
+The <code>xadd</code> instruction exchanges values in the first and second operand (like
+<code>xchg</code>) and stores the sum of the two values in the first operand. In this case it
+will exchange the values at <code>rax</code> and <code>rdx</code>, and save the sum in <code>rax</code>. Because of the
+<code>loop</code> instruction, this process will be repeated <code>rcx</code> times.
+</p>
+
+<p>
+Using the <code>xadd</code> instruction on the same registers over and over can be used to
+generate Fibonacci or similar sequences. For example:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">Iteration</th>
+<th scope="col" class="org-right"><code>rax</code></th>
+<th scope="col" class="org-right"><code>rdx</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">0</td>
+<td class="org-right">1</td>
+<td class="org-right">0</td>
+</tr>
+
+<tr>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-right">2</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-right">3</td>
+<td class="org-right">2</td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-right">5</td>
+<td class="org-right">3</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+As you can see, the value in each register is the sum of the values that were in
+that register in the previous two iterations.
+</p>
+
+<p>
+By changing the initial state of the registers, the Lucas sequence can be
+generated:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Sequence</th>
+<th scope="col" class="org-right">Initial <code>rax</code></th>
+<th scope="col" class="org-right">Initial <code>rdx</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Fibonacci</td>
+<td class="org-right">1</td>
+<td class="org-right">0</td>
+</tr>
+
+<tr>
+<td class="org-left">Lucas</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
