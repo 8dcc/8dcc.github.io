@@ -107,14 +107,12 @@ generated:
 | Fibonacci |           1 |           0 |
 | Lucas     |           1 |           2 |
 
-* COMMENT TODO
-:PROPERTIES:
-:CUSTOM_ID: comment-todo
-:END:
 ** Snippet 02
 :PROPERTIES:
 :CUSTOM_ID: snippet-02
 :END:
+
+The following code converts non-zero numbers to one.
 
 #+begin_src nasm
     neg      rax
@@ -122,6 +120,59 @@ generated:
     neg      rax
 #+end_src
 
+This is equivalent to the following C code:
+
+#+begin_src C
+int val = 123;
+bool is_non_zero = !!val; /* 1 or 0 */
+#+end_src
+
+There are a few key details for understanding the assembly snippet.
+
+The =neg= instruction replaces the value of the operand with its [[https://en.wikipedia.org/wiki/Two%27s_complement][two's
+complement]]. This is equivalent to subtracting the value from zero. It's
+important to note that this instruction also sets the carry flag (=CF=) if the
+source operand was non-zero.
+
+The =sbb= instruction adds the carry flag (=CF=) to the source operand, and
+subtracts the result from the destination operand. The result is stored into the
+destination operand. The operation is:
+
+#+begin_example text
+dst = dst - (src + CF)
+#+end_example
+
+Note how the carry flag (=CF=) is /only/ added to the source operand. This happens
+even if both source and operand registers are the same.
+
+Let's look at the operations of the assembly snippet step by step.
+
+| Step | Last operation       | ~rax~ = 0       | ~rax~ = 1       | ~rax~ = 5        |
+|------+----------------------+---------------+---------------+----------------|
+|    1 | Initial state        | ~0b0000...0000~ | ~0b0000...0001~ | ~0b0000...00101~ |
+|    2 | First ~neg~            | ~0b0000...0000~ | ~0b1111...1111~ | ~0b1111...11011~ |
+|    3 | Add carry flag (~sbb~) | ~0b0000...0000~ | ~0b0000...0000~ | ~0b1111...11100~ |
+|    4 | Subtract (~sbb~)       | ~0b0000...0000~ | ~0b1111...1111~ | ~0b1111...11111~ |
+|    5 | Second ~neg~           | ~0b0000...0000~ | ~0b1111...1111~ | ~0b0000...00000~ |
+
+Again, note that the 4th step isn't subtracting the number of the 3rd step to
+itself; it is subtracting it to the number of the 2nd step.
+
+Since the source and destination operands of the =sbb= instruction are the same,
+it's essentially setting the operand to the negated carry flag (=CF=):
+
+#+begin_example
+x = x - (x + CF)
+x = -(CF)
+#+end_example
+
+After negating this value with the second =neg= instruction, the operand becomes
+the carry flag (=CF=), which was set by the first =neg= instruction to either 0 or 1
+depending on whether the value was zero or non-zero, respectively.
+
+As we can see, non-zero values are set to one, while zero remains unchanged.
+
+* COMMENT TODO
 ** Snippet 03
 :PROPERTIES:
 :CUSTOM_ID: snippet-03

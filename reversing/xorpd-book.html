@@ -405,6 +405,153 @@ generated:
 </table>
 </div>
 </div>
+
+<div id="outline-container-snippet-02" class="outline-3">
+<h3 id="snippet-02"><span class="section-number-3">2.3.</span> Snippet 02</h3>
+<div class="outline-text-3" id="text-snippet-02">
+<p>
+The following code converts non-zero numbers to one.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #feacd0;">neg</span>      <span style="color: #6ae4b9;">rax</span>
+<span style="color: #feacd0;">sbb</span>      <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rax</span>
+<span style="color: #feacd0;">neg</span>      <span style="color: #6ae4b9;">rax</span>
+</pre>
+</div>
+
+<p>
+This is equivalent to the following C code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">val</span> = <span style="color: #88ca9f;">123</span>;
+<span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">is_non_zero</span> = <span style="color: #ff6740; font-weight: bold;">!</span>!val; <span style="color: #989898;">/* </span><span style="color: #989898;">1 or 0</span><span style="color: #989898;"> */</span>
+</pre>
+</div>
+
+<p>
+There are a few key details for understanding the assembly snippet.
+</p>
+
+<p>
+The <code>neg</code> instruction replaces the value of the operand with its <a href="https://en.wikipedia.org/wiki/Two%27s_complement">two&rsquo;s
+complement</a>. This is equivalent to subtracting the value from zero. It&rsquo;s
+important to note that this instruction also sets the carry flag (<code>CF</code>) if the
+source operand was non-zero.
+</p>
+
+<p>
+The <code>sbb</code> instruction adds the carry flag (<code>CF</code>) to the source operand, and
+subtracts the result from the destination operand. The result is stored into the
+destination operand. The operation is:
+</p>
+
+<pre class="example" id="org05af4e0">
+dst = dst - (src + CF)
+</pre>
+
+<p>
+Note how the carry flag (<code>CF</code>) is <i>only</i> added to the source operand. This happens
+even if both source and operand registers are the same.
+</p>
+
+<p>
+Let&rsquo;s look at the operations of the assembly snippet step by step.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">Step</th>
+<th scope="col" class="org-left">Last operation</th>
+<th scope="col" class="org-left"><code>rax</code> = 0</th>
+<th scope="col" class="org-left"><code>rax</code> = 1</th>
+<th scope="col" class="org-left"><code>rax</code> = 5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">Initial state</td>
+<td class="org-left"><code>0b0000...0000</code></td>
+<td class="org-left"><code>0b0000...0001</code></td>
+<td class="org-left"><code>0b0000...00101</code></td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">First <code>neg</code></td>
+<td class="org-left"><code>0b0000...0000</code></td>
+<td class="org-left"><code>0b1111...1111</code></td>
+<td class="org-left"><code>0b1111...11011</code></td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">Add carry flag (<code>sbb</code>)</td>
+<td class="org-left"><code>0b0000...0000</code></td>
+<td class="org-left"><code>0b0000...0000</code></td>
+<td class="org-left"><code>0b1111...11100</code></td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-left">Subtract (<code>sbb</code>)</td>
+<td class="org-left"><code>0b0000...0000</code></td>
+<td class="org-left"><code>0b1111...1111</code></td>
+<td class="org-left"><code>0b1111...11111</code></td>
+</tr>
+
+<tr>
+<td class="org-right">5</td>
+<td class="org-left">Second <code>neg</code></td>
+<td class="org-left"><code>0b0000...0000</code></td>
+<td class="org-left"><code>0b1111...1111</code></td>
+<td class="org-left"><code>0b0000...00000</code></td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Again, note that the 4th step isn&rsquo;t subtracting the number of the 3rd step to
+itself; it is subtracting it to the number of the 2nd step.
+</p>
+
+<p>
+Since the source and destination operands of the <code>sbb</code> instruction are the same,
+it&rsquo;s essentially setting the operand to the negated carry flag (<code>CF</code>):
+</p>
+
+<pre class="example" id="orge9c2d15">
+x = x - (x + CF)
+x = -(CF)
+</pre>
+
+<p>
+After negating this value with the second <code>neg</code> instruction, the operand becomes
+the carry flag (<code>CF</code>), which was set by the first <code>neg</code> instruction to either 0 or 1
+depending on whether the value was zero or non-zero, respectively.
+</p>
+
+<p>
+As we can see, non-zero values are set to one, while zero remains unchanged.
+</p>
+</div>
+</div>
 </div>
 </div>
 </body>
