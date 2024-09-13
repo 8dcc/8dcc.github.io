@@ -244,8 +244,8 @@
 <li><a href="#simple-version-for-positive-values">2. Simple version for positive values</a></li>
 <li><a href="#supporting-negative-values">3. Supporting negative values</a>
 <ul>
-<li><a href="#cs-fmod">3.1. C's <code>fmod</code></a></li>
-<li><a href="#emacs-mod">3.2. Emacs' <code>mod</code></a></li>
+<li><a href="#cs-fmod">3.1. C&rsquo;s <code>fmod</code></a></li>
+<li><a href="#emacs-mod">3.2. Emacs&rsquo; <code>mod</code></a></li>
 <li><a href="#my-approach">3.3. My approach</a></li>
 </ul>
 </li>
@@ -258,10 +258,10 @@
 <h2 id="motivation"><span class="section-number-2">1.</span> Motivation</h2>
 <div class="outline-text-2" id="text-motivation">
 <p>
-This article was very remotely inspired by <a href="https://jacobwsmith.xyz/stories/color_schemes.html">Jacob Smith's article</a> about color
+This article was very remotely inspired by <a href="https://jacobwsmith.xyz/stories/color_schemes.html">Jacob Smith&rsquo;s article</a> about color
 palettes. I started writing some Scheme code for <a href="https://github.com/8dcc/scratch/tree/main/Lisp/misc/color-palettes">generating color palettes</a>, and
 I decided to first write some functions for <a href="https://github.com/8dcc/scratch/tree/main/Lisp/misc/color-conversion">converting between RGB and HSV</a>
-formats. Then, I realized that Scheme (unlike Emacs Lisp, for example) doesn't
+formats. Then, I realized that Scheme (unlike Emacs Lisp, for example) doesn&rsquo;t
 support floating-point inputs in its <code>modulus</code> function.
 </p>
 
@@ -315,16 +315,16 @@ I also wrote an iterative C version.
 <p>
 There are two main approaches for handling negative values: the one used by the
 <code>fmod</code> function in the <code>math.h</code> C header and the one used by the <code>mod</code> function in
-Emacs Lisp. Let's have a look at the outputs of both functions, and how they can
+Emacs Lisp. Let&rsquo;s have a look at the outputs of both functions, and how they can
 be implemented.
 </p>
 </div>
 
 <div id="outline-container-cs-fmod" class="outline-3">
-<h3 id="cs-fmod"><span class="section-number-3">3.1.</span> C's <code>fmod</code></h3>
+<h3 id="cs-fmod"><span class="section-number-3">3.1.</span> C&rsquo;s <code>fmod</code></h3>
 <div class="outline-text-3" id="text-cs-fmod">
 <p>
-Let's have a look at some outputs from the <code>fmod</code> function in the math header.
+Let&rsquo;s have a look at some outputs from the <code>fmod</code> function in the math header.
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -394,7 +394,7 @@ calls to <code>abs</code> and wrapping our previous function with a sign conditi
 
 <p>
 This is the iterative C version. I decided to use an <code>int</code> instead of a <code>bool</code> for
-the <code>bNegativeResult</code> variable because I didn't want to include <code>stdbool.h</code> just for
+the <code>bNegativeResult</code> variable because I didn&rsquo;t want to include <code>stdbool.h</code> just for
 this. I used <a href="https://en.wikipedia.org/wiki/Hungarian_notation">hungarian notation</a> to emphasize that it acts as a boolean.
 </p>
 
@@ -419,10 +419,10 @@ this. I used <a href="https://en.wikipedia.org/wiki/Hungarian_notation">hungaria
 </div>
 
 <div id="outline-container-emacs-mod" class="outline-3">
-<h3 id="emacs-mod"><span class="section-number-3">3.2.</span> Emacs' <code>mod</code></h3>
+<h3 id="emacs-mod"><span class="section-number-3">3.2.</span> Emacs&rsquo; <code>mod</code></h3>
 <div class="outline-text-3" id="text-emacs-mod">
 <p>
-Now let's compare the previous results with the ones from Emacs.
+Now let&rsquo;s compare the previous results with the ones from Emacs.
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -483,7 +483,7 @@ Where \(\lfloor a / b \rfloor\) indicates the integer division of \(a\) and \(b\
 </p>
 
 <p>
-Before explaining my approach, I want to show how Emacs' <code>mod</code> actually works. The
+Before explaining my approach, I want to show how Emacs&rsquo; <code>mod</code> actually works. The
 actual C function is called <code>fmod_float</code> and is located in the <a href="https://github.com/emacs-mirror/emacs/blob/2119cd52cdb58221a850360bf65c91cf3bf4b47e/src/floatfns.c#L569-L582">src/floatfns.c</a>
 file. Omitting the emacs-specific parts, we get the following function.
 </p>
@@ -504,14 +504,14 @@ file. Omitting the emacs-specific parts, we get the following function.
 </div>
 
 <p>
-I want to note that, although Emacs' obviously uses the real <code>fmod</code> from <code>math.h</code>,
+I want to note that, although Emacs&rsquo; obviously uses the real <code>fmod</code> from <code>math.h</code>,
 the previous <code>my_fmod</code> function can be used here as well.
 </p>
 
 <p>
 As you can see, the only part that differences the Emacs modulus from the C
 modulus is the conditional in the middle. We could simply implement this
-behavior in Scheme by adding the missing conditional, but I think it's better if
+behavior in Scheme by adding the missing conditional, but I think it&rsquo;s better if
 we adapt our previous function.
 </p>
 </div>
@@ -521,7 +521,7 @@ we adapt our previous function.
 <h3 id="my-approach"><span class="section-number-3">3.3.</span> My approach</h3>
 <div class="outline-text-3" id="text-my-approach">
 <p>
-If we look again at the outputs from Emacs' <code>mod</code>, we can see that the changes in
+If we look again at the outputs from Emacs&rsquo; <code>mod</code>, we can see that the changes in
 the output match the following table.
 </p>
 
@@ -616,7 +616,7 @@ With this, we can make a final <code>fmod</code> version.
 </div>
 
 <p>
-There are some unnecessary calls to <code>positive?</code> and <code>negative?</code>, but I think it's
+There are some unnecessary calls to <code>positive?</code> and <code>negative?</code>, but I think it&rsquo;s
 clearer this way. This issue does not happen in the following C version.
 </p>
 
@@ -646,7 +646,7 @@ clearer this way. This issue does not happen in the following C version.
 <div class="outline-text-2" id="text-final-note">
 <p>
 Most of these functions were made just by observing the output of already
-existing functions, so I don't know if this is the most optimal or mathematical
+existing functions, so I don&rsquo;t know if this is the most optimal or mathematical
 approach. If you have any suggestions or improvements, feel free to <a href="https://github.com/8dcc/8dcc.github.io">contribute</a>
 to this page.
 </p>
