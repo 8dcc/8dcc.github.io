@@ -1,0 +1,377 @@
+#+TITLE: Replacing conditional Lisp primitives with macros
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+Some months ago I started writing [[https://github.com/8dcc/sl][my own Lisp]]. I decided to implement the =or= and
+=and= procedures as /special form/ C primitives, but I wanted to explain in the
+documentation that they don't need to be C primitives, since we can define them
+as macros that use =if=. When writing the example for the documentation, I wrote a
+few different alternatives that I consider worth sharing here.
+
+Before getting into the macros, I will briefly explain some of these
+concepts. Keep in mind that I will be referring to these concepts in the context
+of a Lisp interpreter written in C, more specifically on the Lisp syntax used in
+my interpreter.
+
+** Primitives
+:PROPERTIES:
+:CUSTOM_ID: primitives
+:END:
+
+Even though the user can define his own functions, at some point the interpreter
+will have to translate them to machine instructions that run on the actual
+hardware. What this means is that, even thought the user can write:
+
+#+begin_src lisp
+(defun square (x)
+  (* x x))
+
+(square 5)
+#+end_src
+
+At some point the Lisp has to multiply the numbers, either with another Lisp
+procedure that uses, for example, addition; or with actual CPU instructions.
+
+These basic building blocks, like arithmetic functions, are called
+primitives/. In my case they are built into the interpreter as C functions.
+
+** Special Forms
+:PROPERTIES:
+:CUSTOM_ID: special-forms
+:END:
+
+Lisp follows a general evaluation process when calling a procedure. Usually,
+when the user calls a function =func= with the following arguments:
+
+#+begin_src lisp
+(defun func (arg0 arg1 arg2)
+  (format "%d %d %s" arg0 arg1 arg2))
+
+(func 1 (+ 3 4) "foo")
+#+end_src
+
+The following process is performed:
+
+1. Each argument is evaluated. The integer =1= evaluates to itself; the list
+   =(+ 3 4)= is treated as a procedure call, and returns 7; and the string ="foo"=
+   evaluates to itself.
+2. The evaluated arguments are bound to the /formal arguments/ =arg0=, =arg1= and
+   =arg2=, respectively.
+3. Each expression in the body of the procedure is evaluated, returning the last
+   result.
+
+However, some exceptions have to be made. For example, we can't define =if= as a
+normal procedure because its 3 arguments would be evaluated before calling =if=,
+when in reality only the second or the third argument should be evaluated
+depending on the predicate:
+
+#+begin_src lisp
+(defun my-if (predicate consequent alternative)
+  ...)
+
+(my-if tru
+       (define var 1)
+       (define var 2))
+#+end_src
+
+In the previous example =var= was defined to 2 because all three expressions were
+evaluated before the procedure call was made (assuming the arguments were
+evaluated in order).
+
+These special procedures that don't follow normal evaluation rules are called
+/special forms/.
+
+** Macros
+:PROPERTIES:
+:CUSTOM_ID: macros
+:END:
+
+Macros in my Lisp are inspired by [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Macros.html][Emacs Lisp macros]]. Macros are similar to
+procedures, but have a few key differences:
+
+1. When a macro is called, the arguments are *not* evaluated before applying it,
+   so the macro can operate on the un-evaluated expressions directly, instead of
+   on the values they compute. The first step of a macro call is binding the
+   un-evaluated arguments to the formals.
+2. Macros don't /directly/ compute values, they instead build Lisp expressions
+   that will be used to compute the actual values. The second step of a macro
+   call is the /macro expansion/. In this step, the macro is called just like a
+   lambda, returning a Lisp expression.
+3. The last step of a macro call is evaluating the expanded expression, which
+   will be used to compute the actual value returned by the macro.
+
+In other words the general process when calling a procedure is:
+
+#+begin_example
+Evaluate arguments -> Bind arguments -> Evaluate body
+                      `-----------------------------´
+                                 (Apply)
+#+end_example
+
+While the process of calling a macro is:
+
+#+begin_example
+Bind arguments -> Evaluate body -> Evaluate expansion
+`-----------------------------´
+            (Expand)
+#+end_example
+
+For example:
+
+#+begin_src lisp
+> (defmacro my-macro (name)
+    (list 'define name 123))
+<macro>
+
+> (my-macro some-name)
+123
+
+> (macroexpand '(my-macro some-name))
+(define some-name 123)
+
+> some-name
+123
+#+end_src
+
+* The =or= macro
+:PROPERTIES:
+:CUSTOM_ID: the-or-macro
+:END:
+
+** Version 1
+:PROPERTIES:
+:CUSTOM_ID: version-1
+:END:
+
+#+begin_src lisp
+(defmacro my-or (&rest exprs)
+  (defun or-lst (expr-list)
+    (if (null? expr-list)
+        nil
+        ;; TODO: Don't overwrite "result", generate unique symbol.
+        (list (list 'lambda (list 'result)
+                    (list 'if 'result 'result
+                          (or-lst (cdr expr-list))))
+              (car expr-list))))
+  (or-lst exprs))
+#+end_src
+
+The first version uses an inner =or-lst= procedure to allow easier recursion. Note
+that this procedure is not defined globally, the scope is restricted to the body
+of the macro. Since =my-or= uses =&rest=, when the macro is called with
+=(my-or 'A 'B 'C)=, the list =(A B C)= is bound to the symbol =exprs=. This makes
+recursion trickier, because if we call ourselves with =(cdr exprs)=, we are not
+doing =(my-or B C)=, but =(my-or '(B C))=, which gets put into another list because
+of =&rest=. An easier solution for this "problem" is shown on the next section.
+
+First, it checks the base case, we didn't get any arguments. In that case, =nil=
+is returned. This is the expected behavior in Scheme and in my Lisp.
+
+If we got an argument, the macro will expand to a /call/ to a /lambda/ that receives
+the evaluated argument. We need to do this to evaluate the expression only
+once. An incorrect example:
+
+#+begin_src lisp
+(or A B C)
+
+;; Expanded (incorrectly) into:
+(if A A
+    (if B B
+        (if C C
+            nil)))
+#+end_src
+
+In that example, =A= is evaluated once to get the condition and, if the result is
+non-nil, =A= is evaluated a second time as the /consequent/. Instead, the correct
+approach is something like:
+
+#+begin_src lisp
+(let ((result A))
+  (if result
+      result
+      ...))
+#+end_src
+
+In that second example, =A= is evaluated only once. However, since my Lisp didn't
+have a =let= macro at this point, I used an uglier (but equivalent) version:
+
+#+begin_src lisp
+((lambda (result)
+   (if result
+       result
+       ...))
+ A)
+#+end_src
+
+As you can see, there is a Big Bug™ in this macro, that will remain throughout
+all versions. The name used for the lambda argument, "result", is far from
+unique, so we might overwrite some user value during this call. In a real
+implementation, we could use some function like Emacs Lisp's [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#index-gensym][gensym]].
+
+Here are some examples of the macro:
+
+#+begin_src lisp
+> (my-or nil 'A 'B)
+A
+
+> (macroexpand '(my-or 'A 'B 'C))  ; God almighty...
+((lambda (result)
+   (if result result
+     ((lambda (result)
+        (if result result
+          ((lambda (result)
+             (if result result
+               nil))
+           'C)))
+      'B)))
+ 'A)
+
+> (my-or)
+nil
+
+> (macroexpand '(my-or))
+nil
+#+end_src
+
+Throughout this article I will make some minor changes to the interpreter output
+for readability, like modifying indentation or replacing =(quote expr)= with
+='expr=.
+
+** Version 2
+:PROPERTIES:
+:CUSTOM_ID: version-2
+:END:
+
+#+begin_src lisp
+(defmacro my-or (&rest exprs)
+  (if (null? exprs)
+      nil
+      (list (list 'lambda (list 'result)
+                  (list 'if 'result 'result
+                        ;; The expansion will call `my-or'.
+                        (cons 'my-or (cdr exprs))))
+            (car exprs))))
+#+end_src
+
+This version still uses the lambda call method, but it doesn't use an inner
+=or-lst= procedure. Instead, it introduces a call to the macro itself /in the
+expansion/.
+
+We use =cons= to append =my-or= to the =cdr= of the argument list, constructing a
+function call. We could also use =apply=, but we would have to quote the argument
+list to avoid using the =cadr= as another function call:
+
+#+begin_src lisp
+(list 'apply 'my-or
+      (list 'quote (cdr exprs)))
+
+;; Assumming `exprs' is (A B C), expands to:
+(apply my-or (quote (B C)))
+
+;; Alternatively:
+(apply my-or '(B C))
+#+end_src
+
+Some examples of the second version:
+
+#+begin_src lisp
+> (my-or nil 'A 'B)
+A
+
+> (macroexpand '(my-or 'A 'B 'C))  ; Much more readable
+((lambda (result)
+   (if result result
+     (my-or ('B 'C))))
+ 'A)
+#+end_src
+
+** Version 3
+:PROPERTIES:
+:CUSTOM_ID: version-3
+:END:
+
+#+begin_src lisp
+(defmacro my-or (&rest exprs)
+  (if (null? exprs)
+      nil
+      (list 'let (list (list 'result (car exprs)))
+            (list 'if 'result 'result
+                  (cons 'my-or (cdr exprs))))))
+#+end_src
+
+Finally, to make the expansion a bit more readable, we can remove that lambda
+call by using the =let= macro. This version is probably a bit less efficient since
+=let= also expands to a lambda call, but it's more readable.
+
+Some examples of the third version:
+
+#+begin_src lisp
+> (my-or nil 'A 'B)
+A
+
+> (macroexpand '(my-or 'A 'B 'C))  ; Much more readable
+(let ((result 'A))
+  (if result result
+    (my-or 'B 'C)))
+#+end_src
+
+* The =and= macro
+:PROPERTIES:
+:CUSTOM_ID: the-and-macro
+:END:
+
+This version of =my-and= is based on the third version of =my-or=, so it also
+overwrites the =result= symbol.
+
+#+begin_src lisp
+(defmacro my-and (&rest exprs)
+  (if (null? exprs)
+      tru
+      (list 'let (list (list 'result (car exprs)))
+            (list 'if
+                  'result
+                  (if (null? (cdr exprs))
+                      'result
+                      (cons 'my-and (cdr exprs)))
+                  nil))))
+#+end_src
+
+The first difference is that, when =expr= is empty, =tru= is returned instead of
+=nil=. Again, this is the expected behavior in Scheme and in my Lisp.
+
+Then, a conditional is introduced when expanding the macro. Just to be clear,
+this conditional, the one that checks if =(cdr exprs)= is empty, will be performed
+when the macro is /expanded/, not when the expansion is /evaluated/. This
+conditional is needed because, if we reached the last argument, we want to
+return it if it's non-nil. If we are not on the last argument, we keep checking
+by calling ourselves, just like we did in =my-or=.
+
+#+begin_src lisp
+(let ((result 'A))
+  (if result
+    (my-and 'B 'C)
+    nil))
+#+end_src
+
+* Final note
+:PROPERTIES:
+:CUSTOM_ID: final-note
+:END:
+
+I will end up adding a 4th version once I add [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html][backquote]] support to my Lisp.
+
+Feel free to [[https://github.com/8dcc/8dcc.github.io/pulls][contribute]] if you have any suggestions or improvements.

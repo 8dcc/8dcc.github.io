@@ -19,6 +19,7 @@ These articles are about programming and math.
 - [[file:understanding-entropy.org][Understanding entropy]]
 - [[file:switch-statement.org][Switch statements from a low-level perspective]]
 - [[file:asm-loop-conditionals.org][Optimizing loop conditions in assembly]]
+- [[file:conditional-lisp-macros.org][Replacing conditional Lisp primitives with macros]]
 - [[file:fmod.org][Implementing the modulus operator for floating-point numbers]]
 - [[file:color-transparency.org][Applying color transparencies]]
 - [[file:creating-keygen.org][Creating a simple keygen]]

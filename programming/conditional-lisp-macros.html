@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Replacing conditional Lisp primitives with macros</title>
+<meta name="author" content="8dcc" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Replacing conditional Lisp primitives with macros</h1>
+<p>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
+</p>
+
+<hr />
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#introduction">1. Introduction</a>
+<ul>
+<li><a href="#primitives">1.1. Primitives</a></li>
+<li><a href="#special-forms">1.2. Special Forms</a></li>
+<li><a href="#macros">1.3. Macros</a></li>
+</ul>
+</li>
+<li><a href="#the-or-macro">2. The <code>or</code> macro</a>
+<ul>
+<li><a href="#version-1">2.1. Version 1</a></li>
+<li><a href="#version-2">2.2. Version 2</a></li>
+<li><a href="#version-3">2.3. Version 3</a></li>
+</ul>
+</li>
+<li><a href="#the-and-macro">3. The <code>and</code> macro</a></li>
+<li><a href="#final-note">4. Final note</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-introduction" class="outline-2">
+<h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-introduction">
+<p>
+Some months ago I started writing <a href="https://github.com/8dcc/sl">my own Lisp</a>. I decided to implement the <code>or</code> and
+<code>and</code> procedures as <i>special form</i> C primitives, but I wanted to explain in the
+documentation that they don&rsquo;t need to be C primitives, since we can define them
+as macros that use <code>if</code>. When writing the example for the documentation, I wrote a
+few different alternatives that I consider worth sharing here.
+</p>
+
+<p>
+Before getting into the macros, I will briefly explain some of these
+concepts. Keep in mind that I will be referring to these concepts in the context
+of a Lisp interpreter written in C, more specifically on the Lisp syntax used in
+my interpreter.
+</p>
+</div>
+
+<div id="outline-container-primitives" class="outline-3">
+<h3 id="primitives"><span class="section-number-3">1.1.</span> Primitives</h3>
+<div class="outline-text-3" id="text-primitives">
+<p>
+Even though the user can define his own functions, at some point the interpreter
+will have to translate them to machine instructions that run on the actual
+hardware. What this means is that, even thought the user can write:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defun</span> <span style="color: #4ae2ff;">square</span> <span style="color: #cabf00;">(</span>x<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span>* x x<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+
+<span style="color: #ff5f59;">(</span>square <span style="color: #88ca9f;">5</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+At some point the Lisp has to multiply the numbers, either with another Lisp
+procedure that uses, for example, addition; or with actual CPU instructions.
+</p>
+
+<p>
+These basic building blocks, like arithmetic functions, are called
+primitives/. In my case they are built into the interpreter as C functions.
+</p>
+</div>
+</div>
+
+<div id="outline-container-special-forms" class="outline-3">
+<h3 id="special-forms"><span class="section-number-3">1.2.</span> Special Forms</h3>
+<div class="outline-text-3" id="text-special-forms">
+<p>
+Lisp follows a general evaluation process when calling a procedure. Usually,
+when the user calls a function <code>func</code> with the following arguments:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defun</span> <span style="color: #4ae2ff;">func</span> <span style="color: #cabf00;">(</span>arg0 arg1 arg2<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span>format <span style="color: #00d3d0;">"%d %d %s"</span> arg0 arg1 arg2<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+
+<span style="color: #ff5f59;">(</span>func <span style="color: #88ca9f;">1</span> <span style="color: #cabf00;">(</span>+ <span style="color: #88ca9f;">3</span> <span style="color: #88ca9f;">4</span><span style="color: #cabf00;">)</span> <span style="color: #00d3d0;">"foo"</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+The following process is performed:
+</p>
+
+<ol class="org-ol">
+<li>Each argument is evaluated. The integer <code>1</code> evaluates to itself; the list
+<code>(+ 3 4)</code> is treated as a procedure call, and returns 7; and the string <code>"foo"</code>
+evaluates to itself.</li>
+<li>The evaluated arguments are bound to the <i>formal arguments</i> <code>arg0</code>, <code>arg1</code> and
+<code>arg2</code>, respectively.</li>
+<li>Each expression in the body of the procedure is evaluated, returning the last
+result.</li>
+</ol>
+
+<p>
+However, some exceptions have to be made. For example, we can&rsquo;t define <code>if</code> as a
+normal procedure because its 3 arguments would be evaluated before calling <code>if</code>,
+when in reality only the second or the third argument should be evaluated
+depending on the predicate:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defun</span> <span style="color: #4ae2ff;">my-if</span> <span style="color: #cabf00;">(</span>predicate consequent alternative<span style="color: #cabf00;">)</span>
+  ...<span style="color: #ff5f59;">)</span>
+
+<span style="color: #ff5f59;">(</span>my-if tru
+       <span style="color: #cabf00;">(</span>define var <span style="color: #88ca9f;">1</span><span style="color: #cabf00;">)</span>
+       <span style="color: #cabf00;">(</span>define var <span style="color: #88ca9f;">2</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+In the previous example <code>var</code> was defined to 2 because all three expressions were
+evaluated before the procedure call was made (assuming the arguments were
+evaluated in order).
+</p>
+
+<p>
+These special procedures that don&rsquo;t follow normal evaluation rules are called
+<i>special forms</i>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-macros" class="outline-3">
+<h3 id="macros"><span class="section-number-3">1.3.</span> Macros</h3>
+<div class="outline-text-3" id="text-macros">
+<p>
+Macros in my Lisp are inspired by <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Macros.html">Emacs Lisp macros</a>. Macros are similar to
+procedures, but have a few key differences:
+</p>
+
+<ol class="org-ol">
+<li>When a macro is called, the arguments are <b>not</b> evaluated before applying it,
+so the macro can operate on the un-evaluated expressions directly, instead of
+on the values they compute. The first step of a macro call is binding the
+un-evaluated arguments to the formals.</li>
+<li>Macros don&rsquo;t <i>directly</i> compute values, they instead build Lisp expressions
+that will be used to compute the actual values. The second step of a macro
+call is the <i>macro expansion</i>. In this step, the macro is called just like a
+lambda, returning a Lisp expression.</li>
+<li>The last step of a macro call is evaluating the expanded expression, which
+will be used to compute the actual value returned by the macro.</li>
+</ol>
+
+<p>
+In other words the general process when calling a procedure is:
+</p>
+
+<pre class="example" id="org99c0e20">
+Evaluate arguments -&gt; Bind arguments -&gt; Evaluate body
+                      `-----------------------------´
+                                 (Apply)
+</pre>
+
+<p>
+While the process of calling a macro is:
+</p>
+
+<pre class="example" id="org48496dc">
+Bind arguments -&gt; Evaluate body -&gt; Evaluate expansion
+`-----------------------------´
+            (Expand)
+</pre>
+
+<p>
+For example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">&gt; <span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defmacro</span> <span style="color: #4ae2ff;">my-macro</span> <span style="color: #cabf00;">(</span>name<span style="color: #cabf00;">)</span>
+    <span style="color: #cabf00;">(</span>list 'define name <span style="color: #88ca9f;">123</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+&lt;macro&gt;
+
+&gt; <span style="color: #ff5f59;">(</span>my-macro some-name<span style="color: #ff5f59;">)</span>
+<span style="color: #88ca9f;">123</span>
+
+&gt; <span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-macro some-name<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+<span style="color: #ff5f59;">(</span>define some-name <span style="color: #88ca9f;">123</span><span style="color: #ff5f59;">)</span>
+
+&gt; some-name
+<span style="color: #88ca9f;">123</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-the-or-macro" class="outline-2">
+<h2 id="the-or-macro"><span class="section-number-2">2.</span> The <code>or</code> macro</h2>
+<div class="outline-text-2" id="text-the-or-macro">
+</div>
+
+<div id="outline-container-version-1" class="outline-3">
+<h3 id="version-1"><span class="section-number-3">2.1.</span> Version 1</h3>
+<div class="outline-text-3" id="text-version-1">
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defmacro</span> <span style="color: #4ae2ff;">my-or</span> <span style="color: #cabf00;">(</span><span style="color: #79a8ff;">&amp;rest</span> exprs<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">defun</span> <span style="color: #4ae2ff;">or-lst</span> <span style="color: #44bc44;">(</span>expr-list<span style="color: #44bc44;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #00eff0;">(</span>null? expr-list<span style="color: #00eff0;">)</span>
+        nil
+        <span style="color: #989898;">;; </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Don't overwrite "result", generate unique symbol.</span>
+        <span style="color: #00eff0;">(</span>list <span style="color: #338fff;">(</span>list 'lambda <span style="color: #ef7fff;">(</span>list 'result<span style="color: #ef7fff;">)</span>
+                    <span style="color: #ef7fff;">(</span>list 'if 'result 'result
+                          <span style="color: #ff5f59;">(</span>or-lst <span style="color: #cabf00;">(</span>cdr expr-list<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
+              <span style="color: #338fff;">(</span>car expr-list<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span>or-lst exprs<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+The first version uses an inner <code>or-lst</code> procedure to allow easier recursion. Note
+that this procedure is not defined globally, the scope is restricted to the body
+of the macro. Since <code>my-or</code> uses <code>&amp;rest</code>, when the macro is called with
+<code>(my-or 'A 'B 'C)</code>, the list <code>(A B C)</code> is bound to the symbol <code>exprs</code>. This makes
+recursion trickier, because if we call ourselves with <code>(cdr exprs)</code>, we are not
+doing <code>(my-or B C)</code>, but <code>(my-or '(B C))</code>, which gets put into another list because
+of <code>&amp;rest</code>. An easier solution for this &ldquo;problem&rdquo; is shown on the next section.
+</p>
+
+<p>
+First, it checks the base case, we didn&rsquo;t get any arguments. In that case, <code>nil</code>
+is returned. This is the expected behavior in Scheme and in my Lisp.
+</p>
+
+<p>
+If we got an argument, the macro will expand to a <i>call</i> to a <i>lambda</i> that receives
+the evaluated argument. We need to do this to evaluate the expression only
+once. An incorrect example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>or A B C<span style="color: #ff5f59;">)</span>
+
+<span style="color: #989898;">;; </span><span style="color: #989898;">Expanded (incorrectly) into:</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">if</span> A A
+    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> B B
+        <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> C C
+            nil<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+In that example, <code>A</code> is evaluated once to get the condition and, if the result is
+non-nil, <code>A</code> is evaluated a second time as the <i>consequent</i>. Instead, the correct
+approach is something like:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>result A<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> result
+      result
+      ...<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+In that second example, <code>A</code> is evaluated only once. However, since my Lisp didn&rsquo;t
+have a <code>let</code> macro at this point, I used an uglier (but equivalent) version:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>result<span style="color: #44bc44;">)</span>
+   <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> result
+       result
+       ...<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+ A<span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+As you can see, there is a Big Bug™ in this macro, that will remain throughout
+all versions. The name used for the lambda argument, &ldquo;result&rdquo;, is far from
+unique, so we might overwrite some user value during this call. In a real
+implementation, we could use some function like Emacs Lisp&rsquo;s <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#index-gensym">gensym</a>.
+</p>
+
+<p>
+Here are some examples of the macro:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">&gt; <span style="color: #ff5f59;">(</span>my-or nil 'A 'B<span style="color: #ff5f59;">)</span>
+A
+
+&gt; <span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or 'A 'B 'C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; God almighty...</span>
+<span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>result<span style="color: #44bc44;">)</span>
+   <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> result result
+     <span style="color: #00eff0;">(</span><span style="color: #338fff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ef7fff;">(</span>result<span style="color: #ef7fff;">)</span>
+        <span style="color: #ef7fff;">(</span><span style="color: #ff6f9f;">if</span> result result
+          <span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>result<span style="color: #44bc44;">)</span>
+             <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> result result
+               nil<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+           'C<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
+      'B<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+ 'A<span style="color: #ff5f59;">)</span>
+
+&gt; <span style="color: #ff5f59;">(</span>my-or<span style="color: #ff5f59;">)</span>
+nil
+
+&gt; <span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+nil
+</pre>
+</div>
+
+<p>
+Throughout this article I will make some minor changes to the interpreter output
+for readability, like modifying indentation or replacing <code>(quote expr)</code> with
+<code>'expr</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-version-2" class="outline-3">
+<h3 id="version-2"><span class="section-number-3">2.2.</span> Version 2</h3>
+<div class="outline-text-3" id="text-version-2">
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defmacro</span> <span style="color: #4ae2ff;">my-or</span> <span style="color: #cabf00;">(</span><span style="color: #79a8ff;">&amp;rest</span> exprs<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>null? exprs<span style="color: #44bc44;">)</span>
+      nil
+      <span style="color: #44bc44;">(</span>list <span style="color: #00eff0;">(</span>list 'lambda <span style="color: #338fff;">(</span>list 'result<span style="color: #338fff;">)</span>
+                  <span style="color: #338fff;">(</span>list 'if 'result 'result
+                        <span style="color: #989898;">;; </span><span style="color: #989898;">The expansion will call `</span><span style="color: #88ca9f;">my-or</span><span style="color: #989898;">'.</span>
+                        <span style="color: #ef7fff;">(</span>cons 'my-or <span style="color: #ff5f59;">(</span>cdr exprs<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
+            <span style="color: #00eff0;">(</span>car exprs<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+This version still uses the lambda call method, but it doesn&rsquo;t use an inner
+<code>or-lst</code> procedure. Instead, it introduces a call to the macro itself <i>in the
+expansion</i>.
+</p>
+
+<p>
+We use <code>cons</code> to append <code>my-or</code> to the <code>cdr</code> of the argument list, constructing a
+function call. We could also use <code>apply</code>, but we would have to quote the argument
+list to avoid using the <code>cadr</code> as another function call:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>list 'apply 'my-or
+      <span style="color: #cabf00;">(</span>list 'quote <span style="color: #44bc44;">(</span>cdr exprs<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+
+<span style="color: #989898;">;; </span><span style="color: #989898;">Assumming `</span><span style="color: #88ca9f;">exprs</span><span style="color: #989898;">' is (A B C), expands to:</span>
+<span style="color: #ff5f59;">(</span>apply my-or <span style="color: #cabf00;">(</span>quote <span style="color: #44bc44;">(</span>B C<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+
+<span style="color: #989898;">;; </span><span style="color: #989898;">Alternatively:</span>
+<span style="color: #ff5f59;">(</span>apply my-or '<span style="color: #cabf00;">(</span>B C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+Some examples of the second version:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">&gt; <span style="color: #ff5f59;">(</span>my-or nil 'A 'B<span style="color: #ff5f59;">)</span>
+A
+
+&gt; <span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or 'A 'B 'C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; Much more readable</span>
+<span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>result<span style="color: #44bc44;">)</span>
+   <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> result result
+     <span style="color: #00eff0;">(</span>my-or <span style="color: #338fff;">(</span>'B 'C<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+ 'A<span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-version-3" class="outline-3">
+<h3 id="version-3"><span class="section-number-3">2.3.</span> Version 3</h3>
+<div class="outline-text-3" id="text-version-3">
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defmacro</span> <span style="color: #4ae2ff;">my-or</span> <span style="color: #cabf00;">(</span><span style="color: #79a8ff;">&amp;rest</span> exprs<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>null? exprs<span style="color: #44bc44;">)</span>
+      nil
+      <span style="color: #44bc44;">(</span>list 'let <span style="color: #00eff0;">(</span>list <span style="color: #338fff;">(</span>list 'result <span style="color: #ef7fff;">(</span>car exprs<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
+            <span style="color: #00eff0;">(</span>list 'if 'result 'result
+                  <span style="color: #338fff;">(</span>cons 'my-or <span style="color: #ef7fff;">(</span>cdr exprs<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+Finally, to make the expansion a bit more readable, we can remove that lambda
+call by using the <code>let</code> macro. This version is probably a bit less efficient since
+<code>let</code> also expands to a lambda call, but it&rsquo;s more readable.
+</p>
+
+<p>
+Some examples of the third version:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">&gt; <span style="color: #ff5f59;">(</span>my-or nil 'A 'B<span style="color: #ff5f59;">)</span>
+A
+
+&gt; <span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or 'A 'B 'C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; Much more readable</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>result 'A<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> result result
+    <span style="color: #44bc44;">(</span>my-or 'B 'C<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-the-and-macro" class="outline-2">
+<h2 id="the-and-macro"><span class="section-number-2">3.</span> The <code>and</code> macro</h2>
+<div class="outline-text-2" id="text-the-and-macro">
+<p>
+This version of <code>my-and</code> is based on the third version of <code>my-or</code>, so it also
+overwrites the <code>result</code> symbol.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defmacro</span> <span style="color: #4ae2ff;">my-and</span> <span style="color: #cabf00;">(</span><span style="color: #79a8ff;">&amp;rest</span> exprs<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>null? exprs<span style="color: #44bc44;">)</span>
+      tru
+      <span style="color: #44bc44;">(</span>list 'let <span style="color: #00eff0;">(</span>list <span style="color: #338fff;">(</span>list 'result <span style="color: #ef7fff;">(</span>car exprs<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
+            <span style="color: #00eff0;">(</span>list 'if
+                  'result
+                  <span style="color: #338fff;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #ef7fff;">(</span>null? <span style="color: #ff5f59;">(</span>cdr exprs<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span>
+                      'result
+                      <span style="color: #ef7fff;">(</span>cons 'my-and <span style="color: #ff5f59;">(</span>cdr exprs<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
+                  nil<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+The first difference is that, when <code>expr</code> is empty, <code>tru</code> is returned instead of
+<code>nil</code>. Again, this is the expected behavior in Scheme and in my Lisp.
+</p>
+
+<p>
+Then, a conditional is introduced when expanding the macro. Just to be clear,
+this conditional, the one that checks if <code>(cdr exprs)</code> is empty, will be performed
+when the macro is <i>expanded</i>, not when the expansion is <i>evaluated</i>. This
+conditional is needed because, if we reached the last argument, we want to
+return it if it&rsquo;s non-nil. If we are not on the last argument, we keep checking
+by calling ourselves, just like we did in <code>my-or</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>result 'A<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> result
+    <span style="color: #44bc44;">(</span>my-and 'B 'C<span style="color: #44bc44;">)</span>
+    nil<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-final-note" class="outline-2">
+<h2 id="final-note"><span class="section-number-2">4.</span> Final note</h2>
+<div class="outline-text-2" id="text-final-note">
+<p>
+I will end up adding a 4th version once I add <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html">backquote</a> support to my Lisp.
+</p>
+
+<p>
+Feel free to <a href="https://github.com/8dcc/8dcc.github.io/pulls">contribute</a> if you have any suggestions or improvements.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>
