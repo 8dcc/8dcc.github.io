@@ -11,7 +11,7 @@
 
 #+TOC: headlines 2
 
-* What does hooking mean?
+* What does "hooking" mean?
 :PROPERTIES:
 :CUSTOM_ID: what-does-hooking-mean
 :END:
