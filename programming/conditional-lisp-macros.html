@@ -234,7 +234,7 @@
 <p>
 Some months ago I started writing <a href="https://github.com/8dcc/sl">my own Lisp</a>. I decided to implement the <code>or</code> and
 <code>and</code> procedures as <i>special form</i> C primitives, but I wanted to explain in the
-documentation that they don&rsquo;t need to be C primitives, since we can define them
+documentation that they don&rsquo;t <i>need</i> to be C primitives, since we can define them
 as macros that use <code>if</code>. When writing the example for the documentation, I wrote a
 few different alternatives that I consider worth sharing here.
 </p>
@@ -271,7 +271,7 @@ procedure that uses, for example, addition; or with actual CPU instructions.
 
 <p>
 These basic building blocks, like arithmetic functions, are called
-primitives/. In my case they are built into the interpreter as C functions.
+<i>primitives</i>. In my case they are built into the interpreter as C functions.
 </p>
 </div>
 </div>
@@ -286,9 +286,9 @@ when the user calls a function <code>func</code> with the following arguments:
 
 <div class="org-src-container">
 <pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defun</span> <span style="color: #4ae2ff;">func</span> <span style="color: #cabf00;">(</span>arg0 arg1 arg2<span style="color: #cabf00;">)</span>
-  <span style="color: #cabf00;">(</span>format <span style="color: #00d3d0;">"%d %d %s"</span> arg0 arg1 arg2<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span>format <span style="color: #00d3d0;">"%d %f %s"</span> arg0 arg1 arg2<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span> <span style="color: #989898;">; Sample body</span>
 
-<span style="color: #ff5f59;">(</span>func <span style="color: #88ca9f;">1</span> <span style="color: #cabf00;">(</span>+ <span style="color: #88ca9f;">3</span> <span style="color: #88ca9f;">4</span><span style="color: #cabf00;">)</span> <span style="color: #00d3d0;">"foo"</span><span style="color: #ff5f59;">)</span>
+<span style="color: #ff5f59;">(</span>func <span style="color: #88ca9f;">1</span> <span style="color: #cabf00;">(</span>+ <span style="color: #88ca9f;">3</span> <span style="color: #88ca9f;">4.0</span><span style="color: #cabf00;">)</span> <span style="color: #00d3d0;">"foo"</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
@@ -297,20 +297,20 @@ The following process is performed:
 </p>
 
 <ol class="org-ol">
-<li>Each argument is evaluated. The integer <code>1</code> evaluates to itself; the list
-<code>(+ 3 4)</code> is treated as a procedure call, and returns 7; and the string <code>"foo"</code>
+<li>Each argument is evaluated. The integer <code>1</code> evaluates to itself; the list <code>(+ 3
+   4)</code> is treated as a procedure call, and returns 7.0; and the string <code>"foo"</code>
 evaluates to itself.</li>
-<li>The evaluated arguments are bound to the <i>formal arguments</i> <code>arg0</code>, <code>arg1</code> and
-<code>arg2</code>, respectively.</li>
+<li>The evaluated arguments are bound to the <i>formal arguments</i>. In this case <code>arg0</code>,
+<code>arg1</code> and <code>arg2</code>, respectively.</li>
 <li>Each expression in the body of the procedure is evaluated, returning the last
-result.</li>
+result. In this case, the string returned by <code>format</code> is also returned by <code>func</code>.</li>
 </ol>
 
 <p>
 However, some exceptions have to be made. For example, we can&rsquo;t define <code>if</code> as a
-normal procedure because its 3 arguments would be evaluated before calling <code>if</code>,
+normal procedure because its 3 arguments would be evaluated before the call,
 when in reality only the second or the third argument should be evaluated
-depending on the predicate:
+depending on the first one:
 </p>
 
 <div class="org-src-container">
@@ -324,9 +324,10 @@ depending on the predicate:
 </div>
 
 <p>
-In the previous example <code>var</code> was defined to 2 because all three expressions were
-evaluated before the procedure call was made (assuming the arguments were
-evaluated in order).
+In the previous example <code>var</code> would be defined to 2 because all three arguments
+were evaluated before the procedure call was made. In this case, it&rsquo;s assumed
+that the arguments are evaluated in order, which is true in my Lisp, but isn&rsquo;t
+guaranteed in most interpreters.
 </p>
 
 <p>
@@ -361,7 +362,7 @@ will be used to compute the actual value returned by the macro.</li>
 In other words the general process when calling a procedure is:
 </p>
 
-<pre class="example" id="org99c0e20">
+<pre class="example" id="org60d0b2e">
 Evaluate arguments -&gt; Bind arguments -&gt; Evaluate body
                       `-----------------------------´
                                  (Apply)
@@ -371,7 +372,7 @@ Evaluate arguments -&gt; Bind arguments -&gt; Evaluate body
 While the process of calling a macro is:
 </p>
 
-<pre class="example" id="org48496dc">
+<pre class="example" id="org658fdae">
 Bind arguments -&gt; Evaluate body -&gt; Evaluate expansion
 `-----------------------------´
             (Expand)
@@ -403,6 +404,17 @@ For example:
 <div id="outline-container-the-or-macro" class="outline-2">
 <h2 id="the-or-macro"><span class="section-number-2">2.</span> The <code>or</code> macro</h2>
 <div class="outline-text-2" id="text-the-or-macro">
+<p>
+First, the expected behavior of <code>or</code>:
+</p>
+
+<ol class="org-ol">
+<li>When called with no arguments, <code>nil</code> is returned. This is the expected behavior
+in Scheme and in my Lisp.</li>
+<li>Each argument is evaluated in order. If one of them is non-nil, stop
+evaluating and return it.</li>
+<li>If all arguments are <code>nil</code>, then <code>nil</code> is returned.</li>
+</ol>
 </div>
 
 <div id="outline-container-version-1" class="outline-3">
@@ -434,7 +446,7 @@ of <code>&amp;rest</code>. An easier solution for this &ldquo;problem&rdquo; is 
 
 <p>
 First, it checks the base case, we didn&rsquo;t get any arguments. In that case, <code>nil</code>
-is returned. This is the expected behavior in Scheme and in my Lisp.
+is returned.
 </p>
 
 <p>
@@ -470,7 +482,8 @@ approach is something like:
 
 <p>
 In that second example, <code>A</code> is evaluated only once. However, since my Lisp didn&rsquo;t
-have a <code>let</code> macro at this point, I used an uglier (but equivalent) version:
+have a <code>let</code> macro at this point, I used an uglier (but equivalent) version which
+calls an anonymous lambda:
 </p>
 
 <div class="org-src-container">
@@ -483,10 +496,10 @@ have a <code>let</code> macro at this point, I used an uglier (but equivalent) v
 </div>
 
 <p>
-As you can see, there is a Big Bug™ in this macro, that will remain throughout
-all versions. The name used for the lambda argument, &ldquo;result&rdquo;, is far from
-unique, so we might overwrite some user value during this call. In a real
-implementation, we could use some function like Emacs Lisp&rsquo;s <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#index-gensym">gensym</a>.
+As you can probably tell, there is a Big Bug™ in the macro, and it will remain
+throughout all versions. The name &ldquo;result&rdquo;, used as the lambda argument, is far
+from unique, so we might overwrite some user value during this call. In a real
+implementation, we should use some function like Emacs Lisp&rsquo;s <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#index-gensym">gensym</a>.
 </p>
 
 <p>
@@ -519,7 +532,7 @@ nil
 
 <p>
 Throughout this article I will make some minor changes to the interpreter output
-for readability, like modifying indentation or replacing <code>(quote expr)</code> with
+for readability, like formatting the indentation or replacing <code>(quote expr)</code> with
 <code>'expr</code>.
 </p>
 </div>
@@ -549,17 +562,22 @@ expansion</i>.
 <p>
 We use <code>cons</code> to append <code>my-or</code> to the <code>cdr</code> of the argument list, constructing a
 function call. We could also use <code>apply</code>, but we would have to quote the argument
-list to avoid using the <code>cadr</code> as another function call:
+list to avoid evaluating the <code>cdr</code> as another function call:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>list 'apply 'my-or
+<pre class="src src-lisp"><span style="color: #989898;">;; </span><span style="color: #989898;">Incorrect version, the `</span><span style="color: #88ca9f;">cadr</span><span style="color: #989898;">' will be interpreted as a function.</span>
+<span style="color: #ff5f59;">(</span>list 'apply 'my-or
+      <span style="color: #cabf00;">(</span>cdr exprs<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+
+<span style="color: #989898;">;; </span><span style="color: #989898;">Correct version.</span>
+<span style="color: #ff5f59;">(</span>list 'apply 'my-or
       <span style="color: #cabf00;">(</span>list 'quote <span style="color: #44bc44;">(</span>cdr exprs<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 
-<span style="color: #989898;">;; </span><span style="color: #989898;">Assumming `</span><span style="color: #88ca9f;">exprs</span><span style="color: #989898;">' is (A B C), expands to:</span>
+<span style="color: #989898;">;; </span><span style="color: #989898;">Which, assumming `</span><span style="color: #88ca9f;">exprs</span><span style="color: #989898;">' is (A B C), expands to:</span>
 <span style="color: #ff5f59;">(</span>apply my-or <span style="color: #cabf00;">(</span>quote <span style="color: #44bc44;">(</span>B C<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 
-<span style="color: #989898;">;; </span><span style="color: #989898;">Alternatively:</span>
+<span style="color: #989898;">;; </span><span style="color: #989898;">Or alternatively:</span>
 <span style="color: #ff5f59;">(</span>apply my-or '<span style="color: #cabf00;">(</span>B C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>

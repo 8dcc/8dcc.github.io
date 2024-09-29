@@ -18,7 +18,7 @@
 
 Some months ago I started writing [[https://github.com/8dcc/sl][my own Lisp]]. I decided to implement the =or= and
 =and= procedures as /special form/ C primitives, but I wanted to explain in the
-documentation that they don't need to be C primitives, since we can define them
+documentation that they don't /need/ to be C primitives, since we can define them
 as macros that use =if=. When writing the example for the documentation, I wrote a
 few different alternatives that I consider worth sharing here.
 
@@ -47,7 +47,7 @@ At some point the Lisp has to multiply the numbers, either with another Lisp
 procedure that uses, for example, addition; or with actual CPU instructions.
 
 These basic building blocks, like arithmetic functions, are called
-primitives/. In my case they are built into the interpreter as C functions.
+/primitives/. In my case they are built into the interpreter as C functions.
 
 ** Special Forms
 :PROPERTIES:
@@ -59,25 +59,25 @@ when the user calls a function =func= with the following arguments:
 
 #+begin_src lisp
 (defun func (arg0 arg1 arg2)
-  (format "%d %d %s" arg0 arg1 arg2))
+  (format "%d %f %s" arg0 arg1 arg2)) ; Sample body
 
-(func 1 (+ 3 4) "foo")
+(func 1 (+ 3 4.0) "foo")
 #+end_src
 
 The following process is performed:
 
-1. Each argument is evaluated. The integer =1= evaluates to itself; the list
-   =(+ 3 4)= is treated as a procedure call, and returns 7; and the string ="foo"=
+1. Each argument is evaluated. The integer =1= evaluates to itself; the list =(+ 3
+   4)= is treated as a procedure call, and returns 7.0; and the string ="foo"=
    evaluates to itself.
-2. The evaluated arguments are bound to the /formal arguments/ =arg0=, =arg1= and
-   =arg2=, respectively.
+2. The evaluated arguments are bound to the /formal arguments/. In this case =arg0=,
+   =arg1= and =arg2=, respectively.
 3. Each expression in the body of the procedure is evaluated, returning the last
-   result.
+   result. In this case, the string returned by =format= is also returned by =func=.
 
 However, some exceptions have to be made. For example, we can't define =if= as a
-normal procedure because its 3 arguments would be evaluated before calling =if=,
+normal procedure because its 3 arguments would be evaluated before the call,
 when in reality only the second or the third argument should be evaluated
-depending on the predicate:
+depending on the first one:
 
 #+begin_src lisp
 (defun my-if (predicate consequent alternative)
@@ -88,9 +88,10 @@ depending on the predicate:
        (define var 2))
 #+end_src
 
-In the previous example =var= was defined to 2 because all three expressions were
-evaluated before the procedure call was made (assuming the arguments were
-evaluated in order).
+In the previous example =var= would be defined to 2 because all three arguments
+were evaluated before the procedure call was made. In this case, it's assumed
+that the arguments are evaluated in order, which is true in my Lisp, but isn't
+guaranteed in most interpreters.
 
 These special procedures that don't follow normal evaluation rules are called
 /special forms/.
@@ -152,6 +153,14 @@ For example:
 :CUSTOM_ID: the-or-macro
 :END:
 
+First, the expected behavior of =or=:
+
+1. When called with no arguments, =nil= is returned. This is the expected behavior
+   in Scheme and in my Lisp.
+2. Each argument is evaluated in order. If one of them is non-nil, stop
+   evaluating and return it.
+3. If all arguments are =nil=, then =nil= is returned.
+
 ** Version 1
 :PROPERTIES:
 :CUSTOM_ID: version-1
@@ -179,7 +188,7 @@ doing =(my-or B C)=, but =(my-or '(B C))=, which gets put into another list beca
 of =&rest=. An easier solution for this "problem" is shown on the next section.
 
 First, it checks the base case, we didn't get any arguments. In that case, =nil=
-is returned. This is the expected behavior in Scheme and in my Lisp.
+is returned.
 
 If we got an argument, the macro will expand to a /call/ to a /lambda/ that receives
 the evaluated argument. We need to do this to evaluate the expression only
@@ -207,7 +216,8 @@ approach is something like:
 #+end_src
 
 In that second example, =A= is evaluated only once. However, since my Lisp didn't
-have a =let= macro at this point, I used an uglier (but equivalent) version:
+have a =let= macro at this point, I used an uglier (but equivalent) version which
+calls an anonymous lambda:
 
 #+begin_src lisp
 ((lambda (result)
@@ -217,10 +227,10 @@ have a =let= macro at this point, I used an uglier (but equivalent) version:
  A)
 #+end_src
 
-As you can see, there is a Big Bug™ in this macro, that will remain throughout
-all versions. The name used for the lambda argument, "result", is far from
-unique, so we might overwrite some user value during this call. In a real
-implementation, we could use some function like Emacs Lisp's [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#index-gensym][gensym]].
+As you can probably tell, there is a Big Bug™ in the macro, and it will remain
+throughout all versions. The name "result", used as the lambda argument, is far
+from unique, so we might overwrite some user value during this call. In a real
+implementation, we should use some function like Emacs Lisp's [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Symbols.html#index-gensym][gensym]].
 
 Here are some examples of the macro:
 
@@ -248,7 +258,7 @@ nil
 #+end_src
 
 Throughout this article I will make some minor changes to the interpreter output
-for readability, like modifying indentation or replacing =(quote expr)= with
+for readability, like formatting the indentation or replacing =(quote expr)= with
 ='expr=.
 
 ** Version 2
@@ -273,16 +283,21 @@ expansion/.
 
 We use =cons= to append =my-or= to the =cdr= of the argument list, constructing a
 function call. We could also use =apply=, but we would have to quote the argument
-list to avoid using the =cadr= as another function call:
+list to avoid evaluating the =cdr= as another function call:
 
 #+begin_src lisp
+;; Incorrect version, the `cadr' will be interpreted as a function.
+(list 'apply 'my-or
+      (cdr exprs))
+
+;; Correct version.
 (list 'apply 'my-or
       (list 'quote (cdr exprs)))
 
-;; Assumming `exprs' is (A B C), expands to:
+;; Which, assumming `exprs' is (A B C), expands to:
 (apply my-or (quote (B C)))
 
-;; Alternatively:
+;; Or alternatively:
 (apply my-or '(B C))
 #+end_src
 
