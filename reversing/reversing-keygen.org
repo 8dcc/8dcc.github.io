@@ -197,7 +197,7 @@ key, so we will rename the function to =get_key()=, and the parameter =user_key=
 
 From =main+0x5d= to =main+0x71=, it calls an unknown function at =0x1189= with the
 =user= we got from =scanf()= and =0x4180= as arguments. This looks very promising,
-since it will compare this =0x4180= value with =user_key= right bellow. For this
+since it will compare this =0x4180= value with =user_key= right below. For this
 reason, we will call this function =generate_key()= and the second parameter at
 =0x4180=, =real_key=.
 

@@ -42,7 +42,7 @@ I don't like the vanilla GNU Emacs keybinds. At all. I don't know them and I
 don't want to, even the most experienced Emacs users say they suck, and often
 change them.
 
-I use evil mode, which allows vi-like keybinds. See [[*Evil mode][Evil mode]] bellow.
+I use evil mode, which allows vi-like keybinds. See [[*Evil mode][Evil mode]] below.
 
 See also [[https://en.wikipedia.org/wiki/Repetitive_strain_injury][RSI]], [[http://xahlee.info/kbd/typing_rsi.html][Xah Lee's RSI page]] and [[http://xahlee.info/emacs/emacs/emacs_pinky.html][Xah Lee's Emacs pinky page]].
 

@@ -48,8 +48,8 @@ on GNU/Linux through [[https://github.com/ValveSoftware/Proton][Proton]]. A frie
 and it's in fact what made me definitely switch from Windows to GNU/Linux on my
 main computer.
 
-This means that any memory inspecting (more on this bellow) has to be done
-*within the same wine prefix*. I personally use [[https://github.com/jcnils/protonhax][this tool]] to accomplish that.
+This means that any memory inspecting (more on this below) has to be done *within
+the same wine prefix*. I personally use [[https://github.com/jcnils/protonhax][this tool]] to accomplish that.
 
 ** The amazing developer team
 :PROPERTIES:
@@ -81,7 +81,7 @@ the output folder because they assume that the game needs it.
 
 You might also notice the suspicious =.i64= files. In case the reader is not
 familiar with reversing, these are 64-bit [[https://en.wikipedia.org/wiki/Interactive_Disassembler][IDA Pro]] databases, and they will be
-covered bellow.
+covered below.
 
 As a side note, I think it's very funny that this could happen to the developers
 to begin with. I don't know what they used to compile this program, but I think
@@ -161,7 +161,7 @@ things you can easily find from IDA.
 :END:
 
 Remember to open the =Mordhau-Win64-Shipping.exe= file, not =Mordhau.exe= files. We
-will also use this executable with =UEDumper= bellow.
+will also use this executable with =UEDumper= below.
 
 Also, you will need some settings in order to find the required offsets.
 
@@ -292,7 +292,7 @@ LABEL_123:
 #+end_src
 
 In that case, we would have to jump to the xref of that =LABEL_123= and look for
-the same =qword= assignment bellow the jump.
+the same =qword= assignment below the jump.
 
 * Dumping and exploring the game with =UEDumper=
 :PROPERTIES:

@@ -251,7 +251,7 @@ was so broken that you could fly anywhere, clip into stuff, and do much more.
 </p>
 
 
-<div id="orgbe314b1" class="figure">
+<div id="orgd5a96d7" class="figure">
 <p><img src="../img/mordhau1.jpg" alt="mordhau1.jpg" />
 </p>
 </div>
@@ -270,7 +270,7 @@ since the developers did such a bad job, but it was not the same.
 </p>
 
 
-<div id="org267d178" class="figure">
+<div id="orge8e79c6" class="figure">
 <p><img src="../img/mordhau2.jpg" alt="mordhau2.jpg" />
 </p>
 </div>
@@ -283,8 +283,8 @@ main computer.
 </p>
 
 <p>
-This means that any memory inspecting (more on this bellow) has to be done
-<b>within the same wine prefix</b>. I personally use <a href="https://github.com/jcnils/protonhax">this tool</a> to accomplish that.
+This means that any memory inspecting (more on this below) has to be done <b>within
+the same wine prefix</b>. I personally use <a href="https://github.com/jcnils/protonhax">this tool</a> to accomplish that.
 </p>
 </div>
 </div>
@@ -314,7 +314,7 @@ let&rsquo;s have a look at the binaries folder now.
 </p>
 
 
-<div id="org1a72f04" class="figure">
+<div id="orgb0e08a6" class="figure">
 <p><img src="../img/mordhau3.png" alt="mordhau3.png" />
 </p>
 </div>
@@ -330,7 +330,7 @@ the output folder because they assume that the game needs it.
 <p>
 You might also notice the suspicious <code>.i64</code> files. In case the reader is not
 familiar with reversing, these are 64-bit <a href="https://en.wikipedia.org/wiki/Interactive_Disassembler">IDA Pro</a> databases, and they will be
-covered bellow.
+covered below.
 </p>
 
 <p>
@@ -399,7 +399,7 @@ immediately banned me exclusively based on my screenshots.
 </p>
 
 
-<div id="orge131a90" class="figure">
+<div id="org468606d" class="figure">
 <p><img src="../img/mordhau4.png" alt="mordhau4.png" />
 </p>
 </div>
@@ -438,7 +438,7 @@ things you can easily find from IDA.
 <div class="outline-text-3" id="text-important-ida-notes">
 <p>
 Remember to open the <code>Mordhau-Win64-Shipping.exe</code> file, not <code>Mordhau.exe</code> files. We
-will also use this executable with <code>UEDumper</code> bellow.
+will also use this executable with <code>UEDumper</code> below.
 </p>
 
 <p>
@@ -452,7 +452,7 @@ pressing <code>Shift+F12</code>. From there, right click on the string list and 
 </p>
 
 
-<div id="org6def638" class="figure">
+<div id="org85586e6" class="figure">
 <p><img src="../img/mordhau5.png" alt="mordhau5.png" />
 </p>
 </div>
@@ -472,7 +472,7 @@ not 16-bits.
 </p>
 
 
-<div id="org335028b" class="figure">
+<div id="org9074a26" class="figure">
 <p><img src="../img/mordhau6.png" alt="mordhau6.png" />
 </p>
 </div>
@@ -483,7 +483,7 @@ the <code>aMulticastdeleg</code> symbol, or by pressing the <code>x</code> key. 
 </p>
 
 
-<div id="orgff443a4" class="figure">
+<div id="org96cab3f" class="figure">
 <p><img src="../img/mordhau7.png" alt="mordhau7.png" />
 </p>
 </div>
@@ -496,7 +496,7 @@ its cross references.
 </p>
 
 
-<div id="org1e2c973" class="figure">
+<div id="org4560bfd" class="figure">
 <p><img src="../img/mordhau8.png" alt="mordhau8.png" />
 </p>
 </div>
@@ -509,7 +509,7 @@ this.
 </p>
 
 
-<div id="org6696de8" class="figure">
+<div id="org032e850" class="figure">
 <p><img src="../img/mordhau9.png" alt="mordhau9.png" />
 </p>
 </div>
@@ -531,7 +531,7 @@ prompt.
 </p>
 
 
-<div id="org7dd6cf7" class="figure">
+<div id="org8788c5e" class="figure">
 <p><img src="../img/mordhau10.png" alt="mordhau10.png" />
 </p>
 </div>
@@ -548,7 +548,7 @@ parameter.
 </p>
 
 
-<div id="org3f40654" class="figure">
+<div id="orged2acfd" class="figure">
 <p><img src="../img/mordhau11.png" alt="mordhau11.png" />
 </p>
 </div>
@@ -586,7 +586,7 @@ jump to its only xref. Once you are in the subroutine, press <code>F5</code> to 
 </p>
 
 
-<div id="org1e0cc32" class="figure">
+<div id="org84cd2b5" class="figure">
 <p><img src="../img/mordhau12.png" alt="mordhau12.png" />
 </p>
 </div>
@@ -632,7 +632,7 @@ function might look something like this:
 
 <p>
 In that case, we would have to jump to the xref of that <code>LABEL_123</code> and look for
-the same <code>qword</code> assignment bellow the jump.
+the same <code>qword</code> assignment below the jump.
 </p>
 </div>
 </div>
@@ -687,7 +687,7 @@ as Mordhau.
 </p>
 
 
-<div id="org1b3c6e4" class="figure">
+<div id="org8683883" class="figure">
 <p><img src="../img/mordhau13.png" alt="mordhau13.png" />
 </p>
 </div>
@@ -700,7 +700,7 @@ this.
 </p>
 
 
-<div id="org95933a1" class="figure">
+<div id="orgabce5bd" class="figure">
 <p><img src="../img/mordhau14.png" alt="mordhau14.png" />
 </p>
 </div>
@@ -712,7 +712,7 @@ Offset&rdquo; tab, select <code>UWorld</code>, and enter any display name.
 </p>
 
 
-<div id="org364ec43" class="figure">
+<div id="org5334e22" class="figure">
 <p><img src="../img/mordhau15.png" alt="mordhau15.png" />
 </p>
 </div>

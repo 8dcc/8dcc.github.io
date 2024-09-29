@@ -33,7 +33,7 @@ be easy to forget at first.
 There are two very important registers when dealing with the stack. The =rsp=
 register (stack pointer) always points to the top of the stack, and the =rbp=
 register (base pointer) is used to delimit stack frames (more on this
-bellow). The =rip= register will be mentioned as well, since it points to the
+below). The =rip= register will be mentioned as well, since it points to the
 address of the next instruction to the one being executed.
 
 When a value is /pushed/ onto the stack the =rsp= register is decremented, *and then*
@@ -62,7 +62,7 @@ of the next instruction (=rip= register) onto the stack, so =bar= knows where to
 return once it's done. Then, after =foo= calls =bar=, =bar= might push some of the
 registers that need to be preserved by the callee, like =rbp= or =r12=, and it will
 allocate some space for storing its data, if needed. This will be explained in
-more detail bellow, with an example.
+more detail below, with an example.
 
 These kind of details are specified in the Application Binary Interface (ABI) of
 each architecture. For example, if we look in the System V AMD64 ABI ([[https://en.wikipedia.org/wiki/X86_calling_conventions#System_V_AMD64_ABI][Wikipedia]],
@@ -214,7 +214,7 @@ the *caller*, not the callee.
 
 As an example, let's write some of the assembly that =DrawLine= could be using. To
 avoid cluttering the code with comments, I moved the explanation of each part to
-the legend bellow.
+the legend below.
 
 In the following code, =DrawLine= pushes the base pointer (=rbp=) for *preserving the
 caller's stack frame*. Then, it saves the value of =rsp= in =rbp=, creating its own
@@ -254,7 +254,7 @@ DrawLine:
 #+end_src
 
 1. Right when we got called, =RSP= points to the return address in =DrawSquare=, and
-   the =DrawLine= arguments are right bellow it, from =[RSP+0x8]= to
+   the =DrawLine= arguments are right below it, from =[RSP+0x8]= to
    =[RSP+(n*0x8)]=. Note that they are lower on the stack, but higher in memory.
 2. The first thing we usually do is push the old =RBP= value that =DrawSquare= was
    using. After pushing it, =RSP= will point to the old =RBP=, hence the "linked

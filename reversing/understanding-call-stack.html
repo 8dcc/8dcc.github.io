@@ -255,7 +255,7 @@ be easy to forget at first.
 There are two very important registers when dealing with the stack. The <code>rsp</code>
 register (stack pointer) always points to the top of the stack, and the <code>rbp</code>
 register (base pointer) is used to delimit stack frames (more on this
-bellow). The <code>rip</code> register will be mentioned as well, since it points to the
+below). The <code>rip</code> register will be mentioned as well, since it points to the
 address of the next instruction to the one being executed.
 </p>
 
@@ -294,7 +294,7 @@ of the next instruction (<code>rip</code> register) onto the stack, so <code>bar
 return once it&rsquo;s done. Then, after <code>foo</code> calls <code>bar</code>, <code>bar</code> might push some of the
 registers that need to be preserved by the callee, like <code>rbp</code> or <code>r12</code>, and it will
 allocate some space for storing its data, if needed. This will be explained in
-more detail bellow, with an example.
+more detail below, with an example.
 </p>
 
 <p>
@@ -429,7 +429,7 @@ typically organized.
 </p>
 
 
-<div id="org0fe48ad" class="figure">
+<div id="org08830cd" class="figure">
 <p><img src="../img/callstack1.png" alt="callstack1.png" />
 </p>
 </div>
@@ -480,7 +480,7 @@ version, where the top of the stack is in a lower address than the bottom.
 </p>
 
 
-<div id="org35e3431" class="figure">
+<div id="org3ddf946" class="figure">
 <p><img src="../img/callstack2.png" alt="callstack2.png" />
 </p>
 </div>
@@ -499,7 +499,7 @@ the <b>caller</b>, not the callee.
 <p>
 As an example, let&rsquo;s write some of the assembly that <code>DrawLine</code> could be using. To
 avoid cluttering the code with comments, I moved the explanation of each part to
-the legend bellow.
+the legend below.
 </p>
 
 <p>
@@ -544,7 +544,7 @@ creates a <b>linked list</b>, where you can follow <code>rbp</code>&rsquo;s to t
 
 <ol class="org-ol">
 <li>Right when we got called, <code>RSP</code> points to the return address in <code>DrawSquare</code>, and
-the <code>DrawLine</code> arguments are right bellow it, from <code>[RSP+0x8]</code> to
+the <code>DrawLine</code> arguments are right below it, from <code>[RSP+0x8]</code> to
 <code>[RSP+(n*0x8)]</code>. Note that they are lower on the stack, but higher in memory.</li>
 <li>The first thing we usually do is push the old <code>RBP</code> value that <code>DrawSquare</code> was
 using. After pushing it, <code>RSP</code> will point to the old <code>RBP</code>, hence the &ldquo;linked
@@ -613,7 +613,7 @@ Let&rsquo;s look at some example C code.
 The call stack for <code>DrawPoint()</code> would be the following:
 </p>
 
-<pre class="example" id="org8dab530">
+<pre class="example" id="orgbdfab58">
 (???)  -&gt;  DrawSquare()  -&gt;  DrawLine()  -&gt;  DrawPoint()
 </pre>
 </div>
@@ -753,7 +753,7 @@ I chose to use the second option, so I can explain how it works. If we just used
 following warnings:
 </p>
 
-<pre class="example" id="org8a382b8">
+<pre class="example" id="orgff9bb36">
 /usr/bin/ld: obj/callstack.asm.o: warning: relocation in read-only section `.text'
 /usr/bin/ld: obj/callstack.asm.o: relocation R_X86_64_PC32 against symbol `printf@@GLIBC_2.2.5' can not be used when making a PIE object; recompile with -fPIE
 /usr/bin/ld: final link failed: bad value
@@ -934,7 +934,7 @@ what I mentioned in <a href="#note-about-position-independent-executables">Note 
 Then, we can just run <code>make</code> and check the output:
 </p>
 
-<pre class="example" id="orgb1e83c5">
+<pre class="example" id="orga6166fe">
 (main) Address of DrawPoint:  0x5a1e3d78e139
 (main) Address of DrawLine:   0x5a1e3d78e170
 (main) Address of DrawSquare: 0x5a1e3d78e1bf
@@ -976,7 +976,7 @@ look.
 </p>
 
 
-<div id="org3debd47" class="figure">
+<div id="orgfd5040d" class="figure">
 <p><img src="../img/callstack3.png" alt="callstack3.png" />
 </p>
 </div>
@@ -987,7 +987,7 @@ Indeed, the call to <code>DrawPoint</code> is at <code>+0x2e</code>, and the nex
 </p>
 
 
-<div id="org6cfc06d" class="figure">
+<div id="org0ac9d7b" class="figure">
 <p><img src="../img/callstack4.png" alt="callstack4.png" />
 </p>
 </div>

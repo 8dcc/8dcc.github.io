@@ -437,10 +437,10 @@ In Scheme:
 
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact</span>
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>n<span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #44bc44;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>n<span style="color: #44bc44;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #00eff0;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #00eff0;">)</span>
         <span style="color: #88ca9f;">1</span>
-        <span style="color: #44bc44;">(</span>mult n <span style="color: #ff5f59;">(</span>fact <span style="color: #2fafff;">(</span>prec n<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+        <span style="color: #00eff0;">(</span>mult n <span style="color: #338fff;">(</span>fact <span style="color: #ef7fff;">(</span>prec n<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
@@ -494,8 +494,8 @@ Or in Scheme:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>x<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span>x x<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span>
- <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>x<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span>x x<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>x<span style="color: #44bc44;">)</span> <span style="color: #44bc44;">(</span>x x<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+ <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>x<span style="color: #44bc44;">)</span> <span style="color: #44bc44;">(</span>x x<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
@@ -525,14 +525,14 @@ the whole second parenthesized expression.
 </p>
 
 
-<div id="org769baa2" class="figure">
+<div id="org933fb9c" class="figure">
 <p><img src="../img/ycombinator1.png" alt="ycombinator1.png" />
 </p>
 </div>
 
 <p>
 We are right back where we started. This function would call itself
-indefinitely, and a similar form will be used for the Y combinator bellow.
+indefinitely, and a similar form will be used for the Y combinator below.
 </p>
 </div>
 </div>
@@ -558,7 +558,7 @@ For example, if \(f(x) = x!\), 1 and 2 are fixed points, since \(f(1) = 1\) and
 </p>
 
 
-<div id="org3eba7c5" class="figure">
+<div id="orge72fca6" class="figure">
 <p><img src="../img/ycombinator2.png" alt="ycombinator2.png" width="250px" />
 </p>
 </div>
@@ -632,15 +632,15 @@ Or in Scheme:
 
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">Y</span>
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>f<span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>x<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span>f <span style="color: #2fafff;">(</span>x x<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span>
-     <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>x<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span>f <span style="color: #2fafff;">(</span>x x<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>f<span style="color: #44bc44;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #338fff;">(</span>x<span style="color: #338fff;">)</span> <span style="color: #338fff;">(</span>f <span style="color: #ef7fff;">(</span>x x<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
+     <span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #338fff;">(</span>x<span style="color: #338fff;">)</span> <span style="color: #338fff;">(</span>f <span style="color: #ef7fff;">(</span>x x<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
 <blockquote>
 <p>
-<b>Note:</b> This version is not accurate, see <a href="#implementation-in-scheme">Implementation in Scheme</a> bellow.
+<b>Note:</b> This version is not accurate, see <a href="#implementation-in-scheme">Implementation in Scheme</a> below.
 </p>
 </blockquote>
 
@@ -662,7 +662,7 @@ useful concept, and it&rsquo;s where this image comes from.
 </p>
 
 
-<div id="orgd8d5b0e" class="figure">
+<div id="org358b2b0" class="figure">
 <p><img src="../img/ycombinator3.png" alt="ycombinator3.png" width="250px" />
 </p>
 </div>
@@ -727,10 +727,10 @@ Scheme.
 
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact</span>
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>n<span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #44bc44;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>n<span style="color: #44bc44;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #00eff0;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #00eff0;">)</span>
         <span style="color: #88ca9f;">1</span>
-        <span style="color: #44bc44;">(</span>* n <span style="color: #ff5f59;">(</span>fact <span style="color: #2fafff;">(</span>- n <span style="color: #88ca9f;">1</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+        <span style="color: #00eff0;">(</span>* n <span style="color: #338fff;">(</span>fact <span style="color: #ef7fff;">(</span>- n <span style="color: #88ca9f;">1</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
@@ -750,11 +750,11 @@ The Y combinator allows us to call a function recursively in a language that
 
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact-generator</span>
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>self<span style="color: #cabf00;">)</span>        <span style="color: #989898;">; </span><span style="color: #989898;">Outer lambda (fact-generator)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>n<span style="color: #44bc44;">)</span>         <span style="color: #989898;">; </span><span style="color: #989898;">Inner lambda (returned by fact-generator)</span>
-      <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #ff5f59;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>self<span style="color: #44bc44;">)</span>        <span style="color: #989898;">; </span><span style="color: #989898;">Outer lambda (fact-generator)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #00eff0;">(</span>n<span style="color: #00eff0;">)</span>         <span style="color: #989898;">; </span><span style="color: #989898;">Inner lambda (returned by fact-generator)</span>
+      <span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #338fff;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #338fff;">)</span>
           <span style="color: #88ca9f;">1</span>
-          <span style="color: #ff5f59;">(</span>* n <span style="color: #2fafff;">(</span>self <span style="color: #cabf00;">(</span>- n <span style="color: #88ca9f;">1</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+          <span style="color: #338fff;">(</span>* n <span style="color: #ef7fff;">(</span>self <span style="color: #ff5f59;">(</span>- n <span style="color: #88ca9f;">1</span><span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
@@ -783,7 +783,7 @@ something like this.
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">Wrong.</span>
 <span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact</span>
-  <span style="color: #2fafff;">(</span>fact-generator fact<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span>fact-generator fact<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
@@ -802,7 +802,7 @@ factorial, but also returns one, we are looking for something like:
 
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact</span>
-  <span style="color: #2fafff;">(</span>fact-generator <span style="color: #cabf00;">(</span>fact-generator <span style="color: #44bc44;">(</span>fact-generator ...<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span>fact-generator <span style="color: #44bc44;">(</span>fact-generator <span style="color: #00eff0;">(</span>fact-generator ...<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
@@ -829,8 +829,8 @@ Scheme (and most Lisps) is <i>strict</i>, meaning that each argument is evaluate
 <p>
 Defining <code>Y</code> like we did before would result in infinite recursive calls when
 trying to apply the <code>(x x)</code> expressions. This will be more obvious when analyzing
-the combinator bellow, so let&rsquo;s look at a possible solution first. We can fix
-our Y combinator by <b>beta abstracting</b><sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup> those two applications.
+the combinator below, so let&rsquo;s look at a possible solution first. We can fix our
+Y combinator by <b>beta abstracting</b><sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup> those two applications.
 </p>
 
 <blockquote>
@@ -857,9 +857,9 @@ as a &ldquo;proxy&rdquo;.
 
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">Y</span>
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>f<span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>x<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span>f <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>n<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>x x<span style="color: #44bc44;">)</span> n<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span>
-     <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>x<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span>f <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>n<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>x x<span style="color: #44bc44;">)</span> n<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>f<span style="color: #44bc44;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #338fff;">(</span>x<span style="color: #338fff;">)</span> <span style="color: #338fff;">(</span>f <span style="color: #ef7fff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>n<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span>x x<span style="color: #cabf00;">)</span> n<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
+     <span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #338fff;">(</span>x<span style="color: #338fff;">)</span> <span style="color: #338fff;">(</span>f <span style="color: #ef7fff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>n<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span>x x<span style="color: #cabf00;">)</span> n<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
@@ -882,7 +882,7 @@ have decided to make some changes to make it easier to understand.
 </p>
 
 
-<div id="org0cf48f3" class="figure">
+<div id="org2000c83" class="figure">
 <p><img src="../img/ycombinator4.svg" alt="ycombinator4.svg" class="org-svg" />
 </p>
 </div>
@@ -948,7 +948,7 @@ Which is just what we wanted to achieve earlier.
 
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact</span>
-  <span style="color: #2fafff;">(</span>fact-generator <span style="color: #cabf00;">(</span>fact-generator <span style="color: #44bc44;">(</span>fact-generator ...<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span>fact-generator <span style="color: #44bc44;">(</span>fact-generator <span style="color: #00eff0;">(</span>fact-generator ...<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 </div>
@@ -963,19 +963,19 @@ Finally, we can <a href="https://try.scheme.org/">try</a> our full example.
 
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">Y</span>
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>f<span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>x<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span>f <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>n<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>x x<span style="color: #44bc44;">)</span> n<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span>
-     <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>x<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span>f <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>n<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>x x<span style="color: #44bc44;">)</span> n<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>f<span style="color: #44bc44;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #338fff;">(</span>x<span style="color: #338fff;">)</span> <span style="color: #338fff;">(</span>f <span style="color: #ef7fff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>n<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span>x x<span style="color: #cabf00;">)</span> n<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
+     <span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #338fff;">(</span>x<span style="color: #338fff;">)</span> <span style="color: #338fff;">(</span>f <span style="color: #ef7fff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ff5f59;">(</span>n<span style="color: #ff5f59;">)</span> <span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span>x x<span style="color: #cabf00;">)</span> n<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 
 <span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact-generator</span>
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #cabf00;">(</span>self<span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>n<span style="color: #44bc44;">)</span>
-      <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #ff5f59;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>self<span style="color: #44bc44;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #00eff0;">(</span>n<span style="color: #00eff0;">)</span>
+      <span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #338fff;">(</span>equal? n <span style="color: #88ca9f;">0</span><span style="color: #338fff;">)</span>
           <span style="color: #88ca9f;">1</span>
-          <span style="color: #ff5f59;">(</span>* n <span style="color: #2fafff;">(</span>self <span style="color: #cabf00;">(</span>- n <span style="color: #88ca9f;">1</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+          <span style="color: #338fff;">(</span>* n <span style="color: #ef7fff;">(</span>self <span style="color: #ff5f59;">(</span>- n <span style="color: #88ca9f;">1</span><span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 
 <span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #4ae2ff;">fact</span>
-  <span style="color: #2fafff;">(</span>Y fact-generator<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span>Y fact-generator<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 
 <span style="color: #ff5f59;">(</span>fact <span style="color: #88ca9f;">5</span><span style="color: #ff5f59;">)</span>
 </pre>

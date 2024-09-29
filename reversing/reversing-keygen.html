@@ -247,7 +247,7 @@ in case you are interested.
 First, let&rsquo;s try running the program to see what it&rsquo;s asking.
 </p>
 
-<pre class="example" id="org532880d">
+<pre class="example" id="org471fb34">
 Username: test
 Key: test
 Invalid key.
@@ -445,7 +445,7 @@ key, so we will rename the function to <code>get_key()</code>, and the parameter
 <p>
 From <code>main+0x5d</code> to <code>main+0x71</code>, it calls an unknown function at <code>0x1189</code> with the
 <code>user</code> we got from <code>scanf()</code> and <code>0x4180</code> as arguments. This looks very promising,
-since it will compare this <code>0x4180</code> value with <code>user_key</code> right bellow. For this
+since it will compare this <code>0x4180</code> value with <code>user_key</code> right below. For this
 reason, we will call this function <code>generate_key()</code> and the second parameter at
 <code>0x4180</code>, <code>real_key</code>.
 </p>

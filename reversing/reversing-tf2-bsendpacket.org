@@ -82,10 +82,10 @@ us, so we need to find a way of changing its value.
 
 As I said, this is a *local variable*, so we can't just treat it as a global and
 get a pointer to it. This variable is declared within the [[https://en.wikipedia.org/wiki/Call_stack#STACK-FRAME][stack frame]] of
-=CL_Move=, and only exists throughout its life cycle (this will be explained
-bellow in more detail). We will need to find a way of somehow tricking =CL_Move=
-into thinking that this variable has the value we want it to have, and ideally
-do that from =ClientModeShared::CreateMove=.
+=CL_Move=, and only exists throughout its life cycle (this will be explained below
+in more detail). We will need to find a way of somehow tricking =CL_Move= into
+thinking that this variable has the value we want it to have, and ideally do
+that from =ClientModeShared::CreateMove=.
 
 * The old solution
 :PROPERTIES:

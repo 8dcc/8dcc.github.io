@@ -216,7 +216,7 @@ the whole second parenthesized expression.
 [[file:../img/ycombinator1.png]]
 
 We are right back where we started. This function would call itself
-indefinitely, and a similar form will be used for the Y combinator bellow.
+indefinitely, and a similar form will be used for the Y combinator below.
 
 * Fixed points
 :PROPERTIES:
@@ -290,7 +290,7 @@ Or in Scheme:
 #+end_src
 
 #+begin_quote
-*Note:* This version is not accurate, see [[*Implementation in Scheme][Implementation in Scheme]] bellow.
+*Note:* This version is not accurate, see [[*Implementation in Scheme][Implementation in Scheme]] below.
 #+end_quote
 
 Or in JavaScript:
@@ -434,8 +434,8 @@ Scheme (and most Lisps) is /strict/, meaning that each argument is evaluated
 
 Defining =Y= like we did before would result in infinite recursive calls when
 trying to apply the =(x x)= expressions. This will be more obvious when analyzing
-the combinator bellow, so let's look at a possible solution first. We can fix
-our Y combinator by *beta abstracting*[fn:5] those two applications.
+the combinator below, so let's look at a possible solution first. We can fix our
+Y combinator by *beta abstracting*[fn:5] those two applications.
 
 #+begin_quote
 *JAO's blog about the Y-combinator in Scheme (2014)*
