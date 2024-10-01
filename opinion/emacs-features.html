@@ -234,6 +234,7 @@
 <li><a href="#erc">3.9. ERC</a></li>
 <li><a href="#c-macro-expansion">3.10. C macro expansion</a></li>
 <li><a href="#calculator">3.11. Calculator</a></li>
+<li><a href="#macros">3.12. Macros</a></li>
 </ul>
 </li>
 <li><a href="#external-packages">4. External packages</a>
@@ -543,7 +544,7 @@ using very long plain comments within a single source.
 </p>
 
 
-<div id="orgd7b5315" class="figure">
+<div id="orga8f0370" class="figure">
 <p><img src="../img/emacs-org.png" alt="emacs-org.png" />
 </p>
 </div>
@@ -582,7 +583,7 @@ Behold, the beauty of GNU Emacs (at least since version 22.1).
 </p>
 
 
-<div id="org38c2b2d" class="figure">
+<div id="org0e80bf3" class="figure">
 <p><img src="../img/emacs-gdb.png" alt="emacs-gdb.png" />
 </p>
 </div>
@@ -757,7 +758,7 @@ displays the matches in an interactive buffer.
 </p>
 
 
-<div id="org7333e36" class="figure">
+<div id="orge05ce52" class="figure">
 <p><img src="../img/emacs-grep.png" alt="emacs-grep.png" />
 </p>
 </div>
@@ -804,7 +805,7 @@ the <code>diff</code> command, but much more interactive and integrated with Ema
 </p>
 
 
-<div id="org7caab8c" class="figure">
+<div id="orgf1df975" class="figure">
 <p><img src="../img/emacs-ediff.png" alt="emacs-ediff.png" />
 </p>
 </div>
@@ -941,7 +942,7 @@ forms with standard deviations, open and closed intervals, vectors and
 matrices, dates and times, infinities, sets, quantities with units, and
 algebraic formulas.</li>
 <li>Mathematical operations such as logarithms and trigonometric functions.</li>
-<li>Programmer’s features (bitwise operations, non-decimal numbers).</li>
+<li>Programmer&rsquo;s features (bitwise operations, non-decimal numbers).</li>
 <li>Financial functions such as future value and internal rate of return.</li>
 <li>Number theoretical features such as prime factorization and arithmetic modulo
 m for any m.</li>
@@ -968,7 +969,7 @@ If you find this overwhelming, you might want to at least consider using
 <code>M-x quick-calc</code> for quick (but not necesarily simple) calculations. For example:
 </p>
 
-<pre class="example" id="org9ca0966">
+<pre class="example" id="orgb1949ac">
 M-x quick-calc RET
 Quick calc: 632+56-32*4+2^3
 Result: 632 + 56 - 32 4 + 2^3 =&gt;  568  (16#238, 8#1070, 2#1000111000)
@@ -1057,6 +1058,20 @@ Some other keybinds, related to the trail:
 </div>
 </div>
 </div>
+
+<div id="outline-container-macros" class="outline-3">
+<h3 id="macros"><span class="section-number-3">3.12.</span> Macros</h3>
+<div class="outline-text-3" id="text-macros">
+<p>
+I can&rsquo;t say much about Emacs macros, since I use <a href="#evil-mode">Evil mode</a> and I don&rsquo;t how much
+they differ from vanilla Emacs macros. However, Emacs allows you to <i>share</i> macros
+very easily, which is very handy sometimes. Simply record your macro (in my case
+with <code>evil-record-macro</code>) and give it a name with <code>name-last-kbd-macro</code>. Then,
+insert it into the current buffer with <code>insert-kbd-macro</code>. The Lisp format is
+perfect for storing it anywhere (e.g. in a comment) for future sessions.
+</p>
+</div>
+</div>
 </div>
 
 <div id="outline-container-external-packages" class="outline-2">
@@ -1088,7 +1103,7 @@ with Emacs.
 </p>
 
 
-<div id="org5aa958a" class="figure">
+<div id="org938e168" class="figure">
 <p><img src="../img/emacs-magit.png" alt="emacs-magit.png" />
 </p>
 </div>

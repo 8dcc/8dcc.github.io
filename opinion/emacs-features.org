@@ -501,7 +501,7 @@ Some of the features include:
   matrices, dates and times, infinities, sets, quantities with units, and
   algebraic formulas.
 - Mathematical operations such as logarithms and trigonometric functions.
-- Programmer’s features (bitwise operations, non-decimal numbers).
+- Programmer's features (bitwise operations, non-decimal numbers).
 - Financial functions such as future value and internal rate of return.
 - Number theoretical features such as prime factorization and arithmetic modulo
   m for any m.
@@ -558,6 +558,18 @@ Some other keybinds, related to the trail:
 |----------+---------------------------------------------------------------|
 | ~t p~, ~t n~ | Move up and down in the trail, from the main calc window.     |
 | ~t y~      | Copy the selected value in the trail to the main calc window. |
+
+** Macros
+:PROPERTIES:
+:CUSTOM_ID: macros
+:END:
+
+I can't say much about Emacs macros, since I use [[*Evil mode][Evil mode]] and I don't how much
+they differ from vanilla Emacs macros. However, Emacs allows you to /share/ macros
+very easily, which is very handy sometimes. Simply record your macro (in my case
+with =evil-record-macro=) and give it a name with =name-last-kbd-macro=. Then,
+insert it into the current buffer with =insert-kbd-macro=. The Lisp format is
+perfect for storing it anywhere (e.g. in a comment) for future sessions.
 
 * External packages
 :PROPERTIES:
