@@ -331,10 +331,11 @@ the Emacs manual.
   with something like [[https://github.com/minad/consult][consult]]).
 
   You can replace text (with =query-replace-regexp=) in the marked buffers with
-  =Q=. This is a very useful feature. If you exit the query replace loop, you can
-  use =r= in the =*xref*= buffer to continue replacing. If there are marked
-  directories in the current buffer when invoking, they are searched
-  recursively.
+  =Q=. This is a very useful feature. In addition to normal query replace
+  commands, you can use =Y= to confirm all replacements on all target files. If
+  you exit the query replace loop, you can use =r= in the =*xref*= buffer to
+  continue replacing. If there are marked directories in the current buffer when
+  invoking, they are searched recursively.
 
   You can compare two files (the file at point with a second prompted file) in a
   =*Diff*= buffer with ~=~.
