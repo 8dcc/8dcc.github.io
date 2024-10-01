@@ -78,6 +78,14 @@ p, li {
     line-height: 1.4em;
 }
 
+dl.org-dl dd p:nth-child(1) {
+    margin-top: 0px;
+}
+
+dl.org-dl dd p:nth-last-child(1) {
+    margin-bottom: 0px;
+}
+
 #text-table-of-contents li {
     line-height: 1.3em;
 }
