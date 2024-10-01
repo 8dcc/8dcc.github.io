@@ -226,13 +226,14 @@
 <li><a href="#org-mode">3.1. Org mode</a></li>
 <li><a href="#gdb">3.2. GDB</a></li>
 <li><a href="#eshell">3.3. Eshell</a></li>
-<li><a href="#grep">3.4. Grep</a></li>
-<li><a href="#compilation">3.5. Compilation</a></li>
-<li><a href="#ediff">3.6. Ediff</a></li>
-<li><a href="#browser-and-external-documentation">3.7. Browser and external documentation</a></li>
-<li><a href="#erc">3.8. ERC</a></li>
-<li><a href="#c-macro-expansion">3.9. C macro expansion</a></li>
-<li><a href="#calculator">3.10. Calculator</a></li>
+<li><a href="#dired">3.4. Dired</a></li>
+<li><a href="#grep">3.5. Grep</a></li>
+<li><a href="#compilation">3.6. Compilation</a></li>
+<li><a href="#ediff">3.7. Ediff</a></li>
+<li><a href="#browser-and-external-documentation">3.8. Browser and external documentation</a></li>
+<li><a href="#erc">3.9. ERC</a></li>
+<li><a href="#c-macro-expansion">3.10. C macro expansion</a></li>
+<li><a href="#calculator">3.11. Calculator</a></li>
 </ul>
 </li>
 <li><a href="#external-packages">4. External packages</a>
@@ -542,7 +543,7 @@ using very long plain comments within a single source.
 </p>
 
 
-<div id="org6e87326" class="figure">
+<div id="org2cb0391" class="figure">
 <p><img src="../img/emacs-org.png" alt="emacs-org.png" />
 </p>
 </div>
@@ -581,7 +582,7 @@ Behold, the beauty of GNU Emacs (at least since version 22.1).
 </p>
 
 
-<div id="org2774530" class="figure">
+<div id="org7f7d3cc" class="figure">
 <p><img src="../img/emacs-gdb.png" alt="emacs-gdb.png" />
 </p>
 </div>
@@ -661,8 +662,93 @@ not only call normal system programs, but you can also use, for example,
 </div>
 </div>
 
+<div id="outline-container-dired" class="outline-3">
+<h3 id="dired"><span class="section-number-3">3.4.</span> Dired</h3>
+<div class="outline-text-3" id="text-dired">
+<p>
+Dired, the Directory Editor, is the Emacs file manager. Dired has many useful
+features, but I will talk about the ones I use the most. Note that some of my
+keybinds come from <a href="#evil-mode">Evil mode</a>, but you can consult them in <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html">the Dired section</a> of
+the Emacs manual.
+</p>
+
+<dl class="org-dl">
+<dt>Marking</dt><dd>You generally operate on files and directories by <i>marking</i> them with <code>m</code>. If the
+region is active, all the selected files are marked. You can mark all items in
+the current buffer with <code>t</code>. You can unmark all items in the current buffer with
+<code>U</code>.</dd>
+
+<dt>Navigation</dt><dd><p>
+You can move through the buffer with <a href="#evil-mode">normal evil keys</a>. You can go up to the
+parent directory with the <code>^</code> key.
+</p>
+
+<p>
+You can add the contents of sub-directories into the current dired buffer with
+<code>I</code>. If the sub-directory&rsquo;s contents are already present in the buffer, the <code>I</code>
+command just moves to it. If the point is in a sub-diredtory, and the parent
+is in the same buffer, you can press <code>^</code> to move to the line where the current
+directory appears in the parent. You can remove a subdirectory with <code>C-u K</code> or
+<code>M-x dired-kill-subdir</code>.
+</p></dd>
+
+<dt>General commands</dt><dd><p>
+You can <i>flag</i> files or directories for deletion with <code>d</code>, and unflag them with
+<code>u</code>. You can delete all items flagged for deletion in the current buffer with
+<code>x</code>. You can also delete all <i>marked</i> files with <code>D</code>.
+</p>
+
+<p>
+You can copy files with <code>C</code>, and rename/move them with <code>R</code>. You can change
+permissions with <code>M</code>, the user with <code>O</code> and the group with <code>G</code>. You can touch them
+with <code>T</code>. You can print files with <code>P</code> (usually with <code>lpr</code>). You can
+compress/uncompress them with <code>Z</code> (usually with <code>gzip</code>).
+</p>
+
+<p>
+You can create new directories with <code>+</code>.
+</p></dd>
+
+<dt>Search, replace and compare</dt><dd><p>
+You can search for regular expressions in marked files with <code>A</code>. It&rsquo;s a variant
+of <code>xref-find-references</code> (in my config bound to <code>SPC j x</code>), so it displays an
+<code>*xref*</code> buffer (or a fancy completion, if overwriting <code>xref-show-xrefs-function</code>
+with something like <a href="https://github.com/minad/consult">consult</a>).
+</p>
+
+<p>
+You can replace text (with <code>query-replace-regexp</code>) in the marked buffers with
+<code>Q</code>. This is a very useful feature. If you exit the query replace loop, you can
+use <code>r</code> in the <code>*xref*</code> buffer to continue replacing. If there are marked
+directories in the current buffer when invoking, they are searched
+recursively.
+</p>
+
+<p>
+You can compare two files (the file at point with a second prompted file) in a
+<code>*Diff*</code> buffer with <code>=</code>.
+</p></dd>
+
+<dt>Remote directories</dt><dd>You can access remote files in Dired with the usual <code>/method:...</code> syntax. See
+the <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Remote-Files.html">Remote Files</a> section of the Emacs manual.</dd>
+
+<dt>Wdired</dt><dd><p>
+By default, Dired buffers are read-only. However, you can enable the Wdired
+mode with <code>M-x wdired-change-to-wdired-mode</code> or with <code>M-x read-only-mode</code>. In this
+state you can rename files, move them by appending a path to the name, or mark
+them for deletion by deleting the whole name.
+</p>
+
+<p>
+This can be really useful with evil&rsquo;s visual block (or the Emacs alternative,
+which I honestly don&rsquo;t know).
+</p></dd>
+</dl>
+</div>
+</div>
+
 <div id="outline-container-grep" class="outline-3">
-<h3 id="grep"><span class="section-number-3">3.4.</span> Grep</h3>
+<h3 id="grep"><span class="section-number-3">3.5.</span> Grep</h3>
 <div class="outline-text-3" id="text-grep">
 <p>
 You can run <code>grep</code> commands from within Emacs. The basic form is with <code>M-x grep</code>,
@@ -671,7 +757,7 @@ displays the matches in an interactive buffer.
 </p>
 
 
-<div id="org91bb70a" class="figure">
+<div id="org9560be3" class="figure">
 <p><img src="../img/emacs-grep.png" alt="emacs-grep.png" />
 </p>
 </div>
@@ -692,7 +778,7 @@ See also <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Grep
 </div>
 
 <div id="outline-container-compilation" class="outline-3">
-<h3 id="compilation"><span class="section-number-3">3.5.</span> Compilation</h3>
+<h3 id="compilation"><span class="section-number-3">3.6.</span> Compilation</h3>
 <div class="outline-text-3" id="text-compilation">
 <p>
 In Emacs, you can run compilers and build tools, feeding the output into an
@@ -710,7 +796,7 @@ similar commands, so make sure you check it out.
 </div>
 
 <div id="outline-container-ediff" class="outline-3">
-<h3 id="ediff"><span class="section-number-3">3.6.</span> Ediff</h3>
+<h3 id="ediff"><span class="section-number-3">3.7.</span> Ediff</h3>
 <div class="outline-text-3" id="text-ediff">
 <p>
 This package allows you to compare files, buffers and much more. It&rsquo;s similar to
@@ -718,7 +804,7 @@ the <code>diff</code> command, but much more interactive and integrated with Ema
 </p>
 
 
-<div id="org5c68e7b" class="figure">
+<div id="org433d362" class="figure">
 <p><img src="../img/emacs-ediff.png" alt="emacs-ediff.png" />
 </p>
 </div>
@@ -726,7 +812,7 @@ the <code>diff</code> command, but much more interactive and integrated with Ema
 </div>
 
 <div id="outline-container-browser-and-external-documentation" class="outline-3">
-<h3 id="browser-and-external-documentation"><span class="section-number-3">3.7.</span> Browser and external documentation</h3>
+<h3 id="browser-and-external-documentation"><span class="section-number-3">3.8.</span> Browser and external documentation</h3>
 <div class="outline-text-3" id="text-browser-and-external-documentation">
 <p>
 Emacs has many commands related to documentation, but one of the most useful
@@ -764,7 +850,7 @@ whatever text I wanted to add afterwards.</li>
 </div>
 
 <div id="outline-container-erc" class="outline-3">
-<h3 id="erc"><span class="section-number-3">3.8.</span> ERC</h3>
+<h3 id="erc"><span class="section-number-3">3.9.</span> ERC</h3>
 <div class="outline-text-3" id="text-erc">
 <p>
 <a href="https://www.gnu.org/software/emacs/manual/html_mono/erc.html">ERC</a> is a powerful <a href="https://es.wikipedia.org/wiki/Internet_Relay_Chat">IRC</a> client for Emacs, and it&rsquo;s included since version 22.3. I
@@ -789,7 +875,7 @@ from the manual:
 </div>
 
 <div id="outline-container-c-macro-expansion" class="outline-3">
-<h3 id="c-macro-expansion"><span class="section-number-3">3.9.</span> C macro expansion</h3>
+<h3 id="c-macro-expansion"><span class="section-number-3">3.10.</span> C macro expansion</h3>
 <div class="outline-text-3" id="text-c-macro-expansion">
 <p>
 Emacs allows you to expand C macros with <code>M-x c-macro-expand</code>. This is very useful
@@ -836,7 +922,7 @@ Emacs.
 </div>
 
 <div id="outline-container-calculator" class="outline-3">
-<h3 id="calculator"><span class="section-number-3">3.10.</span> Calculator</h3>
+<h3 id="calculator"><span class="section-number-3">3.11.</span> Calculator</h3>
 <div class="outline-text-3" id="text-calculator">
 <p>
 You can open the Emacs calculator with <code>M-x calc</code>. It uses <a href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">Reverse Polish Notation</a>
@@ -875,14 +961,14 @@ it&rsquo;s worth learning. See also the <a href="https://www.gnu.org/software/em
 </div>
 
 <div id="outline-container-quick-calculator" class="outline-4">
-<h4 id="quick-calculator"><span class="section-number-4">3.10.1.</span> Quick calculator</h4>
+<h4 id="quick-calculator"><span class="section-number-4">3.11.1.</span> Quick calculator</h4>
 <div class="outline-text-4" id="text-quick-calculator">
 <p>
 If you find this overwhelming, you might want to at least consider using
 <code>M-x quick-calc</code> for quick (but not necesarily simple) calculations. For example:
 </p>
 
-<pre class="example" id="org9184853">
+<pre class="example" id="orgd566f57">
 M-x quick-calc RET
 Quick calc: 632+56-32*4+2^3
 Result: 632 + 56 - 32 4 + 2^3 =&gt;  568  (16#238, 8#1070, 2#1000111000)
@@ -899,7 +985,7 @@ Result: 3 x = 2 x + 18 =&gt;  x = 18
 </div>
 
 <div id="outline-container-personal-reference-card" class="outline-4">
-<h4 id="personal-reference-card"><span class="section-number-4">3.10.2.</span> Personal reference card</h4>
+<h4 id="personal-reference-card"><span class="section-number-4">3.11.2.</span> Personal reference card</h4>
 <div class="outline-text-4" id="text-personal-reference-card">
 <p>
 These are some keybinds that I use often, appart from the basic operations and
@@ -1002,7 +1088,7 @@ with Emacs.
 </p>
 
 
-<div id="orgf2ba7e2" class="figure">
+<div id="org3d8789d" class="figure">
 <p><img src="../img/emacs-magit.png" alt="emacs-magit.png" />
 </p>
 </div>

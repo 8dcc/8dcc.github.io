@@ -281,6 +281,79 @@ It's capable of running Emacs Lisp code, and calling Emacs functions. So you can
 not only call normal system programs, but you can also use, for example,
 =find-file a.txt= to open a file in that window.
 
+** Dired
+:PROPERTIES:
+:CUSTOM_ID: dired
+:END:
+
+Dired, the Directory Editor, is the Emacs file manager. Dired has many useful
+features, but I will talk about the ones I use the most. Note that some of my
+keybinds come from [[#evil-mode][Evil mode]], but you can consult them in [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][the Dired section]] of
+the Emacs manual.
+
+- Marking ::
+
+  You generally operate on files and directories by /marking/ them with =m=. If the
+  region is active, all the selected files are marked. You can mark all items in
+  the current buffer with =t=. You can unmark all items in the current buffer with
+  =U=.
+
+- Navigation ::
+
+  You can move through the buffer with [[*Evil mode][normal evil keys]]. You can go up to the
+  parent directory with the =^= key.
+
+  You can add the contents of sub-directories into the current dired buffer with
+  =I=. If the sub-directory's contents are already present in the buffer, the =I=
+  command just moves to it. If the point is in a sub-diredtory, and the parent
+  is in the same buffer, you can press =^= to move to the line where the current
+  directory appears in the parent. You can remove a subdirectory with =C-u K= or
+  =M-x dired-kill-subdir=.
+
+- General commands ::
+
+  You can /flag/ files or directories for deletion with =d=, and unflag them with
+  =u=. You can delete all items flagged for deletion in the current buffer with
+  =x=. You can also delete all /marked/ files with =D=.
+
+  You can copy files with =C=, and rename/move them with =R=. You can change
+  permissions with =M=, the user with =O= and the group with =G=. You can touch them
+  with =T=. You can print files with =P= (usually with =lpr=). You can
+  compress/uncompress them with =Z= (usually with =gzip=).
+
+  You can create new directories with =+=.
+
+- Search, replace and compare ::
+
+  You can search for regular expressions in marked files with =A=. It's a variant
+  of =xref-find-references= (in my config bound to =SPC j x=), so it displays an
+  =*xref*= buffer (or a fancy completion, if overwriting =xref-show-xrefs-function=
+  with something like [[https://github.com/minad/consult][consult]]).
+
+  You can replace text (with =query-replace-regexp=) in the marked buffers with
+  =Q=. This is a very useful feature. If you exit the query replace loop, you can
+  use =r= in the =*xref*= buffer to continue replacing. If there are marked
+  directories in the current buffer when invoking, they are searched
+  recursively.
+
+  You can compare two files (the file at point with a second prompted file) in a
+  =*Diff*= buffer with ~=~.
+
+- Remote directories ::
+
+  You can access remote files in Dired with the usual =/method:...= syntax. See
+  the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Remote-Files.html][Remote Files]] section of the Emacs manual.
+
+- Wdired ::
+
+  By default, Dired buffers are read-only. However, you can enable the Wdired
+  mode with =M-x wdired-change-to-wdired-mode= or with =M-x read-only-mode=. In this
+  state you can rename files, move them by appending a path to the name, or mark
+  them for deletion by deleting the whole name.
+
+  This can be really useful with evil's visual block (or the Emacs alternative,
+  which I honestly don't know).
+
 ** Grep
 :PROPERTIES:
 :CUSTOM_ID: grep
