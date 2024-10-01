@@ -17,8 +17,8 @@
 :END:
 
 [[https://www.gnu.org/software/emacs/][Emacs]] is an amazing editor. I come from [[https://neovim.io/][neovim]] and I decided to try [[https://github.com/doomemacs/doomemacs][doom emacs]]
-some years ago, and decided to eventually "doom-ify" vanilla Emacs to my liking,
-removing all features I didn't like or use.
+some years ago, and decided to eventually switch to vanilla Emacs and customize
+it to my liking. I keep customizing more and more stuff in my [[https://github.com/8dcc/emacs-dotfiles/blob/main/emacs/config.org][dotfiles]].
 
 As you might have heard, Emacs /is not/ a text editor, Emacs /has/ a text editor. It
 has a lot of features, and it's so easy to customize and extend that it creates
@@ -80,7 +80,7 @@ menu.
 :CUSTOM_ID: small-emacs-glossary
 :END:
 
-In case anyone is very new to emacs, this list might help understanding the
+In case anyone is very new to Emacs, this list might help understanding the
 difference between some terms used in this page.
 
 *** Frames, windows and buffers
@@ -572,7 +572,7 @@ change in the future, so keep that in mind.
 :CUSTOM_ID: evil-mode
 :END:
 
-This package allows you to use vi's keybinds in Emacs. I would not use emacs if
+This package allows you to use vi's keybinds in Emacs. I would not use Emacs if
 it wasn't for this package. Not much else to be said. This is its [[https://github.com/emacs-evil/evil][GitHub
 repository]].
 
