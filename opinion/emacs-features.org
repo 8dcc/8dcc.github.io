@@ -551,6 +551,7 @@ insertion commands:
 |-----------+----------------------------------------------------|
 | ~C-u~ + /n/   | Run the next command /n/ times, edit /n/ entries, etc. |
 | ~`~ (tilde) | Edit the top of the stack (Combine with =C-u=).      |
+| ~TAB~       | Cycle the top of the stack (Combine with =C-u=).     |
 | ~D r~       | Change the radix used when displaying.             |
 
 Some other keybinds, related to the trail:
