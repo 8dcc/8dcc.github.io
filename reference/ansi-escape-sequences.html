@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reverse engineering</title>
+<title>ANSI Escape Sequences</title>
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -192,83 +192,211 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   .org-svg { }
 </style>
-<link rel="icon" type="image/x-icon" href="../img/favicon.png" />
-<link rel="stylesheet" type="text/css" href="../css/main.css" />
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">Reverse engineering</h1>
+<h1 class="title">ANSI Escape Sequences</h1>
 <p>
-<a href="../index.html">Index</a>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
 </p>
 
 <hr />
 
-<div id="outline-container-list-of-articles" class="outline-2">
-<h2 id="list-of-articles">List of articles</h2>
-<div class="outline-text-2" id="text-list-of-articles">
-<p>
-These articles are related to reverse engineering.
-</p>
-
-<ul class="org-ul">
-<li><a href="understanding-call-stack.html">Understanding and traversing the call stack</a></li>
-<li><a href="reversing-tf2-bsendpacket.html">Reversing TF2&rsquo;s bSendPacket</a></li>
-<li><a href="reversing-mordhau.html">Mordhau: From reversing Unreal Engine 4 to breaking animations</a></li>
-<li><a href="cs-source-localplayer.html">Finding the local player offset in source games</a></li>
-<li><a href="devildaggers.html">Reversing Devil Daggers</a></li>
-<li><a href="xorpd-book.html">Inspecting xorpd’s assembly snippets</a></li>
-<li><a href="reversing-keygen.html">Reversing a simple keygen</a></li>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org0161d18">1. Terminal colors and effects</a>
+<ul>
+<li><a href="#org8d54e85">1.1. Colors</a></li>
+<li><a href="#org3fc6043">1.2. Effects</a></li>
+<li><a href="#orgebe7bce">1.3. Other links</a></li>
 </ul>
-
-<p>
-These articles explain how to solve <a href="https://yurichev.com/">Dennis Yurichev</a>&rsquo;s reverse engineering
-<a href="https://challenges.re/">challenges</a>.
-</p>
-
-<ul class="org-ul">
-<li><a href="challenge2.html">Challenge 2</a></li>
-<li><a href="challenge3.html">Challenge 3</a></li>
-<li><a href="challenge4.html">Challenge 4</a></li>
-<li><a href="challenge5.html">Challenge 5</a></li>
-<li><a href="challenge6.html">Challenge 6</a></li>
-<li><a href="challenge7.html">Challenge 7</a></li>
-<li><a href="challenge8.html">Challenge 8</a></li>
-<li><a href="challenge9.html">Challenge 9</a></li>
-<li><a href="challenge10.html">Challenge 10</a></li>
+</li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-external-resources" class="outline-2">
-<h2 id="external-resources">External resources</h2>
-<div class="outline-text-2" id="text-external-resources">
-<p>
-These are some good resources for learning and practicing reverse engineering.
-</p>
+<div id="outline-container-org0161d18" class="outline-2">
+<h2 id="org0161d18"><span class="section-number-2">1.</span> Terminal colors and effects</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org8d54e85" class="outline-3">
+<h3 id="org8d54e85"><span class="section-number-3">1.1.</span> Colors</h3>
+<div class="outline-text-3" id="text-1-1">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-right">Foreground</th>
+<th scope="col" class="org-right">Background</th>
+<th scope="col" class="org-right">Bright Foreground</th>
+<th scope="col" class="org-right">Bright Background</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Black</td>
+<td class="org-right">30</td>
+<td class="org-right">40</td>
+<td class="org-right">90</td>
+<td class="org-right">100</td>
+</tr>
+
+<tr>
+<td class="org-left">Red</td>
+<td class="org-right">31</td>
+<td class="org-right">41</td>
+<td class="org-right">91</td>
+<td class="org-right">101</td>
+</tr>
+
+<tr>
+<td class="org-left">Green</td>
+<td class="org-right">32</td>
+<td class="org-right">42</td>
+<td class="org-right">92</td>
+<td class="org-right">102</td>
+</tr>
+
+<tr>
+<td class="org-left">Yellow</td>
+<td class="org-right">33</td>
+<td class="org-right">43</td>
+<td class="org-right">93</td>
+<td class="org-right">103</td>
+</tr>
+
+<tr>
+<td class="org-left">Blue</td>
+<td class="org-right">34</td>
+<td class="org-right">44</td>
+<td class="org-right">94</td>
+<td class="org-right">104</td>
+</tr>
+
+<tr>
+<td class="org-left">Magenta</td>
+<td class="org-right">35</td>
+<td class="org-right">45</td>
+<td class="org-right">95</td>
+<td class="org-right">105</td>
+</tr>
+
+<tr>
+<td class="org-left">Cyan</td>
+<td class="org-right">36</td>
+<td class="org-right">46</td>
+<td class="org-right">96</td>
+<td class="org-right">106</td>
+</tr>
+
+<tr>
+<td class="org-left">White</td>
+<td class="org-right">37</td>
+<td class="org-right">47</td>
+<td class="org-right">97</td>
+<td class="org-right">107</td>
+</tr>
+
+<tr>
+<td class="org-left">Default</td>
+<td class="org-right">39</td>
+<td class="org-right">49</td>
+<td class="org-right">99</td>
+<td class="org-right">109</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-org3fc6043" class="outline-3">
+<h3 id="org3fc6043"><span class="section-number-3">1.2.</span> Effects</h3>
+<div class="outline-text-3" id="text-1-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Effect</th>
+<th scope="col" class="org-right">Enable</th>
+<th scope="col" class="org-right">Disable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Bold</td>
+<td class="org-right">1</td>
+<td class="org-right">21</td>
+</tr>
+
+<tr>
+<td class="org-left">Dim</td>
+<td class="org-right">2</td>
+<td class="org-right">22</td>
+</tr>
+
+<tr>
+<td class="org-left">Underline</td>
+<td class="org-right">4</td>
+<td class="org-right">24</td>
+</tr>
+
+<tr>
+<td class="org-left">Blink</td>
+<td class="org-right">5</td>
+<td class="org-right">25</td>
+</tr>
+
+<tr>
+<td class="org-left">Reverse</td>
+<td class="org-right">7</td>
+<td class="org-right">27</td>
+</tr>
+
+<tr>
+<td class="org-left">Hide</td>
+<td class="org-right">8</td>
+<td class="org-right">28</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-orgebe7bce" class="outline-3">
+<h3 id="orgebe7bce"><span class="section-number-3">1.3.</span> Other links</h3>
+<div class="outline-text-3" id="text-1-3">
 <ul class="org-ul">
-<li><a href="https://en.wikipedia.org/wiki/Reversing:_Secrets_of_Reverse_Engineering">Reversing: Secrets of Reverse Engineering</a>, by Eldad Eilam. Apart from RE, it&rsquo;s
-a great resource to learn about assembly, compiler optimizations, operating
-system design, and much more.</li>
-<li>Dennis Yurichev&rsquo;s <a href="https://challenges.re/">challenges.re</a> website, which has a lot of interesting
-challenges with different difficulties.</li>
-<li><a href="https://www.xorpd.net/">xorpd&rsquo;s website</a>.</li>
-<li>Félix Cloutier&rsquo;s <a href="https://www.felixcloutier.com/x86/">x86 and amd64 instruction reference</a>. In case the volume 2 of
-the Intel SDM is too intimidating.</li>
+<li><a href="https://notes.burke.libbey.me/ansi-escape-codes/">https://notes.burke.libbey.me/ansi-escape-codes/</a></li>
+<li><a href="https://tldp.org/HOWTO/Bash-Prompt-HOWTO/c327.html">https://tldp.org/HOWTO/Bash-Prompt-HOWTO/c327.html</a></li>
+<li><a href="https://azrael.digipen.edu/~mmead/www/mg/ansicolors/index.html">https://azrael.digipen.edu/~mmead/www/mg/ansicolors/index.html</a></li>
+<li><a href="https://en.wikipedia.org/wiki/ANSI_escape_code">https://en.wikipedia.org/wiki/ANSI_escape_code</a></li>
 </ul>
 </div>
-</div>
-
-<div id="outline-container-about-the-intel-sdm" class="outline-2">
-<h2 id="about-the-intel-sdm">About the Intel SDM</h2>
-<div class="outline-text-2" id="text-about-the-intel-sdm">
-<p>
-Throughout this section, you might see some references to the <i>Intel Software
-Developer Manual</i> (Intel SDM). Since the volumes on the <a href="https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html">official website</a> are
-regularly updated, you can read and download the specific version I used for the
-references from the <a href="../reference/index.html">reference index</a>.
-</p>
 </div>
 </div>
 </div>

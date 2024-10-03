@@ -1,0 +1,46 @@
+#+TITLE: ANSI Escape Sequences
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Terminal colors and effects
+
+** Colors
+
+| Name    | Foreground | Background | Bright Foreground | Bright Background |
+|---------+------------+------------+-------------------+-------------------|
+| Black   |         30 |         40 |                90 |               100 |
+| Red     |         31 |         41 |                91 |               101 |
+| Green   |         32 |         42 |                92 |               102 |
+| Yellow  |         33 |         43 |                93 |               103 |
+| Blue    |         34 |         44 |                94 |               104 |
+| Magenta |         35 |         45 |                95 |               105 |
+| Cyan    |         36 |         46 |                96 |               106 |
+| White   |         37 |         47 |                97 |               107 |
+| Default |         39 |         49 |                99 |               109 |
+
+** Effects
+
+| Effect    | Enable | Disable |
+|-----------+--------+---------|
+| Bold      |      1 |      21 |
+| Dim       |      2 |      22 |
+| Underline |      4 |      24 |
+| Blink     |      5 |      25 |
+| Reverse   |      7 |      27 |
+| Hide      |      8 |      28 |
+
+** Other links
+
+- https://notes.burke.libbey.me/ansi-escape-codes/
+- https://tldp.org/HOWTO/Bash-Prompt-HOWTO/c327.html
+- https://azrael.digipen.edu/~mmead/www/mg/ansicolors/index.html
+- https://en.wikipedia.org/wiki/ANSI_escape_code

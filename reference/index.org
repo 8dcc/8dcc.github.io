@@ -1,0 +1,34 @@
+#+TITLE: Reference
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil num:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+
+[[file:../index.org][Index]]
+
+-----
+
+* List of entries
+:PROPERTIES:
+:CUSTOM_ID: list-of-entries
+:END:
+
+This is an attempt of centralizing some useful technical information on various
+topics.
+
+- [[file:ansi-escape-sequences.org][ANSI Escape Sequences]]
+
+* Intel manuals
+:PROPERTIES:
+:CUSTOM_ID: intel-manuals
+:END:
+
+Since the [[https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html][official Intel SDM]] is regularly updated, you can read and download the
+specific version I used in this blog from the following links:
+
+- Intel SDM, Volume 1: [[file:../manuals/intel-sdm-vol-1.pdf][253665-sdm-vol-1.pdf]]
+- Intel SDM, Volume 2: [[file:../manuals/intel-sdm-vol-2abcd.pdf][325383-sdm-vol-2abcd.pdf]]
+- Intel SDM, Volume 3: [[file:../manuals/intel-sdm-vol-3abcd.pdf][325384-sdm-vol-3abcd.pdf]]
+- Intel SDM, Volume 4: [[file:../manuals/intel-sdm-vol-4.pdf][335592-sdm-vol-4.pdf]]
+- AMD Manual: [[file:../manuals/amd-manual.pdf][24593.pdf]]

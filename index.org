@@ -16,6 +16,7 @@ writing articles across my different projects.
 - [[file:reversing/index.org][Reverse engineering]]
 - [[file:programming/index.org][Programming]]
 - [[file:opinion/index.org][Opinion]]
+- [[file:reference/index.org][Reference]]
 
 * External articles
 :PROPERTIES:
