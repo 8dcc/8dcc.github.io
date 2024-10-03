@@ -301,7 +301,7 @@ concepts you need to know to understand this:
 <li>The <code>je</code> and <code>jz</code> instructions are the same. The <a href="https://www.felixcloutier.com/x86/jcc">opcode</a> for both <code>je rel32</code> and <code>jz
   rel32</code> is <code>0F 84 cd</code>.</li>
 <li>Both of these instructions just check the <code>ZF</code> bit inside the EFLAGS
-register. See <i>Intel SDM, Vol. 1, Chapter 3.4.3</i> and <i>Vol. 1, Chapter 5.1.7</i>.</li>
+register<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>.</li>
 <li>The <code>cmp</code> instruction just subtracts the second operand from the first operand,
 but setting the flags without saving the result in the first operand.</li>
 <li>This flag is not only changed by the <code>cmp</code> instruction, but also by other
@@ -309,7 +309,7 @@ instructions like <code>add</code>, <code>sub</code>, etc.</li>
 </ul>
 
 <p>
-So in this case, it's checking if <code>rsi</code> minus <code>rcx</code> plus one is zero or not. In
+So in this case, it&rsquo;s checking if <code>rsi</code> minus <code>rcx</code> plus one is zero or not. In
 other words, if <code>rcx</code> is equal to <code>rsi+1</code>. If it is, it returns zero.
 </p>
 </div>
@@ -327,14 +327,14 @@ V ABI.
 <p>
 Another important thing to note is how we know the types of the function
 parameters. We know the first argument (<code>rdi</code>) is a pointer because right after
-<code>.L4</code> it's being used for indexing. We can determine the type of the pointer
+<code>.L4</code> it&rsquo;s being used for indexing. We can determine the type of the pointer
 because:
 </p>
 
 <ul class="org-ul">
-<li>It's not multiplying the index by the size of the elements (e.g. <code>i*4</code> for
+<li>It&rsquo;s not multiplying the index by the size of the elements (e.g. <code>i*4</code> for
 arrays of DWORDs), so we can asume the size of each element is one byte.</li>
-<li>Right after <code>.L8</code>, you can see it's moving and comparing byte pointers, so it's
+<li>Right after <code>.L8</code>, you can see it&rsquo;s moving and comparing byte pointers, so it&rsquo;s
 not hard to see that these are <code>char*</code>.</li>
 </ul>
 </div>
@@ -345,13 +345,13 @@ not hard to see that these are <code>char*</code>.</li>
 <div class="outline-text-3" id="text-function-return-type">
 <p>
 We can tell that the function returns a <code>char*</code> because at line 31 of the assembly
-code, it's returning without changing the value of <code>rax</code>, and the only place it's
+code, it&rsquo;s returning without changing the value of <code>rax</code>, and the only place it&rsquo;s
 modified is at line 20, where it loads the address of a character inside the
 string.
 </p>
 
 <p>
-The other place where we don't return zero is at line 10, where we return the
+The other place where we don&rsquo;t return zero is at line 10, where we return the
 first parameter, which as we know is a <code>char*</code>.
 </p>
 </div>
@@ -395,7 +395,7 @@ We can tell that they are actually <code>for</code> loops because:
 
 
 <ul class="org-ul">
-<li>One of the variables used for the loop's condition is initialized before the
+<li>One of the variables used for the loop&rsquo;s condition is initialized before the
 loop starts (before the label used for jumping). In the first loop, the <code>r10</code>
 register is initialized to zero (line 17), and in the inner loop, the <code>rsi</code>
 register is also initialized to zero (line 21).</li>
@@ -404,7 +404,7 @@ register is also initialized to zero (line 21).</li>
 </ul>
 
 <p>
-In my opinion, the best approach when trying to understand a label's purpose is
+In my opinion, the best approach when trying to understand a label&rsquo;s purpose is
 to look at the places where those labels are being used, and get the
 loop/conditional information directly from there.
 </p>
@@ -412,7 +412,7 @@ loop/conditional information directly from there.
 <p>
 Also note that the <code>rsi</code> variable is now being used as the iterator for the inner
 loop, instead of holding the old result of subtracting the arguments. This old
-value was stored in the <code>r11</code> register on line 6. It's important to know where the
+value was stored in the <code>r11</code> register on line 6. It&rsquo;s important to know where the
 meaning/usage of the registers change.
 </p>
 </div>
@@ -450,7 +450,7 @@ execution continues with the instruction following the <code>CMOVcc</code> instr
 <h2 id="c-translation"><span class="section-number-2">3.</span> C translation</h2>
 <div class="outline-text-2" id="text-c-translation">
 <p>
-From the <a href="challenge4.html">previous challenge</a>, I learned that it's a good approach to first
+From the <a href="challenge4.html">previous challenge</a>, I learned that it&rsquo;s a good approach to first
 convert the assembly code into a higher level language like C, and try to figure
 out what the function does from there.
 </p>
@@ -565,6 +565,15 @@ example we pass 5 instead of 6 (<code>sizeof("world")</code>) so <code>"world\0"
 </p>
 </div>
 </div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See Intel SDM, Vol. 1, Chapter 3.4.3 <i>EFLAGS Register</i> and Vol. 1,
+Chapter 5.1.7 <i>Control Transfer Instructions</i>.</p></div></div>
+
+
 </div>
+</div></div>
 </body>
 </html>

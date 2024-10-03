@@ -373,8 +373,7 @@ of our function.
 <p>
 For the return value, we can see that it&rsquo;s signed, and likely 32-bits because we
 not only <code>test eax</code>, but we also check if the sign flag (SF) is set with a <code>js</code> jump
-(Jump if less than zero). See <i>Intel SDM, Vol. 1, Chapter 3.4.3.1</i> and <i>Intel SDM,
-Vol.2, Jcc</i> (Pg. 3-537).
+(jump if less than zero<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>).
 </p>
 
 <p>
@@ -569,6 +568,16 @@ also renamed some symbols to match my last example.
 </div>
 </div>
 </div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See Intel SDM, Vol. 1, Chapter 3.4.3.1 <i>Status Flags</i>,
+Vol. 1, Chapter 5.1.7 <i>Control Transfer Instructions</i> and Vol.2, <i>Jcc</i>
+(pp. 3-537)</p></div></div>
+
+
 </div>
+</div></div>
 </body>
 </html>

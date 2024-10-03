@@ -230,8 +230,8 @@ have the following manuals around:
 </p>
 
 <ul class="org-ul">
-<li>Intel Software Developer Manual (SDM), specially volume 2. See the
-<a href="index.html#intel-manuals">Intel manuals</a> section on the reverse engineering index for more information.</li>
+<li>Intel Software Developer Manual (SDM), specially volume 2. See the <a href="../reference/index.html#intel-manuals">Intel SDM</a>
+section on the reference index for more information.</li>
 <li>The <a href="https://www.nasm.us/doc/">NASM manual</a>, since it&rsquo;s the syntax used by the author of the book.</li>
 </ul>
 </div>
@@ -447,7 +447,7 @@ subtracts the result from the destination operand. The result is stored into the
 destination operand. The operation is:
 </p>
 
-<pre class="example" id="org05af4e0">
+<pre class="example" id="orga22eb29">
 dst = dst - (src + CF)
 </pre>
 
@@ -536,7 +536,7 @@ Since the source and destination operands of the <code>sbb</code> instruction ar
 it&rsquo;s essentially setting the operand to the negated carry flag (<code>CF</code>):
 </p>
 
-<pre class="example" id="orge9c2d15">
+<pre class="example" id="org4dcc38b">
 x = x - (x + CF)
 x = -(CF)
 </pre>

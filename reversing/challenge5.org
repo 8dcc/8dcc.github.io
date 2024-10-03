@@ -82,7 +82,8 @@ concepts you need to know to understand this:
 - The =je= and =jz= instructions are the same. The [[https://www.felixcloutier.com/x86/jcc][opcode]] for both =je rel32= and =jz
   rel32= is =0F 84 cd=.
 - Both of these instructions just check the =ZF= bit inside the EFLAGS
-  register. See /Intel SDM, Vol. 1, Chapter 3.4.3/ and /Vol. 1, Chapter 5.1.7/.
+  register[fn::See Intel SDM, Vol. 1, Chapter 3.4.3 /EFLAGS Register/ and Vol. 1,
+  Chapter 5.1.7 /Control Transfer Instructions/.].
 - The =cmp= instruction just subtracts the second operand from the first operand,
   but setting the flags without saving the result in the first operand.
 - This flag is not only changed by the =cmp= instruction, but also by other

@@ -24,8 +24,8 @@ might know.
 If you want to try and figure out the snippets for yourself, I recommend you
 have the following manuals around:
 
-- Intel Software Developer Manual (SDM), specially volume 2. See the
-  [[file:index.org::#intel-manuals][Intel manuals]] section on the reverse engineering index for more information.
+- Intel Software Developer Manual (SDM), specially volume 2. See the [[file:../reference/index.org::#intel-manuals][Intel SDM]]
+  section on the reference index for more information.
 - The [[https://www.nasm.us/doc/][NASM manual]], since it's the syntax used by the author of the book.
 
 * Snippets

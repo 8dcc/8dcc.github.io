@@ -149,8 +149,9 @@ of our function.
 
 For the return value, we can see that it's signed, and likely 32-bits because we
 not only =test eax=, but we also check if the sign flag (SF) is set with a =js= jump
-(Jump if less than zero). See /Intel SDM, Vol. 1, Chapter 3.4.3.1/ and /Intel SDM,
-Vol.2, Jcc/ (Pg. 3-537).
+(jump if less than zero[fn::See Intel SDM, Vol. 1, Chapter 3.4.3.1 /Status Flags/,
+Vol. 1, Chapter 5.1.7 /Control Transfer Instructions/ and Vol.2, /Jcc/
+(pp. 3-537)]).
 
 For the C translation, I will create a =callback_t= typedef so the parameter type
 is more readable.

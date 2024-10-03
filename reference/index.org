@@ -19,9 +19,9 @@ topics.
 
 - [[file:ansi-escape-sequences.org][ANSI Escape Sequences]]
 
-* Intel manuals
+* Intel SDM
 :PROPERTIES:
-:CUSTOM_ID: intel-manuals
+:CUSTOM_ID: intel-sdm
 :END:
 
 Since the [[https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html][official Intel SDM]] is regularly updated, you can read and download the
