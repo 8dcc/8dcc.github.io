@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quick reference for socket programming in C</title>
+<meta name="author" content="8dcc" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Quick reference for socket programming in C</h1>
+<p>
+<a href="../index.html">Index</a> | <a href="index.html">Up</a>
+</p>
+
+<hr />
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#introduction">1. Introduction</a></li>
+<li><a href="#network-related-concepts">2. Network-related concepts</a>
+<ul>
+<li><a href="#transport-protocol">2.1. Transport protocol</a></li>
+<li><a href="#ip-address">2.2. IP address</a></li>
+<li><a href="#port-number">2.3. Port number</a></li>
+<li><a href="#socket">2.4. Socket</a></li>
+</ul>
+</li>
+<li><a href="#connecting-with-tcp">3. Connecting with TCP</a>
+<ul>
+<li><a href="#org15344f5">3.1. Obtaining the socket descriptor</a></li>
+<li><a href="#org152add4">3.2. Passive connection</a></li>
+<li><a href="#org1661175">3.3. Active connection</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-introduction" class="outline-2">
+<h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-introduction">
+<p>
+This article is meant to be a quick reference for C programmers who are
+interested in socket programming on Unix-like systems. The code in this article
+has been tested on Linux 6.11.6.
+</p>
+
+<p>
+I am somewhat new to network programming myself, so if you have any suggestions,
+please feel free to <a href="https://github.com/8dcc/8dcc.github.io">contribute</a> to this page.
+</p>
+
+<p>
+Some other interesting resources about network programming:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://beej.us/guide/bgnet/">Beej&rsquo;s Guide to Network Programming</a>.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-network-related-concepts" class="outline-2">
+<h2 id="network-related-concepts"><span class="section-number-2">2.</span> Network-related concepts</h2>
+<div class="outline-text-2" id="text-network-related-concepts">
+<p>
+These are some concepts related to network programming that will be used
+throughout this article.
+</p>
+</div>
+
+<div id="outline-container-transport-protocol" class="outline-3">
+<h3 id="transport-protocol"><span class="section-number-3">2.1.</span> Transport protocol</h3>
+<div class="outline-text-3" id="text-transport-protocol">
+<p>
+The <i>transport layer protocol</i> provides end-to-end connection between a source and
+a destination computer, and it is responsible for features such as reliability,
+flow control or multiplexing, for example. The transport layer is the 4th layer
+in the <a href="https://en.wikipedia.org/wiki/OSI_model">OSI model</a>.
+</p>
+
+
+<div id="org1d783ea" class="figure">
+<p><img src="../img/socket-ref1.png" alt="socket-ref1.png" />
+</p>
+</div>
+
+<p>
+There are two<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup> main transport
+protocols: <i>Transmission Control Protocol</i> (TCP)<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup> and <i>User
+Datagram Protocol</i> (UDP)<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>.
+</p>
+
+<p>
+TCP is connection-oriented, meaning that the sender and receiver need to
+establish a connection before communicating. The server must be listening for
+connection requests from clients before a connection is established.
+</p>
+
+<p>
+UDP is a connectionless protocol, meaning that messages are sent without
+establishing a connection, and that UDP doesn&rsquo;t keep track of what it has
+sent. UDP is suitable for purposes where error checking and correction are
+either not necessary or are performed in the application.
+</p>
+</div>
+</div>
+
+<div id="outline-container-ip-address" class="outline-3">
+<h3 id="ip-address"><span class="section-number-3">2.2.</span> IP address</h3>
+<div class="outline-text-3" id="text-ip-address">
+<p>
+An <i>Internet Protocol address</i> is a numerical label that is assigned to a device
+connected to a computer network that uses the Internet Protocol for
+communication.
+</p>
+
+<p>
+Internet Protocol version 4 (IPv4) was the first standalone specification for
+the IP address, and it defined the addresses as 32-bit numbers such as
+<code>192.168.2.123</code>. As the internet grew, Internet Protocol version 6 (IPv6) started
+being used, which uses uses 128-bit addresses such as
+<code>2001:db8::8a2e:370:7334</code><sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-port-number" class="outline-3">
+<h3 id="port-number"><span class="section-number-3">2.3.</span> Port number</h3>
+<div class="outline-text-3" id="text-port-number">
+<p>
+In networking, a <i>port</i> is a number assigned to identify a connection endpoint;
+and usually, to identify a specific service in that endpoint. A port is always
+associated with a network address (such as an IP address) and the type of
+transport protocol used (such as TCP or UDP).
+</p>
+
+<p>
+For example, when connecting to another computer through <a href="https://en.wikipedia.org/wiki/Secure_Shell">SSH</a>, the client
+connects to port 22 in the server. The client uses that port number because it
+knows that the SSH server will be listening for connections on that specific
+port by convention.
+</p>
+</div>
+</div>
+
+<div id="outline-container-socket" class="outline-3">
+<h3 id="socket"><span class="section-number-3">2.4.</span> Socket</h3>
+<div class="outline-text-3" id="text-socket">
+<p>
+A socket, more specifically a <i>socket descriptor</i>, is essentially a connection
+identifier used by the operating system for sending and receiving data. The term
+<i>socket</i> is commonly used in the networking context, but it&rsquo;s also used for
+<i>inter-process communication</i> (IPC).
+</p>
+
+<p>
+Sockets are created with the <a href="https://man.cx/socket(2)"><code>socket(2)</code></a> function, which will be discussed
+bellow. The returned socket descriptor is essentially a <i>file descriptor</i>, just
+like the ones returned by <a href="https://man.cx/open(2)"><code>open(2)</code></a>.
+</p>
+
+<p>
+A <i>socket address</i> is used to externally identify sockets in other computers. The
+socket address contains the transport protocol, the IP address, and the port
+number.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-connecting-with-tcp" class="outline-2">
+<h2 id="connecting-with-tcp"><span class="section-number-2">3.</span> Connecting with TCP</h2>
+<div class="outline-text-2" id="text-connecting-with-tcp">
+<p>
+To receive data through TCP, we need to either listen and accept incoming
+connections (a <i>passive open</i>), or establish a connection to another computer on a
+listening port (an <i>active open</i>).
+</p>
+</div>
+
+<div id="outline-container-org15344f5" class="outline-3">
+<h3 id="org15344f5"><span class="section-number-3">3.1.</span> Obtaining the socket descriptor</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Before establishing a connection, whether it&rsquo;s passive or active, we need to
+create a socket. As I mentioned above, the operating system uses socket
+descriptors for identifying connections and transmitting data. Sockets are
+created with the <a href="https://man.cx/socket(2)"><code>socket(2)</code></a> function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">socket</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">domain</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">type</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">protocol</span>);
+</pre>
+</div>
+
+<p>
+We could call this function with values such as <code>PF_INET</code><sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup>, <code>SOCK_STREAM</code> and <code>IPPROTO_IP</code>. However, there is
+a cleaner way of obtaining the information that is used when making most of
+these networking calls: using the <a href="https://man.cx/getaddrinfo(3)"><code>getaddrinfo(3)</code></a> function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;netdb.h&gt;</span>
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">getaddrinfo</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">node</span>,
+                <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">service</span>,
+                <span style="color: #ff6f9f;">const</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">hints</span>,
+                <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>** <span style="color: #6ae4b9;">res</span>);
+</pre>
+</div>
+
+<p>
+This function fills an <code>addrinfo</code> structure based on its inputs. Here is a brief
+description of each parameter:
+</p>
+
+<ol class="org-ol">
+<li>The <code>node</code> parameter is used to specify the target host. This is usually an
+IPv4 or IPv6 address<sup><a id="fnr.6" class="footref" href="#fn.6" role="doc-backlink">6</a></sup>, but it can also be
+network hostname and it will be looked up and resolved. It can also be <code>NULL</code>,
+as we will see when doing a passive open below.</li>
+<li>The <code>service</code> parameter is a string used to specify the target service. The
+string usually contains the target port as a decimal number, but it can also
+be a <i>service name</i> (such as &ldquo;ftp&rdquo; or &ldquo;http&rdquo;) which will be translated to the
+port number according to the <a href="https://man.cx/services(5)"><code>services(5)</code></a> file.</li>
+<li>The <code>hints</code> parameter is an <code>addrinfo</code> structure containing some hints about the
+type of information we want to receive. Note that unused members this <code>hints</code>
+structure must be set to zero, so a call to <code>memset</code> is convenient after the
+definition.</li>
+<li>The <code>res</code> parameter is a pointer to another <code>addrinfo</code> pointer, and the function
+will use it to build a linked list of <code>addrinfo</code> structures. The pointer that
+<code>res</code> points to should be freed by the caller with the <code>freeaddrinfo</code> function.</li>
+</ol>
+
+<p>
+The <code>getaddrinfo</code> function returns 0 on success, or non-zero on error. The error
+codes returned by this function can be converted to a human-readable string with
+<code>gai_strerror</code>.
+</p>
+
+<p>
+Different members of the <code>addrinfo</code> will be used throughout this article, so here
+is the structure definition from <code>&lt;netdb.h&gt;</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+
+<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span> {
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ai_flags</span>;             <span style="color: #989898;">/* </span><span style="color: #989898;">Input flags</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ai_family</span>;            <span style="color: #989898;">/* </span><span style="color: #989898;">Protocol family for socket</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ai_socktype</span>;          <span style="color: #989898;">/* </span><span style="color: #989898;">Socket type</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ai_protocol</span>;          <span style="color: #989898;">/* </span><span style="color: #989898;">Protocol for socket</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">socklen_t</span> <span style="color: #6ae4b9;">ai_addrlen</span>;     <span style="color: #989898;">/* </span><span style="color: #989898;">Length of socket address</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr</span>* <span style="color: #6ae4b9;">ai_addr</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">Socket address for socket</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">ai_canonname</span>;       <span style="color: #989898;">/* </span><span style="color: #989898;">Canonical name for service location</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">ai_next</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">Pointer to next in list</span><span style="color: #989898;"> */</span>
+};
+</pre>
+</div>
+
+<p>
+The <code>sockaddr</code> structure is defined in <code>&lt;sys/socket.h</code>, contains useful information
+about the socket address. However, since its members are a bit abstract,
+this <code>sockaddr</code> structure is usually casted to a <code>sockaddr_in</code> or <code>sockaddr_in6</code>
+structure (depending on whether it&rsquo;s an IPv4 or IPv6 address, respectively),
+both defined in <code>&lt;netinet/in.h&gt;</code><sup><a id="fnr.7" class="footref" href="#fn.7" role="doc-backlink">7</a></sup>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;netinet/in.h&gt;</span>
+
+<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr_in</span> {
+    <span style="color: #79a8ff;">sa_family_t</span>     <span style="color: #6ae4b9;">sin_family</span>;     <span style="color: #989898;">/* </span><span style="color: #989898;">AF_INET</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">in_port_t</span>       <span style="color: #6ae4b9;">sin_port</span>;       <span style="color: #989898;">/* </span><span style="color: #989898;">Port number</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">in_addr</span>  <span style="color: #6ae4b9;">sin_addr</span>;       <span style="color: #989898;">/* </span><span style="color: #989898;">IPv4 address</span><span style="color: #989898;"> */</span>
+};
+
+<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr_in6</span> {
+    <span style="color: #79a8ff;">sa_family_t</span>     <span style="color: #6ae4b9;">sin6_family</span>;    <span style="color: #989898;">/* </span><span style="color: #989898;">AF_INET6</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">in_port_t</span>       <span style="color: #6ae4b9;">sin6_port</span>;      <span style="color: #989898;">/* </span><span style="color: #989898;">Port number</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">uint32_t</span>        <span style="color: #6ae4b9;">sin6_flowinfo</span>;  <span style="color: #989898;">/* </span><span style="color: #989898;">IPv6 flow info</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">in6_addr</span> <span style="color: #6ae4b9;">sin6_addr</span>;      <span style="color: #989898;">/* </span><span style="color: #989898;">IPv6 address</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">uint32_t</span>        <span style="color: #6ae4b9;">sin6_scope_id</span>;  <span style="color: #989898;">/* </span><span style="color: #989898;">Set of interfaces for a scope</span><span style="color: #989898;"> */</span>
+};
+
+<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">in_addr</span> {
+    <span style="color: #79a8ff;">in_addr_t</span> <span style="color: #6ae4b9;">s_addr</span>;
+};
+
+<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">in6_addr</span> {
+    <span style="color: #79a8ff;">uint8_t</span>   <span style="color: #6ae4b9;">s6_addr</span>[<span style="color: #88ca9f;">16</span>];
+};
+
+<span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #79a8ff;">in_addr_t</span>;
+<span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">uint16_t</span> <span style="color: #79a8ff;">in_port_t</span>;
+</pre>
+</div>
+
+<p>
+The following example shows a call to <code>getaddrinfo</code>, although more specific
+examples will be shown below.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span> <span style="color: #6ae4b9;">hints</span>;
+memset(&amp;hints, <span style="color: #88ca9f;">0</span>, <span style="color: #ff6f9f;">sizeof</span>(hints));
+hints.ai_family   = AF_INET;     <span style="color: #989898;">/* </span><span style="color: #989898;">IPv4</span><span style="color: #989898;"> */</span>
+hints.ai_socktype = SOCK_STREAM; <span style="color: #989898;">/* </span><span style="color: #989898;">TCP</span><span style="color: #989898;"> */</span>
+
+<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">server_info</span>;
+<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = getaddrinfo(ip, port, &amp;hints, &amp;server_info);
+<span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Error: %s\n"</span>, gai_strerror(status));
+    abort();
+}
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org152add4" class="outline-3">
+<h3 id="org152add4"><span class="section-number-3">3.2.</span> Passive connection</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+TODO
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1661175" class="outline-3">
+<h3 id="org1661175"><span class="section-number-3">3.3.</span> Active connection</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+TODO
+</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Note that these are not the only existing transport
+protocols. Some other examples include the <a href="https://en.wikipedia.org/wiki/Datagram_Congestion_Control_Protocol">Datagram Congestion Control Protocol</a>
+(DCCP) and the <a href="https://en.wikipedia.org/wiki/Stream_Control_Transmission_Protocol">Stream Control Transmission Protocol</a> (SCTP).</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See <a href="https://datatracker.ietf.org/doc/html/rfc793">RFC 793</a>.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See <a href="https://datatracker.ietf.org/doc/html/rfc768">RCC 768</a>.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">When one of the colon-separated numbers is zero, it
+can be omited. Therefore, the &ldquo;expanded&rdquo; version of that IPv6 address is
+<code>2001:0db8:0000:0000:0000:8a2e:0370:7334</code>.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">The <code>PF</code> prefix stands
+for <i>Protocol Family</i>, whereas <code>AF</code> stands for <i>Address Family</i>. In practise, <code>AF_INET</code>
+and <code>PF_INET</code> have the same value.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.6" class="footnum" href="#fnr.6" role="doc-backlink">6</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">The IPv4 and IPv6 formats are valid acording to
+<a href="https://man.cx/inet_aton(3)"><code>inet_aton(3)</code></a> and <a href="https://man.cx/inet_pton(3)"><code>inet_pton(3)</code></a>, respectively.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.7" class="footnum" href="#fnr.7" role="doc-backlink">7</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">More specifically, the <code>sockaddr</code> structure
+from <code>&lt;sys/socket.h&gt;</code> contains only a <code>sa_family_t</code> member and a <code>char data[]</code>
+array. Based on the <code>sa_family</code> member, we can decide which <code>sockaddr_in*</code> structure
+we should use, since they provide a nicer interface.</p></div></div>
+
+
+</div>
+</div></div>
+</body>
+</html>

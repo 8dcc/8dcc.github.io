@@ -1,0 +1,262 @@
+#+TITLE: Quick reference for socket programming in C
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+#+MACRO: man [[https://man.cx/$1][=$1=]]
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+This article is meant to be a quick reference for C programmers who are
+interested in socket programming on Unix-like systems. The code in this article
+has been tested on Linux 6.11.6.
+
+I am somewhat new to network programming myself, so if you have any suggestions,
+please feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this page.
+
+Some other interesting resources about network programming:
+
+- [[https://beej.us/guide/bgnet/][Beej's Guide to Network Programming]].
+
+* Network-related concepts
+:PROPERTIES:
+:CUSTOM_ID: network-related-concepts
+:END:
+
+These are some concepts related to network programming that will be used
+throughout this article.
+
+** Transport protocol
+:PROPERTIES:
+:CUSTOM_ID: transport-protocol
+:END:
+
+The /transport layer protocol/ provides end-to-end connection between a source and
+a destination computer, and it is responsible for features such as reliability,
+flow control or multiplexing, for example. The transport layer is the 4th layer
+in the [[https://en.wikipedia.org/wiki/OSI_model][OSI model]].
+
+[[file:../img/socket-ref1.png]]
+
+There are two[fn::Note that these are not the only existing transport
+protocols. Some other examples include the [[https://en.wikipedia.org/wiki/Datagram_Congestion_Control_Protocol][Datagram Congestion Control Protocol]]
+(DCCP) and the [[https://en.wikipedia.org/wiki/Stream_Control_Transmission_Protocol][Stream Control Transmission Protocol]] (SCTP).] main transport
+protocols: /Transmission Control Protocol/ (TCP)[fn::See [[https://datatracker.ietf.org/doc/html/rfc793][RFC 793]].] and /User
+Datagram Protocol/ (UDP)[fn::See [[https://datatracker.ietf.org/doc/html/rfc768][RCC 768]].].
+
+TCP is connection-oriented, meaning that the sender and receiver need to
+establish a connection before communicating. The server must be listening for
+connection requests from clients before a connection is established.
+
+UDP is a connectionless protocol, meaning that messages are sent without
+establishing a connection, and that UDP doesn't keep track of what it has
+sent. UDP is suitable for purposes where error checking and correction are
+either not necessary or are performed in the application.
+
+** IP address
+:PROPERTIES:
+:CUSTOM_ID: ip-address
+:END:
+
+An /Internet Protocol address/ is a numerical label that is assigned to a device
+connected to a computer network that uses the Internet Protocol for
+communication.
+
+Internet Protocol version 4 (IPv4) was the first standalone specification for
+the IP address, and it defined the addresses as 32-bit numbers such as
+=192.168.2.123=. As the internet grew, Internet Protocol version 6 (IPv6) started
+being used, which uses uses 128-bit addresses such as
+=2001:db8::8a2e:370:7334=[fn::When one of the colon-separated numbers is zero, it
+can be omited. Therefore, the "expanded" version of that IPv6 address is
+=2001:0db8:0000:0000:0000:8a2e:0370:7334=.].
+
+** Port number
+:PROPERTIES:
+:CUSTOM_ID: port-number
+:END:
+
+In networking, a /port/ is a number assigned to identify a connection endpoint;
+and usually, to identify a specific service in that endpoint. A port is always
+associated with a network address (such as an IP address) and the type of
+transport protocol used (such as TCP or UDP).
+
+For example, when connecting to another computer through [[https://en.wikipedia.org/wiki/Secure_Shell][SSH]], the client
+connects to port 22 in the server. The client uses that port number because it
+knows that the SSH server will be listening for connections on that specific
+port by convention.
+
+** Socket
+:PROPERTIES:
+:CUSTOM_ID: socket
+:END:
+
+A socket, more specifically a /socket descriptor/, is essentially a connection
+identifier used by the operating system for sending and receiving data. The term
+/socket/ is commonly used in the networking context, but it's also used for
+/inter-process communication/ (IPC).
+
+Sockets are created with the {{{man(socket(2))}}} function, which will be discussed
+bellow. The returned socket descriptor is essentially a /file descriptor/, just
+like the ones returned by {{{man(open(2))}}}.
+
+A /socket address/ is used to externally identify sockets in other computers. The
+socket address contains the transport protocol, the IP address, and the port
+number.
+
+* Connecting with TCP
+:PROPERTIES:
+:CUSTOM_ID: connecting-with-tcp
+:END:
+
+To receive data through TCP, we need to either listen and accept incoming
+connections (a /passive open/), or establish a connection to another computer on a
+listening port (an /active open/).
+
+** Obtaining the socket descriptor
+
+Before establishing a connection, whether it's passive or active, we need to
+create a socket. As I mentioned above, the operating system uses socket
+descriptors for identifying connections and transmitting data. Sockets are
+created with the {{{man(socket(2))}}} function.
+
+#+begin_src C
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int socket(int domain, int type, int protocol);
+#+end_src
+
+We could call this function with values such as =PF_INET=[fn::The =PF= prefix stands
+for /Protocol Family/, whereas =AF= stands for /Address Family/. In practise, =AF_INET=
+and =PF_INET= have the same value.], =SOCK_STREAM= and =IPPROTO_IP=. However, there is
+a cleaner way of obtaining the information that is used when making most of
+these networking calls: using the {{{man(getaddrinfo(3))}}} function.
+
+#+begin_src C
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int getaddrinfo(const char* node,
+                const char* service,
+                const struct addrinfo* hints,
+                struct addrinfo** res);
+#+end_src
+
+This function fills an =addrinfo= structure based on its inputs. Here is a brief
+description of each parameter:
+
+1. The =node= parameter is used to specify the target host. This is usually an
+   IPv4 or IPv6 address[fn::The IPv4 and IPv6 formats are valid acording to
+   {{{man(inet_aton(3))}}} and {{{man(inet_pton(3))}}}, respectively.], but it can also be
+   network hostname and it will be looked up and resolved. It can also be =NULL=,
+   as we will see when doing a passive open below.
+2. The =service= parameter is a string used to specify the target service. The
+   string usually contains the target port as a decimal number, but it can also
+   be a /service name/ (such as "ftp" or "http") which will be translated to the
+   port number according to the {{{man(services(5))}}} file.
+3. The =hints= parameter is an =addrinfo= structure containing some hints about the
+   type of information we want to receive. Note that unused members this =hints=
+   structure must be set to zero, so a call to =memset= is convenient after the
+   definition.
+4. The =res= parameter is a pointer to another =addrinfo= pointer, and the function
+   will use it to build a linked list of =addrinfo= structures. The pointer that
+   =res= points to should be freed by the caller with the =freeaddrinfo= function.
+
+The =getaddrinfo= function returns 0 on success, or non-zero on error. The error
+codes returned by this function can be converted to a human-readable string with
+=gai_strerror=.
+
+Different members of the =addrinfo= will be used throughout this article, so here
+is the structure definition from =<netdb.h>=:
+
+#+begin_src C
+#include <sys/socket.h>
+
+struct addrinfo {
+    int ai_flags;             /* Input flags */
+    int ai_family;            /* Protocol family for socket */
+    int ai_socktype;          /* Socket type */
+    int ai_protocol;          /* Protocol for socket */
+    socklen_t ai_addrlen;     /* Length of socket address */
+    struct sockaddr* ai_addr; /* Socket address for socket */
+    char* ai_canonname;       /* Canonical name for service location */
+    struct addrinfo* ai_next; /* Pointer to next in list */
+};
+#+end_src
+
+The =sockaddr= structure is defined in =<sys/socket.h=, contains useful information
+about the socket address. However, since its members are a bit abstract,
+this =sockaddr= structure is usually casted to a =sockaddr_in= or =sockaddr_in6=
+structure (depending on whether it's an IPv4 or IPv6 address, respectively),
+both defined in =<netinet/in.h>=[fn::More specifically, the =sockaddr= structure
+from =<sys/socket.h>= contains only a =sa_family_t= member and a =char data[]=
+array. Based on the =sa_family= member, we can decide which =sockaddr_in*= structure
+we should use, since they provide a nicer interface.].
+
+#+begin_src C
+#include <netinet/in.h>
+
+struct sockaddr_in {
+    sa_family_t     sin_family;     /* AF_INET */
+    in_port_t       sin_port;       /* Port number */
+    struct in_addr  sin_addr;       /* IPv4 address */
+};
+
+struct sockaddr_in6 {
+    sa_family_t     sin6_family;    /* AF_INET6 */
+    in_port_t       sin6_port;      /* Port number */
+    uint32_t        sin6_flowinfo;  /* IPv6 flow info */
+    struct in6_addr sin6_addr;      /* IPv6 address */
+    uint32_t        sin6_scope_id;  /* Set of interfaces for a scope */
+};
+
+struct in_addr {
+    in_addr_t s_addr;
+};
+
+struct in6_addr {
+    uint8_t   s6_addr[16];
+};
+
+typedef uint32_t in_addr_t;
+typedef uint16_t in_port_t;
+#+end_src
+
+The following example shows a call to =getaddrinfo=, although more specific
+examples will be shown below.
+
+#+begin_src C
+struct addrinfo hints;
+memset(&hints, 0, sizeof(hints));
+hints.ai_family   = AF_INET;     /* IPv4 */
+hints.ai_socktype = SOCK_STREAM; /* TCP */
+
+struct addrinfo* server_info;
+const int status = getaddrinfo(ip, port, &hints, &server_info);
+if (status != 0) {
+    fprintf(stderr, "Error: %s\n", gai_strerror(status));
+    abort();
+}
+
+/* ... */
+#+end_src
+
+** Passive connection
+
+TODO
+
+** Active connection
+
+TODO
