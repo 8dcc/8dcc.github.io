@@ -17,6 +17,7 @@ These articles are about programming and math.
 - [[file:detour-hooking.org][Detour hooking]]
 - [[file:understanding-y-combinator.org][Understanding the Y combinator]]
 - [[file:understanding-entropy.org][Understanding entropy]]
+- [[file:netref.org][C Network Programming Reference]]
 - [[file:switch-statement.org][Switch statements from a low-level perspective]]
 - [[file:asm-loop-conditionals.org][Optimizing loop conditions in assembly]]
 - [[file:conditional-lisp-macros.org][Replacing conditional Lisp primitives with macros]]

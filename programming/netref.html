@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Quick reference for socket programming in C</title>
+<title>C Network Programming Reference</title>
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -197,7 +197,7 @@
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">Quick reference for socket programming in C</h1>
+<h1 class="title">C Network Programming Reference</h1>
 <p>
 <a href="../index.html">Index</a> | <a href="index.html">Up</a>
 </p>
@@ -219,9 +219,9 @@
 </li>
 <li><a href="#connecting-with-tcp">3. Connecting with TCP</a>
 <ul>
-<li><a href="#org15344f5">3.1. Obtaining the socket descriptor</a></li>
-<li><a href="#org152add4">3.2. Passive connection</a></li>
-<li><a href="#org1661175">3.3. Active connection</a></li>
+<li><a href="#obtaining-the-socket-descriptor">3.1. Obtaining the socket descriptor</a></li>
+<li><a href="#passive-connection">3.2. Passive connection</a></li>
+<li><a href="#active-connection">3.3. Active connection</a></li>
 </ul>
 </li>
 </ul>
@@ -232,8 +232,8 @@
 <h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-introduction">
 <p>
-This article is meant to be a quick reference for C programmers who are
-interested in socket programming on Unix-like systems. The code in this article
+This article is meant to be a quick guide/reference for C programmers who are
+interested in network programming on Unix-like systems. The code in this article
 has been tested on Linux 6.11.6.
 </p>
 
@@ -272,8 +272,8 @@ in the <a href="https://en.wikipedia.org/wiki/OSI_model">OSI model</a>.
 </p>
 
 
-<div id="org1d783ea" class="figure">
-<p><img src="../img/socket-ref1.png" alt="socket-ref1.png" />
+<div id="orgdb33df3" class="figure">
+<p><img src="../img/netref1.png" alt="netref1.png" />
 </p>
 </div>
 
@@ -371,9 +371,9 @@ listening port (an <i>active open</i>).
 </p>
 </div>
 
-<div id="outline-container-org15344f5" class="outline-3">
-<h3 id="org15344f5"><span class="section-number-3">3.1.</span> Obtaining the socket descriptor</h3>
-<div class="outline-text-3" id="text-3-1">
+<div id="outline-container-obtaining-the-socket-descriptor" class="outline-3">
+<h3 id="obtaining-the-socket-descriptor"><span class="section-number-3">3.1.</span> Obtaining the socket descriptor</h3>
+<div class="outline-text-3" id="text-obtaining-the-socket-descriptor">
 <p>
 Before establishing a connection, whether it&rsquo;s passive or active, we need to
 create a socket. As I mentioned above, the operating system uses socket
@@ -519,18 +519,18 @@ hints.ai_socktype = SOCK_STREAM; <span style="color: #989898;">/* </span><span s
 </div>
 </div>
 
-<div id="outline-container-org152add4" class="outline-3">
-<h3 id="org152add4"><span class="section-number-3">3.2.</span> Passive connection</h3>
-<div class="outline-text-3" id="text-3-2">
+<div id="outline-container-passive-connection" class="outline-3">
+<h3 id="passive-connection"><span class="section-number-3">3.2.</span> Passive connection</h3>
+<div class="outline-text-3" id="text-passive-connection">
 <p>
 TODO
 </p>
 </div>
 </div>
 
-<div id="outline-container-org1661175" class="outline-3">
-<h3 id="org1661175"><span class="section-number-3">3.3.</span> Active connection</h3>
-<div class="outline-text-3" id="text-3-3">
+<div id="outline-container-active-connection" class="outline-3">
+<h3 id="active-connection"><span class="section-number-3">3.3.</span> Active connection</h3>
+<div class="outline-text-3" id="text-active-connection">
 <p>
 TODO
 </p>

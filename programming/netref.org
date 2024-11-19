@@ -1,4 +1,4 @@
-#+TITLE: Quick reference for socket programming in C
+#+TITLE: C Network Programming Reference
 #+AUTHOR: 8dcc
 #+OPTIONS: toc:nil
 #+STARTUP: nofold
@@ -18,8 +18,8 @@
 :CUSTOM_ID: introduction
 :END:
 
-This article is meant to be a quick reference for C programmers who are
-interested in socket programming on Unix-like systems. The code in this article
+This article is meant to be a quick guide/reference for C programmers who are
+interested in network programming on Unix-like systems. The code in this article
 has been tested on Linux 6.11.6.
 
 I am somewhat new to network programming myself, so if you have any suggestions,
@@ -47,7 +47,7 @@ a destination computer, and it is responsible for features such as reliability,
 flow control or multiplexing, for example. The transport layer is the 4th layer
 in the [[https://en.wikipedia.org/wiki/OSI_model][OSI model]].
 
-[[file:../img/socket-ref1.png]]
+[[file:../img/netref1.png]]
 
 There are two[fn::Note that these are not the only existing transport
 protocols. Some other examples include the [[https://en.wikipedia.org/wiki/Datagram_Congestion_Control_Protocol][Datagram Congestion Control Protocol]]
@@ -124,6 +124,9 @@ connections (a /passive open/), or establish a connection to another computer on
 listening port (an /active open/).
 
 ** Obtaining the socket descriptor
+:PROPERTIES:
+:CUSTOM_ID: obtaining-the-socket-descriptor
+:END:
 
 Before establishing a connection, whether it's passive or active, we need to
 create a socket. As I mentioned above, the operating system uses socket
@@ -254,9 +257,15 @@ if (status != 0) {
 #+end_src
 
 ** Passive connection
+:PROPERTIES:
+:CUSTOM_ID: passive-connection
+:END:
 
 TODO
 
 ** Active connection
+:PROPERTIES:
+:CUSTOM_ID: active-connection
+:END:
 
 TODO
