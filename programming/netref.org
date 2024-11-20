@@ -114,12 +114,12 @@ A /socket address/ is used to externally identify sockets in other computers. Th
 socket address contains the transport protocol, the IP address, and the port
 number.
 
-* Connecting with TCP
+* Communicating through TCP
 :PROPERTIES:
-:CUSTOM_ID: connecting-with-tcp
+:CUSTOM_ID: communicating-through-tcp
 :END:
 
-To receive data through TCP, we need to either listen and accept incoming
+To communicate data through TCP, we need to either listen and accept incoming
 connections (a /passive open/), or establish a connection to another computer on a
 listening port (an /active open/).
 
