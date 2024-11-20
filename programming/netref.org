@@ -138,7 +138,7 @@ networking calls: using the {{{man(getaddrinfo(3))}}} function.
 
 ** Usage for =getaddrinfo=
 :PROPERTIES:
-:CUSTOM_ID: using-getaddrinfo
+:CUSTOM_ID: usage-for-getaddrinfo
 :END:
 
 The =getaddrinfo= function fills a linked list of =addrinfo= structures based on its
