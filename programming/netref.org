@@ -299,11 +299,186 @@ close(sockfd);
 :CUSTOM_ID: passive-connection
 :END:
 
-TODO
+These are the general steps for establishing a passive connection:
+
+1. Obtain a /socket/ descriptor, used for listening.
+2. /Bind/ a local port to the socket descriptor.
+3. Start to /listen/ on that socket descriptor.
+4. Wait for connections, and /accept/ them.
+
+*** Getting our address information
+:PROPERTIES:
+:CUSTOM_ID: getting-our-address-information
+:END:
+
+We know how to obtain information about an /external/ address (using =getaddinfo=),
+but we will also need to obtain information about ourselves before creating the
+socket. We need to make two small changes when making the call:
+
+1. Set =hints.ai_flags= to =AI_PASSIVE=.
+2. Pass =NULL= as the first (=node=) parameter of =getaddrinfo=.
+
+From the {{{man(getaddinfo(3))}}} man page:
+
+#+begin_quote
+If the =AI_PASSIVE= flag is specified in =hints.ai_flags=, and node is =NULL=, then
+the returned socket addresses will be suitable for {{{man(bind(2))}}}ing a socket that
+will {{{man(accept(2))}}} connections.
+#+end_quote
+
+It's important to note that the second argument when calling =getaddrifo= will
+determine the port that we will use when listening, and therefore the port that
+the peer will have to use when connecting to us (i.e. when doing an active
+open). Note that all ports below 1024 are reserved[fn::See also [[https://en.wikipedia.org/wiki/Registered_port][Registered port]]
+(Wikipedia) and [[https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers][List of TCP and UDP port numbers]] (Wikipedia).] for the system,
+so you should use a number in the range =[1025..65535]= (inclusive), and it should
+not be in use by another program.
+
+This is the new code for obtaining our address information, without error
+checking. In this case, the returned =addrinfo= structure will refer to the port
+=4321= of our machine.
+
+#+begin_src C
+struct addrinfo hints;
+memset(&hints, 0, sizeof(hints));
+hints.ai_family   = AF_INET;
+hints.ai_socktype = SOCK_STREAM;
+hints.ai_flags    = AI_PASSIVE; /* New */
+
+struct addrinfo* self_info;
+getaddrinfo(NULL, "4321", &hints, &self_info); /* Updated */
+#+end_src
+
+*** Creating the passive socket
+:PROPERTIES:
+:CUSTOM_ID: creating-the-passive-socket
+:END:
+
+Now that =self_info= contains information about the current machine, we can call
+=socket= just like we did [[#obtaining-the-socket-descriptor][before]]. Again, without error checking:
+
+#+begin_src C
+const int sockfd_listen = socket(server_info->ai_family,
+                                 server_info->ai_socktype,
+                                 server_info->ai_protocol);
+#+end_src
+
+That =sockfd_listen= variable will be used for the process of accepting
+connections, /not/ for transmitting data after the connection is established. This
+is normally referred to as a /passive socket/.
+
+*** Binding the socket address
+:PROPERTIES:
+:CUSTOM_ID: binding-the-socket-address
+:END:
+
+Next, we need to bind the socket address (IP address, port and protocol) to the
+socket descriptor we just created. This can be done with the {{{man(bind(2))}}}
+function.
+
+#+begin_src C
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen);
+#+end_src
+
+The =bind= function returns zero on success, or -1 on error, setting =errno=
+appropriately. We could create our own =sockaddr= structure, but =getaddrinfo=
+already filled one for us, so we should use that.
+
+#+begin_src C
+const int status = bind(sockfd_listen,
+                        self_info->ai_addr,
+                        self_info->ai_addrlen);
+if (status != 0) {
+    fprintf(stderr, "Could not bind to socket descriptor: %s\n",
+            strerror(errno));
+    abort();
+}
+#+end_src
+
+*** Listening for connections
+:PROPERTIES:
+:CUSTOM_ID: listening-for-connections
+:END:
+
+After binding the socket address, we can start listening for connections. We do
+this with the {{{man(listen(2))}}} function.
+
+#+begin_src C
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int listen(int sockfd, int backlog);
+#+end_src
+
+The first parameter is the passive socket we created earlier, and the second
+parameter is the maximum length to which the queue of pending connections for
+=sockfd= may grow[fn::A value of 5 or 10 for the =backlog= argument is fine. The
+system silently truncates the argument to the value in
+=/proc/sys/net/core/somaxconn=. Since Linux 5.4, the default in this file is 4096;
+in earlier kernels, the default value is 128.]. The =listen= function returns zero
+on success, or -1 on error, setting =errno= appropriately.
+
+#+begin_src C
+const int status = listen(sockfd_listen, 10);
+if (status != 0) {
+    fprintf(stderr, "Could not listen for connections: %s\n", strerror(errno));
+    abort();
+}
+#+end_src
+
+Now the system is listening for connections on the port we specified when
+calling =getaddrinfo= (in this case =4321=), and it will queue incoming connections
+until we accept them.
+
+*** Accepting connections
+:PROPERTIES:
+:CUSTOM_ID: accepting-connections
+:END:
+
+Once we encounter an incoming connection, we can accept it using the
+{{{man(accept(2))}}} function.
+
+#+begin_src C
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int accept(int sockfd, struct sockaddr* addr, socklen_t* addrlen);
+#+end_src
+
+The first parameter of =accept= is the passive socket we created with
+{{{man(socket(2))}}} above. The other two parameters are used to retrieve information
+about the computer that is connecting to us, but they can be set to =NULL= if we
+don't care about this information.
+
+The =accept= function returns a /new socket descriptor/ used for sending and
+receiving data in the accepted connection. On error, it returns -1 and sets
+=errno=.
+
+#+begin_src C
+const int sockfd_connection = accept(sockfd_listen, NULL, NULL);
+if (sockfd_connection < 0) {
+    fprintf(stderr, "Could not accept incoming connection: %s\n",
+            strerror(errno));
+    abort();
+}
+#+end_src
+
+After the connection is accepted, we can send and receive data from the peer
+using the returned socket descriptor.
 
 ** Active connection
 :PROPERTIES:
 :CUSTOM_ID: active-connection
+:END:
+
+TODO
+
+** Sending and receiving data through sockets
+:PROPERTIES:
+:CUSTOM_ID: sending-and-receiving-data-through-sockets
 :END:
 
 TODO

@@ -225,8 +225,17 @@
 <li><a href="#example-calls">3.1.2. Example calls</a></li>
 </ul>
 </li>
-<li><a href="#passive-connection">3.2. Passive connection</a></li>
+<li><a href="#passive-connection">3.2. Passive connection</a>
+<ul>
+<li><a href="#getting-our-address-information">3.2.1. Getting our address information</a></li>
+<li><a href="#creating-the-passive-socket">3.2.2. Creating the passive socket</a></li>
+<li><a href="#binding-the-socket-address">3.2.3. Binding the socket address</a></li>
+<li><a href="#listening-for-connections">3.2.4. Listening for connections</a></li>
+<li><a href="#accepting-connections">3.2.5. Accepting connections</a></li>
+</ul>
+</li>
 <li><a href="#active-connection">3.3. Active connection</a></li>
+<li><a href="#sending-and-receiving-data-through-sockets">3.4. Sending and receiving data through sockets</a></li>
 </ul>
 </li>
 </ul>
@@ -277,7 +286,7 @@ in the <a href="https://en.wikipedia.org/wiki/OSI_model">OSI model</a>.
 </p>
 
 
-<div id="orga192091" class="figure">
+<div id="orgfbad0e7" class="figure">
 <p><img src="../img/netref1.png" alt="netref1.png" />
 </p>
 </div>
@@ -571,14 +580,231 @@ descriptor after you are done using it.
 <h3 id="passive-connection"><span class="section-number-3">3.2.</span> Passive connection</h3>
 <div class="outline-text-3" id="text-passive-connection">
 <p>
-TODO
+These are the general steps for establishing a passive connection:
 </p>
+
+<ol class="org-ol">
+<li>Obtain a <i>socket</i> descriptor, used for listening.</li>
+<li><i>Bind</i> a local port to the socket descriptor.</li>
+<li>Start to <i>listen</i> on that socket descriptor.</li>
+<li>Wait for connections, and <i>accept</i> them.</li>
+</ol>
+</div>
+
+<div id="outline-container-getting-our-address-information" class="outline-4">
+<h4 id="getting-our-address-information"><span class="section-number-4">3.2.1.</span> Getting our address information</h4>
+<div class="outline-text-4" id="text-getting-our-address-information">
+<p>
+We know how to obtain information about an <i>external</i> address (using <code>getaddinfo</code>),
+but we will also need to obtain information about ourselves before creating the
+socket. We need to make two small changes when making the call:
+</p>
+
+<ol class="org-ol">
+<li>Set <code>hints.ai_flags</code> to <code>AI_PASSIVE</code>.</li>
+<li>Pass <code>NULL</code> as the first (<code>node</code>) parameter of <code>getaddrinfo</code>.</li>
+</ol>
+
+<p>
+From the <a href="https://man.cx/getaddinfo(3)"><code>getaddinfo(3)</code></a> man page:
+</p>
+
+<blockquote>
+<p>
+If the <code>AI_PASSIVE</code> flag is specified in <code>hints.ai_flags</code>, and node is <code>NULL</code>, then
+the returned socket addresses will be suitable for <a href="https://man.cx/bind(2)"><code>bind(2)</code></a>ing a socket that
+will <a href="https://man.cx/accept(2)"><code>accept(2)</code></a> connections.
+</p>
+</blockquote>
+
+<p>
+It&rsquo;s important to note that the second argument when calling <code>getaddrifo</code> will
+determine the port that we will use when listening, and therefore the port that
+the peer will have to use when connecting to us (i.e. when doing an active
+open). Note that all ports below 1024 are reserved<sup><a id="fnr.8" class="footref" href="#fn.8" role="doc-backlink">8</a></sup> for the system,
+so you should use a number in the range <code>[1025..65535]</code> (inclusive), and it should
+not be in use by another program.
+</p>
+
+<p>
+This is the new code for obtaining our address information, without error
+checking. In this case, the returned <code>addrinfo</code> structure will refer to the port
+<code>4321</code> of our machine.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span> <span style="color: #6ae4b9;">hints</span>;
+memset(&amp;hints, <span style="color: #88ca9f;">0</span>, <span style="color: #ff6f9f;">sizeof</span>(hints));
+hints.ai_family   = AF_INET;
+hints.ai_socktype = SOCK_STREAM;
+hints.ai_flags    = AI_PASSIVE; <span style="color: #989898;">/* </span><span style="color: #989898;">New</span><span style="color: #989898;"> */</span>
+
+<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">self_info</span>;
+getaddrinfo(<span style="color: #88ca9f;">NULL</span>, <span style="color: #00d3d0;">"4321"</span>, &amp;hints, &amp;self_info); <span style="color: #989898;">/* </span><span style="color: #989898;">Updated</span><span style="color: #989898;"> */</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-creating-the-passive-socket" class="outline-4">
+<h4 id="creating-the-passive-socket"><span class="section-number-4">3.2.2.</span> Creating the passive socket</h4>
+<div class="outline-text-4" id="text-creating-the-passive-socket">
+<p>
+Now that <code>self_info</code> contains information about the current machine, we can call
+<code>socket</code> just like we did <a href="#obtaining-the-socket-descriptor">before</a>. Again, without error checking:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd_listen</span> = socket(server_info-&gt;ai_family,
+                                 server_info-&gt;ai_socktype,
+                                 server_info-&gt;ai_protocol);
+</pre>
+</div>
+
+<p>
+That <code>sockfd_listen</code> variable will be used for the process of accepting
+connections, <i>not</i> for transmitting data after the connection is established. This
+is normally referred to as a <i>passive socket</i>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-binding-the-socket-address" class="outline-4">
+<h4 id="binding-the-socket-address"><span class="section-number-4">3.2.3.</span> Binding the socket address</h4>
+<div class="outline-text-4" id="text-binding-the-socket-address">
+<p>
+Next, we need to bind the socket address (IP address, port and protocol) to the
+socket descriptor we just created. This can be done with the <a href="https://man.cx/bind(2)"><code>bind(2)</code></a>
+function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">bind</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr</span>* <span style="color: #6ae4b9;">addr</span>, <span style="color: #79a8ff;">socklen_t</span> <span style="color: #6ae4b9;">addrlen</span>);
+</pre>
+</div>
+
+<p>
+The <code>bind</code> function returns zero on success, or -1 on error, setting <code>errno</code>
+appropriately. We could create our own <code>sockaddr</code> structure, but <code>getaddrinfo</code>
+already filled one for us, so we should use that.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = bind(sockfd_listen,
+                        self_info-&gt;ai_addr,
+                        self_info-&gt;ai_addrlen);
+<span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not bind to socket descriptor: %s\n"</span>,
+            strerror(errno));
+    abort();
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-listening-for-connections" class="outline-4">
+<h4 id="listening-for-connections"><span class="section-number-4">3.2.4.</span> Listening for connections</h4>
+<div class="outline-text-4" id="text-listening-for-connections">
+<p>
+After binding the socket address, we can start listening for connections. We do
+this with the <a href="https://man.cx/listen(2)"><code>listen(2)</code></a> function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">listen</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">backlog</span>);
+</pre>
+</div>
+
+<p>
+The first parameter is the passive socket we created earlier, and the second
+parameter is the maximum length to which the queue of pending connections for
+<code>sockfd</code> may grow<sup><a id="fnr.9" class="footref" href="#fn.9" role="doc-backlink">9</a></sup>. The <code>listen</code> function returns zero
+on success, or -1 on error, setting <code>errno</code> appropriately.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = listen(sockfd_listen, <span style="color: #88ca9f;">10</span>);
+<span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not listen for connections: %s\n"</span>, strerror(errno));
+    abort();
+}
+</pre>
+</div>
+
+<p>
+Now the system is listening for connections on the port we specified when
+calling <code>getaddrinfo</code> (in this case <code>4321</code>), and it will queue incoming connections
+until we accept them.
+</p>
+</div>
+</div>
+
+<div id="outline-container-accepting-connections" class="outline-4">
+<h4 id="accepting-connections"><span class="section-number-4">3.2.5.</span> Accepting connections</h4>
+<div class="outline-text-4" id="text-accepting-connections">
+<p>
+Once we encounter an incoming connection, we can accept it using the
+<a href="https://man.cx/accept(2)"><code>accept(2)</code></a> function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">accept</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr</span>* <span style="color: #6ae4b9;">addr</span>, <span style="color: #79a8ff;">socklen_t</span>* <span style="color: #6ae4b9;">addrlen</span>);
+</pre>
+</div>
+
+<p>
+The first parameter of <code>accept</code> is the passive socket we created with
+<a href="https://man.cx/socket(2)"><code>socket(2)</code></a> above. The other two parameters are used to retrieve information
+about the computer that is connecting to us, but they can be set to <code>NULL</code> if we
+don&rsquo;t care about this information.
+</p>
+
+<p>
+The <code>accept</code> function returns a <i>new socket descriptor</i> used for sending and
+receiving data in the accepted connection. On error, it returns -1 and sets
+<code>errno</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd_connection</span> = accept(sockfd_listen, <span style="color: #88ca9f;">NULL</span>, <span style="color: #88ca9f;">NULL</span>);
+<span style="color: #ff6f9f;">if</span> (sockfd_connection &lt; <span style="color: #88ca9f;">0</span>) {
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not accept incoming connection: %s\n"</span>,
+            strerror(errno));
+    abort();
+}
+</pre>
+</div>
+
+<p>
+After the connection is accepted, we can send and receive data from the peer
+using the returned socket descriptor.
+</p>
+</div>
 </div>
 </div>
 
 <div id="outline-container-active-connection" class="outline-3">
 <h3 id="active-connection"><span class="section-number-3">3.3.</span> Active connection</h3>
 <div class="outline-text-3" id="text-active-connection">
+<p>
+TODO
+</p>
+</div>
+</div>
+
+<div id="outline-container-sending-and-receiving-data-through-sockets" class="outline-3">
+<h3 id="sending-and-receiving-data-through-sockets"><span class="section-number-3">3.4.</span> Sending and receiving data through sockets</h3>
+<div class="outline-text-3" id="text-sending-and-receiving-data-through-sockets">
 <p>
 TODO
 </p>
@@ -612,6 +838,14 @@ can be omited. Therefore, the &ldquo;expanded&rdquo; version of that IPv6 addres
 from <code>&lt;sys/socket.h&gt;</code> contains only a <code>sa_family_t</code> member and a <code>char data[]</code>
 array. Based on the <code>sa_family</code> member, we can decide which <code>sockaddr_in*</code> structure
 we should use, since they provide a nicer interface.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.8" class="footnum" href="#fnr.8" role="doc-backlink">8</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See also <a href="https://en.wikipedia.org/wiki/Registered_port">Registered port</a>
+(Wikipedia) and <a href="https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers">List of TCP and UDP port numbers</a> (Wikipedia).</p></div></div>
+
+<div class="footdef"><sup><a id="fn.9" class="footnum" href="#fnr.9" role="doc-backlink">9</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">A value of 5 or 10 for the <code>backlog</code> argument is fine. The
+system silently truncates the argument to the value in
+<code>/proc/sys/net/core/somaxconn</code>. Since Linux 5.4, the default in this file is 4096;
+in earlier kernels, the default value is 128.</p></div></div>
 
 
 </div>
