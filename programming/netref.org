@@ -114,24 +114,14 @@ A /socket address/ is used to externally identify sockets in other computers. Th
 socket address contains the transport protocol, the IP address, and the port
 number.
 
-* Communicating through TCP
+* Getting address information
 :PROPERTIES:
-:CUSTOM_ID: communicating-through-tcp
+:CUSTOM_ID: getting-address-information
 :END:
 
-To communicate data through TCP, we need to either listen and accept incoming
-connections (a /passive open/), or establish a connection to another computer on a
-listening port (an /active open/).
-
-** Obtaining the socket descriptor
-:PROPERTIES:
-:CUSTOM_ID: obtaining-the-socket-descriptor
-:END:
-
-Before establishing a connection, whether it's passive or active, we need to
-create a socket. As I mentioned above, the operating system uses socket
-descriptors for identifying connections and transmitting data. Sockets are
-created with the {{{man(socket(2))}}} function.
+Before establishing a connection, we need to create a socket. As I mentioned
+above, the operating system uses socket descriptors for identifying connections
+and transmitting data. Sockets are created with the {{{man(socket(2))}}} function.
 
 #+begin_src C
 #include <sys/types.h>
@@ -140,21 +130,19 @@ created with the {{{man(socket(2))}}} function.
 int socket(int domain, int type, int protocol);
 #+end_src
 
-This function returns a socket descriptor from the specified domain (e.g. IPv4
-or IPv6), socket type (e.g. TCP or UDP) and protocol (e.g. IP). On error, -1 is
-returned and =errno= is set. If the returned socket is valid, it must be closed by
-the caller using {{{man(close(2))}}}.
-
-*** Getting the address information
-:PROPERTIES:
-:CUSTOM_ID: getting-the-address-information
-:END:
-
 We could call =socket= with values such as =PF_INET=[fn::The =PF= prefix stands for
 /Protocol Family/, whereas =AF= stands for /Address Family/. In practise, =AF_INET= and
 =PF_INET= have the same value.], =SOCK_STREAM= and =IPPROTO_IP=. However, there is a
 cleaner way of obtaining the information that is used when making most of these
 networking calls: using the {{{man(getaddrinfo(3))}}} function.
+
+** Usage for =getaddrinfo=
+:PROPERTIES:
+:CUSTOM_ID: using-getaddrinfo
+:END:
+
+The =getaddrinfo= function fills a linked list of =addrinfo= structures based on its
+arguments.
 
 #+begin_src C
 #include <sys/types.h>
@@ -167,9 +155,7 @@ int getaddrinfo(const char* node,
                 struct addrinfo** res);
 #+end_src
 
-This function fills an =addrinfo= structure based on its inputs, which must be
-freed by the caller using =freeaddrinfo=. Here is a brief description of each
-parameter:
+Here is a brief description of each parameter:
 
 1. The =node= parameter is used to specify the target host. This is usually an
    IPv4 or IPv6 address[fn::The IPv4 and IPv6 formats are valid acording to
@@ -190,7 +176,8 @@ parameter:
 
 The =getaddrinfo= function returns 0 on success, or non-zero on error. The error
 codes returned by this function can be converted to a human-readable string with
-=gai_strerror=.
+=gai_strerror=. The linked filled by =getaddrinfo= (the last argument) must be freed
+by the caller using =freeaddrinfo=.
 
 Different members of the =addrinfo= will be used throughout this article, so here
 is the structure definition from =<netdb.h>=:
@@ -248,9 +235,9 @@ typedef uint32_t in_addr_t;
 typedef uint16_t in_port_t;
 #+end_src
 
-*** Example calls
+** Example code for =getaddrinfo=
 :PROPERTIES:
-:CUSTOM_ID: example-calls
+:CUSTOM_ID: example-code-for-getaddrinfo
 :END:
 
 The following example shows a call to =getaddrinfo=, although more specific
@@ -294,12 +281,22 @@ if (sockfd < 0) {
 close(sockfd);
 #+end_src
 
-** Passive connection
+* Communicating through TCP
 :PROPERTIES:
-:CUSTOM_ID: passive-connection
+:CUSTOM_ID: communicating-through-tcp
 :END:
 
-These are the general steps for establishing a passive connection:
+To communicate data through TCP, we need to either listen and accept incoming
+connections (a /passive open/), or establish a connection to another computer on a
+listening port (an /active open/).
+
+** Connecting with a passive open
+:PROPERTIES:
+:CUSTOM_ID: connecting-with-a-passive-open
+:END:
+
+These are the general steps for establishing a connection through a passive
+open:
 
 1. Obtain a /socket/ descriptor, used for listening.
 2. /Bind/ a local port to the socket descriptor.
@@ -334,9 +331,9 @@ open). Note that all ports below 1024 are reserved[fn::See also [[https://en.wik
 so you should use a number in the range =[1025..65535]= (inclusive), and it should
 not be in use by another program.
 
-This is the new code for obtaining our address information, without error
-checking. In this case, the returned =addrinfo= structure will refer to the port
-=4321= of our machine.
+This is the new code for obtaining our address information. In this case, the
+=addrinfo= structure filled by =getaddrinfo= will refer to the port =4321= of our
+machine.
 
 #+begin_src C
 struct addrinfo hints;
@@ -346,7 +343,12 @@ hints.ai_socktype = SOCK_STREAM;
 hints.ai_flags    = AI_PASSIVE; /* New */
 
 struct addrinfo* self_info;
-getaddrinfo(NULL, "4321", &hints, &self_info); /* Updated */
+const int status = getaddrinfo(NULL, "4321", &hints, &self_info); /* Updated */
+if (status != 0) {
+    fprintf(stderr, "Could not obtaining our address info: %s\n",
+            gai_strerror(status));
+    abort();
+}
 #+end_src
 
 *** Creating the passive socket
@@ -354,13 +356,31 @@ getaddrinfo(NULL, "4321", &hints, &self_info); /* Updated */
 :CUSTOM_ID: creating-the-passive-socket
 :END:
 
+The {{{man(socket(2))}}} function returns a socket descriptor from the specified
+domain (e.g. IPv4 or IPv6), socket type (e.g. TCP or UDP) and protocol
+(e.g. IP).
+
+#+begin_src C
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int socket(int domain, int type, int protocol);
+#+end_src
+
+On error, -1 is returned and =errno= is set. If the returned socket is valid, it
+must be closed by the caller using {{{man(close(2))}}}.
+
 Now that =self_info= contains information about the current machine, we can call
-=socket= just like we did [[#obtaining-the-socket-descriptor][before]]. Again, without error checking:
+=socket= just like we did [[*Example code for =getaddrinfo=][before]].
 
 #+begin_src C
 const int sockfd_listen = socket(server_info->ai_family,
                                  server_info->ai_socktype,
                                  server_info->ai_protocol);
+if (sockfd_listen < 0) {
+    fprintf(stderr, "Could not create socket: %s\n", strerror(errno));
+    abort();
+}
 #+end_src
 
 That =sockfd_listen= variable will be used for the process of accepting
@@ -469,9 +489,9 @@ if (sockfd_connection < 0) {
 After the connection is accepted, we can send and receive data from the peer
 using the returned socket descriptor.
 
-** Active connection
+** Connecting with an active open
 :PROPERTIES:
-:CUSTOM_ID: active-connection
+:CUSTOM_ID: connecting-with-an-active-open
 :END:
 
 TODO
