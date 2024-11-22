@@ -47,6 +47,7 @@ a destination computer, and it is responsible for features such as reliability,
 flow control or multiplexing, for example. The transport layer is the 4th layer
 in the [[https://en.wikipedia.org/wiki/OSI_model][OSI model]].
 
+#+NAME: fig-netref1
 [[file:../img/netref1.png]]
 
 There are two[fn::Note that these are not the only existing transport
