@@ -516,7 +516,102 @@ freeaddrinfo(self_info);
 :CUSTOM_ID: connecting-with-an-active-open
 :END:
 
-TODO
+These are the general steps for establishing a connection through an active
+open:
+
+1. Obtain a /socket/ descriptor with the server information.
+2. /Connect/ to the server.
+
+*** Getting the server information
+:PROPERTIES:
+:CUSTOM_ID: getting-the-server-information
+:END:
+
+This is essentially the same code that was shown [[*Example code for =getaddrinfo=][before]], but now we point to a
+specific IP address and port.
+
+#+begin_src C
+struct addrinfo hints;
+memset(&hints, 0, sizeof(hints));
+hints.ai_family   = AF_INET;     /* IPv4 */
+hints.ai_socktype = SOCK_STREAM; /* TCP */
+
+struct addrinfo* server_info;
+const int status = getaddrinfo("192.168.2.123", "4321", &hints, &server_info);
+if (status != 0) {
+    fprintf(stderr, "Could not obtain address info: %s\n", gai_strerror(status));
+    abort();
+}
+#+end_src
+
+*** Creating the socket
+:PROPERTIES:
+:CUSTOM_ID: creating-the-socket
+:END:
+
+Now we have to create a socket, just like we did for the [[*Creating the passive socket][passive open]]. In this
+case, however, we will only need a single socket for connecting and
+communicating.
+
+#+begin_src C
+const int sockfd = socket(server_info->ai_family,
+                          server_info->ai_socktype,
+                          server_info->ai_protocol);
+if (sockfd < 0) {
+    fprintf(stderr, "Could not create socket: %s\n", strerror(errno));
+    abort();
+}
+#+end_src
+
+As you can probably tell, the nice part of using =getaddrinfo= is that we can
+obtain most of the important information from there, so both calls to =socket= are
+made using the same =addrinfo= members.
+
+*** Connecting to the server
+:PROPERTIES:
+:CUSTOM_ID: connecting-to-the-server
+:END:
+
+After creating the socket with the information about the server, we have to
+connect to it. For that, we use the {{{man(connect(2))}}} function.
+
+#+begin_src C
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int connect(int sockfd, const struct sockaddr* addr, socklen_t addrlen);
+#+end_src
+
+The =connect= function expects the socket descriptor we just created, and a
+=sockaddr= structure with the information about the server. Fortunately,
+=getaddrinfo= also filled two =ai_addr= and =ai_addrlen= members for this. The =connect=
+function returns zero on success, or -1 on error, setting =errno= appropriately.
+
+#+begin_src C
+const int status = connect(sockfd,
+                           server_info->ai_addr,
+                           server_info->ai_addrlen);
+if (status != 0) {
+    fprintf(stderr, "Connection error: %s\n", strerror(errno));
+    abort();
+}
+#+end_src
+
+Once we are connected, we can send and receive data from the server.
+
+*** Cleaning up
+:PROPERTIES:
+:CUSTOM_ID: cleaning-up1
+:END:
+
+After we are done sending and/or receiving data from that connection, we need to
+close it. Don't forget to also free the linked list of =addrinfo= structures by
+calling =freeaddrinfo=.
+
+#+begin_src C
+close(sockfd);
+freeaddrinfo(server_info);
+#+end_src
 
 ** Sending and receiving data through sockets
 :PROPERTIES:

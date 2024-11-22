@@ -235,7 +235,14 @@
 <li><a href="#cleaning-up">4.1.6. Cleaning up</a></li>
 </ul>
 </li>
-<li><a href="#connecting-with-an-active-open">4.2. Connecting with an active open</a></li>
+<li><a href="#connecting-with-an-active-open">4.2. Connecting with an active open</a>
+<ul>
+<li><a href="#getting-the-server-information">4.2.1. Getting the server information</a></li>
+<li><a href="#creating-the-socket">4.2.2. Creating the socket</a></li>
+<li><a href="#connecting-to-the-server">4.2.3. Connecting to the server</a></li>
+<li><a href="#cleaning-up1">4.2.4. Cleaning up</a></li>
+</ul>
+</li>
 <li><a href="#sending-and-receiving-data-through-sockets">4.3. Sending and receiving data through sockets</a></li>
 </ul>
 </li>
@@ -850,8 +857,124 @@ structures by calling <code>freeaddrinfo</code>.
 <h3 id="connecting-with-an-active-open"><span class="section-number-3">4.2.</span> Connecting with an active open</h3>
 <div class="outline-text-3" id="text-connecting-with-an-active-open">
 <p>
-TODO
+These are the general steps for establishing a connection through an active
+open:
 </p>
+
+<ol class="org-ol">
+<li>Obtain a <i>socket</i> descriptor with the server information.</li>
+<li><i>Connect</i> to the server.</li>
+</ol>
+</div>
+
+<div id="outline-container-getting-the-server-information" class="outline-4">
+<h4 id="getting-the-server-information"><span class="section-number-4">4.2.1.</span> Getting the server information</h4>
+<div class="outline-text-4" id="text-getting-the-server-information">
+<p>
+This is essentially the same code that was shown <a href="#example-code-for-getaddrinfo">before</a>, but now we point to a
+specific IP address and port.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span> <span style="color: #6ae4b9;">hints</span>;
+memset(&amp;hints, <span style="color: #88ca9f;">0</span>, <span style="color: #ff6f9f;">sizeof</span>(hints));
+hints.ai_family   = AF_INET;     <span style="color: #989898;">/* </span><span style="color: #989898;">IPv4</span><span style="color: #989898;"> */</span>
+hints.ai_socktype = SOCK_STREAM; <span style="color: #989898;">/* </span><span style="color: #989898;">TCP</span><span style="color: #989898;"> */</span>
+
+<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">server_info</span>;
+<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = getaddrinfo(<span style="color: #00d3d0;">"192.168.2.123"</span>, <span style="color: #00d3d0;">"4321"</span>, &amp;hints, &amp;server_info);
+<span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not obtain address info: %s\n"</span>, gai_strerror(status));
+    abort();
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-creating-the-socket" class="outline-4">
+<h4 id="creating-the-socket"><span class="section-number-4">4.2.2.</span> Creating the socket</h4>
+<div class="outline-text-4" id="text-creating-the-socket">
+<p>
+Now we have to create a socket, just like we did for the <a href="#creating-the-passive-socket">passive open</a>. In this
+case, however, we will only need a single socket for connecting and
+communicating.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span> = socket(server_info-&gt;ai_family,
+                          server_info-&gt;ai_socktype,
+                          server_info-&gt;ai_protocol);
+<span style="color: #ff6f9f;">if</span> (sockfd &lt; <span style="color: #88ca9f;">0</span>) {
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not create socket: %s\n"</span>, strerror(errno));
+    abort();
+}
+</pre>
+</div>
+
+<p>
+As you can probably tell, the nice part of using <code>getaddrinfo</code> is that we can
+obtain most of the important information from there, so both calls to <code>socket</code> are
+made using the same <code>addrinfo</code> members.
+</p>
+</div>
+</div>
+
+<div id="outline-container-connecting-to-the-server" class="outline-4">
+<h4 id="connecting-to-the-server"><span class="section-number-4">4.2.3.</span> Connecting to the server</h4>
+<div class="outline-text-4" id="text-connecting-to-the-server">
+<p>
+After creating the socket with the information about the server, we have to
+connect to it. For that, we use the <a href="https://man.cx/connect(2)"><code>connect(2)</code></a> function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">connect</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr</span>* <span style="color: #6ae4b9;">addr</span>, <span style="color: #79a8ff;">socklen_t</span> <span style="color: #6ae4b9;">addrlen</span>);
+</pre>
+</div>
+
+<p>
+The <code>connect</code> function expects the socket descriptor we just created, and a
+<code>sockaddr</code> structure with the information about the server. Fortunately,
+<code>getaddrinfo</code> also filled two <code>ai_addr</code> and <code>ai_addrlen</code> members for this. The <code>connect</code>
+function returns zero on success, or -1 on error, setting <code>errno</code> appropriately.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = connect(sockfd,
+                           server_info-&gt;ai_addr,
+                           server_info-&gt;ai_addrlen);
+<span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Connection error: %s\n"</span>, strerror(errno));
+    abort();
+}
+</pre>
+</div>
+
+<p>
+Once we are connected, we can send and receive data from the server.
+</p>
+</div>
+</div>
+
+<div id="outline-container-cleaning-up1" class="outline-4">
+<h4 id="cleaning-up1"><span class="section-number-4">4.2.4.</span> Cleaning up</h4>
+<div class="outline-text-4" id="text-cleaning-up1">
+<p>
+After we are done sending and/or receiving data from that connection, we need to
+close it. Don&rsquo;t forget to also free the linked list of <code>addrinfo</code> structures by
+calling <code>freeaddrinfo</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #4ae2ff;">close</span>(sockfd);
+<span style="color: #4ae2ff;">freeaddrinfo</span>(server_info);
+</pre>
+</div>
+</div>
 </div>
 </div>
 
