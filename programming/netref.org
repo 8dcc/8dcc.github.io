@@ -489,6 +489,27 @@ if (sockfd_connection < 0) {
 After the connection is accepted, we can send and receive data from the peer
 using the returned socket descriptor.
 
+*** Cleaning up
+:PROPERTIES:
+:CUSTOM_ID: cleaning-up
+:END:
+
+After we are done sending and/or receiving data from that connection, we need to
+close it.
+
+#+begin_src C
+close(sockfd_connection);
+#+end_src
+
+And after we are done with all connections, we can stop listening by closing the
+first socket descriptor. Don't forget to also free the linked list of =addrinfo=
+structures by calling =freeaddrinfo=.
+
+#+begin_src C
+close(sockfd_listen);
+freeaddrinfo(self_info);
+#+end_src
+
 ** Connecting with an active open
 :PROPERTIES:
 :CUSTOM_ID: connecting-with-an-active-open
