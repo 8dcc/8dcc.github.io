@@ -375,9 +375,9 @@ Now that =self_info= contains information about the current machine, we can call
 =socket= just like we did [[*Example code for =getaddrinfo=][before]].
 
 #+begin_src C
-const int sockfd_listen = socket(server_info->ai_family,
-                                 server_info->ai_socktype,
-                                 server_info->ai_protocol);
+const int sockfd_listen = socket(self_info->ai_family,
+                                 self_info->ai_socktype,
+                                 self_info->ai_protocol);
 if (sockfd_listen < 0) {
     fprintf(stderr, "Could not create socket: %s\n", strerror(errno));
     abort();
