@@ -243,7 +243,11 @@
 <li><a href="#cleaning-up1">4.2.4. Cleaning up</a></li>
 </ul>
 </li>
-<li><a href="#sending-and-receiving-data-through-sockets">4.3. Sending and receiving data through sockets</a></li>
+<li><a href="#sending-and-receiving-data-through-sockets">4.3. Sending and receiving data through sockets</a>
+<ul>
+<li><a href="#example-code">4.3.1. Example code</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -982,8 +986,127 @@ calling <code>freeaddrinfo</code>.
 <h3 id="sending-and-receiving-data-through-sockets"><span class="section-number-3">4.3.</span> Sending and receiving data through sockets</h3>
 <div class="outline-text-3" id="text-sending-and-receiving-data-through-sockets">
 <p>
-TODO
+Once a connection has been established, we can send and receive data through its
+socket descriptor. Most functions that operate on file descriptors, like
+<a href="https://man.cx/read(2)"><code>read(2)</code></a> and <a href="https://man.cx/write(2)"><code>write(2)</code></a>, can work with socket descriptors too. However,
+it&rsquo;s better to use <a href="https://man.cx/recv(2)"><code>recv(2)</code></a> and <a href="https://man.cx/send(2)"><code>send(2)</code></a>, even if we don&rsquo;t specify any
+<code>flags</code>.
 </p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+
+<span style="color: #79a8ff;">ssize_t</span> <span style="color: #4ae2ff;">recv</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">buf</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">len</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">flags</span>);
+<span style="color: #79a8ff;">ssize_t</span> <span style="color: #4ae2ff;">send</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">buf</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">len</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">flags</span>);
+</pre>
+</div>
+
+<p>
+The <code>recv</code> function is used to receive data into the specified buffer of size
+<code>len</code>. The <code>send</code> function is used to send a buffer of the specified size <code>len</code>.
+</p>
+
+<p>
+The <code>recv</code> function returns:
+</p>
+
+<ul class="org-ul">
+<li>The number of bytes received, when the call was successful.</li>
+<li>Zero, when a stream socket peer has performed an orderly shutdown (the
+&ldquo;end-of-file&rdquo; indicator).</li>
+<li>Negative one (-1), if an error occurred. The <code>errno</code> variable is also set.</li>
+</ul>
+
+<p>
+The <code>send</code> function returns:
+</p>
+
+<ul class="org-ul">
+<li>The number of bytes sent, when the call was successful.</li>
+<li>Negative one (-1), if an error occurred. The <code>errno</code> variable is also set.</li>
+</ul>
+
+<p>
+Note how both functions return a <i>signed</i> size type (<code>ssize_t</code>), defined in the
+<code>stddef.h</code> header.
+</p>
+</div>
+
+<div id="outline-container-example-code" class="outline-4">
+<h4 id="example-code"><span class="section-number-4">4.3.1.</span> Example code</h4>
+<div class="outline-text-4" id="text-example-code">
+<p>
+When receiving data, we should check for errors and end-of-file indicators.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stddef.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">ssize_t</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>   <span style="color: #989898;">/* </span><span style="color: #989898;">fprintf()</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;string.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">strerror()</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdlib.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">abort()</span><span style="color: #989898;"> */</span>
+
+<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">BUF_SZ</span> <span style="color: #88ca9f;">100</span> <span style="color: #989898;">/* </span><span style="color: #989898;">Arbitrary size</span><span style="color: #989898;"> */</span>
+
+<span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">buf</span>[BUF_SZ];
+<span style="color: #ff6f9f;">for</span> (;;) {
+    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">ssize_t</span> <span style="color: #6ae4b9;">received</span> = recv(sockfd_connection, buf, <span style="color: #ff6f9f;">sizeof</span>(buf), <span style="color: #88ca9f;">0</span>);
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Error</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">if</span> (received &lt; <span style="color: #88ca9f;">0</span>) {
+        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Receive error: %s\n"</span>, strerror(errno));
+        abort();
+    }
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">End of file</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">if</span> (received == <span style="color: #88ca9f;">0</span>)
+        <span style="color: #ff6f9f;">break</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Handle data in `buf'</span><span style="color: #989898;"> */</span>
+}
+</pre>
+</div>
+
+<p>
+When sending data, we should check if the function really sent all the
+bytes. For example, the following <code>send_data</code> function keeps trying to send data
+until all the buffer is sent:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdbool.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">bool</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stddef.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">size_t, ssize_t</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>   <span style="color: #989898;">/* </span><span style="color: #989898;">fprintf()</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;string.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">strerror()</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdlib.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">abort()</span><span style="color: #989898;"> */</span>
+
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
+<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">send()</span><span style="color: #989898;"> */</span>
+
+<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">send_data</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">data</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">data_sz</span>) {
+    <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">total_sent</span> = <span style="color: #88ca9f;">0</span>;
+
+    <span style="color: #ff6f9f;">while</span> (data_sz &gt; <span style="color: #88ca9f;">0</span>) {
+        <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">ssize_t</span> <span style="color: #6ae4b9;">sent</span> =
+            send(sockfd, &amp;((<span style="color: #79a8ff;">char</span>*)data)[total_sent], data_sz, <span style="color: #88ca9f;">0</span>);
+        <span style="color: #ff6f9f;">if</span> (sent &lt; <span style="color: #88ca9f;">0</span>)
+            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+
+        total_sent += sent;
+        data_sz -= sent;
+    }
+
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+}
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Calling the function</span><span style="color: #989898;"> */</span>
+<span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>send_data(sockfd, buf, buf_pos)) {
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Send error: %s\n"</span>, strerror(errno));
+    abort();
+}
+</pre>
+</div>
+</div>
 </div>
 </div>
 </div>

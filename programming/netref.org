@@ -618,4 +618,104 @@ freeaddrinfo(server_info);
 :CUSTOM_ID: sending-and-receiving-data-through-sockets
 :END:
 
-TODO
+Once a connection has been established, we can send and receive data through its
+socket descriptor. Most functions that operate on file descriptors, like
+{{{man(read(2))}}} and {{{man(write(2))}}}, can work with socket descriptors too. However,
+it's better to use {{{man(recv(2))}}} and {{{man(send(2))}}}, even if we don't specify any
+=flags=.
+
+#+begin_src C
+#include <sys/types.h>
+#include <sys/socket.h>
+
+ssize_t recv(int sockfd, void* buf, size_t len, int flags);
+ssize_t send(int sockfd, const void* buf, size_t len, int flags);
+#+end_src
+
+The =recv= function is used to receive data into the specified buffer of size
+=len=. The =send= function is used to send a buffer of the specified size =len=.
+
+The =recv= function returns:
+
+- The number of bytes received, when the call was successful.
+- Zero, when a stream socket peer has performed an orderly shutdown (the
+  "end-of-file" indicator).
+- Negative one (-1), if an error occurred. The =errno= variable is also set.
+
+The =send= function returns:
+
+- The number of bytes sent, when the call was successful.
+- Negative one (-1), if an error occurred. The =errno= variable is also set.
+
+Note how both functions return a /signed/ size type (=ssize_t=), defined in the
+=stddef.h= header.
+
+*** Example code
+:PROPERTIES:
+:CUSTOM_ID: example-code
+:END:
+
+When receiving data, we should check for errors and end-of-file indicators.
+
+#+begin_src C
+#include <stddef.h>  /* ssize_t */
+#include <stdio.h>   /* fprintf() */
+#include <string.h>  /* strerror() */
+#include <stdlib.h>  /* abort() */
+
+#define BUF_SZ 100 /* Arbitrary size */
+
+char buf[BUF_SZ];
+for (;;) {
+    const ssize_t received = recv(sockfd_connection, buf, sizeof(buf), 0);
+
+    /* Error */
+    if (received < 0) {
+        fprintf(stderr, "Receive error: %s\n", strerror(errno));
+        abort();
+    }
+
+    /* End of file */
+    if (received == 0)
+        break;
+
+    /* TODO: Handle data in `buf' */
+}
+#+end_src
+
+When sending data, we should check if the function really sent all the
+bytes. For example, the following =send_data= function keeps trying to send data
+until all the buffer is sent:
+
+#+begin_src C
+#include <stdbool.h> /* bool */
+#include <stddef.h>  /* size_t, ssize_t */
+#include <stdio.h>   /* fprintf() */
+#include <string.h>  /* strerror() */
+#include <stdlib.h>  /* abort() */
+
+#include <sys/types.h>
+#include <sys/socket.h> /* send() */
+
+bool send_data(int sockfd, void* data, size_t data_sz) {
+    size_t total_sent = 0;
+
+    while (data_sz > 0) {
+        const ssize_t sent =
+            send(sockfd, &((char*)data)[total_sent], data_sz, 0);
+        if (sent < 0)
+            return false;
+
+        total_sent += sent;
+        data_sz -= sent;
+    }
+
+    return true;
+}
+
+/* Calling the function */
+if (!send_data(sockfd, buf, buf_pos)) {
+    fprintf(stderr, "Send error: %s\n", strerror(errno));
+    abort();
+}
+#+end_src
