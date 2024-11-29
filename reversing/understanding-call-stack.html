@@ -429,7 +429,7 @@ typically organized.
 </p>
 
 
-<div id="org08830cd" class="figure">
+<div id="org9ecd982" class="figure">
 <p><img src="../img/callstack1.png" alt="callstack1.png" />
 </p>
 </div>
@@ -480,7 +480,7 @@ version, where the top of the stack is in a lower address than the bottom.
 </p>
 
 
-<div id="org3ddf946" class="figure">
+<div id="org1325c9c" class="figure">
 <p><img src="../img/callstack2.png" alt="callstack2.png" />
 </p>
 </div>
@@ -613,7 +613,7 @@ Let&rsquo;s look at some example C code.
 The call stack for <code>DrawPoint()</code> would be the following:
 </p>
 
-<pre class="example" id="orgbdfab58">
+<pre class="example" id="org8e88960">
 (???)  -&gt;  DrawSquare()  -&gt;  DrawLine()  -&gt;  DrawPoint()
 </pre>
 </div>
@@ -753,7 +753,7 @@ I chose to use the second option, so I can explain how it works. If we just used
 following warnings:
 </p>
 
-<pre class="example" id="orgff9bb36">
+<pre class="example" id="org64f48a2">
 /usr/bin/ld: obj/callstack.asm.o: warning: relocation in read-only section `.text'
 /usr/bin/ld: obj/callstack.asm.o: relocation R_X86_64_PC32 against symbol `printf@@GLIBC_2.2.5' can not be used when making a PIE object; recompile with -fPIE
 /usr/bin/ld: final link failed: bad value
@@ -901,27 +901,27 @@ what I mentioned in <a href="#note-about-position-independent-executables">Note 
 <span style="color: #6ae4b9;">CFLAGS</span>=-Wall -Wextra
 <span style="color: #6ae4b9;">LDFLAGS</span>=-fPIE
 
-<span style="color: #6ae4b9;">ASM</span>=nasm
-<span style="color: #6ae4b9;">ASMFLAGS</span>=-f elf64
+<span style="color: #6ae4b9;">AS</span>=nasm
+<span style="color: #6ae4b9;">ASFLAGS</span>=-f elf64
 
-<span style="color: #6ae4b9;">OBJS</span>=obj/main.c.o obj/callstack.asm.o
+<span style="color: #6ae4b9;">OBJ</span>=obj/main.c.o obj/callstack.asm.o
 <span style="color: #6ae4b9;">BIN</span>=callstack-test.out
 
+<span style="color: #4ae2ff;">.PHONY</span>: all clean
 <span style="color: #4ae2ff;">all</span>: $(<span style="color: #6ae4b9;">BIN</span>)
-
 <span style="color: #4ae2ff;">clean</span>:
-    rm -f $(<span style="color: #6ae4b9;">BIN</span>) $(<span style="color: #6ae4b9;">OBJS</span>)
+    rm -f $(<span style="color: #6ae4b9;">BIN</span>) $(<span style="color: #6ae4b9;">OBJ</span>)
 
-<span style="color: #4ae2ff;">$(</span><span style="color: #4ae2ff;">BIN</span><span style="color: #4ae2ff;">)</span>: $(<span style="color: #6ae4b9;">OBJS</span>)
-    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">^</span> $(<span style="color: #6ae4b9;">LDFLAGS</span>)
+<span style="color: #4ae2ff;">$(</span><span style="color: #4ae2ff;">BIN</span><span style="color: #4ae2ff;">)</span>: $(<span style="color: #6ae4b9;">OBJ</span>)
+    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) $(<span style="color: #6ae4b9;">LDFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">^</span>
 
 <span style="color: #4ae2ff;">obj/main.c.o</span>: main.c
     @mkdir -p $(<span style="color: #6ae4b9;">dir</span> <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span>)
-    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -c -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span>
+    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> -c $<span style="color: #88ca9f;">&lt;</span>
 
 <span style="color: #4ae2ff;">obj/callstack.asm.o</span>: callstack.asm
     @mkdir -p $(<span style="color: #6ae4b9;">dir</span> <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span>)
-    $(<span style="color: #6ae4b9;">ASM</span>) $(<span style="color: #6ae4b9;">ASMFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span>
+    $(<span style="color: #6ae4b9;">AS</span>) $(<span style="color: #6ae4b9;">ASFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span>
 </pre>
 </div>
 </div>
@@ -934,7 +934,7 @@ what I mentioned in <a href="#note-about-position-independent-executables">Note 
 Then, we can just run <code>make</code> and check the output:
 </p>
 
-<pre class="example" id="orga6166fe">
+<pre class="example" id="org11e3cfa">
 (main) Address of DrawPoint:  0x5a1e3d78e139
 (main) Address of DrawLine:   0x5a1e3d78e170
 (main) Address of DrawSquare: 0x5a1e3d78e1bf
@@ -976,7 +976,7 @@ look.
 </p>
 
 
-<div id="orgfd5040d" class="figure">
+<div id="orgbd8f8df" class="figure">
 <p><img src="../img/callstack3.png" alt="callstack3.png" />
 </p>
 </div>
@@ -987,7 +987,7 @@ Indeed, the call to <code>DrawPoint</code> is at <code>+0x2e</code>, and the nex
 </p>
 
 
-<div id="org0ac9d7b" class="figure">
+<div id="org8bd5f6c" class="figure">
 <p><img src="../img/callstack4.png" alt="callstack4.png" />
 </p>
 </div>

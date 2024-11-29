@@ -11,10 +11,6 @@
 
 #+TOC: headlines 2
 
-#+begin_comment
-TODO: Is subroutine/procedure/function the correct term for assembly?
-#+end_comment
-
 * Introduction
 :PROPERTIES:
 :CUSTOM_ID: introduction
@@ -553,27 +549,27 @@ CC=gcc
 CFLAGS=-Wall -Wextra
 LDFLAGS=-fPIE
 
-ASM=nasm
-ASMFLAGS=-f elf64
+AS=nasm
+ASFLAGS=-f elf64
 
-OBJS=obj/main.c.o obj/callstack.asm.o
+OBJ=obj/main.c.o obj/callstack.asm.o
 BIN=callstack-test.out
 
+.PHONY: all clean
 all: $(BIN)
-
 clean:
-	rm -f $(BIN) $(OBJS)
+	rm -f $(BIN) $(OBJ)
 
-$(BIN): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+$(BIN): $(OBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 obj/main.c.o: main.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 obj/callstack.asm.o: callstack.asm
 	@mkdir -p $(dir $@)
-	$(ASM) $(ASMFLAGS) -o $@ $<
+	$(AS) $(ASFLAGS) -o $@ $<
 #+end_src
 
 ** Checking the output
