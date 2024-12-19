@@ -4,6 +4,7 @@
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+#+OPTIONS: tex:dvisvgm
 
 [[file:../index.org][Index]] | [[file:index.org][Up]]
 
@@ -140,7 +141,7 @@ formula.
   \lfloor a / b \rfloor \times b + a \bmod b = a
 \end{equation*}
 
-Where $\lfloor a / b \rfloor$ indicates the integer division of $a$ and $b$.
+Where ~\lfloor a / b \rfloor~ indicates the integer division of ~a~ and ~b~.
 
 Before explaining my approach, I want to show how Emacs' =mod= actually works. The
 actual C function is called =fmod_float= and is located in the [[https://github.com/emacs-mirror/emacs/blob/2119cd52cdb58221a850360bf65c91cf3bf4b47e/src/floatfns.c#L569-L582][src/floatfns.c]]
@@ -183,7 +184,7 @@ the output match the following table.
 | Negative | Positive | ~y - AbsMod(x, y)~ |
 | Negative | Negative | ~-AbsMod(x, y)~    |
 
-Where =AbsMod= represents the modulus of $|x|$ and $|y|$:
+Where =AbsMod= represents the modulus of ~|x|~ and ~|y|~:
 
 \begin{equation*}
   \text{AbsMod}(x, y) = |x| \bmod |y|

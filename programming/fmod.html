@@ -194,38 +194,6 @@
 </style>
 <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 <link rel="stylesheet" type="text/css" href="../css/main.css" />
-<script>
-  window.MathJax = {
-    tex: {
-      ams: {
-        multlineWidth: '85%'
-      },
-      tags: 'ams',
-      tagSide: 'right',
-      tagIndent: '.8em'
-    },
-    chtml: {
-      scale: 1.0,
-      displayAlign: 'center',
-      displayIndent: '0em'
-    },
-    svg: {
-      scale: 1.0,
-      displayAlign: 'center',
-      displayIndent: '0em'
-    },
-    output: {
-      font: 'mathjax-modern',
-      displayOverflow: 'overflow'
-    }
-  };
-</script>
-
-<script
-  id="MathJax-script"
-  async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-</script>
 </head>
 <body>
 <div id="content" class="content">
@@ -286,10 +254,10 @@ until the dividend is smaller than the divisor.
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">Calculate remainder of X by Y. Supports floating-point, as long as they are</span>
 <span style="color: #989898;">;; </span><span style="color: #989898;">positive.</span>
-<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #2fafff;">(</span><span style="color: #4ae2ff;">basic-fmod</span> x y<span style="color: #2fafff;">)</span>
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #cabf00;">(</span>&lt; x y<span style="color: #cabf00;">)</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #cabf00;">(</span><span style="color: #4ae2ff;">basic-fmod</span> x y<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>&lt; x y<span style="color: #44bc44;">)</span>
       x
-      <span style="color: #cabf00;">(</span>basic-fmod <span style="color: #44bc44;">(</span>- x y<span style="color: #44bc44;">)</span> y<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+      <span style="color: #44bc44;">(</span>basic-fmod <span style="color: #00eff0;">(</span>- x y<span style="color: #00eff0;">)</span> y<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
@@ -379,16 +347,16 @@ calls to <code>abs</code> and wrapping our previous function with a sign conditi
 
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">Scheme equivalent of C's `fmod'.</span>
-<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #2fafff;">(</span><span style="color: #4ae2ff;">c-fmod</span> x y<span style="color: #2fafff;">)</span>
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #cabf00;">(</span><span style="color: #4ae2ff;">basic-fmod</span> x y<span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>&lt; x y<span style="color: #44bc44;">)</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #cabf00;">(</span><span style="color: #4ae2ff;">c-fmod</span> x y<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #44bc44;">(</span><span style="color: #4ae2ff;">basic-fmod</span> x y<span style="color: #44bc44;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #00eff0;">(</span>&lt; x y<span style="color: #00eff0;">)</span>
         x
-        <span style="color: #44bc44;">(</span>basic-fmod <span style="color: #ff5f59;">(</span>- x y<span style="color: #ff5f59;">)</span> y<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span>
+        <span style="color: #00eff0;">(</span>basic-fmod <span style="color: #338fff;">(</span>- x y<span style="color: #338fff;">)</span> y<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
 
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>result <span style="color: #ff5f59;">(</span>basic-fmod <span style="color: #2fafff;">(</span>abs x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>abs y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>negative? x<span style="color: #44bc44;">)</span>
-        <span style="color: #44bc44;">(</span>- result<span style="color: #44bc44;">)</span>
-        result<span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #44bc44;">(</span><span style="color: #00eff0;">(</span>result <span style="color: #338fff;">(</span>basic-fmod <span style="color: #ef7fff;">(</span>abs x<span style="color: #ef7fff;">)</span> <span style="color: #ef7fff;">(</span>abs y<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #00eff0;">(</span>negative? x<span style="color: #00eff0;">)</span>
+        <span style="color: #00eff0;">(</span>- result<span style="color: #00eff0;">)</span>
+        result<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
@@ -474,12 +442,18 @@ These results are better in my opinion, since they satisfy the following
 formula.
 </p>
 
-\begin{equation*}
+
+<div class="equation-container">
+<span class="equation">
+<img src="ltximg/fmod_cf315b40edb38bfb5b74637f07ddc9f1143d4690.svg" alt="\begin{equation*}
   \lfloor a / b \rfloor \times b + a \bmod b = a
 \end{equation*}
+" class="org-svg" />
+</span>
+</div>
 
 <p>
-Where \(\lfloor a / b \rfloor\) indicates the integer division of \(a\) and \(b\).
+Where <code>\lfloor a / b \rfloor</code> indicates the integer division of <code>a</code> and <code>b</code>.
 </p>
 
 <p>
@@ -570,26 +544,38 @@ the output match the following table.
 </table>
 
 <p>
-Where <code>AbsMod</code> represents the modulus of \(|x|\) and \(|y|\):
+Where <code>AbsMod</code> represents the modulus of <code>|x|</code> and <code>|y|</code>:
 </p>
 
-\begin{equation*}
+
+<div class="equation-container">
+<span class="equation">
+<img src="ltximg/fmod_81cca13c96e2fcc51f2be04debcfc0d81d78667f.svg" alt="\begin{equation*}
   \text{AbsMod}(x, y) = |x| \bmod |y|
 \end{equation*}
+" class="org-svg" />
+</span>
+</div>
 
 <p>
 The table can also be expressed as a conditional formula, if you are into that.
 </p>
 
-\begin{equation*}
+
+<div class="equation-container">
+<span class="equation">
+<img src="ltximg/fmod_ad95e050b35f7257aa3bb309044c349d1463531d.svg" alt="\begin{equation*}
   x \bmod b =
   \begin{cases}
-    \text{AbsMod}(x, y),     & x \geq 0 \land y \geq 0 \\
-    y + \text{AbsMod}(x, y), & x \geq 0 \land y < 0 \\
-    y - \text{AbsMod}(x, y), & x < 0 \land y \geq 0 \\
-    -\text{AbsMod}(x, y),    & x < 0 \land y < 0
+    \text{AbsMod}(x, y),     &amp;amp; x \geq 0 \land y \geq 0 \\
+    y + \text{AbsMod}(x, y), &amp;amp; x \geq 0 \land y &amp;lt; 0 \\
+    y - \text{AbsMod}(x, y), &amp;amp; x &amp;lt; 0 \land y \geq 0 \\
+    -\text{AbsMod}(x, y),    &amp;amp; x &amp;lt; 0 \land y &amp;lt; 0
   \end{cases}
 \end{equation*}
+" class="org-svg" />
+</span>
+</div>
 
 <p>
 With this, we can make a final <code>fmod</code> version.
@@ -597,21 +583,21 @@ With this, we can make a final <code>fmod</code> version.
 
 <div class="org-src-container">
 <pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">Calculate remainder of X by Y, supporting floating point and negative values.</span>
-<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #2fafff;">(</span><span style="color: #4ae2ff;">fmod</span> x y<span style="color: #2fafff;">)</span>
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #cabf00;">(</span><span style="color: #4ae2ff;">basic-fmod</span> x y<span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>&lt; x y<span style="color: #44bc44;">)</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #cabf00;">(</span><span style="color: #4ae2ff;">fmod</span> x y<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #44bc44;">(</span><span style="color: #4ae2ff;">basic-fmod</span> x y<span style="color: #44bc44;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #00eff0;">(</span>&lt; x y<span style="color: #00eff0;">)</span>
         x
-        <span style="color: #44bc44;">(</span>basic-fmod <span style="color: #ff5f59;">(</span>- x y<span style="color: #ff5f59;">)</span> y<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span>
+        <span style="color: #00eff0;">(</span>basic-fmod <span style="color: #338fff;">(</span>- x y<span style="color: #338fff;">)</span> y<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
 
-  <span style="color: #2fafff;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>abs-result <span style="color: #ff5f59;">(</span>fmod-positive <span style="color: #2fafff;">(</span>abs x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>abs y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">cond</span> <span style="color: #44bc44;">(</span><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #2fafff;">(</span>positive? x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>positive? y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
-           abs-result<span style="color: #44bc44;">)</span>
-          <span style="color: #44bc44;">(</span><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #2fafff;">(</span>positive? x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>negative? y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
-           <span style="color: #ff5f59;">(</span>+ y abs-result<span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span>
-          <span style="color: #44bc44;">(</span><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #2fafff;">(</span>negative? x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>positive? y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
-           <span style="color: #ff5f59;">(</span>- y abs-result<span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span>
-          <span style="color: #44bc44;">(</span><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #2fafff;">(</span>negative? x<span style="color: #2fafff;">)</span> <span style="color: #2fafff;">(</span>negative? y<span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
-           <span style="color: #ff5f59;">(</span>- abs-result<span style="color: #ff5f59;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #2fafff;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #44bc44;">(</span><span style="color: #00eff0;">(</span>abs-result <span style="color: #338fff;">(</span>fmod-positive <span style="color: #ef7fff;">(</span>abs x<span style="color: #ef7fff;">)</span> <span style="color: #ef7fff;">(</span>abs y<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">cond</span> <span style="color: #00eff0;">(</span><span style="color: #338fff;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #ef7fff;">(</span>positive? x<span style="color: #ef7fff;">)</span> <span style="color: #ef7fff;">(</span>positive? y<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
+           abs-result<span style="color: #00eff0;">)</span>
+          <span style="color: #00eff0;">(</span><span style="color: #338fff;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #ef7fff;">(</span>positive? x<span style="color: #ef7fff;">)</span> <span style="color: #ef7fff;">(</span>negative? y<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
+           <span style="color: #338fff;">(</span>+ y abs-result<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
+          <span style="color: #00eff0;">(</span><span style="color: #338fff;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #ef7fff;">(</span>negative? x<span style="color: #ef7fff;">)</span> <span style="color: #ef7fff;">(</span>positive? y<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
+           <span style="color: #338fff;">(</span>- y abs-result<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
+          <span style="color: #00eff0;">(</span><span style="color: #338fff;">(</span><span style="color: #ff6f9f;">and</span> <span style="color: #ef7fff;">(</span>negative? x<span style="color: #ef7fff;">)</span> <span style="color: #ef7fff;">(</span>negative? y<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
+           <span style="color: #338fff;">(</span>- abs-result<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
