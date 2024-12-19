@@ -10,8 +10,12 @@
 -----
 
 * List of articles
+:PROPERTIES:
+:CUSTOM_ID: list-of-articles
+:END:
 
-These articles are about programming and math.
+These articles are about programming and math. Some of these articles might
+require JavaScript, since it uses the [[https://www.mathjax.org/][MathJax library]].
 
 - [[file:signature-scanning.org][Signature scanning in C]]
 - [[file:detour-hooking.org][Detour hooking]]
