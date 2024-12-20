@@ -22,6 +22,7 @@ require JavaScript, since it uses the [[https://www.mathjax.org/][MathJax librar
 - [[file:understanding-y-combinator.org][Understanding the Y combinator]]
 - [[file:understanding-entropy.org][Understanding entropy]]
 - [[file:netref.org][C Network Programming Reference]]
+- [[file:pool-allocator.org][Writing a simple pool allocator in C]]
 - [[file:switch-statement.org][Switch statements from a low-level perspective]]
 - [[file:asm-loop-conditionals.org][Optimizing loop conditions in assembly]]
 - [[file:conditional-lisp-macros.org][Replacing conditional Lisp primitives with macros]]
