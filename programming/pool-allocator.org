@@ -1,0 +1,265 @@
+#+TITLE: Writing a simple pool allocator in C
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+
+[[file:../index.org][Index]] | [[file:index.org][Up]]
+
+-----
+
+#+TOC: headlines 2
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+#+begin_comment
+TODO: Link to arena allocator article.
+#+end_comment
+
+I found out about [[https://en.wikipedia.org/wiki/Memory_pool][pool allocators]] some time ago, and I really liked its
+simplicity and high performance, so I decided to write my own. This article was
+initially inspired by [[http://dmitrysoshnikov.com/compilers/writing-a-pool-allocator/][Dmitry Soshnikov's article]].
+
+Similarly to =malloc=, a pool allocator allows the user to allocate memory at run
+time. The pool allocator, however, is much faster than =malloc=, at the cost of
+having a /fixed pool size/. It allows the user to allocate and free memory blocks
+(referred to as /chunks/, from now on) in /O(1)/ linear time. This implementation
+also uses very little memory: when creating the pool, a very small =Pool=
+structure is allocated, along with the pool itself. Free chunks are used to
+store information, so the memory impact is minimal.
+
+Lastly, I would like to mention that this article is based on my ANSI C library
+for pool allocation, [[https://github.com/8dcc/libpool][libpool]]. In the future, I might make small changes to the
+code on that repository and they won't be reflected here, so feel free to check
+it out as well.
+
+* Writing the initial implementation
+:PROPERTIES:
+:CUSTOM_ID: writing-the-initial-implementation
+:END:
+
+The following implementation corresponds to version =v1.0.0= of my =libpool= library
+(linked above). Some improvements could be made, like being able to
+resize/reallocate an existing pool.
+
+** The =Chunk= type
+:PROPERTIES:
+:CUSTOM_ID: the-chunk-type
+:END:
+
+In our simple implementation, we will declare a =Chunk= type with a fixed size. In
+a more general implementation, we would use a chunk size specified by the
+programmer at runtime, but that method adds a lot of casts, and I think it would
+make this article more confusing.
+
+First, let's have a look at the definition of =Chunk=.
+
+#+begin_src C
+#define CHUNK_SZ 64
+
+typedef union Chunk Chunk;
+union Chunk {
+    Chunk* next;
+    char arr[CHUNK_SZ];
+};
+#+end_src
+
+Notice how we are =typedef='ing a =union=, not a =struct=.
+
+If you are not familiar with C =union='s, they are syntactically similar to
+=struct='s, but they can be used to define variables that may hold (at different
+times) objects of different types and sizes; as opposed to structures, which let
+the programmer /group/ different data types as a single record. Unions essentially
+let the programmer access the data in a /single area of storage/ as if it were
+storing one of many /data types/ at a given time. When you access a /member/ of a
+union variable (e.g. =my_chunk.next= or =my_chunk.arr=), the compiler is responsible
+for accessing the =union= variable as if it were the specified member type (in
+that example, either a pointer or an array of =CHUNK_SZ= characters, never both).
+
+In this case, using a =union= is convenient because it lets us "interpret" the
+=Chunk= as a pointer to another =Chunk= depending on the context, while also
+specifying the real size of the =Chunk= (i.e. =CHUNK_SZ=). Also note that the size
+of a union is the size of the /biggest possible member/ (in a 64-bit computer,
+~sizeof(Chunk*)~ is 8 bytes, and since the =arr= member is 64 bytes, that will be
+the size of the =Chunk= union).
+
+However, it's still not clear why we would need to interpret the =Chunk= as a
+pointer depending on the context. First, we need to understand that there will
+be two (implicit) types of chunks:
+
+1. *Free chunks*: They are not in use by the program. They will use the =next=
+   pointer.
+2. *Non-free chunks*: They have been allocated, so we assume they contain
+   arbitrary user data. Specifically, in this implementation, each chunk can
+   contain (at most) =CHUNK_SZ= bytes of data.
+
+As mentioned, these types are "implicit". This means that there isn't any =flags=
+variable that lets us know whether a specified chunk is free; instead, we know
+that a chunk is free because it will be inside a /linked list/ of free
+chunks. When we initialize the pool, since all chunks are free, we will use the
+=Chunk.next= pointer to link each chunk to its adjacent one, like this:
+
+#+NAME: fig1
+#+CAPTION: Four free chunks right after initializing the pool.
+[[file:../img/pool-allocator1.svg]]
+
+The gray area represents the rest of the union that is not used when accessing
+=Chunk.next=, and the last incomplete arrow represents a =NULL= pointer. The
+creation of this linked list, along with its advantages, will be explained when
+[[*Creating the pool][creating the pool]] below.
+
+** The =Pool= structure
+:PROPERTIES:
+:CUSTOM_ID: the-pool-structure
+:END:
+
+We will also declare a =Pool= structure, which simply contains:
+
+1. A pointer to the first element of the chunk array, which will be used when
+   freeing the whole pool.
+2. A pointer to the first element of the linked list of free chunks, which will
+   be used when the user allocates a chunk.
+
+#+begin_src C
+typedef struct Pool Pool;
+struct Pool {
+    Chunk* chunk_arr;
+    Chunk* free_chunk;
+};
+#+end_src
+
+Again, other members such as the chunks size might be necessary depending on the
+implementation; in this case it's known at compile time.
+
+** Creating the pool
+:PROPERTIES:
+:CUSTOM_ID: creating-the-pool
+:END:
+
+We will define a function for creating a =Pool= with an arbitrary number of
+chunks.
+
+#+begin_src C
+Pool* pool_new(size_t pool_sz) {
+    Pool* pool = malloc(sizeof(Pool));
+    if (pool == NULL)
+        return NULL;
+
+    pool->chunk_arr = pool->free_chunk = malloc(pool_sz * sizeof(Chunk));
+    if (pool->chunk_arr == NULL) {
+        free(pool);
+        return NULL;
+    }
+
+    for (size_t i = 0; i < pool_sz - 1; i++)
+        pool->chunk_arr[i].next = &pool->chunk_arr[i + 1];
+    pool->chunk_arr[pool_sz - 1].next = NULL;
+
+    return pool;
+}
+#+end_src
+
+Here's a brief explanation of each step:
+
+1. We allocate the =Pool= structure that will be returned, using =malloc=. We could
+   use any generic allocation function, not necessarily =malloc=.
+2. We allocate the pool itself, that is, the array of =Chunk= structures. We
+   initialize both =chunk_arr= and =free_chunk= pointers to the same address, since
+   all chunks will be free by default.
+3. We build the linked list of free chunks. We set the =.next= member of the =Chunk=
+   union to the address of the adjacent chunk, except for the last free chunk,
+   which will point to =NULL=.
+
+This is how the pool looks after being returned from =pool_new=:
+
+#+NAME: fig2
+#+CAPTION: Layout of a =Pool= structure after initialization.
+[[file:../img/pool-allocator2.svg]]
+
+And this is how the pool looks after the user has allocated two chunks. This
+process will be explained below, but perhaps you are starting to realize the
+advantages of this method:
+
+#+NAME: fig3
+#+CAPTION: Layout of a =Pool= structure after two allocations.
+[[file:../img/pool-allocator3.svg]]
+
+Since this implementation doesn't support pool resizing, the only /O(n)/ algorithm
+occurs when creating the pool itself, since we need to iterate each chunk to
+build the linked list described above. The chunk allocation process, on the
+other hand, has /O(1)/ complexity, since we always have a free chunk waiting for
+us at =Pool.free_chunk=. Freeing a chunk is also done in linear time, since we
+just have to prepend an element to this linked list.
+
+** Allocating chunks
+:PROPERTIES:
+:CUSTOM_ID: allocating-chunks
+:END:
+
+Now that the pool has a pointer to a linked list of free chunks, when the user
+requests an allocation for a chunk, we just have to:
+
+1. Ensure that we haven't reached the end of the list, that is, ensure the
+   =Pool.free_chunk= pointer is not =NULL=.
+2. The first element of this "free chunks" list will be returned. Before that,
+   remove it from the list by setting the start of the list
+   (i.e. =Pool.free_chunk=) to what used to be the second element
+   (i.e. =Pool.free_chunk.next=).
+
+#+begin_src C
+void* pool_alloc(Pool* pool) {
+    if (pool == NULL || pool->free_chunk == NULL)
+        return NULL;
+
+    Chunk* result    = pool->free_chunk;
+    pool->free_chunk = pool->free_chunk->next;
+    return result;
+}
+#+end_src
+
+Now the user can safely overwrite the contents of the pointer returned by
+=pool_alloc=, and it will be essentially setting the =arr= member of the =Chunk=
+union. This is fine, since that chunk is no longer part of our "free chunks"
+list.
+
+Just to emphasize once again, we are not iterating anything, so this process is
+/linear/. Allocating chunks of arbitrary size on linear time obviously has great
+advantages, specially when we have to allocate and free many times per second
+(e.g. many entities in each tick of a simulation).
+
+** Freeing chunks
+:PROPERTIES:
+:CUSTOM_ID: freeing-chunks
+:END:
+
+Freeing chunks is pretty straight-forward, and if you understood the previous
+sections, I recommend you try to write your own function.
+
+The freeing process simply consists of adding (prepending) a chunk back into the
+linked list of free chunks. As you can probably tell, this is also a linear
+process.
+
+#+begin_src C
+void pool_free(Pool* pool, void* ptr) {
+    if (pool == NULL || ptr == NULL)
+        return;
+
+    Chunk* freed     = ptr;
+    freed->next      = pool->free_chunk;
+    pool->free_chunk = freed;
+}
+#+end_src
+
+For example, following the [[fig3][previous figure]], this would be the layout after the
+user frees the first block of memory.
+
+#+NAME: fig4
+#+CAPTION: Layout of a =Pool= structure after freeing a chunk.
+[[file:../img/pool-allocator4.svg]]
+
+Notice how, unlike with arena allocators, we don't have to free in the same
+order that we allocated.
