@@ -594,6 +594,12 @@ array, so they are also invalid. If the user tries to access or free these
 pointers, a segmentation fault might occur.</li>
 </ol>
 
+<p>
+This is how the layout will probably look like after resizing. Incomplete
+connections crossed-out with a single line represent invalid (but non-null)
+pointers to the old array, which is now invalid.
+</p>
+
 
 <div id="fig6" class="figure">
 <p><img src="../img/pool-allocator6.svg" alt="pool-allocator6.svg" class="org-svg" />

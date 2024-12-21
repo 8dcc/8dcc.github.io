@@ -297,6 +297,10 @@ so the address of each chunk will also change. This is a problem because:
    array, so they are also invalid. If the user tries to access or free these
    pointers, a segmentation fault might occur.
 
+This is how the layout will probably look like after resizing. Incomplete
+connections crossed-out with a single line represent invalid (but non-null)
+pointers to the old array, which is now invalid.
+
 #+NAME: fig6
 #+CAPTION: Resizing problems: old pointers may become invalid.
 [[file:../img/pool-allocator6.svg]]
