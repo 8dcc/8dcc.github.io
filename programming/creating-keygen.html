@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Creating a simple keygen</title>
+<meta property="og:title" content="Creating a simple keygen" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -368,7 +369,7 @@ Imagine we had the algorithm from the last example. The user is also able to
 tell that the lengths of the strings are proportional, for example:
 </p>
 
-<pre class="example" id="org4426021">
+<pre class="example" id="example1">
 abcd  -&gt; 1234
 abcde -&gt; 12345
 ab    -&gt; 12
@@ -385,7 +386,7 @@ the user. Here are some examples on what to avoid, assuming our key length is
 9:
 </p>
 
-<pre class="example" id="org26b0443">
+<pre class="example" id="example2">
 abcd       -&gt; 123400000 (Same as previous example)
 abcd       -&gt; 123412341 (Repetition is easy to tell)
 abcdefghij -&gt; 123456789 (Last character is ignored, produces same output as abcdefghi)
@@ -449,7 +450,7 @@ the <code>out</code> pointer.
     <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate the user KEY_LEN+1 times</span><span style="color: #989898;"> */</span>
     <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">iter</span> = <span style="color: #88ca9f;">0</span>; iter &lt; KEY_LEN + <span style="color: #88ca9f;">1</span>; iter++) {
         <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate the user</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">user_pos</span> = <span style="color: #88ca9f;">0</span>; user[user_pos] != <span style="color: #00d3d0;">'\0'</span>; user_pos++) {
+        <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">user_pos</span> = <span style="color: #88ca9f;">0</span>; user[user_pos] != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>; user_pos++) {
             <span style="color: #79a8ff;">unsigned</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span> = user[user_pos];
 
             <span style="color: #989898;">/* </span><span style="color: #989898;">Swap every bit pair with the adjactent pair</span><span style="color: #989898;"> */</span>
@@ -488,7 +489,7 @@ This is an example of a simple keygen program:
 
 <span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">argc</span>, <span style="color: #79a8ff;">char</span>** <span style="color: #6ae4b9;">argv</span>) {
     <span style="color: #ff6f9f;">if</span> (argc &lt; <span style="color: #88ca9f;">2</span>) {
-        fprintf(stderr, <span style="color: #00d3d0;">"Usage: %s &lt;username&gt;\n"</span>, argv[<span style="color: #88ca9f;">0</span>]);
+        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Usage: </span><span style="color: #ff6f9f;">%s</span><span style="color: #00d3d0;"> &lt;username&gt;</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">"</span>, argv[<span style="color: #88ca9f;">0</span>]);
         <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">1</span>;
     }
 
@@ -497,10 +498,10 @@ This is an example of a simple keygen program:
 
     generate_key(username, key);
 
-    printf(<span style="color: #00d3d0;">"%s : "</span>, username);
+    printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%s</span><span style="color: #00d3d0;"> : "</span>, username);
     <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; KEY_LEN; i++)
-        printf(<span style="color: #00d3d0;">"%02x"</span>, key[i]);
-    putchar(<span style="color: #00d3d0;">'\n'</span>);
+        printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%02x</span><span style="color: #00d3d0;">"</span>, key[i]);
+    putchar(<span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">'</span>);
 
     <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
 }

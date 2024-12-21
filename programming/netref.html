@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>C Network Programming Reference</title>
+<meta property="og:title" content="C Network Programming Reference" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -540,7 +541,7 @@ hints.ai_socktype = SOCK_STREAM; <span style="color: #989898;">/* </span><span s
 <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">server_info</span>;
 <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = getaddrinfo(ip, port, &amp;hints, &amp;server_info);
 <span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Error: %s\n"</span>, gai_strerror(status));
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Error: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, gai_strerror(status));
     abort();
 }
 
@@ -561,7 +562,7 @@ descriptor after you are done using it.
                           server_info-&gt;ai_socktype,
                           server_info-&gt;ai_protocol);
 <span style="color: #ff6f9f;">if</span> (sockfd &lt; <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not create socket: %s\n"</span>, strerror(errno));
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not create socket: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
     abort();
 }
 
@@ -651,7 +652,7 @@ hints.ai_flags    = AI_PASSIVE; <span style="color: #989898;">/* </span><span st
 <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">self_info</span>;
 <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = getaddrinfo(<span style="color: #88ca9f;">NULL</span>, <span style="color: #00d3d0;">"4321"</span>, &amp;hints, &amp;self_info); <span style="color: #989898;">/* </span><span style="color: #989898;">Updated</span><span style="color: #989898;"> */</span>
 <span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not obtaining our address info: %s\n"</span>,
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not obtaining our address info: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>,
             gai_strerror(status));
     abort();
 }
@@ -692,7 +693,7 @@ Now that <code>self_info</code> contains information about the current machine, 
                                  self_info-&gt;ai_socktype,
                                  self_info-&gt;ai_protocol);
 <span style="color: #ff6f9f;">if</span> (sockfd_listen &lt; <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not create socket: %s\n"</span>, strerror(errno));
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not create socket: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
     abort();
 }
 </pre>
@@ -734,7 +735,7 @@ already filled one for us, so we should use that.
                         self_info-&gt;ai_addr,
                         self_info-&gt;ai_addrlen);
 <span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not bind to socket descriptor: %s\n"</span>,
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not bind to socket descriptor: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>,
             strerror(errno));
     abort();
 }
@@ -769,7 +770,7 @@ on success, or -1 on error, setting <code>errno</code> appropriately.
 <div class="org-src-container">
 <pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = listen(sockfd_listen, <span style="color: #88ca9f;">10</span>);
 <span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not listen for connections: %s\n"</span>, strerror(errno));
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not listen for connections: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
     abort();
 }
 </pre>
@@ -815,7 +816,7 @@ receiving data in the accepted connection. On error, it returns -1 and sets
 <div class="org-src-container">
 <pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd_connection</span> = accept(sockfd_listen, <span style="color: #88ca9f;">NULL</span>, <span style="color: #88ca9f;">NULL</span>);
 <span style="color: #ff6f9f;">if</span> (sockfd_connection &lt; <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not accept incoming connection: %s\n"</span>,
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not accept incoming connection: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>,
             strerror(errno));
     abort();
 }
@@ -888,7 +889,7 @@ hints.ai_socktype = SOCK_STREAM; <span style="color: #989898;">/* </span><span s
 <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">server_info</span>;
 <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = getaddrinfo(<span style="color: #00d3d0;">"192.168.2.123"</span>, <span style="color: #00d3d0;">"4321"</span>, &amp;hints, &amp;server_info);
 <span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not obtain address info: %s\n"</span>, gai_strerror(status));
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not obtain address info: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, gai_strerror(status));
     abort();
 }
 </pre>
@@ -910,7 +911,7 @@ communicating.
                           server_info-&gt;ai_socktype,
                           server_info-&gt;ai_protocol);
 <span style="color: #ff6f9f;">if</span> (sockfd &lt; <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not create socket: %s\n"</span>, strerror(errno));
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not create socket: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
     abort();
 }
 </pre>
@@ -952,7 +953,7 @@ function returns zero on success, or -1 on error, setting <code>errno</code> app
                            server_info-&gt;ai_addr,
                            server_info-&gt;ai_addrlen);
 <span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Connection error: %s\n"</span>, strerror(errno));
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Connection error: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
     abort();
 }
 </pre>
@@ -1054,7 +1055,7 @@ When receiving data, we should check for errors and end-of-file indicators.
 
     <span style="color: #989898;">/* </span><span style="color: #989898;">Error</span><span style="color: #989898;"> */</span>
     <span style="color: #ff6f9f;">if</span> (received &lt; <span style="color: #88ca9f;">0</span>) {
-        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Receive error: %s\n"</span>, strerror(errno));
+        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Receive error: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
         abort();
     }
 
@@ -1101,7 +1102,7 @@ until all the buffer is sent:
 
 <span style="color: #989898;">/* </span><span style="color: #989898;">Calling the function</span><span style="color: #989898;"> */</span>
 <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>send_data(sockfd, buf, buf_pos)) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Send error: %s\n"</span>, strerror(errno));
+    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Send error: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
     abort();
 }
 </pre>

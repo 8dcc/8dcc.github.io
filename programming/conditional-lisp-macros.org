@@ -117,6 +117,7 @@ procedures, but have a few key differences:
 
 In other words the general process when calling a procedure is:
 
+#+NAME: example1
 #+begin_example
 Evaluate arguments -> Bind arguments -> Evaluate body
                       `-----------------------------´
@@ -125,6 +126,7 @@ Evaluate arguments -> Bind arguments -> Evaluate body
 
 While the process of calling a macro is:
 
+#+NAME: example2
 #+begin_example
 Bind arguments -> Evaluate body -> Evaluate expansion
 `-----------------------------´

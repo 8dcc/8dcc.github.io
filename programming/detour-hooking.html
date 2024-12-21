@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Detour hooking</title>
+<meta property="og:title" content="Detour hooking" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -233,7 +234,7 @@ Imagine the following <code>foo</code> function, called from <code>main</code>:
 <pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
 
 <span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">foo</span>(<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">b</span>) {
-    printf(<span style="color: #00d3d0;">"foo: %.1f + %.1f = %.1f\n"</span>, a, b, a + b);
+    printf(<span style="color: #00d3d0;">"foo: </span><span style="color: #ff6f9f;">%.1f</span><span style="color: #00d3d0;"> + </span><span style="color: #ff6f9f;">%.1f</span><span style="color: #00d3d0;"> = </span><span style="color: #ff6f9f;">%.1f\n</span><span style="color: #00d3d0;">"</span>, a, b, a + b);
     <span style="color: #ff6f9f;">return</span> a + b;
 }
 
@@ -417,7 +418,7 @@ the address of the previous page. For more information see <a href="https://stac
 answer</a>.
 </p>
 
-<pre class="example" id="org47387f3">
+<pre class="example" id="example1">
 Ptr:                 0x12345    0b10010001101000101
 Page size:           0x01000    0b00001000000000000
 Page size - 1:       0x00FFF    0b00000111111111111
@@ -433,8 +434,8 @@ Let&rsquo;s declare our sample hook.
 
 <div class="org-src-container">
 <pre class="src src-C"><span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">hook</span>(<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">b</span>) {
-    printf(<span style="color: #00d3d0;">"hook: intercepted %.1f and %.1f\n"</span>, a, b);
-    printf(<span style="color: #00d3d0;">"hook: overwriting return value...\n"</span>);
+    printf(<span style="color: #00d3d0;">"hook: intercepted </span><span style="color: #ff6f9f;">%.1f</span><span style="color: #00d3d0;"> and </span><span style="color: #ff6f9f;">%.1f\n</span><span style="color: #00d3d0;">"</span>, a, b);
+    printf(<span style="color: #00d3d0;">"hook: overwriting return value...</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">"</span>);
     <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">420</span>;
 }
 </pre>

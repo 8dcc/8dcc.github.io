@@ -146,6 +146,7 @@ Which can be simplified into:
 This is how the two plots compare.
 
 #+ATTR_HTML: :style max-width:400px
+#+NAME: fig1
 [[file:../img/entropy1.png]]
 
 The base of the logarithm doesn't usually matter but, since we are talking about

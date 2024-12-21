@@ -130,6 +130,7 @@ an Emacs package called [[https://github.com/joaotavora/beardbolt][beardbolt]]; 
 Compiler Explorer]]. I was looking at some sources, and found an example of the
 same =jmp= strategy that I used for brainfuck.
 
+#+NAME: fig1
 [[file:../img/asm-loop-conditionals1.png]]
 
 Note that there is a bug in the current version of GCC (14.2.1) when generating

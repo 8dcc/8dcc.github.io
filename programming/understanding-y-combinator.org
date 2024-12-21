@@ -18,7 +18,7 @@
 
 *Lambda calculus* (\lambda-calculus) is a mathematical system for computation
 based on *function abstraction* and *application*, using *variable binding* and
-substitution.[fn:1]
+substitution.[fn::See the [[https://en.wikipedia.org/wiki/Lambda_calculus][Wikipedia page]] for lambda calculus.]
 
 ** Rules
 :PROPERTIES:
@@ -67,9 +67,9 @@ Lambda calculus also has 2 main reduction operations:
    body ($M$) of the abstraction.
 
 There is also *eta reduction* (\eta-reduction), which expresses the idea of
-/extensionality/,[fn:2] which applied to this context establishes that two
-functions are the same if and only if they give the same result for all
-arguments.
+/extensionality/,[fn::See the [[https://en.wikipedia.org/wiki/Extensionality][Wikipedia page]] for extensionality.] which applied to
+this context establishes that two functions are the same if and only if they
+give the same result for all arguments.
 
 [[*Implementation in Scheme][Later]] we will also mention the opposite of the beta reduction, the *beta
 abstraction*, which instead of simplifying an expression, it adds an extra
@@ -192,8 +192,8 @@ Or in Scheme:
 #+end_src
 
 #+begin_quote
-*Note:* Depending on the Lisp, you might need to use =(funcall x x)= instead of
-=(x x)=, since variables and functions don't share the same namespace. You can
+*Note:* Depending on the Lisp, you might need to use ~(funcall x x)~ instead of
+~(x x)~, since variables and functions don't share the same namespace. You can
 search about the differences between Lisp-1 and Lisp-2.
 #+end_quote
 
@@ -213,6 +213,7 @@ first is applied to the second one. Let's try to simplify it by
 one. We replace each occurrence of $x$ in the body of the first expression with
 the whole second parenthesized expression.
 
+#+NAME: fig1
 [[file:../img/ycombinator1.png]]
 
 We are right back where we started. This function would call itself
@@ -227,14 +228,16 @@ Before getting into the fixed-point combinators, we need to define what a fixed
 point is.
 
 A fixed point of function $f$ is a value that is mapped to itself by the
-function.[fn:4] In other words, $x$ is a fixed point of $f$ if $f(x) = x$. For
-this to be possible, $x$ has to belong to both the /domain/ of $f$ (set of values
-that it can take), and the /codomain/ of $f$ (set of values that it can return).
+function.[fn::See the [[https://en.wikipedia.org/wiki/Fixed_point_(mathematics)][Wikipedia page]] for fixed point.] In other words, $x$ is a
+fixed point of $f$ if $f(x) = x$. For this to be possible, $x$ has to belong to
+both the /domain/ of $f$ (set of values that it can take), and the /codomain/ of $f$
+(set of values that it can return).
 
 For example, if $f(x) = x!$, 1 and 2 are fixed points, since $f(1) = 1$ and
 $f(2) = 2$.
 
 #+ATTR_HTML: :width 250px
+#+NAME: fig2
 [[file:../img/ycombinator2.png]]
 
 The image shows the graph of a function $f$, with 3 fixed points. When plotting
@@ -257,7 +260,7 @@ with the result.
 
 A *fixed-point combinator* is a higher-order function (i.e. a function that takes
 a function as argument) that returns some fixed point of its argument
-function.[fn:3]
+function.[fn::See the [[https://en.wikipedia.org/wiki/Fixed-point_combinator][Wikipedia page]] for fixed-point combinator.]
 
 So, if a function =fix= is a fixed-point combinator, a function =f= has one or
 more fixed points, then =fix(f)= is one of these fixed points:
@@ -306,6 +309,7 @@ argument would be reduced to $Y\ f = f(Y\ f)$. This is a very interesting and
 useful concept, and it's where this image comes from.
 
 #+ATTR_HTML: :width 250px
+#+NAME: fig3
 [[file:../img/ycombinator3.png]]
 
 Let's try to understand what it does, and why it's a fixed-point combinator. We
@@ -433,22 +437,23 @@ Scheme (and most Lisps) is /strict/, meaning that each argument is evaluated
 :END:
 
 Defining =Y= like we did before would result in infinite recursive calls when
-trying to apply the =(x x)= expressions. This will be more obvious when analyzing
+trying to apply the ~(x x)~ expressions. This will be more obvious when analyzing
 the combinator below, so let's look at a possible solution first. We can fix our
-Y combinator by *beta abstracting*[fn:5] those two applications.
+Y combinator by *beta abstracting*[fn::See [[https://jao.io/blog/2014/08/06/spj-s-y-combinator-in-scheme/][jao.io]] article about the Y combinator
+in Scheme, and about how to design good websites.] those two applications.
 
 #+begin_quote
 *JAO's blog about the Y-combinator in Scheme (2014)*
 
 If you have a function =F= in Scheme, you can define a totally equivalent function
-=G= by =(define G (lambda (args) (F args)))=. We say that =G= is a /beta abstraction/ of
+=G= by ~(define G (lambda (args) (F args)))~. We say that =G= is a /beta abstraction/ of
 =F=, or that =F= is a /beta reduction/ of =G=.
 
 The usual reason you would beta abstract a function in Scheme is in order to
 delay the evaluation of its body, just what the doctor ordered.
 #+end_quote
 
-We can add this beta abstraction to the =(x x)= applications, effectively acting
+We can add this beta abstraction to the ~(x x)~ applications, effectively acting
 as a "proxy".
 
 #+begin_src scheme
@@ -472,6 +477,7 @@ function. Specifically, applying the first inner lambda to its copy. Note that
 this isn't the actual process that a Scheme interpreter would follow, instead I
 have decided to make some changes to make it easier to understand.
 
+#+NAME: fig4
 [[file:../img/ycombinator4.svg]]
 
 Let me explain briefly each step of the diagram.
@@ -559,12 +565,3 @@ If you reached this far, I hope you have learned something. Everything in this
 article is based on what I found while trying to learn about the Y combinator,
 so if you feel like some explanations could be improved, feel free to
 [[file:../index.org::#contributing][contribute]].
-
-# -----
-
-[fn:1] See the [[https://en.wikipedia.org/wiki/Lambda_calculus][Wikipedia page]] for lambda calculus.
-[fn:2] See the [[https://en.wikipedia.org/wiki/Extensionality][Wikipedia page]] for extensionality.
-[fn:3] See the [[https://en.wikipedia.org/wiki/Fixed-point_combinator][Wikipedia page]] for fixed-point combinator.
-[fn:4] See the [[https://en.wikipedia.org/wiki/Fixed_point_(mathematics)][Wikipedia page]] for fixed point.
-[fn:5] See [[https://jao.io/blog/2014/08/06/spj-s-y-combinator-in-scheme/][jao.io]] article about the Y combinator in Scheme, and about how to
-design good websites.

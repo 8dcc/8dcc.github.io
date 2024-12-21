@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Signature scanning in C</title>
+<meta property="og:title" content="Signature scanning in C" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -252,11 +253,11 @@ First, let&rsquo;s have a look at a sample program:
 <span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
     <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span> = <span style="color: #88ca9f;">0x100</span>;
     <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span> = <span style="color: #88ca9f;">4</span>;
-    printf(<span style="color: #00d3d0;">"%d\n"</span>, my_func(x, y));
+    printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, my_func(x, y));
 
     <span style="color: #989898;">/* </span><span style="color: #989898;">Infinite loop for injecting later</span><span style="color: #989898;"> */</span>
     <span style="color: #ff6f9f;">for</span> (;;)
-        ;
+        <span style="color: #cabf00;">;</span>
 
     <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
 }
@@ -324,7 +325,7 @@ This is the disassembly of the main function:
 </p>
 
 
-<div id="org37e92e1" class="figure">
+<div id="org037a2a5" class="figure">
 <p><img src="../img/signature-scanning1.png" alt="signature-scanning1.png" />
 </p>
 </div>
@@ -337,7 +338,7 @@ calling <code>my_func</code>. Let&rsquo;s double-click it to have a look at the 
 </p>
 
 
-<div id="org99a8a60" class="figure">
+<div id="org9520ddd" class="figure">
 <p><img src="../img/signature-scanning2.png" alt="signature-scanning2.png" />
 </p>
 </div>
@@ -370,7 +371,7 @@ disassembler.
 </p>
 
 
-<div id="orgdeb77db" class="figure">
+<div id="orgbc7b3e7" class="figure">
 <p><img src="../img/signature-scanning3.png" alt="signature-scanning3.png" />
 </p>
 </div>
@@ -381,7 +382,7 @@ the function/variable we are looking for. Here is a signature of the whole
 function, but in practice, we shouldn&rsquo;t need more than 10 instructions.
 </p>
 
-<pre class="example" id="org7b1f11a">
+<pre class="example" id="org74c1fd0">
 55 48 89 E5 48 83 EC 10 89 7D FC 89 75 F8 8B 45 F8 3B 45 FC 7F 0C 83 7D F8 00 78
 06 83 7D F8 20 7E 07 B8 ? ? ? ? EB 1F 48 8D 05 ? ? ? ? 48 89 C7 E8 ? ? ? ? 8B 45
 F8 8B 55 FC 89 C1 D3 FA 89 D0 01 C0 01 D0 C9 C3
@@ -427,7 +428,7 @@ it is:
         hex++;
 
     <span style="color: #989898;">/* </span><span style="color: #989898;">Store a byte (two digits of string)</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; <span style="color: #88ca9f;">2</span> &amp;&amp; hex[i] != <span style="color: #00d3d0;">'\0'</span>; i++) {
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; <span style="color: #88ca9f;">2</span> &amp;&amp; hex[i] != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>; i++) {
         <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span> = hex[i];
 
         <span style="color: #989898;">/* </span><span style="color: #989898;">For example "E ", although the format should always be "0E"</span><span style="color: #989898;"> */</span>
@@ -478,7 +479,7 @@ And with that, we can make our <code>do_scan</code> function:
     <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">pat_ptr</span> = pattern;
 
     <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate until we reach the end of the memory or the end of the pattern</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">while</span> ((<span style="color: #79a8ff;">void</span>*)mem_ptr &lt; end &amp;&amp; *pat_ptr != <span style="color: #00d3d0;">'\0'</span>) {
+    <span style="color: #ff6f9f;">while</span> ((<span style="color: #79a8ff;">void</span>*)mem_ptr &lt; end &amp;&amp; *pat_ptr != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>) {
         <span style="color: #989898;">/* </span><span style="color: #989898;">Wildcard, always match</span><span style="color: #989898;"> */</span>
         <span style="color: #ff6f9f;">if</span> (*pat_ptr == <span style="color: #00d3d0;">'?'</span>) {
             mem_ptr++;
@@ -506,7 +507,7 @@ And with that, we can make our <code>do_scan</code> function:
             mem_ptr++;
 
             <span style="color: #989898;">/* </span><span style="color: #989898;">Go to next byte separator in pattern (space)</span><span style="color: #989898;"> */</span>
-            <span style="color: #ff6f9f;">while</span> (*pat_ptr != <span style="color: #00d3d0;">' '</span> &amp;&amp; *pat_ptr != <span style="color: #00d3d0;">'\0'</span>)
+            <span style="color: #ff6f9f;">while</span> (*pat_ptr != <span style="color: #00d3d0;">' '</span> &amp;&amp; *pat_ptr != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>)
                 pat_ptr++;
         } <span style="color: #ff6f9f;">else</span> {
             <span style="color: #989898;">/* </span><span style="color: #989898;">Byte didn't match, check pattern from the begining on the next</span>
@@ -522,7 +523,7 @@ And with that, we can make our <code>do_scan</code> function:
     }
 
     <span style="color: #989898;">/* </span><span style="color: #989898;">If we reached end of pattern, return the match. Otherwise, NULL</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">return</span> (*pat_ptr == <span style="color: #00d3d0;">'\0'</span>) ? start : <span style="color: #88ca9f;">NULL</span>;
+    <span style="color: #ff6f9f;">return</span> (*pat_ptr == <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>) ? start : <span style="color: #88ca9f;">NULL</span>;
 }
 </pre>
 </div>
@@ -577,7 +578,7 @@ get the size of the loaded module).
 <span style="color: #79a8ff;">void</span>* <span style="color: #4ae2ff;">sigscan</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">module</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">pattern</span>) {
     <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">our_link_map</span>* <span style="color: #6ae4b9;">link</span> = dlopen(module, RTLD_NOLOAD | RTLD_NOW);
     <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>link) {
-        fprintf(stderr, <span style="color: #00d3d0;">"Can't open module \"%s\""</span>, module);
+        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Can't open module </span><span style="color: #ff6f9f;">\"%s\"</span><span style="color: #00d3d0;">"</span>, module);
         <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
     }
 
@@ -631,7 +632,7 @@ The <code>/proc/&lt;pid&gt;/</code> folder contains many useful files, one of th
 access permissions in the following format (without the column names):
 </p>
 
-<pre class="example" id="org1aba440">
+<pre class="example" id="org298aa0a">
 address           perms offset  dev   inode       pathname
 ----------------------------------------------------------------------
 00400000-00452000 r-xp 00000000 08:02 173521      /usr/bin/dbus-daemon
@@ -685,13 +686,13 @@ function but since it&rsquo;s well commented, I won&rsquo;t dive into too much d
     <span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">pathname</span>[<span style="color: #88ca9f;">200</span>];
 
     <span style="color: #ff6f9f;">while</span> (fgets(line_buf, <span style="color: #ff6f9f;">sizeof</span>(line_buf), fd)) {
-        pathname[<span style="color: #88ca9f;">0</span>] = <span style="color: #00d3d0;">'\0'</span>;
+        pathname[<span style="color: #88ca9f;">0</span>] = <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>;
 
         <span style="color: #989898;">/* </span><span style="color: #989898;">Scan the current line using sscanf(). We need to change address sizes</span>
 <span style="color: #989898;">         * depending on the arch.</span><span style="color: #989898;"> */</span>
         <span style="color: #79a8ff;">long</span> <span style="color: #79a8ff;">unsigned</span> <span style="color: #6ae4b9;">start_num</span> = <span style="color: #88ca9f;">0</span>, <span style="color: #6ae4b9;">end_num</span> = <span style="color: #88ca9f;">0</span>, <span style="color: #6ae4b9;">offset</span> = <span style="color: #88ca9f;">0</span>;
         <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">fmt_match_num</span> =
-          sscanf(line_buf, <span style="color: #00d3d0;">"%lx-%lx %4s %lx %*x:%*x %*d %200[^\n]\n"</span>,
+          sscanf(line_buf, <span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%lx</span><span style="color: #00d3d0;">-</span><span style="color: #ff6f9f;">%lx</span><span style="color: #00d3d0;"> </span><span style="color: #ff6f9f;">%4s</span><span style="color: #00d3d0;"> </span><span style="color: #ff6f9f;">%lx</span><span style="color: #00d3d0;"> </span><span style="color: #ff6f9f;">%*x</span><span style="color: #00d3d0;">:</span><span style="color: #ff6f9f;">%*x</span><span style="color: #00d3d0;"> </span><span style="color: #ff6f9f;">%*d</span><span style="color: #00d3d0;"> %200[^</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">]</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">"</span>,
                  &amp;start_num, &amp;end_num, rwxp, &amp;offset, pathname);
 
         <span style="color: #ff6f9f;">if</span> (fmt_match_num &lt; <span style="color: #88ca9f;">4</span>)
@@ -833,17 +834,17 @@ create a shared object that we can inject into a running process.
 
     <span style="color: #79a8ff;">func_ptr_t</span> <span style="color: #6ae4b9;">found_func</span> = sigscan(<span style="color: #88ca9f;">NULL</span>, MY_SIG);
     <span style="color: #ff6f9f;">if</span> (found_func == <span style="color: #88ca9f;">NULL</span>) {
-        fprintf(stderr, <span style="color: #00d3d0;">"my_lib: Could not find function.\n"</span>);
+        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"my_lib: Could not find function.</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">"</span>);
         <span style="color: #ff6f9f;">return</span>;
     }
 
-    printf(<span style="color: #00d3d0;">"my_lib: Found function at %p\n"</span>, found_func);
+    printf(<span style="color: #00d3d0;">"my_lib: Found function at </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, found_func);
 
     <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">a</span> = found_func(<span style="color: #88ca9f;">0x500</span>, <span style="color: #88ca9f;">4</span>);
-    printf(<span style="color: #00d3d0;">"my_lib: Function returned %d\n"</span>, a);
+    printf(<span style="color: #00d3d0;">"my_lib: Function returned </span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, a);
 
     <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">b</span> = found_func(<span style="color: #88ca9f;">0x1000</span>, <span style="color: #88ca9f;">4</span>);
-    printf(<span style="color: #00d3d0;">"my_lib: Function returned %d\n"</span>, b);
+    printf(<span style="color: #00d3d0;">"my_lib: Function returned </span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, b);
 }
 
 <span style="color: #989898;">/* </span><span style="color: #989898;">Entry point when unloaded</span><span style="color: #989898;"> */</span>

@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Understanding the Y combinator</title>
+<meta property="og:title" content="Understanding the Y combinator" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -339,9 +340,9 @@ body (\(M\)) of the abstraction.</li>
 
 <p>
 There is also <b>eta reduction</b> (&eta;-reduction), which expresses the idea of
-<i>extensionality</i>,<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup> which applied to this context establishes that two
-functions are the same if and only if they give the same result for all
-arguments.
+<i>extensionality</i>,<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup> which applied to
+this context establishes that two functions are the same if and only if they
+give the same result for all arguments.
 </p>
 
 <p>
@@ -525,7 +526,7 @@ the whole second parenthesized expression.
 </p>
 
 
-<div id="org933fb9c" class="figure">
+<div id="fig1" class="figure">
 <p><img src="../img/ycombinator1.png" alt="ycombinator1.png" />
 </p>
 </div>
@@ -547,9 +548,10 @@ point is.
 
 <p>
 A fixed point of function \(f\) is a value that is mapped to itself by the
-function.<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup> In other words, \(x\) is a fixed point of \(f\) if \(f(x) = x\). For
-this to be possible, \(x\) has to belong to both the <i>domain</i> of \(f\) (set of values
-that it can take), and the <i>codomain</i> of \(f\) (set of values that it can return).
+function.<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup> In other words, \(x\) is a
+fixed point of \(f\) if \(f(x) = x\). For this to be possible, \(x\) has to belong to
+both the <i>domain</i> of \(f\) (set of values that it can take), and the <i>codomain</i> of \(f\)
+(set of values that it can return).
 </p>
 
 <p>
@@ -558,7 +560,7 @@ For example, if \(f(x) = x!\), 1 and 2 are fixed points, since \(f(1) = 1\) and
 </p>
 
 
-<div id="orge72fca6" class="figure">
+<div id="fig2" class="figure">
 <p><img src="../img/ycombinator2.png" alt="ycombinator2.png" width="250px" />
 </p>
 </div>
@@ -662,7 +664,7 @@ useful concept, and it&rsquo;s where this image comes from.
 </p>
 
 
-<div id="org358b2b0" class="figure">
+<div id="fig3" class="figure">
 <p><img src="../img/ycombinator3.png" alt="ycombinator3.png" width="250px" />
 </p>
 </div>
@@ -882,7 +884,7 @@ have decided to make some changes to make it easier to understand.
 </p>
 
 
-<div id="org2000c83" class="figure">
+<div id="fig4" class="figure">
 <p><img src="../img/ycombinator4.svg" alt="ycombinator4.svg" class="org-svg" />
 </p>
 </div>
@@ -999,26 +1001,16 @@ so if you feel like some explanations could be improved, feel free to
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
-See the <a href="https://en.wikipedia.org/wiki/Lambda_calculus">Wikipedia page</a> for lambda calculus.
-</p></div></div>
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Lambda_calculus">Wikipedia page</a> for lambda calculus.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
-See the <a href="https://en.wikipedia.org/wiki/Extensionality">Wikipedia page</a> for extensionality.
-</p></div></div>
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Extensionality">Wikipedia page</a> for extensionality.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
-See the <a href="https://en.wikipedia.org/wiki/Fixed_point_(mathematics)">Wikipedia page</a> for fixed point.
-</p></div></div>
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Fixed_point_(mathematics)">Wikipedia page</a> for fixed point.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
-See the <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator">Wikipedia page</a> for fixed-point combinator.
-</p></div></div>
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator">Wikipedia page</a> for fixed-point combinator.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">
-See <a href="https://jao.io/blog/2014/08/06/spj-s-y-combinator-in-scheme/">jao.io</a> article about the Y combinator in Scheme, and about how to
-design good websites.
-</p></div></div>
+<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See <a href="https://jao.io/blog/2014/08/06/spj-s-y-combinator-in-scheme/">jao.io</a> article about the Y combinator
+in Scheme, and about how to design good websites.</p></div></div>
 
 
 </div>

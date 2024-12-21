@@ -120,6 +120,7 @@ easier to find.
 Imagine we had the algorithm from the last example. The user is also able to
 tell that the lengths of the strings are proportional, for example:
 
+#+NAME: example1
 #+begin_example
 abcd  -> 1234
 abcde -> 12345
@@ -133,6 +134,7 @@ Our key should have a fixed number of characters, independently of the length of
 the user. Here are some examples on what to avoid, assuming our key length is
 9:
 
+#+NAME: example2
 #+begin_example
 abcd       -> 123400000 (Same as previous example)
 abcd       -> 123412341 (Repetition is easy to tell)

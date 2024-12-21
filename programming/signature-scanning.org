@@ -90,6 +90,7 @@ first, we need to find what we are looking for from cutter.
 
 This is the disassembly of the main function:
 
+#+NAME: fig1
 [[file:../img/signature-scanning1.png]]
 
 As you can see, in =main+0x8= we are loading =0x100= and =4= into the local
@@ -97,6 +98,7 @@ variables, and in =main+0x1c= we are loading them into the registers used for
 function parameters according to the AMD64 System V ABI. In =main+0x20=, we are
 calling =my_func=. Let's double-click it to have a look at the assembly:
 
+#+NAME: fig2
 [[file:../img/signature-scanning2.png]]
 
 Yeah, that looks like our function.
@@ -118,6 +120,7 @@ Some plugins like [[https://hex-rays.com/ida-pro/][IDA]]'s [[https://github.com/
 selection. I decided to use cutter just to show that you only need a
 disassembler.
 
+#+NAME: fig3
 [[file:../img/signature-scanning3.png]]
 
 For our signature, we should use enough bytes to make sure they are unique for

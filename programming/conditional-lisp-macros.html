@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Replacing conditional Lisp primitives with macros</title>
+<meta property="og:title" content="Replacing conditional Lisp primitives with macros" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -362,7 +363,7 @@ will be used to compute the actual value returned by the macro.</li>
 In other words the general process when calling a procedure is:
 </p>
 
-<pre class="example" id="org60d0b2e">
+<pre class="example" id="example1">
 Evaluate arguments -&gt; Bind arguments -&gt; Evaluate body
                       `-----------------------------´
                                  (Apply)
@@ -372,7 +373,7 @@ Evaluate arguments -&gt; Bind arguments -&gt; Evaluate body
 While the process of calling a macro is:
 </p>
 
-<pre class="example" id="org658fdae">
+<pre class="example" id="example2">
 Bind arguments -&gt; Evaluate body -&gt; Evaluate expansion
 `-----------------------------´
             (Expand)

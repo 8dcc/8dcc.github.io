@@ -178,6 +178,7 @@ don't align an already aligned address. Then we subtract the page size to get
 the address of the previous page. For more information see [[https://stackoverflow.com/a/22971450/11715554][this StackOverflow
 answer]].
 
+#+NAME: example1
 #+begin_example
 Ptr:                 0x12345    0b10010001101000101
 Page size:           0x01000    0b00001000000000000
