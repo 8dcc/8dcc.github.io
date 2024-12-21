@@ -127,6 +127,7 @@ For our signature, we should use enough bytes to make sure they are unique for
 the function/variable we are looking for. Here is a signature of the whole
 function, but in practice, we shouldn't need more than 10 instructions.
 
+#+NAME: example1
 #+begin_example
 55 48 89 E5 48 83 EC 10 89 7D FC 89 75 F8 8B 45 F8 3B 45 FC 7F 0C 83 7D F8 00 78
 06 83 7D F8 20 7E 07 B8 ? ? ? ? EB 1F 48 8D 05 ? ? ? ? 48 89 C7 E8 ? ? ? ? 8B 45
@@ -350,6 +351,7 @@ The =/proc/<pid>/= folder contains many useful files, one of them being =maps=. 
 =maps= file shows information about the currently mapped memory regions and their
 access permissions in the following format (without the column names):
 
+#+NAME: example2
 #+begin_example
 address           perms offset  dev   inode       pathname
 ----------------------------------------------------------------------
