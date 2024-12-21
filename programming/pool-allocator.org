@@ -108,9 +108,9 @@ chunks. When we initialize the pool, since all chunks are free, we will use the
 [[file:../img/pool-allocator1.svg]]
 
 The gray area represents the rest of the union that is not used when accessing
-=Chunk.next=, and the last incomplete arrow represents a =NULL= pointer. The
-creation of this linked list, along with its advantages, will be explained when
-[[*Creating the pool][creating the pool]] below.
+=Chunk.next=, and the incomplete red arrow represents a =NULL= pointer. The creation
+of this linked list, along with its advantages, will be explained when [[*Creating the pool][creating
+the pool]] below.
 
 ** The =Pool= structure
 :PROPERTIES:
@@ -263,3 +263,40 @@ user frees the first block of memory.
 
 Notice how, unlike with arena allocators, we don't have to free in the same
 order that we allocated.
+
+* Resizing problems
+:PROPERTIES:
+:CUSTOM_ID: resizing-problems
+:END:
+
+When using a pool allocator, at some point you will probably want to be able to
+resize an existing pool, for example when you run out of chunks. At first sight,
+this could be done in a few simple steps:
+
+1. Reallocate the old chunk array (i.e. =my_pool.chunk_arr=).
+2. Link the new chunks together, just like we did when [[*Creating the pool][creating the pool]].
+3. Prepend the new chunks to the list of free chunks, just like we did when
+   [[*Freeing chunks][freeing a previously-allocated chunk]].
+
+For example, following the [[fig4][previous figure]], if we reallocated the pool to add
+two more chunks, we would (at first sight) get the following layout.
+
+#+NAME: fig5
+#+CAPTION: Layout of a =Pool= structure after resizing it, with two new chunks.
+[[file:../img/pool-allocator5.svg]]
+
+However, there is an important detail that is easy to miss. When we reallocate
+the pool (i.e. the array of chunks), the /base address/ of the pool might change,
+so the address of each chunk will also change. This is a problem because:
+
+1. The old pointers used to build the linked list of free chunks still point to
+   the old array, so they become invalid. There are a few possible fixes for
+   this (e.g. recalculating the offsets from the old /base address/, storing
+   offsets instead of pointers, etc.)
+2. The pointers we returned when the user [[*Allocating chunks][allocated chunks]] also point to the old
+   array, so they are also invalid. If the user tries to access or free these
+   pointers, a segmentation fault might occur.
+
+#+NAME: fig6
+#+CAPTION: Resizing problems: old pointers may become invalid.
+[[file:../img/pool-allocator6.svg]]

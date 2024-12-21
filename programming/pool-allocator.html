@@ -219,6 +219,7 @@
 <li><a href="#freeing-chunks">2.5. Freeing chunks</a></li>
 </ul>
 </li>
+<li><a href="#resizing-problems">3. Resizing problems</a></li>
 </ul>
 </div>
 </div>
@@ -342,9 +343,9 @@ chunks. When we initialize the pool, since all chunks are free, we will use the
 
 <p>
 The gray area represents the rest of the union that is not used when accessing
-<code>Chunk.next</code>, and the last incomplete arrow represents a <code>NULL</code> pointer. The
-creation of this linked list, along with its advantages, will be explained when
-<a href="#creating-the-pool">creating the pool</a> below.
+<code>Chunk.next</code>, and the incomplete red arrow represents a <code>NULL</code> pointer. The creation
+of this linked list, along with its advantages, will be explained when <a href="#creating-the-pool">creating
+the pool</a> below.
 </p>
 </div>
 </div>
@@ -545,6 +546,59 @@ user frees the first block of memory.
 Notice how, unlike with arena allocators, we don&rsquo;t have to free in the same
 order that we allocated.
 </p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-resizing-problems" class="outline-2">
+<h2 id="resizing-problems"><span class="section-number-2">3.</span> Resizing problems</h2>
+<div class="outline-text-2" id="text-resizing-problems">
+<p>
+When using a pool allocator, at some point you will probably want to be able to
+resize an existing pool, for example when you run out of chunks. At first sight,
+this could be done in a few simple steps:
+</p>
+
+<ol class="org-ol">
+<li>Reallocate the old chunk array (i.e. <code>my_pool.chunk_arr</code>).</li>
+<li>Link the new chunks together, just like we did when <a href="#creating-the-pool">creating the pool</a>.</li>
+<li>Prepend the new chunks to the list of free chunks, just like we did when
+<a href="#freeing-chunks">freeing a previously-allocated chunk</a>.</li>
+</ol>
+
+<p>
+For example, following the <a href="#fig4">previous figure</a>, if we reallocated the pool to add
+two more chunks, we would (at first sight) get the following layout.
+</p>
+
+
+<div id="fig5" class="figure">
+<p><img src="../img/pool-allocator5.svg" alt="pool-allocator5.svg" class="org-svg" />
+</p>
+<p><span class="figure-number">Figure 5: </span>Layout of a <code>Pool</code> structure after resizing it, with two new chunks.</p>
+</div>
+
+<p>
+However, there is an important detail that is easy to miss. When we reallocate
+the pool (i.e. the array of chunks), the <i>base address</i> of the pool might change,
+so the address of each chunk will also change. This is a problem because:
+</p>
+
+<ol class="org-ol">
+<li>The old pointers used to build the linked list of free chunks still point to
+the old array, so they become invalid. There are a few possible fixes for
+this (e.g. recalculating the offsets from the old <i>base address</i>, storing
+offsets instead of pointers, etc.)</li>
+<li>The pointers we returned when the user <a href="#allocating-chunks">allocated chunks</a> also point to the old
+array, so they are also invalid. If the user tries to access or free these
+pointers, a segmentation fault might occur.</li>
+</ol>
+
+
+<div id="fig6" class="figure">
+<p><img src="../img/pool-allocator6.svg" alt="pool-allocator6.svg" class="org-svg" />
+</p>
+<p><span class="figure-number">Figure 6: </span>Resizing problems: old pointers may become invalid.</p>
 </div>
 </div>
 </div>
