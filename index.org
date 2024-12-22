@@ -13,6 +13,8 @@ writing articles across my different projects.
 :CUSTOM_ID: current-sections
 :END:
 
+The articles in this blog are spread across the following categories.
+
 - [[file:reversing/index.org][Reverse engineering]]
 - [[file:programming/index.org][Programming]]
 - [[file:opinion/index.org][Opinion]]
@@ -25,13 +27,16 @@ writing articles across my different projects.
 
 These are some articles that I have written across my different projects.
 
-- The [[https://github.com/8dcc/scratch/tree/main/LaTeX][LaTeX folder]] inside my [[https://github.com/8dcc/scratch][scratch]] GitHub repository, has some other articles
-  I have written, and also contains some of my [[https://github.com/8dcc/scratch/blob/main/LaTeX/math/math.pdf][math notes]].
-- The [[https://github.com/8dcc/scratch][scratch]] repository itself is full of small but interesting projects in
-  various languages. All the code is documented.
 - The [[https://github.com/fs-os/fs-os/wiki][fs-os wiki]], explaining the details of [[https://github.com/fs-os/fs-os][my simple operating system]].
 - [[https://github.com/8dcc/bms-cheat/wiki/Hooking-CreateMove][Hooking CreateMove]] in the Source 1 game engine.
 - Finding offsets and [[https://github.com/8dcc/tf2-cheat/wiki/Getting-SDL-offsets][hooking SDL functions]].
+
+See also:
+
+- The [[https://github.com/8dcc/scratch/tree/main/LaTeX][LaTeX folder]] inside my [[https://github.com/8dcc/scratch][scratch]] GitHub repository has some other articles I
+  have written, and also contains some of my [[https://github.com/8dcc/scratch/blob/main/LaTeX/math/math.pdf][math notes]].
+- The [[https://github.com/8dcc/scratch][scratch]] repository itself is full of small but interesting projects in
+  various languages. All the code is documented.
 
 * Other links and contact
 :PROPERTIES:
@@ -41,7 +46,7 @@ These are some articles that I have written across my different projects.
 These are some external links you might find interesting:
 
 - [[https://github.com/8dcc][GitHub]]
-- [[https://github.com/stars/8dcc/lists/my-dope-shit][List of my best repositories]]
+- [[https://github.com/stars/8dcc/lists/my-dope-stuff][List of my best repositories]]
 - [[https://www.codewars.com/users/8dcc][Codewars profile]]
 
 If you want to contact me, write to [[mailto:8dcc.git@gmail.com][8dcc.git@gmail.com]] and try to encrypt your
@@ -56,11 +61,15 @@ Feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this blog
 suggestions.
 
 * License and credits
+:PROPERTIES:
+:CUSTOM_ID: license-and-credits
+:END:
 
 Copyright © 2024 8dcc. All Rights Reserved. The source code and content of this
-website is covered by GNU General Public License as published by the Free
+website is covered by [[https://www.gnu.org/licenses/gpl-3.0.en.html][GNU General Public License]] as published by the Free
 Software Foundation, version 3.
 
 Credits for the LaTeX theme idea: [[https://mell-o-tron.github.io/][Lorenzo Pace's blog]] and [[https://github.com/vincentdoerig/latex-css][LaTeX.css]].
 
+#+NAME: pepper
 [[file:img/pepper.png]]
