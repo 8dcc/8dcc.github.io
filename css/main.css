@@ -130,6 +130,10 @@ a {
     text-decoration-color: rgba(0, 70, 200, 0.2);
 }
 
+a[href^='#'] {
+    text-decoration-style: dashed;
+}
+
 a:hover {
     text-decoration-color: rgb(0, 70, 200);
 }
