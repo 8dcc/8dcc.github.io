@@ -219,7 +219,7 @@
 <li><a href="#freeing-chunks">2.5. Freeing chunks</a></li>
 </ul>
 </li>
-<li><a href="#resizing-problems">3. Resizing problems</a></li>
+<li><a href="#reallocation-problems">3. Reallocation problems</a></li>
 </ul>
 </div>
 </div>
@@ -550,9 +550,9 @@ order that we allocated.
 </div>
 </div>
 
-<div id="outline-container-resizing-problems" class="outline-2">
-<h2 id="resizing-problems"><span class="section-number-2">3.</span> Resizing problems</h2>
-<div class="outline-text-2" id="text-resizing-problems">
+<div id="outline-container-reallocation-problems" class="outline-2">
+<h2 id="reallocation-problems"><span class="section-number-2">3.</span> Reallocation problems</h2>
+<div class="outline-text-2" id="text-reallocation-problems">
 <p>
 When using a pool allocator, at some point you will probably want to be able to
 resize an existing pool, for example when you run out of chunks. At first sight,
@@ -587,8 +587,8 @@ so the address of each chunk will also change. This is a problem because:
 <ol class="org-ol">
 <li>The old pointers used to build the linked list of free chunks still point to
 the old array, so they become invalid. There are a few possible fixes for
-this (e.g. recalculating the offsets from the old <i>base address</i>, storing
-offsets instead of pointers, etc.)</li>
+this, like recalculating the offsets<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup> from the old <i>base address</i>, storing offsets instead of
+pointers, etc.</li>
 <li>The pointers we returned when the user <a href="#allocating-chunks">allocated chunks</a> also point to the old
 array, so they are also invalid. If the user tries to access or free these
 pointers, a segmentation fault might occur.</li>
@@ -608,6 +608,17 @@ pointers to the old array, which is now invalid.
 </div>
 </div>
 </div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">An example of this method, which I
+wrote before I noticed the second problem, can be seen on commit <a href="https://github.com/8dcc/libpool/blob/bb0c8a2352b38066a8b25440ef9047ea19a34ece/src/libpool.c#L194-L240">bb0c8a2</a> of
+my <a href="https://github.com/8dcc">libpool</a> repository. That code doesn&rsquo;t use <code>Chunk</code> unions, so the casts make
+it less readable.</p></div></div>
+
+
 </div>
+</div></div>
 </body>
 </html>

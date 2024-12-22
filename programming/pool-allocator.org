@@ -264,9 +264,9 @@ user frees the first block of memory.
 Notice how, unlike with arena allocators, we don't have to free in the same
 order that we allocated.
 
-* Resizing problems
+* Reallocation problems
 :PROPERTIES:
-:CUSTOM_ID: resizing-problems
+:CUSTOM_ID: reallocation-problems
 :END:
 
 When using a pool allocator, at some point you will probably want to be able to
@@ -291,8 +291,11 @@ so the address of each chunk will also change. This is a problem because:
 
 1. The old pointers used to build the linked list of free chunks still point to
    the old array, so they become invalid. There are a few possible fixes for
-   this (e.g. recalculating the offsets from the old /base address/, storing
-   offsets instead of pointers, etc.)
+   this, like recalculating the offsets[fn::An example of this method, which I
+   wrote before I noticed the second problem, can be seen on commit [[https://github.com/8dcc/libpool/blob/bb0c8a2352b38066a8b25440ef9047ea19a34ece/src/libpool.c#L194-L240][bb0c8a2]] of
+   my [[https://github.com/8dcc][libpool]] repository. That code doesn't use =Chunk= unions, so the casts make
+   it less readable.] from the old /base address/, storing offsets instead of
+   pointers, etc.
 2. The pointers we returned when the user [[*Allocating chunks][allocated chunks]] also point to the old
    array, so they are also invalid. If the user tries to access or free these
    pointers, a segmentation fault might occur.
