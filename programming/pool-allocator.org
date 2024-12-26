@@ -270,8 +270,10 @@ order that we allocated.
 :END:
 
 When using a pool allocator, at some point you will probably want to be able to
-resize an existing pool, for example when you run out of chunks. At first sight,
-this could be done in a few simple steps:
+resize an existing pool, for example when you run out of chunks. This might not
+seem too hard, but there are a few caveats.
+
+At first sight, we could reallocate an a pool with a few simple steps:
 
 1. Reallocate the old chunk array (i.e. =my_pool.chunk_arr=).
 2. Link the new chunks together, just like we did when [[*Creating the pool][creating the pool]].
@@ -286,7 +288,7 @@ two more chunks, we would (at first sight) get the following layout.
 [[file:../img/pool-allocator5.svg]]
 
 However, there is an important detail that is easy to miss. When we reallocate
-the pool (i.e. the array of chunks), the /base address/ of the pool might change,
+the pool (i.e. the array of chunks), the /base address/ of the array might change,
 so the address of each chunk will also change. This is a problem because:
 
 1. The old pointers used to build the linked list of free chunks still point to
@@ -300,9 +302,9 @@ so the address of each chunk will also change. This is a problem because:
    array, so they are also invalid. If the user tries to access or free these
    pointers, a segmentation fault might occur.
 
-This is how the layout will probably look like after resizing. Incomplete
-connections crossed-out with a single line represent invalid (but non-null)
-pointers to the old array, which is now invalid.
+This is how the layout will probably look like after the
+reallocation. Incomplete connections crossed-out with a single line represent
+invalid (but non-null) pointers to the old array, which is now invalid.
 
 #+NAME: fig6
 #+CAPTION: Resizing problems: old pointers may become invalid.
