@@ -167,7 +167,7 @@ Here's a brief explanation of each step:
 
 1. We allocate the =Pool= structure that will be returned, using =malloc=. We could
    use any generic allocation function, not necessarily =malloc=.
-2. We allocate the pool itself, that is, the array of =Chunk= structures. We
+2. We allocate the pool itself, that is, the array of =Chunk= unions. We
    initialize both =chunk_arr= and =free_chunk= pointers to the same address, since
    all chunks will be free by default.
 3. We build the linked list of free chunks. We set the =.next= member of the =Chunk=

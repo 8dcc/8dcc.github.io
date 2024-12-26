@@ -421,7 +421,7 @@ Here&rsquo;s a brief explanation of each step:
 <ol class="org-ol">
 <li>We allocate the <code>Pool</code> structure that will be returned, using <code>malloc</code>. We could
 use any generic allocation function, not necessarily <code>malloc</code>.</li>
-<li>We allocate the pool itself, that is, the array of <code>Chunk</code> structures. We
+<li>We allocate the pool itself, that is, the array of <code>Chunk</code> unions. We
 initialize both <code>chunk_arr</code> and <code>free_chunk</code> pointers to the same address, since
 all chunks will be free by default.</li>
 <li>We build the linked list of free chunks. We set the <code>.next</code> member of the <code>Chunk</code>
