@@ -331,7 +331,10 @@ memory, which is why there is no need for reallocations.
 [[file:../img/pool-allocator7.svg]]
 
 Notice how we have to keep track of the start of each array, since we will need
-to free them separately.
+to free them separately. In the previous figure, we use two =chunk_arr0= and
+=chunk_arr1= members to denote this, but since we would like to allow the user to
+resize the pool an arbitrary number of times, we should be able to keep track of
+an indefinite number of pointers (to the start of the chunk arrays) at runtime.
 
 ** Keeping track of the array starts
 :PROPERTIES:
