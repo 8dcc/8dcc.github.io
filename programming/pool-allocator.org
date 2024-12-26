@@ -451,12 +451,14 @@ void pool_close(Pool* pool) {
 }
 #+end_src
 
-** COMMENT Resizing without modifying the array
+** Resizing without modifying the array
 :PROPERTIES:
 :CUSTOM_ID: comment-resizing-without-modifying-the-array
 :END:
 
-The resizing process is the following:
+Now that we have a way of storing the start addresses of an indefinite number of
+chunk arrays, we can implement the resizing method shown in the [[fig7][previous
+figure]]. The resizing process is the following:
 
 1. Allocate the array of extra chunks that we are trying to add to the pool.
 2. Link the new chunks together, just like we did when [[*Creating the pool][creating the pool]].
@@ -467,7 +469,41 @@ The resizing process is the following:
 5. Prepend this new =LinkedPtr= structure to the linked list of "array starts",
    stored inside the =Pool= structure.
 
-TODO: Code.
+And this is the code corresponding to the previous steps.
+
+#+begin_src C
+bool pool_resize(Pool* pool, size_t extra_chunk_num) {
+    if (pool == NULL || extra_chunk_num == 0)
+        return false;
+
+    /* Step 1 */
+    Chunk* extra_chunk_arr = malloc(extra_chunk_num * sizeof(Chunk));
+    if (extra_chunk_arr == NULL)
+        return false;
+
+    /* Step 2 */
+    for (size_t i = 0; i < extra_chunk_num - 1; i++)
+        extra_chunk_arr[i].next = &extra_chunk_arr[i + 1];
+
+    /* Step 3 */
+    extra_chunk_arr[extra_chunk_num - 1].next = pool->free_chunk;
+    pool->free_chunk                          = extra_chunk_arr;
+
+    /* Step 4 */
+    LinkedPtr* array_start = malloc(sizeof(LinkedPtr));
+    if (array_start == NULL) {
+        free(extra_chunk_arr);
+        return false;
+    }
+
+    /* Step 5 */
+    array_start->ptr   = extra_chunk_arr;
+    array_start->next  = pool->array_starts;
+    pool->array_starts = array_start;
+
+    return true;
+}
+#+end_src
 
 Just like in the [[fig7][previous figure]], the green and blue regions represent arrays
 allocated independently, but their respective =LinkedPtr= structures are also
@@ -476,3 +512,7 @@ included in the diagram.
 #+NAME: fig8
 #+CAPTION: Layout of a pool after resizing, showing the linked list of array starts.
 [[file:../img/pool-allocator8.svg]]
+
+Naturally, this second implementation is able to allocate and free chunks with
+the same /O(1)/ efficiency. The memory impact is /slightly/ bigger, but it's
+probably worth it if you ever want to resize a pool.

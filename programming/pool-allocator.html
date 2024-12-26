@@ -225,6 +225,7 @@
 <ul>
 <li><a href="#keeping-track-of-the-array-starts">4.1. Keeping track of the array starts</a></li>
 <li><a href="#changes-to-pool-new-and-pool-close">4.2. Changes to <code>pool_new</code> and <code>pool_close</code></a></li>
+<li><a href="#comment-resizing-without-modifying-the-array">4.3. Resizing without modifying the array</a></li>
 </ul>
 </li>
 </ul>
@@ -785,6 +786,86 @@ list, freeing each chunk array and each <code>LinkedPtr</code> structure in the 
 }
 </pre>
 </div>
+</div>
+</div>
+
+<div id="outline-container-comment-resizing-without-modifying-the-array" class="outline-3">
+<h3 id="comment-resizing-without-modifying-the-array"><span class="section-number-3">4.3.</span> Resizing without modifying the array</h3>
+<div class="outline-text-3" id="text-comment-resizing-without-modifying-the-array">
+<p>
+Now that we have a way of storing the start addresses of an indefinite number of
+chunk arrays, we can implement the resizing method shown in the <a href="#fig7">previous
+figure</a>. The resizing process is the following:
+</p>
+
+<ol class="org-ol">
+<li>Allocate the array of extra chunks that we are trying to add to the pool.</li>
+<li>Link the new chunks together, just like we did when <a href="#creating-the-pool">creating the pool</a>.</li>
+<li>Prepend the array of extra chunks to the &ldquo;free chunks&rdquo; list, just like we did
+when <a href="#freeing-chunks">freeing chunks</a>.</li>
+<li>Allocate a new <code>LinkedPtr</code> structure, and store the start of the new chunk
+array in it.</li>
+<li>Prepend this new <code>LinkedPtr</code> structure to the linked list of &ldquo;array starts&rdquo;,
+stored inside the <code>Pool</code> structure.</li>
+</ol>
+
+<p>
+And this is the code corresponding to the previous steps.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">pool_resize</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">extra_chunk_num</span>) {
+    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span> || extra_chunk_num == <span style="color: #88ca9f;">0</span>)
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Step 1</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">Chunk</span>* <span style="color: #6ae4b9;">extra_chunk_arr</span> = malloc(extra_chunk_num * <span style="color: #ff6f9f;">sizeof</span>(Chunk));
+    <span style="color: #ff6f9f;">if</span> (extra_chunk_arr == <span style="color: #88ca9f;">NULL</span>)
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Step 2</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; extra_chunk_num - <span style="color: #88ca9f;">1</span>; i++)
+        extra_chunk_arr[i].next = &amp;extra_chunk_arr[i + <span style="color: #88ca9f;">1</span>];
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Step 3</span><span style="color: #989898;"> */</span>
+    extra_chunk_arr[extra_chunk_num - <span style="color: #88ca9f;">1</span>].next = pool-&gt;free_chunk;
+    pool-&gt;free_chunk                          = extra_chunk_arr;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Step 4</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">LinkedPtr</span>* <span style="color: #6ae4b9;">array_start</span> = malloc(<span style="color: #ff6f9f;">sizeof</span>(LinkedPtr));
+    <span style="color: #ff6f9f;">if</span> (array_start == <span style="color: #88ca9f;">NULL</span>) {
+        free(extra_chunk_arr);
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+    }
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Step 5</span><span style="color: #989898;"> */</span>
+    array_start-&gt;ptr   = extra_chunk_arr;
+    array_start-&gt;next  = pool-&gt;array_starts;
+    pool-&gt;array_starts = array_start;
+
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+}
+</pre>
+</div>
+
+<p>
+Just like in the <a href="#fig7">previous figure</a>, the green and blue regions represent arrays
+allocated independently, but their respective <code>LinkedPtr</code> structures are also
+included in the diagram.
+</p>
+
+
+<div id="fig8" class="figure">
+<p><img src="../img/pool-allocator8.svg" alt="pool-allocator8.svg" class="org-svg" />
+</p>
+<p><span class="figure-number">Figure 8: </span>Layout of a pool after resizing, showing the linked list of array starts.</p>
+</div>
+
+<p>
+Naturally, this second implementation is able to allocate and free chunks with
+the same <i>O(1)</i> efficiency. The memory impact is <i>slightly</i> bigger, but it&rsquo;s
+probably worth it if you ever want to resize a pool.
+</p>
 </div>
 </div>
 </div>
