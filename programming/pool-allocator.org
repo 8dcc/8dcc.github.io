@@ -42,9 +42,10 @@ it out as well.
 :CUSTOM_ID: writing-the-initial-implementation
 :END:
 
-The following implementation corresponds to version =v1.0.0= of my =libpool= library
-(linked above). Some improvements could be made, like being able to
-resize/reallocate an existing pool.
+The following implementation corresponds to version [[https://github.com/8dcc/libpool/blob/v1.0.0/src/libpool.c][=v1.0.0=]] of my =libpool=
+library, with some notable "visual" differences explained immediately. Some
+improvements, like being able to resize/reallocate an existing pool, will also
+be expanded [[#second-implementation-resizing-the-pool][below]].
 
 ** The =Chunk= type
 :PROPERTIES:
@@ -120,9 +121,9 @@ the pool]] below.
 We will also declare a =Pool= structure, which simply contains:
 
 1. A pointer to the first element of the linked list of free chunks, which will
-   be used when the user allocates a chunk.
+   be used when the user [[#allocating-chunks][allocates a chunk]].
 2. A pointer to the first element of the chunk array, which will be used when
-   freeing the whole pool.
+   [[*Closing the pool][closing the whole pool]].
 
 #+begin_src C
 typedef struct Pool Pool;
@@ -264,6 +265,25 @@ user frees the first block of memory.
 Notice how, unlike with arena allocators, we don't have to free in the same
 order that we allocated.
 
+** Closing the pool
+:PROPERTIES:
+:CUSTOM_ID: closing-the-pool
+:END:
+
+Finally, once the user is done with the pool itself, it should be able to free
+it to the system. This is also pretty intuitive in this implementation, but it
+will get a bit trickier [[#changes-to-pool-new-and-pool-close][below]].
+
+#+begin_src C
+void pool_close(Pool* pool) {
+    if (pool == NULL)
+        return;
+
+    free(pool->chunk_arr);
+    free(pool);
+}
+#+end_src
+
 * Reallocation problems
 :PROPERTIES:
 :CUSTOM_ID: reallocation-problems
@@ -370,7 +390,7 @@ to the =LinkedPtr= structure itself, and the (unused) =.next= member.
 
 ** COMMENT Resizing without modifying the array
 :PROPERTIES:
-:CUSTOM_ID: resizing-without-modifying-the-array
+:CUSTOM_ID: comment-resizing-without-modifying-the-array
 :END:
 
 The resizing process is the following:
@@ -394,9 +414,9 @@ included in the diagram.
 #+CAPTION: Layout of a pool after resizing, showing the linked list of array starts.
 [[file:../img/pool-allocator8.svg]]
 
-** COMMENT Changes to =pool_new= and =pool_free=
+** COMMENT Changes to =pool_new= and =pool_close=
 :PROPERTIES:
-:CUSTOM_ID: changes-to-pool-new-and-pool-free
+:CUSTOM_ID: changes-to-pool-new-and-pool-close
 :END:
 
 The =pool_new= and =pool_free= functions need to be modified according to our new

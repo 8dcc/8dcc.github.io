@@ -217,12 +217,14 @@
 <li><a href="#creating-the-pool">2.3. Creating the pool</a></li>
 <li><a href="#allocating-chunks">2.4. Allocating chunks</a></li>
 <li><a href="#freeing-chunks">2.5. Freeing chunks</a></li>
+<li><a href="#closing-the-pool">2.6. Closing the pool</a></li>
 </ul>
 </li>
 <li><a href="#reallocation-problems">3. Reallocation problems</a></li>
 <li><a href="#second-implementation-resizing-the-pool">4. Second implementation: Resizing the pool</a>
 <ul>
 <li><a href="#keeping-track-of-the-array-starts">4.1. Keeping track of the array starts</a></li>
+<li><a href="#changes-to-pool-new-and-pool-close">4.2. Changes to <code>pool_new</code> and <code>pool_close</code></a></li>
 </ul>
 </li>
 </ul>
@@ -261,9 +263,10 @@ it out as well.
 <h2 id="writing-the-initial-implementation"><span class="section-number-2">2.</span> Writing the initial implementation</h2>
 <div class="outline-text-2" id="text-writing-the-initial-implementation">
 <p>
-The following implementation corresponds to version <code>v1.0.0</code> of my <code>libpool</code> library
-(linked above). Some improvements could be made, like being able to
-resize/reallocate an existing pool.
+The following implementation corresponds to version <a href="https://github.com/8dcc/libpool/blob/v1.0.0/src/libpool.c"><code>v1.0.0</code></a> of my <code>libpool</code>
+library, with some notable &ldquo;visual&rdquo; differences explained immediately. Some
+improvements, like being able to resize/reallocate an existing pool, will also
+be expanded <a href="#second-implementation-resizing-the-pool">below</a>.
 </p>
 </div>
 
@@ -364,9 +367,9 @@ We will also declare a <code>Pool</code> structure, which simply contains:
 
 <ol class="org-ol">
 <li>A pointer to the first element of the linked list of free chunks, which will
-be used when the user allocates a chunk.</li>
+be used when the user <a href="#allocating-chunks">allocates a chunk</a>.</li>
 <li>A pointer to the first element of the chunk array, which will be used when
-freeing the whole pool.</li>
+<a href="#closing-the-pool">closing the whole pool</a>.</li>
 </ol>
 
 <div class="org-src-container">
@@ -553,6 +556,28 @@ order that we allocated.
 </p>
 </div>
 </div>
+
+<div id="outline-container-closing-the-pool" class="outline-3">
+<h3 id="closing-the-pool"><span class="section-number-3">2.6.</span> Closing the pool</h3>
+<div class="outline-text-3" id="text-closing-the-pool">
+<p>
+Finally, once the user is done with the pool itself, it should be able to free
+it to the system. This is also pretty intuitive in this implementation, but it
+will get a bit trickier <a href="#changes-to-pool-new-and-pool-close">below</a>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">pool_close</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>) {
+    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span>)
+        <span style="color: #ff6f9f;">return</span>;
+
+    free(pool-&gt;chunk_arr);
+    free(pool);
+}
+</pre>
+</div>
+</div>
+</div>
 </div>
 
 <div id="outline-container-reallocation-problems" class="outline-2">
@@ -688,6 +713,16 @@ pointer to the linked list of array starts.
 This takes a bit more space in memory, but it&rsquo;s worth it. Even if we don&rsquo;t
 resize the pool, only the size 2 more pointers would be needed: one that points
 to the <code>LinkedPtr</code> structure itself, and the (unused) <code>.next</code> member.
+</p>
+</div>
+</div>
+
+<div id="outline-container-changes-to-pool-new-and-pool-close" class="outline-3">
+<h3 id="changes-to-pool-new-and-pool-close"><span class="section-number-3">4.2.</span> Changes to <code>pool_new</code> and <code>pool_close</code></h3>
+<div class="outline-text-3" id="text-changes-to-pool-new-and-pool-close">
+<p>
+The <code>pool_new</code> and <code>pool_free</code> functions need to be modified according to our new
+<code>LinkedPtr</code> structure.
 </p>
 </div>
 </div>
