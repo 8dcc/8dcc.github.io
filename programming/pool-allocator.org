@@ -9,7 +9,7 @@
 
 -----
 
-#+TOC: headlines 2
+#+TOC: headlines 3
 
 * Introduction
 :PROPERTIES:
@@ -119,16 +119,16 @@ the pool]] below.
 
 We will also declare a =Pool= structure, which simply contains:
 
-1. A pointer to the first element of the chunk array, which will be used when
-   freeing the whole pool.
-2. A pointer to the first element of the linked list of free chunks, which will
+1. A pointer to the first element of the linked list of free chunks, which will
    be used when the user allocates a chunk.
+2. A pointer to the first element of the chunk array, which will be used when
+   freeing the whole pool.
 
 #+begin_src C
 typedef struct Pool Pool;
 struct Pool {
-    Chunk* chunk_arr;
     Chunk* free_chunk;
+    Chunk* chunk_arr;
 };
 #+end_src
 
@@ -273,7 +273,7 @@ When using a pool allocator, at some point you will probably want to be able to
 resize an existing pool, for example when you run out of chunks. This might not
 seem too hard, but there are a few caveats.
 
-At first sight, we could reallocate an a pool with a few simple steps:
+At first sight, we could /reallocate/ a pool with a few simple steps:
 
 1. Reallocate the old chunk array (i.e. =my_pool.chunk_arr=).
 2. Link the new chunks together, just like we did when [[*Creating the pool][creating the pool]].
@@ -309,3 +309,92 @@ invalid (but non-null) pointers to the old array, which is now invalid.
 #+NAME: fig6
 #+CAPTION: Resizing problems: old pointers may become invalid.
 [[file:../img/pool-allocator6.svg]]
+
+* Second implementation: Resizing the pool
+:PROPERTIES:
+:CUSTOM_ID: second-implementation-resizing-the-pool
+:END:
+
+Instead of /modifying/ the existing chunk array, we can allocate a /new array/ with
+the number of chunks we want to add and prepend them to the linked list of free
+chunks an existing pool. Some important details about this approach will be
+explained below.
+
+The following figure shows how two different =Chunk= arrays could be allocated
+separately. The green area denotes the initial chunk array allocated inside
+=pool_new=, while the blue area denotes a different chunk array allocated when
+resizing the pool. The two arrays don't necessarily have to be adjacent in
+memory, which is why there is no need for reallocations.
+
+#+NAME: fig7
+#+CAPTION: Different chunk arrays after resizing a pool.
+[[file:../img/pool-allocator7.svg]]
+
+Notice how we have to keep track of the start of each array, since we will need
+to free them separately.
+
+** Keeping track of the array starts
+:PROPERTIES:
+:CUSTOM_ID: keeping-track-of-the-array-starts
+:END:
+
+For keeping track of these pointers, we will create another linked list of
+"array starts". We declare a =LinkedPtr= structure which will contain the address
+of the next element in the linked list (or =NULL=), along with the pointer to the
+start of each array.
+
+#+begin_src C
+typedef struct LinkedPtr LinkedPtr;
+struct LinkedPtr {
+    Chunk* ptr;
+    LinkedPtr* next;
+};
+#+end_src
+
+Now, instead of storing a single =Chunk*= in the =Pool= structure, we store a
+pointer to the linked list of array starts.
+
+#+begin_src C
+struct Pool {
+    Chunk* free_chunk;
+    LinkedPtr* array_starts; /* Updated */
+};
+#+end_src
+
+This takes a bit more space in memory, but it's worth it. Even if we don't
+resize the pool, only the size 2 more pointers would be needed: one that points
+to the =LinkedPtr= structure itself, and the (unused) =.next= member.
+
+** COMMENT Resizing without modifying the array
+:PROPERTIES:
+:CUSTOM_ID: resizing-without-modifying-the-array
+:END:
+
+The resizing process is the following:
+
+1. Allocate the array of extra chunks that we are trying to add to the pool.
+2. Link the new chunks together, just like we did when [[*Creating the pool][creating the pool]].
+3. Prepend the array of extra chunks to the "free chunks" list, just like we did
+   when [[*Freeing chunks][freeing chunks]].
+4. Allocate a new =LinkedPtr= structure, and store the start of the new chunk
+   array in it.
+5. Prepend this new =LinkedPtr= structure to the linked list of "array starts",
+   stored inside the =Pool= structure.
+
+TODO: Code.
+
+Just like in the [[fig7][previous figure]], the green and blue regions represent arrays
+allocated independently, but their respective =LinkedPtr= structures are also
+included in the diagram.
+
+#+NAME: fig8
+#+CAPTION: Layout of a pool after resizing, showing the linked list of array starts.
+[[file:../img/pool-allocator8.svg]]
+
+** COMMENT Changes to =pool_new= and =pool_free=
+:PROPERTIES:
+:CUSTOM_ID: changes-to-pool-new-and-pool-free
+:END:
+
+The =pool_new= and =pool_free= functions need to be modified according to our new
+=LinkedPtr= structure.
