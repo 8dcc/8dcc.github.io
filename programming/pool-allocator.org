@@ -43,9 +43,9 @@ it out as well.
 :END:
 
 The following implementation corresponds to version [[https://github.com/8dcc/libpool/blob/v1.0.0/src/libpool.c][=v1.0.0=]] of my =libpool=
-library, with some notable "visual" differences explained immediately. Some
-improvements, like being able to resize/reallocate an existing pool, will also
-be expanded [[#second-implementation-resizing-the-pool][below]].
+library, with some notable "visual" differences (e.g. without ANSI
+restrictions). Some improvements, like being able to resize/reallocate an
+existing pool, will also be expanded [[#second-implementation-resizing-the-pool][below]].
 
 ** The =Chunk= type
 :PROPERTIES:
@@ -388,6 +388,69 @@ This takes a bit more space in memory, but it's worth it. Even if we don't
 resize the pool, only the size 2 more pointers would be needed: one that points
 to the =LinkedPtr= structure itself, and the (unused) =.next= member.
 
+** Changes to =pool_new= and =pool_close=
+:PROPERTIES:
+:CUSTOM_ID: changes-to-pool-new-and-pool-close
+:END:
+
+The =pool_new= and =pool_free= functions need to be modified according to our new
+=LinkedPtr= structure.
+
+When [[*Creating the pool][creating the pool]], instead of storing the base address of the chunk array
+in =pool->chunk_arr=, we will have to allocate a =LinkedPtr= structure and write it
+there.
+
+#+begin_src C
+Pool* pool_new(size_t pool_sz) {
+    Pool* pool = malloc(sizeof(Pool));
+    if (pool == NULL)
+        return NULL;
+
+    Chunk* arr = pool->free_chunk = malloc(pool_sz * sizeof(Chunk));
+    if (arr == NULL) {
+        free(pool);
+        return NULL;
+    }
+
+    for (size_t i = 0; i < pool_sz - 1; i++)
+        arr[i].next = &arr[i + 1];
+    arr[pool_sz - 1].next = NULL;
+
+    /* Added */
+    pool->array_starts = malloc(sizeof(LinkedPtr));
+    if (pool->array_starts == NULL) {
+        free(arr);
+        free(pool);
+        return NULL;
+    }
+
+    pool->array_starts->next = NULL;
+    pool->array_starts->ptr  = arr;
+
+    return pool;
+}
+#+end_src
+
+When [[#closing-the-pool][closing the pool]], we will also need to traverse this =array_starts= linked
+list, freeing each chunk array and each =LinkedPtr= structure in the list.
+
+#+begin_src C
+void pool_close(Pool* pool) {
+    if (pool == NULL)
+        return;
+
+    LinkedPtr* linkedptr = pool->array_starts;
+    while (linkedptr != NULL) {
+        LinkedPtr* next = linkedptr->next;
+        free(linkedptr->ptr);
+        free(linkedptr);
+        linkedptr = next;
+    }
+
+    free(pool);
+}
+#+end_src
+
 ** COMMENT Resizing without modifying the array
 :PROPERTIES:
 :CUSTOM_ID: comment-resizing-without-modifying-the-array
@@ -413,11 +476,3 @@ included in the diagram.
 #+NAME: fig8
 #+CAPTION: Layout of a pool after resizing, showing the linked list of array starts.
 [[file:../img/pool-allocator8.svg]]
-
-** COMMENT Changes to =pool_new= and =pool_close=
-:PROPERTIES:
-:CUSTOM_ID: changes-to-pool-new-and-pool-close
-:END:
-
-The =pool_new= and =pool_free= functions need to be modified according to our new
-=LinkedPtr= structure.

@@ -264,9 +264,9 @@ it out as well.
 <div class="outline-text-2" id="text-writing-the-initial-implementation">
 <p>
 The following implementation corresponds to version <a href="https://github.com/8dcc/libpool/blob/v1.0.0/src/libpool.c"><code>v1.0.0</code></a> of my <code>libpool</code>
-library, with some notable &ldquo;visual&rdquo; differences explained immediately. Some
-improvements, like being able to resize/reallocate an existing pool, will also
-be expanded <a href="#second-implementation-resizing-the-pool">below</a>.
+library, with some notable &ldquo;visual&rdquo; differences (e.g. without ANSI
+restrictions). Some improvements, like being able to resize/reallocate an
+existing pool, will also be expanded <a href="#second-implementation-resizing-the-pool">below</a>.
 </p>
 </div>
 
@@ -724,6 +724,67 @@ to the <code>LinkedPtr</code> structure itself, and the (unused) <code>.next</co
 The <code>pool_new</code> and <code>pool_free</code> functions need to be modified according to our new
 <code>LinkedPtr</code> structure.
 </p>
+
+<p>
+When <a href="#creating-the-pool">creating the pool</a>, instead of storing the base address of the chunk array
+in <code>pool-&gt;chunk_arr</code>, we will have to allocate a <code>LinkedPtr</code> structure and write it
+there.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">Pool</span>* <span style="color: #4ae2ff;">pool_new</span>(<span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">pool_sz</span>) {
+    <span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span> = malloc(<span style="color: #ff6f9f;">sizeof</span>(Pool));
+    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span>)
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+
+    <span style="color: #79a8ff;">Chunk</span>* <span style="color: #6ae4b9;">arr</span> = pool-&gt;free_chunk = malloc(pool_sz * <span style="color: #ff6f9f;">sizeof</span>(Chunk));
+    <span style="color: #ff6f9f;">if</span> (arr == <span style="color: #88ca9f;">NULL</span>) {
+        free(pool);
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+    }
+
+    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; pool_sz - <span style="color: #88ca9f;">1</span>; i++)
+        arr[i].next = &amp;arr[i + <span style="color: #88ca9f;">1</span>];
+    arr[pool_sz - <span style="color: #88ca9f;">1</span>].next = <span style="color: #88ca9f;">NULL</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Added</span><span style="color: #989898;"> */</span>
+    pool-&gt;array_starts = malloc(<span style="color: #ff6f9f;">sizeof</span>(LinkedPtr));
+    <span style="color: #ff6f9f;">if</span> (pool-&gt;array_starts == <span style="color: #88ca9f;">NULL</span>) {
+        free(arr);
+        free(pool);
+        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+    }
+
+    pool-&gt;array_starts-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+    pool-&gt;array_starts-&gt;ptr  = arr;
+
+    <span style="color: #ff6f9f;">return</span> pool;
+}
+</pre>
+</div>
+
+<p>
+When <a href="#closing-the-pool">closing the pool</a>, we will also need to traverse this <code>array_starts</code> linked
+list, freeing each chunk array and each <code>LinkedPtr</code> structure in the list.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">pool_close</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>) {
+    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span>)
+        <span style="color: #ff6f9f;">return</span>;
+
+    <span style="color: #79a8ff;">LinkedPtr</span>* <span style="color: #6ae4b9;">linkedptr</span> = pool-&gt;array_starts;
+    <span style="color: #ff6f9f;">while</span> (linkedptr != <span style="color: #88ca9f;">NULL</span>) {
+        <span style="color: #79a8ff;">LinkedPtr</span>* <span style="color: #6ae4b9;">next</span> = linkedptr-&gt;next;
+        free(linkedptr-&gt;ptr);
+        free(linkedptr);
+        linkedptr = next;
+    }
+
+    free(pool);
+}
+</pre>
+</div>
 </div>
 </div>
 </div>
