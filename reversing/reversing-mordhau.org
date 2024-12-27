@@ -1,15 +1,10 @@
 #+TITLE: Mordhau: From reversing Unreal Engine 4 to breaking animations
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Introduction
 :PROPERTIES:
@@ -30,6 +25,7 @@ There was a time where you could do a lot of funny glitches, like
 [[https://www.youtube.com/watch?v=_eaOfSUGv70][flying around]]. This was by far when I had the most fun with people. The game
 was so broken that you could fly anywhere, clip into stuff, and do much more.
 
+#+NAME: fig1
 [[file:../img/mordhau1.jpg]]
 
 You might think that people were using it to take advantage of people, but that
@@ -41,6 +37,7 @@ However, they ended up patching most of the funny glitches, and even removing
 vote-kicks entirely. You could still clip into stuff and do other glitches,
 since the developers did such a bad job, but it was not the same.
 
+#+NAME: fig2
 [[file:../img/mordhau2.jpg]]
 
 The game is only available for Windows (and consoles), but you can still run it
@@ -71,6 +68,7 @@ cheat* in their game. Years ago I noticed that they published an update with a
 it quickly after noticing, because I /obviously/ thought it was a mistake. Well,
 let's have a look at the binaries folder now.
 
+#+NAME: fig3
 [[file:../img/mordhau3.png]]
 
 There it is, the third file on the list. They have been shipping the debugging
@@ -132,6 +130,7 @@ before starting reversing the game. In the end, it was a jealous kid who
 reported my account because I wouldn't tell him how to [[https://en.wikipedia.org/wiki/T-pose][T-pose]] in game. They
 immediately banned me exclusively based on my screenshots.
 
+#+NAME: fig4
 [[file:../img/mordhau4.png]]
 
 Anyhow, this is good news, since now I am able to explain the reverse
@@ -169,6 +168,7 @@ First, open the /Strings/ subview with /View > Open subviews > Strings/, or by
 pressing =Shift+F12=. From there, right click on the string list and press
 /Setup/. Make sure all C-style string types are allowed.
 
+#+NAME: fig5
 [[file:../img/mordhau5.png]]
 
 You can then press =Ctrl+F= in the /Strings/ view to search for strings.
@@ -181,11 +181,13 @@ You can then press =Ctrl+F= in the /Strings/ view to search for strings.
 Search for the string =MulticastDelegateProperty=, and choose the one with C type,
 not 16-bits.
 
+#+NAME: fig6
 [[file:../img/mordhau6.png]]
 
 Double-click the string, then open the cross-references window by right-clicking
 the =aMulticastdeleg= symbol, or by pressing the =x= key. Jump to its only xref.
 
+#+NAME: fig7
 [[file:../img/mordhau7.png]]
 
 You are now in a big subroutine that handles a lot of strings. I opened the
@@ -193,6 +195,7 @@ decompiler window so it's easier to tell what's going on, but it's not
 necessary. From the assembly view, scroll to the top of the subroutine and list
 its cross references.
 
+#+NAME: fig8
 [[file:../img/mordhau8.png]]
 
 Jump to the first one, the /Direction/ of the xref should be /Up/. The function
@@ -200,6 +203,7 @@ where the =MulticastDelegateProperty= string was located is being called with th
 =GNames= structure as its argument, so we should be looking for something like
 this.
 
+#+NAME: fig9
 [[file:../img/mordhau9.png]]
 
 As you can see, the address of =stru_57BEE80= is being loaded into =rcx=, which
@@ -219,6 +223,7 @@ NOTE: Feel free to make a PR if the information about absolute/relative offsets
 and the ImageBase is not accurate.
 #+end_comment
 
+#+NAME: fig10
 [[file:../img/mordhau10.png]]
 
 ** Finding =GObjects=
@@ -230,6 +235,7 @@ Search for the string =CloseDisregardForGC=, and jump to its only xref. In the
 assembly, you will see that the string is being used as a function
 parameter.
 
+#+NAME: fig11
 [[file:../img/mordhau11.png]]
 
 Right before that function call, you can see that it's checking for a
@@ -257,6 +263,7 @@ will get the offset of =GObjects=. Again, remember to also subtract the =ImageBa
 Search for the string =Failed to load package '%s' into a new game world.=, and
 jump to its only xref. Once you are in the subroutine, press =F5= to decompile it.
 
+#+NAME: fig12
 [[file:../img/mordhau12.png]]
 
 In this case, we were lucky and the function call with our string has no labels
@@ -333,6 +340,7 @@ the introduction, if you are running the game in GNU/Linux through Proton, you
 will need to use some kind of [[https://github.com/jcnils/protonhax][tool]] to run the dumper under the same wine prefix
 as Mordhau.
 
+#+NAME: fig13
 [[file:../img/mordhau13.png]]
 
 Enter any project name and the name of the Mordhau executable. Again, remember
@@ -340,12 +348,14 @@ this is not =Mordhau.exe= but =Mordhau-Win64-Shipping.exe=. When you have done t
 press "Dump Game". If your offsets were correct, you should see something like
 this.
 
+#+NAME: fig14
 [[file:../img/mordhau14.png]]
 
 Once it's done loading, you can start inspecting the game live. Press "Live
 editor" on the top bar, then the "Add Inspector" button, then switch to the "Add
 Offset" tab, select =UWorld=, and enter any display name.
 
+#+NAME: fig15
 [[file:../img/mordhau15.png]]
 
 After pressing "Add", you should be able to see the structures in a nice
@@ -481,21 +491,39 @@ And more importantly, get creative. I found all this stuff by trial and error.
 
 Since my account was banned, I decided to upload my funniest screenshots here.
 
+#+NAME: fig16
 [[file:../img/mordhau-ss1.jpg]]
+#+NAME: fig17
 [[file:../img/mordhau-ss2.jpg]]
+#+NAME: fig18
 [[file:../img/mordhau-ss3.jpg]]
+#+NAME: fig19
 [[file:../img/mordhau-ss4.jpg]]
+#+NAME: fig20
 [[file:../img/mordhau-ss5.jpg]]
+#+NAME: fig21
 [[file:../img/mordhau-ss6.jpg]]
+#+NAME: fig22
 [[file:../img/mordhau-ss7.jpg]]
+#+NAME: fig23
 [[file:../img/mordhau-ss8.jpg]]
+#+NAME: fig24
 [[file:../img/mordhau-ss9.jpg]]
+#+NAME: fig25
 [[file:../img/mordhau-ss10.jpg]]
+#+NAME: fig26
 [[file:../img/mordhau-ss11.jpg]]
+#+NAME: fig27
 [[file:../img/mordhau-ss12.jpg]]
+#+NAME: fig28
 [[file:../img/mordhau-ss13.jpg]]
+#+NAME: fig29
 [[file:../img/mordhau-ss14.jpg]]
+#+NAME: fig30
 [[file:../img/mordhau-ss15.jpg]]
+#+NAME: fig31
 [[file:../img/mordhau-ss16.jpg]]
+#+NAME: fig32
 [[file:../img/mordhau-ss17.jpg]]
+#+NAME: fig33
 [[file:../img/mordhau-ss18.jpg]]

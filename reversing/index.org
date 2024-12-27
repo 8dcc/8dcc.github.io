@@ -4,10 +4,8 @@
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]]
-
------
+#+HTML_LINK_UP: ../index.html
+#+HTML_LINK_HOME: ../index.html
 
 * List of articles
 :PROPERTIES:

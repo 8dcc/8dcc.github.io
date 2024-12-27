@@ -1,15 +1,10 @@
 #+TITLE: Reversing TF2's bSendPacket
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Introduction
 :PROPERTIES:
@@ -70,6 +65,7 @@ Let's have a look at where this is called by looking at the [[https://github.com
 
 So, in order, the calls would be the following:
 
+#+NAME: example1
 #+begin_example text
 CL_Move()  ->  CHLClient::CreateMove()  ->  CInput::CreateMove()  ->  ClientModeShared::CreateMove()
 #+end_example
@@ -104,6 +100,7 @@ Let's look at the *old 32-bit binary* from IDA. If we open =engine.so=, where
 that it uses, and jumping to their xrefs. Then, we can hit the almighty =F5= key
 to decompile the function.
 
+#+NAME: fig1
 [[file:../img/bsendpacket1.png]]
 
 I renamed the variables on the decompiler window (right split), but it should be
@@ -142,11 +139,13 @@ caused me a lot of unusual trouble before.
 Let's have a look at =CL_Move= after the 64-bit update. Again, we search for
 strings and check the xrefs.
 
+#+NAME: fig2
 [[file:../img/bsendpacket2.png]]
 
 We can see that it's moving moving =ebx= (=v3=) into =r12d= (=bSendPacket=), but how do
 we know that it's setting it to true?  Let's scroll up a bit.
 
+#+NAME: fig3
 [[file:../img/bsendpacket3.png]]
 
 As you can see, it's moving the value returned by =sub_5376C0= (=eax=) into =ebx=. If
@@ -221,6 +220,7 @@ looking at the strings in surrounding functions from the VMT.
 After a bit of decompiling, we can find that it's on index 21 (since
 =(0x26B2178-0x26B20D0)/8= is 21).
 
+#+NAME: fig4
 [[file:../img/bsendpacket4.png]]
 
 As you can see, it matches the source of [[https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4d0958e52236ecc28a956/tf2_src/game/client/cdll_client_int.cpp#L1448][=CHLClient::CreateMove=]]. We can
@@ -229,6 +229,7 @@ probably tell that =off_2D65868[0]= is =CInput=, since it's also passing it as t
 
 If we look at the actual disassembly, we find some bad news.
 
+#+NAME: fig5
 [[file:../img/bsendpacket5.png]]
 
 Indeed, the =r12= register is being pushed to the stack and then used as a local
@@ -248,6 +249,7 @@ check out my [[file:understanding-call-stack.org][Understanding and traversing t
 
 Just as a reminder, this is how =ClientModeShared::CreateMove()= is called.
 
+#+NAME: example2
 #+begin_example text
 CL_Move()  ->  CHLClient::CreateMove()  ->  CInput::CreateMove()  ->  ClientModeShared::CreateMove()
 #+end_example
@@ -271,6 +273,7 @@ We will have to keep in mind 3 things:
 
 I have highlighted the important instructions.
 
+#+NAME: fig6
 [[file:../img/bsendpacket6.png]]
 
 After the first push, =r12= is at =[rsp]=. After the second, at =[rsp + 0x8]=. Then,
@@ -291,6 +294,7 @@ This function is longer, so first we will analyze the pushed registers and the
 allocated space, and then we will try to find the call to
 =ClientModeShared::CreateMove= from the decompiler window.
 
+#+NAME: fig7
 [[file:../img/bsendpacket7.png]]
 
 It pushes a total of 6 registers, since each is 8 bytes, we can add 0x30 to the
@@ -302,6 +306,7 @@ previous. After the subtraction, =bSendPacket= is at =[rsp + 0xF0]=.
 We can decompile the function and look for the call to
 =ClientModeShared::CreateMove= from there.
 
+#+NAME: fig8
 [[file:../img/bsendpacket8.png]]
 
 Since the function is too large, you will just have to trust me. There were no
@@ -405,8 +410,10 @@ we should start lagging and we should get a timeout.
 
 We join a game, inject, and...
 
+#+NAME: fig9
 [[file:../img/slomo.gif]]
 
+#+NAME: fig10
 [[file:../img/bsendpacket9.png]]
 
 Note that we don't need to change *anything* related to the code that used the old

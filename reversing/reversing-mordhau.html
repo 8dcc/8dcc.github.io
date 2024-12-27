@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mordhau: From reversing Unreal Engine 4 to breaking animations</title>
+<meta property="og:title" content="Mordhau: From reversing Unreal Engine 4 to breaking animations" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -196,14 +197,10 @@
 <link rel="stylesheet" type="text/css" href="../css/main.css" />
 </head>
 <body>
-<div id="content" class="content">
+<div id="org-div-home-and-up">
+  <a accesskey="u" href="index.html">Up</a> | <a accesskey="h" href="../index.html">Home</a>
+</div><div id="content" class="content">
 <h1 class="title">Mordhau: From reversing Unreal Engine 4 to breaking animations</h1>
-<p>
-<a href="../index.html">Index</a> | <a href="index.html">Up</a>
-</p>
-
-<hr />
-
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
@@ -251,7 +248,7 @@ was so broken that you could fly anywhere, clip into stuff, and do much more.
 </p>
 
 
-<div id="orgd5a96d7" class="figure">
+<div id="fig1" class="figure">
 <p><img src="../img/mordhau1.jpg" alt="mordhau1.jpg" />
 </p>
 </div>
@@ -270,7 +267,7 @@ since the developers did such a bad job, but it was not the same.
 </p>
 
 
-<div id="orge8e79c6" class="figure">
+<div id="fig2" class="figure">
 <p><img src="../img/mordhau2.jpg" alt="mordhau2.jpg" />
 </p>
 </div>
@@ -314,7 +311,7 @@ let&rsquo;s have a look at the binaries folder now.
 </p>
 
 
-<div id="orgb0e08a6" class="figure">
+<div id="fig3" class="figure">
 <p><img src="../img/mordhau3.png" alt="mordhau3.png" />
 </p>
 </div>
@@ -399,7 +396,7 @@ immediately banned me exclusively based on my screenshots.
 </p>
 
 
-<div id="org468606d" class="figure">
+<div id="fig4" class="figure">
 <p><img src="../img/mordhau4.png" alt="mordhau4.png" />
 </p>
 </div>
@@ -452,7 +449,7 @@ pressing <code>Shift+F12</code>. From there, right click on the string list and 
 </p>
 
 
-<div id="org85586e6" class="figure">
+<div id="fig5" class="figure">
 <p><img src="../img/mordhau5.png" alt="mordhau5.png" />
 </p>
 </div>
@@ -472,7 +469,7 @@ not 16-bits.
 </p>
 
 
-<div id="org9074a26" class="figure">
+<div id="fig6" class="figure">
 <p><img src="../img/mordhau6.png" alt="mordhau6.png" />
 </p>
 </div>
@@ -483,7 +480,7 @@ the <code>aMulticastdeleg</code> symbol, or by pressing the <code>x</code> key. 
 </p>
 
 
-<div id="org96cab3f" class="figure">
+<div id="fig7" class="figure">
 <p><img src="../img/mordhau7.png" alt="mordhau7.png" />
 </p>
 </div>
@@ -496,7 +493,7 @@ its cross references.
 </p>
 
 
-<div id="org4560bfd" class="figure">
+<div id="fig8" class="figure">
 <p><img src="../img/mordhau8.png" alt="mordhau8.png" />
 </p>
 </div>
@@ -509,7 +506,7 @@ this.
 </p>
 
 
-<div id="org032e850" class="figure">
+<div id="fig9" class="figure">
 <p><img src="../img/mordhau9.png" alt="mordhau9.png" />
 </p>
 </div>
@@ -531,7 +528,7 @@ prompt.
 </p>
 
 
-<div id="org8788c5e" class="figure">
+<div id="fig10" class="figure">
 <p><img src="../img/mordhau10.png" alt="mordhau10.png" />
 </p>
 </div>
@@ -548,7 +545,7 @@ parameter.
 </p>
 
 
-<div id="orged2acfd" class="figure">
+<div id="fig11" class="figure">
 <p><img src="../img/mordhau11.png" alt="mordhau11.png" />
 </p>
 </div>
@@ -586,7 +583,7 @@ jump to its only xref. Once you are in the subroutine, press <code>F5</code> to 
 </p>
 
 
-<div id="org84cd2b5" class="figure">
+<div id="fig12" class="figure">
 <p><img src="../img/mordhau12.png" alt="mordhau12.png" />
 </p>
 </div>
@@ -612,7 +609,7 @@ function might look something like this:
   <span style="color: #989898;">// </span><span style="color: #989898;">Label mess, qword gets assigned somewhere over here</span>
 
 <span style="color: #88ca9f;">LABEL_123</span>:
-  sub_1822B30(&amp;PerformanceCount, L<span style="color: #00d3d0;">"Failed to load package '%s' into a new game world."</span>, v124);
+  sub_1822B30(&amp;PerformanceCount, L<span style="color: #00d3d0;">"Failed to load package '</span><span style="color: #ff6f9f;">%s</span><span style="color: #00d3d0;">' into a new game world."</span>, v124);
   <span style="color: #ff6f9f;">if</span> ( v6 == &amp;PerformanceCount )
   {
       v7 = PerformanceCount;
@@ -687,7 +684,7 @@ as Mordhau.
 </p>
 
 
-<div id="org8683883" class="figure">
+<div id="fig13" class="figure">
 <p><img src="../img/mordhau13.png" alt="mordhau13.png" />
 </p>
 </div>
@@ -700,7 +697,7 @@ this.
 </p>
 
 
-<div id="orgabce5bd" class="figure">
+<div id="fig14" class="figure">
 <p><img src="../img/mordhau14.png" alt="mordhau14.png" />
 </p>
 </div>
@@ -712,7 +709,7 @@ Offset&rdquo; tab, select <code>UWorld</code>, and enter any display name.
 </p>
 
 
-<div id="org5334e22" class="figure">
+<div id="fig15" class="figure">
 <p><img src="../img/mordhau15.png" alt="mordhau15.png" />
 </p>
 </div>
@@ -863,26 +860,96 @@ And more importantly, get creative. I found all this stuff by trial and error.
 Since my account was banned, I decided to upload my funniest screenshots here.
 </p>
 
-<p>
-<img src="../img/mordhau-ss1.jpg" alt="mordhau-ss1.jpg" />
-<img src="../img/mordhau-ss2.jpg" alt="mordhau-ss2.jpg" />
-<img src="../img/mordhau-ss3.jpg" alt="mordhau-ss3.jpg" />
-<img src="../img/mordhau-ss4.jpg" alt="mordhau-ss4.jpg" />
-<img src="../img/mordhau-ss5.jpg" alt="mordhau-ss5.jpg" />
-<img src="../img/mordhau-ss6.jpg" alt="mordhau-ss6.jpg" />
-<img src="../img/mordhau-ss7.jpg" alt="mordhau-ss7.jpg" />
-<img src="../img/mordhau-ss8.jpg" alt="mordhau-ss8.jpg" />
-<img src="../img/mordhau-ss9.jpg" alt="mordhau-ss9.jpg" />
-<img src="../img/mordhau-ss10.jpg" alt="mordhau-ss10.jpg" />
-<img src="../img/mordhau-ss11.jpg" alt="mordhau-ss11.jpg" />
-<img src="../img/mordhau-ss12.jpg" alt="mordhau-ss12.jpg" />
-<img src="../img/mordhau-ss13.jpg" alt="mordhau-ss13.jpg" />
-<img src="../img/mordhau-ss14.jpg" alt="mordhau-ss14.jpg" />
-<img src="../img/mordhau-ss15.jpg" alt="mordhau-ss15.jpg" />
-<img src="../img/mordhau-ss16.jpg" alt="mordhau-ss16.jpg" />
-<img src="../img/mordhau-ss17.jpg" alt="mordhau-ss17.jpg" />
-<img src="../img/mordhau-ss18.jpg" alt="mordhau-ss18.jpg" />
+
+<div id="fig16" class="figure">
+<p><img src="../img/mordhau-ss1.jpg" alt="mordhau-ss1.jpg" />
 </p>
+</div>
+
+<div id="fig17" class="figure">
+<p><img src="../img/mordhau-ss2.jpg" alt="mordhau-ss2.jpg" />
+</p>
+</div>
+
+<div id="fig18" class="figure">
+<p><img src="../img/mordhau-ss3.jpg" alt="mordhau-ss3.jpg" />
+</p>
+</div>
+
+<div id="fig19" class="figure">
+<p><img src="../img/mordhau-ss4.jpg" alt="mordhau-ss4.jpg" />
+</p>
+</div>
+
+<div id="fig20" class="figure">
+<p><img src="../img/mordhau-ss5.jpg" alt="mordhau-ss5.jpg" />
+</p>
+</div>
+
+<div id="fig21" class="figure">
+<p><img src="../img/mordhau-ss6.jpg" alt="mordhau-ss6.jpg" />
+</p>
+</div>
+
+<div id="fig22" class="figure">
+<p><img src="../img/mordhau-ss7.jpg" alt="mordhau-ss7.jpg" />
+</p>
+</div>
+
+<div id="fig23" class="figure">
+<p><img src="../img/mordhau-ss8.jpg" alt="mordhau-ss8.jpg" />
+</p>
+</div>
+
+<div id="fig24" class="figure">
+<p><img src="../img/mordhau-ss9.jpg" alt="mordhau-ss9.jpg" />
+</p>
+</div>
+
+<div id="fig25" class="figure">
+<p><img src="../img/mordhau-ss10.jpg" alt="mordhau-ss10.jpg" />
+</p>
+</div>
+
+<div id="fig26" class="figure">
+<p><img src="../img/mordhau-ss11.jpg" alt="mordhau-ss11.jpg" />
+</p>
+</div>
+
+<div id="fig27" class="figure">
+<p><img src="../img/mordhau-ss12.jpg" alt="mordhau-ss12.jpg" />
+</p>
+</div>
+
+<div id="fig28" class="figure">
+<p><img src="../img/mordhau-ss13.jpg" alt="mordhau-ss13.jpg" />
+</p>
+</div>
+
+<div id="fig29" class="figure">
+<p><img src="../img/mordhau-ss14.jpg" alt="mordhau-ss14.jpg" />
+</p>
+</div>
+
+<div id="fig30" class="figure">
+<p><img src="../img/mordhau-ss15.jpg" alt="mordhau-ss15.jpg" />
+</p>
+</div>
+
+<div id="fig31" class="figure">
+<p><img src="../img/mordhau-ss16.jpg" alt="mordhau-ss16.jpg" />
+</p>
+</div>
+
+<div id="fig32" class="figure">
+<p><img src="../img/mordhau-ss17.jpg" alt="mordhau-ss17.jpg" />
+</p>
+</div>
+
+<div id="fig33" class="figure">
+<p><img src="../img/mordhau-ss18.jpg" alt="mordhau-ss18.jpg" />
+</p>
+</div>
 </div>
 </div>
 </div>

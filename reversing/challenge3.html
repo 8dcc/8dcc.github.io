@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Challenge 3</title>
+<meta property="og:title" content="Challenge 3" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -196,14 +197,10 @@
 <link rel="stylesheet" type="text/css" href="../css/main.css" />
 </head>
 <body>
-<div id="content" class="content">
+<div id="org-div-home-and-up">
+  <a accesskey="u" href="index.html">Up</a> | <a accesskey="h" href="../index.html">Home</a>
+</div><div id="content" class="content">
 <h1 class="title">Challenge 3</h1>
-<p>
-<a href="../index.html">Index</a> | <a href="index.html">Up</a>
-</p>
-
-<hr />
-
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
@@ -305,7 +302,7 @@ order) for passing as follows:
 
 <p>
 After that, it shifts the value in the <code>edx</code> register (the function argument) 1
-bit to the right, and OR's it with the original unshifted value from <code>edi</code>.
+bit to the right, and OR&rsquo;s it with the original unshifted value from <code>edi</code>.
 </p>
 
 <div class="org-src-container">
@@ -315,8 +312,8 @@ bit to the right, and OR's it with the original unshifted value from <code>edi</
 </div>
 
 <p>
-Next, it moves the OR'd value to <code>eax</code>, and shifts it again 2 bits to the
-right. Then it OR's them back into <code>eax</code>.
+Next, it moves the OR&rsquo;d value to <code>eax</code>, and shifts it again 2 bits to the
+right. Then it OR&rsquo;s them back into <code>eax</code>.
 </p>
 
 <div class="org-src-container">
@@ -346,7 +343,7 @@ It repeats that same process, duplicating the number of bits shifted every time:
 </div>
 
 <p>
-Let's have a look at what this is doing to the bits of our input:
+Let&rsquo;s have a look at what this is doing to the bits of our input:
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -414,7 +411,7 @@ every bit from there will be set.
 </p>
 
 
-<div id="orgf98dc47" class="figure">
+<div id="fig1" class="figure">
 <p><img src="../img/slomo.gif" alt="slomo.gif" />
 </p>
 </div>
@@ -476,14 +473,14 @@ element. In this case, 4 bytes, since the exercise specifies that they are
 </div>
 
 <p>
-So, what's the item at position 62 in our array? Turns out it's zero.
+So, what&rsquo;s the item at position 62 in our array? Turns out it&rsquo;s zero.
 </p>
 
 <p>
-Let's try to use another number to see how it changes:
+Let&rsquo;s try to use another number to see how it changes:
 </p>
 
-<pre class="example" id="orgb126f38">
+<pre class="example" id="example1">
 Initial number:            0x000F0055  0b00000000000011110000000001010101
 After shifting and ORing:  0x000FFFFF  0b00000000000011111111111111111111
 After the multiplication:  0xEC1520F3  0b11101100000101010010000011110011
@@ -492,7 +489,7 @@ Number at that index:      12
 </pre>
 
 <p>
-It looks like it's calculating the position of the first set bit starting from
+It looks like it&rsquo;s calculating the position of the first set bit starting from
 the left (starting from zero). Or, in other words, the number of cleared bits
 after the first <i>Shift + OR</i> step.
 </p>
@@ -515,7 +512,7 @@ bits of a double word</b>. See <a href="#more-information">More information</a>.
 <h2 id="c-version"><span class="section-number-2">3.</span> C version</h2>
 <div class="outline-text-2" id="text-c-version">
 <p>
-I made a similar version, but it's not exactly a <i>translation</i> since I am using a
+I made a similar version, but it&rsquo;s not exactly a <i>translation</i> since I am using a
 <code>for</code> loop instead of copying and pasting the <i>Shift + OR</i> code 5 times.
 </p>
 
@@ -543,7 +540,7 @@ I made a similar version, but it's not exactly a <i>translation</i> since I am u
     <span style="color: #ff6f9f;">return</span> v[tmp];
 }
 
-<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PRINT_EXPR</span>(<span style="color: #6ae4b9;">E</span>) printf(<span style="color: #00d3d0;">"%s -&gt; %d\n"</span>, #E, E)
+<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PRINT_EXPR</span>(<span style="color: #6ae4b9;">E</span>) printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%s</span><span style="color: #00d3d0;"> -&gt; </span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, #E, E)
 
 <span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
     PRINT_EXPR(func(<span style="color: #88ca9f;">0x80000000</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">0</span><span style="color: #989898;"> */</span>
@@ -573,7 +570,7 @@ least significant bit position.
 </blockquote>
 
 <p>
-From <a href="https://αβγ.ελ/math-notes.pdf">Dennis' math notes</a>:
+From <a href="https://αβγ.ελ/math-notes.pdf">Dennis&rsquo; math notes</a>:
 </p>
 
 <blockquote>
@@ -589,7 +586,7 @@ the left of most significant 1 bit are not touched.
 </p>
 
 <p>
-It's possible to add 1 to resulting number, so it will becomes 0x2000 or
+It&rsquo;s possible to add 1 to resulting number, so it will becomes 0x2000 or
 0x20000000, but in fact, since multiplication by magic number is used, these
 numbers are very close to each other, so there is no error.
 </p>
@@ -605,7 +602,7 @@ to google it, for the sake of exercise.
 
 <p>
 The code is tricky after all, and the moral of the exercise is that practicing
-reverse engineer sometimes may just observe input/outputs to understand code's
+reverse engineer sometimes may just observe input/outputs to understand code&rsquo;s
 behavior instead of diving into it.
 </p>
 </blockquote>

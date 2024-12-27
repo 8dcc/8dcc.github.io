@@ -1,15 +1,10 @@
 #+TITLE: Understanding and traversing the call stack
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Introduction
 :PROPERTIES:
@@ -158,6 +153,7 @@ concept of the stack frame itself.
 The [[https://en.wikipedia.org/wiki/Call_stack#STACK-FRAME][Wikipedia page]] has a very good diagram for visualizing how a stack frame is
 typically organized.
 
+#+NAME: fig1
 [[file:../img/callstack1.png]]
 
 The diagram shows the call stack layout for an upward-growing stack after the
@@ -197,6 +193,7 @@ In the last example, the stack grew upwards, which is not normally the case. The
 next one (from the ABI) shows a more realistic (but perhaps more confusing)
 version, where the top of the stack is in a lower address than the bottom.
 
+#+NAME: fig2
 [[file:../img/callstack2.png]]
 
 As I mentioned before, the specifics depend on the convention. Unlike in the
@@ -312,6 +309,7 @@ void DrawSquare(int x, int y, int w, int h) {
 
 The call stack for =DrawPoint()= would be the following:
 
+#+NAME: example1
 #+begin_example text
 (???)  ->  DrawSquare()  ->  DrawLine()  ->  DrawPoint()
 #+end_example
@@ -429,6 +427,7 @@ I chose to use the second option, so I can explain how it works. If we just used
 =call print= and =mov rdi, fmt=, and linked with PIE enabled, we would get the
 following warnings:
 
+#+NAME: example2
 #+begin_example text
 /usr/bin/ld: obj/callstack.asm.o: warning: relocation in read-only section `.text'
 /usr/bin/ld: obj/callstack.asm.o: relocation R_X86_64_PC32 against symbol `printf@@GLIBC_2.2.5' can not be used when making a PIE object; recompile with -fPIE
@@ -579,6 +578,7 @@ obj/callstack.asm.o: callstack.asm
 
 Then, we can just run =make= and check the output:
 
+#+NAME: example3
 #+begin_example text
 (main) Address of DrawPoint:  0x5a1e3d78e139
 (main) Address of DrawLine:   0x5a1e3d78e170
@@ -614,9 +614,11 @@ According to our output, the next instruction to the call to =DrawPoint= should 
 at offset =+0x33= (=0x5a1e3d78e1a3-0x5a1e3d78e170=) inside =DrawLine=. Let's have a
 look.
 
+#+NAME: fig3
 [[file:../img/callstack3.png]]
 
 Indeed, the call to =DrawPoint= is at =+0x2e=, and the next instruction is at
 =+0x33=. We can see that this is also the case with =DrawSquare= and =main=.
 
+#+NAME: fig4
 [[file:../img/callstack4.png]]

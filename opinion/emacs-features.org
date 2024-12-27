@@ -1,15 +1,10 @@
 #+TITLE: My favorite GNU/Emacs features
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Introduction
 :PROPERTIES:
@@ -198,6 +193,7 @@ different sources, filtering by language. I use this for my [[https://github.com
 and it allows me to put the code snippets between the markdown text, rather than
 using very long plain comments within a single source.
 
+#+NAME: fig1
 [[file:../img/emacs-org.png]]
 
 See also: [[https://orgmode.org/manuals.html][Org-mode manual]].
@@ -224,6 +220,7 @@ setting the following variables, and then running =M-x gdb=.
 
 Behold, the beauty of GNU Emacs (at least since version 22.1).
 
+#+NAME: fig2
 [[file:../img/emacs-gdb.png]]
 
 All 6 windows have been opened by =gdb=, but don't worry, your previous layout
@@ -364,6 +361,7 @@ You can run =grep= commands from within Emacs. The basic form is with =M-x grep=
 which simply runs a grep command (or a command with a similar output) and
 displays the matches in an interactive buffer.
 
+#+NAME: fig3
 [[file:../img/emacs-grep.png]]
 
 You can jump to each of those lines.
@@ -395,6 +393,7 @@ similar commands, so make sure you check it out.
 This package allows you to compare files, buffers and much more. It's similar to
 the =diff= command, but much more interactive and integrated with Emacs and Magit.
 
+#+NAME: fig4
 [[file:../img/emacs-ediff.png]]
 
 ** Browser and external documentation
@@ -525,6 +524,7 @@ it's worth learning. See also the [[https://www.gnu.org/software/emacs/manual/ht
 If you find this overwhelming, you might want to at least consider using
 =M-x quick-calc= for quick (but not necesarily simple) calculations. For example:
 
+#+NAME: example1
 #+begin_example
 M-x quick-calc RET
 Quick calc: 632+56-32*4+2^3
@@ -598,6 +598,7 @@ repository]].
 This package provides a great interface for Git, and is very well integrated
 with Emacs.
 
+#+NAME: fig5
 [[file:../img/emacs-magit.png]]
 
 It's a very well known package, but this is it's [[https://magit.vc/][homepage]].

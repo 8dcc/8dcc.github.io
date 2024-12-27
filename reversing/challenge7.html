@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Challenge 7</title>
+<meta property="og:title" content="Challenge 7" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -196,14 +197,10 @@
 <link rel="stylesheet" type="text/css" href="../css/main.css" />
 </head>
 <body>
-<div id="content" class="content">
+<div id="org-div-home-and-up">
+  <a accesskey="u" href="index.html">Up</a> | <a accesskey="h" href="../index.html">Home</a>
+</div><div id="content" class="content">
 <h1 class="title">Challenge 7</h1>
-<p>
-<a href="../index.html">Index</a> | <a href="index.html">Up</a>
-</p>
-
-<hr />
-
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
@@ -295,7 +292,7 @@ code.
 <h3 id="function-parameters"><span class="section-number-3">2.1.</span> Function parameters</h3>
 <div class="outline-text-3" id="text-function-parameters">
 <p>
-We can asume the first parameter of the function is a <code>char*</code> because it's always
+We can asume the first parameter of the function is a <code>char*</code> because it&rsquo;s always
 using <code>BYTE [ptr]</code> when reading and writing values.
 </p>
 </div>
@@ -339,14 +336,14 @@ Or in simpler words: If I am at <code>rdx</code>, and I move back <code>0x41</co
 <h3 id="understanding-0x41"><span class="section-number-3">2.4.</span> Understanding <code>0x41</code></h3>
 <div class="outline-text-3" id="text-understanding-0x41">
 <p>
-At first, <code>0x41</code> doesn't look particularly special. First, we should convert it to
-decimal to see if it rings any bell. 65 doesn't give much clue, but since we
+At first, <code>0x41</code> doesn&rsquo;t look particularly special. First, we should convert it to
+decimal to see if it rings any bell. 65 doesn&rsquo;t give much clue, but since we
 know we are dealing with a <code>char*</code>, and we are subtracting this from each
 character, we should look up what this number represents in the <a href="https://theasciicode.com.ar/">ASCII table</a>.
 </p>
 
 <p>
-We can see that it's the letter <code>A</code>, which already looks interesting since we are
+We can see that it&rsquo;s the letter <code>A</code>, which already looks interesting since we are
 subtracting the first capital letter from the input.
 </p>
 
@@ -363,7 +360,7 @@ at <code>0x5A</code>, which is <code>Z</code>. We are basically checking if the 
 <h3 id="the-sil-register"><span class="section-number-3">2.5.</span> The <code>SIL</code> register</h3>
 <div class="outline-text-3" id="text-the-sil-register">
 <p>
-Although the <code>SIL</code> register is not commonly used, it's used to access the <b>lower 8
+Although the <code>SIL</code> register is not commonly used, it&rsquo;s used to access the <b>lower 8
 bits of the <code>ESI</code> register</b>.
 </p>
 </div>
@@ -406,8 +403,8 @@ The first version uses register names and is a more direct translation.
 
 <p>
 If we look at the assembly, we can also see that the functions return the
-initial parameter (<code>rdi</code>), since it gets loaded into <code>rax</code> at the start. I didn't
-add it to the C translations because I feel like it's a detail that can just be
+initial parameter (<code>rdi</code>), since it gets loaded into <code>rax</code> at the start. I didn&rsquo;t
+add it to the C translations because I feel like it&rsquo;s a detail that can just be
 mentioned, keeping the C code cleaner.
 </p>
 
@@ -418,7 +415,7 @@ variables.
 
 <div class="org-src-container">
 <pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">ptr</span>) {
-    <span style="color: #ff6f9f;">while</span> (*ptr != <span style="color: #00d3d0;">'\0'</span>) {
+    <span style="color: #ff6f9f;">while</span> (*ptr != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>) {
         <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span> = *ptr - <span style="color: #00d3d0;">'A'</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">esi</span><span style="color: #989898;"> */</span>
 
         <span style="color: #989898;">/* </span><span style="color: #989898;">Between 'A' and 'Z'</span><span style="color: #989898;"> */</span>

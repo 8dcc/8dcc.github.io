@@ -1,16 +1,11 @@
 #+TITLE: Implementing the modulus operator for floating-point numbers
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
 #+OPTIONS: tex:dvisvgm
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Motivation
 :PROPERTIES:

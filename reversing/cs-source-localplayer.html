@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Finding the local player offset in source games</title>
+<meta property="og:title" content="Finding the local player offset in source games" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -196,14 +197,10 @@
 <link rel="stylesheet" type="text/css" href="../css/main.css" />
 </head>
 <body>
-<div id="content" class="content">
+<div id="org-div-home-and-up">
+  <a accesskey="u" href="index.html">Up</a> | <a accesskey="h" href="../index.html">Home</a>
+</div><div id="content" class="content">
 <h1 class="title">Finding the local player offset in source games</h1>
-<p>
-<a href="../index.html">Index</a> | <a href="index.html">Up</a>
-</p>
-
-<hr />
-
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
@@ -243,7 +240,7 @@ through its x-refs until you see something like this.
 </p>
 
 
-<div id="orga6b1345" class="figure">
+<div id="fig1" class="figure">
 <p><img src="../img/cs-source-localplayer1.png" alt="cs-source-localplayer1.png" />
 </p>
 </div>
@@ -265,7 +262,7 @@ double-click on the function (<code>sub_5723E0</code>) and you will see the offs
 </p>
 
 
-<div id="orgfc475b6" class="figure">
+<div id="fig2" class="figure">
 <p><img src="../img/cs-source-localplayer2.png" alt="cs-source-localplayer2.png" />
 </p>
 </div>
@@ -276,7 +273,7 @@ That <code>0xBD0750</code> is your offset. Make sure you subtract the <code>Imag
 </p>
 
 
-<div id="org3b9486d" class="figure">
+<div id="fig3" class="figure">
 <p><img src="../img/cs-source-localplayer3.png" alt="cs-source-localplayer3.png" />
 </p>
 </div>
@@ -318,7 +315,7 @@ use a function like <code>process_vm_readv</code>.
     remote[<span style="color: #88ca9f;">0</span>].iov_len  = sz;
 
     <span style="color: #ff6f9f;">if</span> (process_vm_readv(pid, local, <span style="color: #88ca9f;">1</span>, remote, <span style="color: #88ca9f;">1</span>, <span style="color: #88ca9f;">0</span>) == -<span style="color: #88ca9f;">1</span>) {
-        fprintf(stderr, <span style="color: #00d3d0;">"Error reading memory of process with ID %d. Errno: %d"</span>,
+        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Error reading memory of process with ID </span><span style="color: #ff6f9f;">%d</span><span style="color: #00d3d0;">. Errno: </span><span style="color: #ff6f9f;">%d</span><span style="color: #00d3d0;">"</span>,
                 pid, errno);
         exit(<span style="color: #88ca9f;">1</span>);
     }
@@ -356,7 +353,7 @@ To get the PID of the game, you can use my <code>libsigscan_pidof</code> functio
         <span style="color: #ff6f9f;">return</span> -<span style="color: #88ca9f;">1</span>;
 
     <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">dirent</span>* <span style="color: #6ae4b9;">de</span>;
-    <span style="color: #ff6f9f;">while</span> ((de = readdir(dir)) != <span style="color: #88ca9f;">NULL</span>) {
+    <span style="color: #ff6f9f;">while</span> ((de <span style="color: #cabf00;">=</span> readdir(dir)) != <span style="color: #88ca9f;">NULL</span>) {
         <span style="color: #989898;">/* </span><span style="color: #989898;">The name of each folder inside /proc/ is a PID</span><span style="color: #989898;"> */</span>
         <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">pid</span> = atoi(de-&gt;d_name);
         <span style="color: #ff6f9f;">if</span> (pid &lt;= <span style="color: #88ca9f;">0</span>)
@@ -364,7 +361,7 @@ To get the PID of the game, you can use my <code>libsigscan_pidof</code> functio
 
         <span style="color: #989898;">/* </span><span style="color: #989898;">See proc_cmdline(5). You can also try:</span>
 <span style="color: #989898;">         *   cat /proc/self/maps | xxd</span><span style="color: #989898;">   */</span>
-        sprintf(filename, <span style="color: #00d3d0;">"/proc/%d/cmdline"</span>, pid);
+        sprintf(filename, <span style="color: #00d3d0;">"/proc/</span><span style="color: #ff6f9f;">%d</span><span style="color: #00d3d0;">/cmdline"</span>, pid);
 
         <span style="color: #79a8ff;">FILE</span>* <span style="color: #6ae4b9;">fd</span> = fopen(filename, <span style="color: #00d3d0;">"r"</span>);
         <span style="color: #ff6f9f;">if</span> (fd == <span style="color: #88ca9f;">NULL</span>)

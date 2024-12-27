@@ -1,15 +1,10 @@
 #+TITLE: Reversing Devil Daggers
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * About the game
 :PROPERTIES:
@@ -38,6 +33,7 @@ Fortunately for us, cutter is able to display a lot of [[https://en.wikipedia.or
 the "Classes" window from "Windows > Info... > Classes". If we scroll down a
 bit, we can start to see these =verse2= classes:
 
+#+NAME: fig1
 [[file:../img/devildaggers1.png]]
 
 We can asume that there is going to be some information related to the player
@@ -94,6 +90,7 @@ We find that the symbol name is
 "=_ZN6verse24hero8take_hitEbN5verse10death_typeEb=". In there, we can also see the
 type of the parameters.
 
+#+NAME: fig2
 [[file:../img/devildaggers2.png]]
 
 The only thing we are missing is the return type. Since the returned value is
@@ -102,12 +99,14 @@ function itself to determine what kind of value is being returned. We can see
 that the value inside the =ebp= register is always being moved into =eax= before
 returning.
 
+#+NAME: fig3
 [[file:../img/devildaggers3.png]]
 
 If we scroll up a bit, we can see that the =ebp= register is either set to zero
 just before returning, or it's set to the result of some kind of =or= operation
 before continuing with the execution.
 
+#+NAME: fig4
 [[file:../img/devildaggers4.png]]
 
 We can safely asume that the function is not only returning a boolean, but also
@@ -229,12 +228,14 @@ when you die), I found a =verse2::VERSE::step_ui()= function which seems to be
 used for rendering most of the menus. In there, I found some interesting code
 related to some "PARTICLES" and "PROGRESSION" windows.
 
+#+NAME: fig5
 [[file:../img/devildaggers5.png]]
 
 The only thing that stops the program from rendering these menus is some value
 located at =[rax + 0x488]= and =[rax + 0x489]=. We can see that the value that was
 loaded into =rax= is =verse2::globals=.
 
+#+NAME: fig6
 [[file:../img/devildaggers6.png]]
 
 ** Getting a pointer to =verse2::globals=
@@ -251,6 +252,7 @@ To get the pointer, I had to use a different method than usual. I looked at the
 functions I was using, and I saw that =hero::step()= also uses =verse2::globals=
 internally.
 
+#+NAME: fig7
 [[file:../img/devildaggers7.png]]
 
 Before trying to understand the next part, it's important to note that
@@ -366,8 +368,10 @@ Note that the game detects if they are enabled, and will mark your score as
 invalid. This could be easily bypassed, but I am not going to do it here (Hint:
 have a look at =verse2::VERSE::step_ui()=)
 
+#+NAME: fig8
 [[file:../img/devildaggers8.png]]
 
+#+NAME: fig9
 [[file:../img/devildaggers9.png]]
 
 Don't forget to set them to false when unloading the library (in =unload()=).
@@ -404,6 +408,7 @@ struct verse_globals_t {
 I am not sure where this value is set from the game's code, but if you have a
 suggestion feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this article.
 
+#+NAME: fig10
 [[file:../img/devildaggers10.png]]
 
 * Complete source code

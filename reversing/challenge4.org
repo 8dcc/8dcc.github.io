@@ -1,15 +1,10 @@
 #+TITLE: Challenge 4
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Original assembly
 :PROPERTIES:
@@ -184,6 +179,7 @@ imul    eax, eax, 0x01010101
 Multiplying small values (less or equal than =0xFF=) by =0x01010101= clones the bits
 to the remaining 3 bytes of the =DWORD=. For example:
 
+#+NAME: example1
 #+begin_example
       0xAB                          0b10101011
 0x01010101  0b00000001000000010000000100000001
@@ -242,6 +238,7 @@ Now that we know what both of them are doing before returning, it's not hard to
 see that these two shifts from ARM are doing the same as the =0x01010101=
 multiplication:
 
+#+NAME: example2
 #+begin_example
 Base:               0x000000AB
 After first shift:  0x00AB0000

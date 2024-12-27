@@ -1,15 +1,10 @@
 #+TITLE: Challenge 6
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Original assembly
 :PROPERTIES:
@@ -90,6 +85,7 @@ stack frame, we store the values of =rdi= and =rsi= (the two function arguments)
 into =[rbp - N]=. Keep in mind that the stack grows downwards, so the stack layout
 (relative to =RBP=) would be the following:
 
+#+NAME: example1
 #+begin_example
 +-----+-------+------+---------+---------+----------------+-----+
 |     | -0x10 | -0x8 |   RBP   |  +0x8   |     +0x10      |     |

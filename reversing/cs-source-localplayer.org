@@ -1,15 +1,10 @@
 #+TITLE: Finding the local player offset in source games
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Introduction
 :PROPERTIES:
@@ -33,6 +28,7 @@ Open the "Strings" sub-view in IDA with /Shift+F12/, and search for the string
 =localplayer_changeteam= with /Ctrl+F/. Double click the result, press /X/ and jump
 through its x-refs until you see something like this.
 
+#+NAME: fig1
 [[file:../img/cs-source-localplayer1.png]]
 
 The left split shows the disassembly in text mode, and the right split shows the
@@ -45,11 +41,13 @@ The call to =C_BasePlayer::GetLocalPlayer= is sometimes optimized to a simple =m
 instruction. If that's the case, you can use that offset directly. Otherwise,
 double-click on the function (=sub_5723E0=) and you will see the offset there.
 
+#+NAME: fig2
 [[file:../img/cs-source-localplayer2.png]]
 
 That =0xBD0750= is your offset. Make sure you subtract the =ImageBase= returned by
 =get_imagebase()=, in my case it was zero.
 
+#+NAME: fig3
 [[file:../img/cs-source-localplayer3.png]]
 
 * Reading from an external process

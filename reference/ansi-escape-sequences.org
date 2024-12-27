@@ -1,19 +1,20 @@
 #+TITLE: ANSI Escape Sequences
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Terminal colors and effects
+:PROPERTIES:
+:CUSTOM_ID: terminal-colors-and-effects
+:END:
 
 ** Colors
+:PROPERTIES:
+:CUSTOM_ID: colors
+:END:
 
 | Name    | Foreground | Background | Bright Foreground | Bright Background |
 |---------+------------+------------+-------------------+-------------------|
@@ -28,6 +29,9 @@
 | Default |         39 |         49 |                99 |               109 |
 
 ** Effects
+:PROPERTIES:
+:CUSTOM_ID: effects
+:END:
 
 | Effect    | Enable | Disable |
 |-----------+--------+---------|
@@ -39,6 +43,9 @@
 | Hide      |      8 |      28 |
 
 ** Other links
+:PROPERTIES:
+:CUSTOM_ID: other-links
+:END:
 
 - https://notes.burke.libbey.me/ansi-escape-codes/
 - https://tldp.org/HOWTO/Bash-Prompt-HOWTO/c327.html

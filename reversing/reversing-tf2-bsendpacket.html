@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Reversing TF2's bSendPacket</title>
+<meta property="og:title" content="Reversing TF2's bSendPacket" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -196,14 +197,10 @@
 <link rel="stylesheet" type="text/css" href="../css/main.css" />
 </head>
 <body>
-<div id="content" class="content">
+<div id="org-div-home-and-up">
+  <a accesskey="u" href="index.html">Up</a> | <a accesskey="h" href="../index.html">Home</a>
+</div><div id="content" class="content">
 <h1 class="title">Reversing TF2&rsquo;s bSendPacket</h1>
-<p>
-<a href="../index.html">Index</a> | <a href="index.html">Up</a>
-</p>
-
-<hr />
-
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
@@ -313,7 +310,7 @@ in <a href="https://github.com/OthmanAba/TeamFortress2/blob/1b81dded673d49adebf4
 So, in order, the calls would be the following:
 </p>
 
-<pre class="example" id="org4d7dac5">
+<pre class="example" id="example1">
 CL_Move()  -&gt;  CHLClient::CreateMove()  -&gt;  CInput::CreateMove()  -&gt;  ClientModeShared::CreateMove()
 </pre>
 
@@ -358,7 +355,7 @@ to decompile the function.
 </p>
 
 
-<div id="orgca91c8b" class="figure">
+<div id="fig1" class="figure">
 <p><img src="../img/bsendpacket1.png" alt="bsendpacket1.png" />
 </p>
 </div>
@@ -410,7 +407,7 @@ strings and check the xrefs.
 </p>
 
 
-<div id="org4349434" class="figure">
+<div id="fig2" class="figure">
 <p><img src="../img/bsendpacket2.png" alt="bsendpacket2.png" />
 </p>
 </div>
@@ -421,7 +418,7 @@ we know that it&rsquo;s setting it to true?  Let&rsquo;s scroll up a bit.
 </p>
 
 
-<div id="orgdbd3c9d" class="figure">
+<div id="fig3" class="figure">
 <p><img src="../img/bsendpacket3.png" alt="bsendpacket3.png" />
 </p>
 </div>
@@ -575,7 +572,7 @@ After a bit of decompiling, we can find that it&rsquo;s on index 21 (since
 </p>
 
 
-<div id="org77af21a" class="figure">
+<div id="fig4" class="figure">
 <p><img src="../img/bsendpacket4.png" alt="bsendpacket4.png" />
 </p>
 </div>
@@ -591,7 +588,7 @@ If we look at the actual disassembly, we find some bad news.
 </p>
 
 
-<div id="org738713f" class="figure">
+<div id="fig5" class="figure">
 <p><img src="../img/bsendpacket5.png" alt="bsendpacket5.png" />
 </p>
 </div>
@@ -622,7 +619,7 @@ check out my <a href="understanding-call-stack.html">Understanding and traversin
 Just as a reminder, this is how <code>ClientModeShared::CreateMove()</code> is called.
 </p>
 
-<pre class="example" id="orga5b8afb">
+<pre class="example" id="example2">
 CL_Move()  -&gt;  CHLClient::CreateMove()  -&gt;  CInput::CreateMove()  -&gt;  ClientModeShared::CreateMove()
 </pre>
 
@@ -653,7 +650,7 @@ I have highlighted the important instructions.
 </p>
 
 
-<div id="orgebaa1f1" class="figure">
+<div id="fig6" class="figure">
 <p><img src="../img/bsendpacket6.png" alt="bsendpacket6.png" />
 </p>
 </div>
@@ -683,7 +680,7 @@ allocated space, and then we will try to find the call to
 </p>
 
 
-<div id="org5af0ee4" class="figure">
+<div id="fig7" class="figure">
 <p><img src="../img/bsendpacket7.png" alt="bsendpacket7.png" />
 </p>
 </div>
@@ -702,7 +699,7 @@ We can decompile the function and look for the call to
 </p>
 
 
-<div id="orgd69f651" class="figure">
+<div id="fig8" class="figure">
 <p><img src="../img/bsendpacket8.png" alt="bsendpacket8.png" />
 </p>
 </div>
@@ -837,13 +834,13 @@ We join a game, inject, and&#x2026;
 </p>
 
 
-<div id="org008fe9d" class="figure">
+<div id="fig9" class="figure">
 <p><img src="../img/slomo.gif" alt="slomo.gif" />
 </p>
 </div>
 
 
-<div id="org4bb4d2a" class="figure">
+<div id="fig10" class="figure">
 <p><img src="../img/bsendpacket9.png" alt="bsendpacket9.png" />
 </p>
 </div>

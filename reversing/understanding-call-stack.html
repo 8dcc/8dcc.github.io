@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Understanding and traversing the call stack</title>
+<meta property="og:title" content="Understanding and traversing the call stack" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -196,14 +197,10 @@
 <link rel="stylesheet" type="text/css" href="../css/main.css" />
 </head>
 <body>
-<div id="content" class="content">
+<div id="org-div-home-and-up">
+  <a accesskey="u" href="index.html">Up</a> | <a accesskey="h" href="../index.html">Home</a>
+</div><div id="content" class="content">
 <h1 class="title">Understanding and traversing the call stack</h1>
-<p>
-<a href="../index.html">Index</a> | <a href="index.html">Up</a>
-</p>
-
-<hr />
-
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
@@ -429,7 +426,7 @@ typically organized.
 </p>
 
 
-<div id="org9ecd982" class="figure">
+<div id="fig1" class="figure">
 <p><img src="../img/callstack1.png" alt="callstack1.png" />
 </p>
 </div>
@@ -480,7 +477,7 @@ version, where the top of the stack is in a lower address than the bottom.
 </p>
 
 
-<div id="org1325c9c" class="figure">
+<div id="fig2" class="figure">
 <p><img src="../img/callstack2.png" alt="callstack2.png" />
 </p>
 </div>
@@ -588,7 +585,7 @@ Let&rsquo;s look at some example C code.
 <pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
 
 <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">DrawPoint</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span>) {
-    printf(<span style="color: #00d3d0;">"Drawing point: %d, %d\n"</span>, x, y);
+    printf(<span style="color: #00d3d0;">"Drawing point: </span><span style="color: #ff6f9f;">%d</span><span style="color: #00d3d0;">, </span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, x, y);
 }
 
 <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">DrawLine</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x0</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y0</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x1</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y1</span>) {
@@ -613,7 +610,7 @@ Let&rsquo;s look at some example C code.
 The call stack for <code>DrawPoint()</code> would be the following:
 </p>
 
-<pre class="example" id="org8e88960">
+<pre class="example" id="example1">
 (???)  -&gt;  DrawSquare()  -&gt;  DrawLine()  -&gt;  DrawPoint()
 </pre>
 </div>
@@ -721,7 +718,7 @@ The rough C translation of the loop would be the following:
 <div class="org-src-container">
 <pre class="src src-C"><span style="color: #ff6f9f;">while</span> (i != <span style="color: #88ca9f;">0</span>) {
     <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">ret_addr</span> = *(cur_base_ptr + <span style="color: #88ca9f;">0x8</span>);
-    printf(<span style="color: #00d3d0;">"%d: %p\n"</span>, i, ret_addr);
+    printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d</span><span style="color: #00d3d0;">: </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, i, ret_addr);
 
     i--;
     cur_base_ptr = *cur_base_ptr;
@@ -753,7 +750,7 @@ I chose to use the second option, so I can explain how it works. If we just used
 following warnings:
 </p>
 
-<pre class="example" id="org64f48a2">
+<pre class="example" id="example2">
 /usr/bin/ld: obj/callstack.asm.o: warning: relocation in read-only section `.text'
 /usr/bin/ld: obj/callstack.asm.o: relocation R_X86_64_PC32 against symbol `printf@@GLIBC_2.2.5' can not be used when making a PIE object; recompile with -fPIE
 /usr/bin/ld: final link failed: bad value
@@ -845,7 +842,7 @@ to call it from <code>DrawPoint</code>.
 <pre class="src src-C"><span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">AsmPrintCallStack</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">depth</span>);
 
 <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">DrawPoint</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span>) {
-    printf(<span style="color: #00d3d0;">"Drawing point: %d, %d\n"</span>, x, y);
+    printf(<span style="color: #00d3d0;">"Drawing point: </span><span style="color: #ff6f9f;">%d</span><span style="color: #00d3d0;">, </span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, x, y);
 
     AsmPrintCallStack(<span style="color: #88ca9f;">3</span>);
 }
@@ -873,10 +870,10 @@ the addresses from <code>AsmPrintCallStack</code> are correct.
 
 <div class="org-src-container">
 <pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
-    printf(<span style="color: #00d3d0;">"(main) Address of DrawPoint:  %p\n"</span>, DrawPoint);
-    printf(<span style="color: #00d3d0;">"(main) Address of DrawLine:   %p\n"</span>, DrawLine);
-    printf(<span style="color: #00d3d0;">"(main) Address of DrawSquare: %p\n"</span>, DrawSquare);
-    printf(<span style="color: #00d3d0;">"(main) Address of main:       %p\n"</span>, main);
+    printf(<span style="color: #00d3d0;">"(main) Address of DrawPoint:  </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, DrawPoint);
+    printf(<span style="color: #00d3d0;">"(main) Address of DrawLine:   </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, DrawLine);
+    printf(<span style="color: #00d3d0;">"(main) Address of DrawSquare: </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, DrawSquare);
+    printf(<span style="color: #00d3d0;">"(main) Address of main:       </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, main);
 
     <span style="color: #989898;">/* </span><span style="color: #989898;">DrawPoint only gets called once</span><span style="color: #989898;"> */</span>
     DrawSquare(<span style="color: #88ca9f;">5</span>, <span style="color: #88ca9f;">5</span>, <span style="color: #88ca9f;">0</span>, <span style="color: #88ca9f;">0</span>);
@@ -934,7 +931,7 @@ what I mentioned in <a href="#note-about-position-independent-executables">Note 
 Then, we can just run <code>make</code> and check the output:
 </p>
 
-<pre class="example" id="org11e3cfa">
+<pre class="example" id="example3">
 (main) Address of DrawPoint:  0x5a1e3d78e139
 (main) Address of DrawLine:   0x5a1e3d78e170
 (main) Address of DrawSquare: 0x5a1e3d78e1bf
@@ -976,7 +973,7 @@ look.
 </p>
 
 
-<div id="orgbd8f8df" class="figure">
+<div id="fig3" class="figure">
 <p><img src="../img/callstack3.png" alt="callstack3.png" />
 </p>
 </div>
@@ -987,7 +984,7 @@ Indeed, the call to <code>DrawPoint</code> is at <code>+0x2e</code>, and the nex
 </p>
 
 
-<div id="org8bd5f6c" class="figure">
+<div id="fig4" class="figure">
 <p><img src="../img/callstack4.png" alt="callstack4.png" />
 </p>
 </div>

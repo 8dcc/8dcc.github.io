@@ -1,15 +1,10 @@
 #+TITLE: Challenge 3
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Original assembly
 :PROPERTIES:
@@ -129,6 +124,7 @@ ends up being the same even if there is more than one bit set on the input
 value. The only thing that matters from the input is the last set bit, since
 every bit from there will be set.
 
+#+NAME: fig1
 [[file:../img/slomo.gif]]
 
 Then, it performs a signed multiplication on the last value (currently stored
@@ -173,6 +169,7 @@ So, what's the item at position 62 in our array? Turns out it's zero.
 
 Let's try to use another number to see how it changes:
 
+#+NAME: example1
 #+begin_example
 Initial number:            0x000F0055  0b00000000000011110000000001010101
 After shifting and ORing:  0x000FFFFF  0b00000000000011111111111111111111

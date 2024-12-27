@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Challenge 4</title>
+<meta property="og:title" content="Challenge 4" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -196,14 +197,10 @@
 <link rel="stylesheet" type="text/css" href="../css/main.css" />
 </head>
 <body>
-<div id="content" class="content">
+<div id="org-div-home-and-up">
+  <a accesskey="u" href="index.html">Up</a> | <a accesskey="h" href="../index.html">Home</a>
+</div><div id="content" class="content">
 <h1 class="title">Challenge 4</h1>
-<p>
-<a href="../index.html">Index</a> | <a href="index.html">Up</a>
-</p>
-
-<hr />
-
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
@@ -260,7 +257,7 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 <div class="outline-text-2" id="text-analysis">
 <p>
 First of all, it loads the function argument into <code>edx</code>, and shifts it one bit to
-the right. Then it AND's the <code>edx</code> register to keep only the even bits (0, 2, &#x2026;,
+the right. Then it AND&rsquo;s the <code>edx</code> register to keep only the even bits (0, 2, &#x2026;,
 30). Now, the bits at odd positions (1, 3, &#x2026;, 31) are being moved to the
 adjacent position.
 </p>
@@ -305,7 +302,7 @@ adds the original value stored in <code>edi</code>.
 
 <p>
 Then, it discards the even <a href="https://en.wikipedia.org/wiki/Nibble">nibbles</a> of <code>eax</code>, and multiplies that by
-<code>0x01010101</code>. Keep in mind that since it's specifying <code>eax</code> as the destination
+<code>0x01010101</code>. Keep in mind that since it&rsquo;s specifying <code>eax</code> as the destination
 register, it will truncate the value and keep the lower 32 bits.
 </p>
 
@@ -326,7 +323,7 @@ It then shifts the result 24 bits to the right, before returning it.
 </div>
 
 <p>
-Let's test it with some other numbers to see how the result changes:
+Let&rsquo;s test it with some other numbers to see how the result changes:
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -392,7 +389,7 @@ Let's test it with some other numbers to see how the result changes:
 </table>
 
 <p>
-With this, can see that it's a function for <b>counting the number of set bits</b> in
+With this, can see that it&rsquo;s a function for <b>counting the number of set bits</b> in
 our input.
 </p>
 </div>
@@ -431,8 +428,8 @@ The assembly function is the simplified version of this one:
     <span style="color: #ff6f9f;">return</span> x &gt;&gt; <span style="color: #88ca9f;">24</span>;
 }
 
-printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
-printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
 </pre>
 </div>
 
@@ -483,7 +480,7 @@ x = (x &amp; <span style="color: #88ca9f;">0x0000ffff</span>) + ((x &gt;&gt; <sp
 </div>
 
 <p>
-I still can't fully understand how this works, though.
+I still can&rsquo;t fully understand how this works, though.
 </p>
 </div>
 </div>
@@ -506,7 +503,7 @@ Multiplying small values (less or equal than <code>0xFF</code>) by <code>0x01010
 to the remaining 3 bytes of the <code>DWORD</code>. For example:
 </p>
 
-<pre class="example" id="orga57970a">
+<pre class="example" id="example1">
       0xAB                          0b10101011
 0x01010101  0b00000001000000010000000100000001
 ---------------------------------------------- (MUL)
@@ -525,7 +522,7 @@ Right after this, it shifts the value 24 bits to the right, discarding the lower
 </div>
 
 <p>
-Let's compare it to the ARM assembly, one of the examples without the <code>0x01010101</code>
+Let&rsquo;s compare it to the ARM assembly, one of the examples without the <code>0x01010101</code>
 constant:
 </p>
 
@@ -541,7 +538,7 @@ constant:
 <p>
 The first instruction is shifting the value at <code>r0</code> 16 bits to the left, adding
 that to <code>r0</code>, and storing that in <code>r0</code>. The next instruction is doing the same but
-shifting it 8 bits to the left, instead of 16. Finally, it's doing the 24 bit
+shifting it 8 bits to the left, instead of 16. Finally, it&rsquo;s doing the 24 bit
 right shift we saw in other examples.
 </p>
 
@@ -582,12 +579,12 @@ r0 = r0 &gt;&gt; <span style="color: #88ca9f;">24</span>;
 </div>
 
 <p>
-Now that we know what both of them are doing before returning, it's not hard to
+Now that we know what both of them are doing before returning, it&rsquo;s not hard to
 see that these two shifts from ARM are doing the same as the <code>0x01010101</code>
 multiplication:
 </p>
 
-<pre class="example" id="orgd6f507b">
+<pre class="example" id="example2">
 Base:               0x000000AB
 After first shift:  0x00AB0000
                     ---------- (ADD)
@@ -643,10 +640,10 @@ for the last step, while the other uses shifting.
     <span style="color: #ff6f9f;">return</span> num;
 }
 
-printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>));          <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
-printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>));          <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
-printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits_shifting(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
-printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits_shifting(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>));          <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>));          <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits_shifting(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits_shifting(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
 </pre>
 </div>
 </div>
@@ -673,8 +670,8 @@ A simpler (but probably slower) way of doing it with a <code>for</code> loop:
     <span style="color: #ff6f9f;">return</span> ret;
 }
 
-printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
-printf(<span style="color: #00d3d0;">"%d\n"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
 </pre>
 </div>
 </div>

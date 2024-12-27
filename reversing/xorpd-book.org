@@ -1,15 +1,10 @@
 #+TITLE: Inspecting xorpd's assembly snippets
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 1
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Introduction
 :PROPERTIES:
@@ -138,6 +133,7 @@ The =sbb= instruction adds the carry flag (=CF=) to the source operand, and
 subtracts the result from the destination operand. The result is stored into the
 destination operand. The operation is:
 
+#+NAME: example1
 #+begin_example text
 dst = dst - (src + CF)
 #+end_example
@@ -161,6 +157,7 @@ itself; it is subtracting it to the number of the 2nd step.
 Since the source and destination operands of the =sbb= instruction are the same,
 it's essentially setting the operand to the negated carry flag (=CF=):
 
+#+NAME: example2
 #+begin_example
 x = x - (x + CF)
 x = -(CF)

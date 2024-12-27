@@ -1,15 +1,10 @@
 #+TITLE: Reversing a simple keygen with rizin
 #+AUTHOR: 8dcc
-#+OPTIONS: toc:nil
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
-
-[[file:../index.org][Index]] | [[file:index.org][Up]]
-
------
-
-#+TOC: headlines 2
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
 
 * Introduction
 :PROPERTIES:
@@ -29,6 +24,7 @@ in case you are interested.
 
 First, let's try running the program to see what it's asking.
 
+#+NAME: example1
 #+begin_example
 Username: test
 Key: test
