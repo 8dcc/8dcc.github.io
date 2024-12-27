@@ -217,11 +217,11 @@
 </ul>
 </li>
 <li><a href="#reallocation-problems">3. Reallocation problems</a></li>
-<li><a href="#second-implementation-resizing-the-pool">4. Second implementation: Resizing the pool</a>
+<li><a href="#second-implementation-expanding-the-pool">4. Second implementation: Expanding the pool</a>
 <ul>
 <li><a href="#keeping-track-of-the-array-starts">4.1. Keeping track of the array starts</a></li>
 <li><a href="#changes-to-pool-new-and-pool-close">4.2. Changes to <code>pool_new</code> and <code>pool_close</code></a></li>
-<li><a href="#comment-resizing-without-modifying-the-array">4.3. Resizing without modifying the array</a></li>
+<li><a href="#resizing-without-modifying-the-array">4.3. Resizing without modifying the array</a></li>
 </ul>
 </li>
 </ul>
@@ -263,7 +263,7 @@ it out as well.
 The following implementation corresponds to version <a href="https://github.com/8dcc/libpool/blob/v1.0.0/src/libpool.c"><code>v1.0.0</code></a> of my <code>libpool</code>
 library, with some notable &ldquo;visual&rdquo; differences (e.g. without ANSI
 restrictions). Some improvements, like being able to resize/reallocate an
-existing pool, will also be expanded <a href="#second-implementation-resizing-the-pool">below</a>.
+existing pool, will also be expanded <a href="#second-implementation-expanding-the-pool">below</a>.
 </p>
 </div>
 
@@ -640,21 +640,22 @@ invalid (but non-null) pointers to the old array, which is now invalid.
 </div>
 </div>
 
-<div id="outline-container-second-implementation-resizing-the-pool" class="outline-2">
-<h2 id="second-implementation-resizing-the-pool"><span class="section-number-2">4.</span> Second implementation: Resizing the pool</h2>
-<div class="outline-text-2" id="text-second-implementation-resizing-the-pool">
+<div id="outline-container-second-implementation-expanding-the-pool" class="outline-2">
+<h2 id="second-implementation-expanding-the-pool"><span class="section-number-2">4.</span> Second implementation: Expanding the pool</h2>
+<div class="outline-text-2" id="text-second-implementation-expanding-the-pool">
 <p>
 Instead of <i>modifying</i> the existing chunk array, we can allocate a <i>new array</i> with
 the number of chunks we want to add and prepend them to the linked list of free
-chunks an existing pool. Some important details about this approach will be
-explained below.
+chunks an existing pool. Although this only let&rsquo;s the pool <i>grow</i> (and not
+<i>shrink</i>), I think it&rsquo;s what most implementations will need. Some important
+details about this approach will be explained below.
 </p>
 
 <p>
 The following figure shows how two different <code>Chunk</code> arrays could be allocated
 separately. The green area denotes the initial chunk array allocated inside
 <code>pool_new</code>, while the blue area denotes a different chunk array allocated when
-resizing the pool. The two arrays don&rsquo;t necessarily have to be adjacent in
+expanding the pool. The two arrays don&rsquo;t necessarily have to be adjacent in
 memory, which is why there is no need for reallocations.
 </p>
 
@@ -662,14 +663,14 @@ memory, which is why there is no need for reallocations.
 <div id="fig7" class="figure">
 <p><img src="../img/pool-allocator7.svg" alt="pool-allocator7.svg" class="org-svg" />
 </p>
-<p><span class="figure-number">Figure 7: </span>Different chunk arrays after resizing a pool.</p>
+<p><span class="figure-number">Figure 7: </span>Different chunk arrays after expanding a pool.</p>
 </div>
 
 <p>
 Notice how we have to keep track of the start of each array, since we will need
 to free them separately. In the previous figure, we use two <code>chunk_arr0</code> and
 <code>chunk_arr1</code> members to denote this, but since we would like to allow the user to
-resize the pool an arbitrary number of times, we should be able to keep track of
+expand the pool an arbitrary number of times, we should be able to keep track of
 an indefinite number of pointers (to the start of the chunk arrays) at runtime.
 </p>
 </div>
@@ -785,9 +786,9 @@ list, freeing each chunk array and each <code>LinkedPtr</code> structure in the 
 </div>
 </div>
 
-<div id="outline-container-comment-resizing-without-modifying-the-array" class="outline-3">
-<h3 id="comment-resizing-without-modifying-the-array"><span class="section-number-3">4.3.</span> Resizing without modifying the array</h3>
-<div class="outline-text-3" id="text-comment-resizing-without-modifying-the-array">
+<div id="outline-container-resizing-without-modifying-the-array" class="outline-3">
+<h3 id="resizing-without-modifying-the-array"><span class="section-number-3">4.3.</span> Resizing without modifying the array</h3>
+<div class="outline-text-3" id="text-resizing-without-modifying-the-array">
 <p>
 Now that we have a way of storing the start addresses of an indefinite number of
 chunk arrays, we can implement the resizing method shown in the <a href="#fig7">previous

@@ -52,7 +52,7 @@ it out as well.
 The following implementation corresponds to version [[https://github.com/8dcc/libpool/blob/v1.0.0/src/libpool.c][=v1.0.0=]] of my =libpool=
 library, with some notable "visual" differences (e.g. without ANSI
 restrictions). Some improvements, like being able to resize/reallocate an
-existing pool, will also be expanded [[#second-implementation-resizing-the-pool][below]].
+existing pool, will also be expanded [[#second-implementation-expanding-the-pool][below]].
 
 ** The =Chunk= type
 :PROPERTIES:
@@ -337,30 +337,31 @@ invalid (but non-null) pointers to the old array, which is now invalid.
 #+CAPTION: Resizing problems: old pointers may become invalid.
 [[file:../img/pool-allocator6.svg]]
 
-* Second implementation: Resizing the pool
+* Second implementation: Expanding the pool
 :PROPERTIES:
-:CUSTOM_ID: second-implementation-resizing-the-pool
+:CUSTOM_ID: second-implementation-expanding-the-pool
 :END:
 
 Instead of /modifying/ the existing chunk array, we can allocate a /new array/ with
 the number of chunks we want to add and prepend them to the linked list of free
-chunks an existing pool. Some important details about this approach will be
-explained below.
+chunks an existing pool. Although this only let's the pool /grow/ (and not
+/shrink/), I think it's what most implementations will need. Some important
+details about this approach will be explained below.
 
 The following figure shows how two different =Chunk= arrays could be allocated
 separately. The green area denotes the initial chunk array allocated inside
 =pool_new=, while the blue area denotes a different chunk array allocated when
-resizing the pool. The two arrays don't necessarily have to be adjacent in
+expanding the pool. The two arrays don't necessarily have to be adjacent in
 memory, which is why there is no need for reallocations.
 
 #+NAME: fig7
-#+CAPTION: Different chunk arrays after resizing a pool.
+#+CAPTION: Different chunk arrays after expanding a pool.
 [[file:../img/pool-allocator7.svg]]
 
 Notice how we have to keep track of the start of each array, since we will need
 to free them separately. In the previous figure, we use two =chunk_arr0= and
 =chunk_arr1= members to denote this, but since we would like to allow the user to
-resize the pool an arbitrary number of times, we should be able to keep track of
+expand the pool an arbitrary number of times, we should be able to keep track of
 an indefinite number of pointers (to the start of the chunk arrays) at runtime.
 
 ** Keeping track of the array starts
@@ -460,7 +461,7 @@ void pool_close(Pool* pool) {
 
 ** Resizing without modifying the array
 :PROPERTIES:
-:CUSTOM_ID: comment-resizing-without-modifying-the-array
+:CUSTOM_ID: resizing-without-modifying-the-array
 :END:
 
 Now that we have a way of storing the start addresses of an indefinite number of
