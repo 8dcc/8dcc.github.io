@@ -1,0 +1,203 @@
+#+TITLE: Connecting to a Wi-Fi network from Guix using ConnMan
+#+AUTHOR: 8dcc
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
+
+#+MACRO: man [[https://man.cx/$1][=$1=]]
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+I have been using [[https://wiki.archlinux.org/title/Iwd][iwd]] and its {{{man(iwctl(1))}}} tool for a long time, but when using
+switching to a [[https://guix.gnu.org/][Guix system]], I realized that there is not much support for it
+yet.
+
+Alternatively, one might use [[https://guix.gnu.org/manual/devel/en/html_node/Services.html][Guix services]] like [[https://guix.gnu.org/manual/devel/en/html_node/Networking-Setup.html#index-network_002dmanager_002dservice_002dtype][=network-manager-service-type=]]
+or [[https://guix.gnu.org/manual/devel/en/html_node/Networking-Setup.html#index-connman_002dservice_002dtype][=connman-service-type=]]. I will be using the later, along with
+[[https://guix.gnu.org/manual/devel/en/html_node/Networking-Setup.html#index-wpa_002dsupplicant_002dservice_002dtype][=wpa-supplicant-service-type=]].
+
+I would also like to note that there is a ='(iwd)= value we could use for the
+=shepherd-requirement= parameter, but currently (01/01/2025) it's not really
+supported.
+
+* Setting up the ConnMan service in Guix
+:PROPERTIES:
+:CUSTOM_ID: setting-up-the-connman-service-in-guix
+:END:
+
+In your [[https://guix.gnu.org/manual/devel/en/html_node/System-Configuration.html][Guix system configuration]], you will have to include the following
+modules:
+
+#+begin_src scheme
+(use-modules
+ ;; ...
+ (gnu services networking))
+#+end_src
+
+And then add the actual services to your ~(operating-system ...)~ declaration:
+
+#+begin_src scheme
+(operating-system
+ ;; Other parameters...
+
+ (services
+  ;; Other services...
+
+  (service wpa-supplicant-service-type)
+  (service connman-service-type
+           (connman-configuration
+            (shepherd-requirement '(wpa-supplicant))
+            (general-configuration
+             (connman-general-configuration
+              (allow-hostname-updates? #f)
+              (allow-domainname-updates? #f)
+              (single-connected-technology? #f)))))))
+#+end_src
+
+In this case we are using the default settings for WPA Supplicant, but we are
+specifying some other options for ConnMan. We could also specify some other
+ConnMan settings like ~(disable-vpn? #t)~ by adding it to the
+=connman-configuration=. For more information on available settings, see
+[[https://guix.gnu.org/manual/devel/en/html_node/Networking-Setup.html#index-index-connman_002dgeneral_002dconfiguration][=connman-general-configuration=]].
+
+Once our configuration is updated, we can reconfigure our system with:
+
+#+begin_src bash
+# Change the path to match your system configuration.
+sudo -E guix system reconfigure ~/.config/guix/system.scm
+#+end_src
+
+** Checking the service
+:PROPERTIES:
+:CUSTOM_ID: checking-the-service
+:END:
+
+Once the system is reconfigured and rebooted, make sure the service is enabled
+and running by checking its [[https://www.gnu.org/software/shepherd/manual/shepherd.html#Invoking-herd][=herd= status]]:
+
+#+begin_src bash
+$ sudo herd status
+Started:
+ ...
+ + connman
+ ...
+ + wpa-supplicant
+ ...
+
+$ sudo herd status connman
+- Status of connman:
+  It is running since 09:04:18 AM (44 minutes ago).
+  Main PID: 309
+  Command: /gnu/store/[...]-connman-1.42/sbin/connmand --config=/gnu/store/[...]-main.conf --nodaemon --nodnsproxy --noplugin=vpn
+  It is enabled.
+  Provides: connman networking
+  Requires: user-processes dbus-system loopback wpa-supplicant
+  Will be respawned.
+  Log file: /var/log/connman.log
+
+$ sudo herd status wpa-supplicant
+- Status of wpa-supplicant:
+  It is running since 09:04:18 AM (45 minutes ago).
+  Main PID: 288
+  Command: /gnu/store/[...]-wpa-supplicant-2.10/sbin/wpa_supplicant -P/var/run/wpa_supplicant.pid -B -s -u
+  It is enabled.
+  Provides: wpa-supplicant
+  Requires: dbus-system user-processes loopback syslogd
+  Will be respawned.
+#+end_src
+
+If you get a socket error like:
+
+#+begin_src bash
+herd: error: /run/user/1000/shepherd/socket: No such file or directory
+#+end_src
+
+It means your user doesn't have enough privileges, so you should run that
+command with =sudo=.
+
+* Connecting to a protected Wi-Fi network using =connmanctl=
+:PROPERTIES:
+:CUSTOM_ID: connecting-to-a-protected-wi-fi-network-using-connmanctl
+:END:
+
+Once the service is enabled and running, we can connect to the network using
+=connmanctl=. Since we are connecting to a protected network, we will need to use
+the program in interactive mode by running:
+
+#+begin_src bash
+$ connmanctl
+#+end_src
+
+First, scan for wifi networks:
+
+#+begin_src bash
+connmanctl> scan wifi
+#+end_src
+
+Then list the available networks:
+
+#+begin_src bash
+connmanctl> services
+*AO MyNetwork               wifi_dc85de828967_68756773616d_managed_psk
+    OtherNET                wifi_dc85de828967_38303944616e69656c73_managed_psk
+    AnotherOne              wifi_dc85de828967_3257495245363836_managed_wep
+    FourthNetwork           wifi_dc85de828967_4d7572706879_managed_wep
+    AnOpenNetwork           wifi_dc85de828967_4d6568657272696e_managed_none
+#+end_src
+
+Register the /agent/ to handle user requests:
+
+#+begin_src bash
+connmanctl> agent on
+#+end_src
+
+Connect to one of the networks using the =wifi_= name.
+
+#+begin_src bash
+connmanctl> connect wifi_dc85de828967_68756773616d_managed_psk
+#+end_src
+
+If it's your first time connecting, you will need to enter the password:
+
+#+begin_src bash
+Agent RequestInput wifi_dc85de828967_38303944616e69656c73_managed_psk
+  Passphrase = [ Type=psk, Requirement=mandatory ]
+  Passphrase?
+#+end_src
+
+After that, you can exit the =connmanctl= program:
+
+#+begin_src bash
+connmanctl> quit
+#+end_src
+
+* Checking the interface status
+:PROPERTIES:
+:CUSTOM_ID: checking-the-interface-status
+:END:
+
+ConnMan will also handle DHCP, so we should get a dynamic IP automatically. You
+can check the interface status with {{{man(ip-address(8))}}}:
+
+#+begin_src bash
+$ ip a
+1: lo: <LOOPBACK,MULTICAST,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope global lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host proto kernel_lo
+       valid_lft forever preferred_lft forever
+2: enp0s25: <NO-CARRIER,BROADCAST,MULTICAST,DYNAMIC,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    link/ether 11:22:33:aa:bb:cc brd ff:ff:ff:ff:ff:ff
+3: wlp3s0: <BROADCAST,MULTICAST,DYNAMIC,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 44:55:66:aa:bb:cc brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.2/24 brd 192.168.0.255 scope global wlp3s0
+       valid_lft forever preferred_lft forever
+    inet6 aaaa::bbbb:111:2222:3333/64 scope link proto kernel_ll
+       valid_lft forever preferred_lft forever
+#+end_src

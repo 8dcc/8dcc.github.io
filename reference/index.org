@@ -15,6 +15,7 @@
 This is an attempt of centralizing some useful technical information on various
 topics.
 
+- [[file:guix-connman.org][Connecting to a Wi-Fi network from Guix using ConnMan]]
 - [[file:ansi-escape-sequences.org][ANSI Escape Sequences]]
 
 * Intel SDM
