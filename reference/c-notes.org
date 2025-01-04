@@ -1,0 +1,253 @@
+#+TITLE: C/C++ notes
+#+AUTHOR: 8dcc
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+These are some C and C++ notes that I have considered important throughout the
+years, although I will probably continue updating this list in the future. I
+will try to store the source of each note,
+
+Here are some related resources that you might find interesting:
+
+- C99 standard: https://www.iso-9899.info/n1256.html
+- Dennis Yurichev's C notes: https://yurichev.com/C-book.html
+
+* C notes
+:PROPERTIES:
+:CUSTOM_ID: c-notes
+:END:
+
+** Arrays
+:PROPERTIES:
+:CUSTOM_ID: arrays
+:END:
+
+*** Array subscripting
+:PROPERTIES:
+:CUSTOM_ID: array-subscripting
+:END:
+
+The definition of the subscript operator =[]= is that =E1[E2]= is identical to
+=(*((E1)+(E2)))=. Because of the conversion rules that apply to the binary =+=
+operator, if =E1= is an array object (equivalently, a pointer to the initial
+element of an array object) and =E2= is an integer, =E1[E2]= designates the =E2=-th
+element of =E1= (counting from zero)[fn::See C99, 6.5.2.1, point 2; and 6.5.6,
+point 8.].
+
+*** Contiguous elements without padding
+:PROPERTIES:
+:CUSTOM_ID: contiguous-elements-without-padding
+:END:
+
+#+begin_comment org
+TODO: This needs more references.
+#+end_comment
+
+Array elements have to be contiguous without padding between them[fn::See C99,
+6.5.6, points 8 and 9, and specially footnote 91.].
+
+** Structures
+:PROPERTIES:
+:CUSTOM_ID: structures
+:END:
+
+See also [[#bit-fields][Bit-fields]].
+
+*** Order of structure members
+:PROPERTIES:
+:CUSTOM_ID: order-of-structure-members
+:END:
+
+The address of each structure member must increase in the order in which they
+are declared. There may be unnamed padding /within/ a structure object, but /not/
+at its beginning[fn::See C99, 6.7.2.1, point 13.].
+
+*** End padding in structures
+:PROPERTIES:
+:CUSTOM_ID: end-padding-in-structures
+:END:
+
+There may be unnamed padding at the end of a structure or union[fn::See C99,
+6.7.2.1, point 15.]. This is normally done to align the start address of a
+potentially contiguous structure of the same type (e.g. when declaring arrays of
+this structure); see [[#contiguous-elements-without-padding][Contiguous elements without padding]].
+
+*** Alignment of each member
+:PROPERTIES:
+:CUSTOM_ID: alignment-of-each-member
+:END:
+
+Each non-bit-field member of a structure or union object is aligned in an
+implementation-defined manner appropriate to its type[fn::See C99, 6.7.2.1,
+point 12; and C99, J.3.9, point 5.].
+
+#+begin_comment org
+TODO: More references.
+
+The alignment of each member must be an integral fraction of the total size of
+that member.
+
+[fn::Regarding pointer alignment in general, see also C99, 6.3.2.3, footnote
+57.]
+#+end_comment
+
+*** Flexible array members
+:PROPERTIES:
+:CUSTOM_ID: flexible-array-members
+:END:
+
+The last element of a structure with more than one named member may have an
+incomplete array type; this is called a /flexible array member/. In most
+situations, the flexible array member is ignored, but it can still be used to
+access elements of an array of that specified type as if it was declared at that
+offset in the structure[fn::This explanation is an oversimplification. See C99,
+6.7.2.1, points 16 to 22.].
+
+For example, after the declaration:
+
+#+begin_src C
+struct Foo {
+    int n;
+    double d[]; /* Flexible array member */
+};
+#+end_src
+
+The structure =Foo= has a flexible array member =d=. A typical way to use this is:
+
+#+begin_src C
+int m = /* some value */;
+struct Foo* p = malloc(sizeof(struct Foo) + sizeof(double[m]));
+#+end_src
+
+And assuming that the call to =malloc= succeeds, the object pointed to by =p=
+behaves, for most purposes, as if =p= had been declared as:
+
+#+begin_src C
+struct {
+    int n;
+    double d[m];
+}* p;
+#+end_src
+
+There are circumstances in which this equivalence is broken; in particular, the
+offsets of member =d= might not be the same.
+
+** Bit-fields
+:PROPERTIES:
+:CUSTOM_ID: bit-fields
+:END:
+
+See also [[#structures][Structures]].
+
+*** Pointers to bit-field objects
+:PROPERTIES:
+:CUSTOM_ID: pointers-to-bit-field-objects
+:END:
+
+The unary =&= (/address-of/) operator cannot be applied to a bit-field object;
+thus, there are no pointers to or arrays of bit-field objects[fn::See C99,
+6.7.2.1, footnote 106.].
+
+*** Order of allocation of bit-fields
+:PROPERTIES:
+:CUSTOM_ID: order-of-allocation-of-bit-fields
+:END:
+
+The order of allocation of bit-fields within a unit ([[https://en.wikipedia.org/wiki/Bit_numbering][high-order to low-order]] or
+low-order to high-order) is implementation-defined[fn::See C99, 6.7.2.1, point
+10.]. Therefore, in the following example:
+
+#+begin_src C
+struct Foo {
+    uint32_t a : 3;
+    uint32_t b : 11;
+};
+
+struct Foo foo;
+foo.a = 0;     /* Unnecessary */
+foo.b = 0x7FF; /* 0b11111111111 */
+#+end_src
+
+The layout of the =foo= variable might be any of the following (assuming the
+integer is stored in [[https://en.wikipedia.org/wiki/Endianness][big-endian]] format):
+
+#+NAME: example1
+#+begin_example
+| Binary                             |        Hex |   Decimal |
+|------------------------------------+------------+-----------|
+| 0b00011111111111000000000000000000 | 0x1FFC0000 | 536608768 |
+| 0b00000000000000000011111111111000 |     0x3FF8 |     16376 |
+#+end_example
+
+*** Unnamed and zero width bit-fields
+:PROPERTIES:
+:CUSTOM_ID: unnamed-and-zero-width-bit-fields
+:END:
+
+A bit-field declaration with no declarator, but only a colon and a width,
+indicates an unnamed bit-field[fn::See C99, 6.7.2.1, point 11.]. Therefore, in
+the following example:
+
+#+begin_src C
+struct Foo {
+    uint32_t a : 3;
+    uint32_t   : 6;
+    uint32_t b : 11;
+};
+
+struct Foo foo;
+foo.a = 0x7;   /* 0b00000000111 */
+foo.b = 0x7FF; /* 0b11111111111 */
+#+end_src
+
+The layout of the =foo= variable would be the following (assuming the integer is
+stored in big-endian format, and that the bit-fields are [[#order-of-allocation-of-bit-fields][allocated low-order to
+high-order]]):
+
+#+NAME: example2
+#+begin_example
+| Binary                             |     Hex | Decimal |
+|------------------------------------+---------+---------|
+| 0b00000000000011111111111000000111 | 0xFFE07 | 1048071 |
+#+end_example
+
+As a special case, an unnamed bit-field member with a width of 0 indicates that
+no further bit-field is to be packed into the unit in which the previous
+bit-field, if any, was placed. Therefore, in the following example:
+
+#+begin_src C
+struct Foo {
+    uint32_t a : 3;
+    uint32_t b : 11;
+    uint32_t   : 0;
+    uint32_t c : 5;
+};
+
+struct Foo foo;
+foo.a = 0x7;   /* 0b00000000111 */
+foo.b = 0x7FF; /* 0b11111111111 */
+foo.c = 0x1F;  /* 0b00000011111 */
+#+end_src
+
+The layout of the =foo= variable would be the following (again, assuming the
+integers are stored in big-endian format, and that the bit-fields are allocated
+low-order to high-order):
+
+#+NAME: example3
+#+begin_example
+.............................###................................ (foo.a)
+..................###########................................... (foo.b)
+...........................................................##### (foo.c)
+^0      ^1      ^2      ^3      ^4      ^5      ^6      ^7       (byte number)
+
+`------------------------------´`------------------------------´
+           First unit                     Second unit
+#+end_example

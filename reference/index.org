@@ -13,8 +13,11 @@
 :END:
 
 This is an attempt of centralizing some useful technical information on various
-topics.
+topics. The entries on this section won't be as elaborated as the rest of this
+blog, but I still decided to make them public in case they are useful for
+anyone.
 
+- [[file:c-notes.org][C/C++ notes]]
 - [[file:guix-connman.org][Connecting to a Wi-Fi network from Guix using ConnMan]]
 - [[file:ansi-escape-sequences.org][ANSI Escape Sequences]]
 
