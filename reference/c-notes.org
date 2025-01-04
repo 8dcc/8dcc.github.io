@@ -90,13 +90,15 @@ implementation-defined manner appropriate to its type[fn::See C99, 6.7.2.1,
 point 12; and C99, J.3.9, point 5.].
 
 #+begin_comment org
-TODO: More references.
+TODO: More references to these points, probably move to a general "Pointers"
+section and just add a link to that here.
 
-The alignment of each member must be an integral fraction of the total size of
-that member.
+- The alignment of each member must be an integral fraction of the total size of
+  that member. [fn::Regarding pointer alignment in general, see also C99,
+  6.3.2.3, footnote 57.]
 
-[fn::Regarding pointer alignment in general, see also C99, 6.3.2.3, footnote
-57.]
+- The size of a structure needs to be divisible by the alignments of all its
+  members.
 #+end_comment
 
 *** Flexible array members
