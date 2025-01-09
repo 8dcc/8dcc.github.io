@@ -378,15 +378,15 @@ an indefinite number of pointers (to the start of the chunk arrays) at runtime.
 :END:
 
 For keeping track of these pointers, we will create another linked list of
-"array starts". We declare a =LinkedPtr= structure which will contain the address
-of the next element in the linked list (or =NULL=), along with the pointer to the
-start of each array.
+"array starts". We declare an =ArrayStart= structure which will contain the
+address of the next element in the linked list (or =NULL=), along with the pointer
+to the start of each array.
 
 #+begin_src C
-typedef struct LinkedPtr LinkedPtr;
-struct LinkedPtr {
-    Chunk* ptr;
-    LinkedPtr* next;
+typedef struct ArrayStart ArrayStart;
+struct ArrayStart {
+    Chunk* arr;
+    ArrayStart* next;
 };
 #+end_src
 
@@ -396,13 +396,13 @@ pointer to the linked list of array starts.
 #+begin_src C
 struct Pool {
     Chunk* free_chunk;
-    LinkedPtr* array_starts; /* Updated */
+    ArrayStart* array_starts; /* Updated */
 };
 #+end_src
 
 This takes a bit more space in memory, but it's worth it. Even if we don't
 resize the pool, only the size 2 more pointers would be needed: one that points
-to the =LinkedPtr= structure itself, and the (unused) =.next= member.
+to the =ArrayStart= structure itself, and the (unused) =.next= member.
 
 ** Changes to =pool_new= and =pool_close=
 :PROPERTIES:
@@ -410,11 +410,11 @@ to the =LinkedPtr= structure itself, and the (unused) =.next= member.
 :END:
 
 The =pool_new= and =pool_free= functions need to be modified according to our new
-=LinkedPtr= structure.
+=ArrayStart= structure.
 
 When [[*Creating the pool][creating the pool]], instead of storing the base address of the chunk array
-in =pool->chunk_arr=, we will have to allocate a =LinkedPtr= structure and write it
-there.
+in =pool->chunk_arr=, we will have to allocate an =ArrayStart= structure and write
+it there.
 
 #+begin_src C
 Pool* pool_new(size_t pool_sz) {
@@ -433,7 +433,7 @@ Pool* pool_new(size_t pool_sz) {
     arr[pool_sz - 1].next = NULL;
 
     /* Added */
-    pool->array_starts = malloc(sizeof(LinkedPtr));
+    pool->array_starts = malloc(sizeof(ArrayStart));
     if (pool->array_starts == NULL) {
         free(arr);
         free(pool);
@@ -441,26 +441,26 @@ Pool* pool_new(size_t pool_sz) {
     }
 
     pool->array_starts->next = NULL;
-    pool->array_starts->ptr  = arr;
+    pool->array_starts->arr  = arr;
 
     return pool;
 }
 #+end_src
 
 When [[#closing-the-pool][closing the pool]], we will also need to traverse this =array_starts= linked
-list, freeing each chunk array and each =LinkedPtr= structure in the list.
+list, freeing each chunk array and each =ArrayStart= structure in the list.
 
 #+begin_src C
 void pool_close(Pool* pool) {
     if (pool == NULL)
         return;
 
-    LinkedPtr* linkedptr = pool->array_starts;
-    while (linkedptr != NULL) {
-        LinkedPtr* next = linkedptr->next;
-        free(linkedptr->ptr);
-        free(linkedptr);
-        linkedptr = next;
+    ArrayStart* array_start = pool->array_starts;
+    while (array_start != NULL) {
+        ArrayStart* next = array_start>next;
+        free(array_start>arr);
+        free(array_start);
+        array_start = next;
     }
 
     free(pool);
@@ -480,40 +480,40 @@ figure]]. The resizing process is the following:
 2. Link the new chunks together, just like we did when [[*Creating the pool][creating the pool]].
 3. Prepend the array of extra chunks to the "free chunks" list, just like we did
    when [[*Freeing chunks][freeing chunks]].
-4. Allocate a new =LinkedPtr= structure, and store the start of the new chunk
+4. Allocate a new =ArrayStart= structure, and store the start of the new chunk
    array in it.
-5. Prepend this new =LinkedPtr= structure to the linked list of "array starts",
+5. Prepend this new =ArrayStart= structure to the linked list of "array starts",
    stored inside the =Pool= structure.
 
 And this is the code corresponding to the previous steps.
 
 #+begin_src C
-bool pool_resize(Pool* pool, size_t extra_chunk_num) {
-    if (pool == NULL || extra_chunk_num == 0)
+bool pool_resize(Pool* pool, size_t extra_sz) {
+    if (pool == NULL || extra_sz == 0)
         return false;
 
     /* Step 1 */
-    Chunk* extra_chunk_arr = malloc(extra_chunk_num * sizeof(Chunk));
-    if (extra_chunk_arr == NULL)
+    Chunk* extra_arr = malloc(extra_sz * sizeof(Chunk));
+    if (extra_arr == NULL)
         return false;
 
     /* Step 2 */
-    for (size_t i = 0; i < extra_chunk_num - 1; i++)
-        extra_chunk_arr[i].next = &extra_chunk_arr[i + 1];
+    for (size_t i = 0; i < extra_sz - 1; i++)
+        extra_arr[i].next = &extra_arr[i + 1];
 
     /* Step 3 */
-    extra_chunk_arr[extra_chunk_num - 1].next = pool->free_chunk;
-    pool->free_chunk                          = extra_chunk_arr;
+    extra_arr[extra_sz - 1].next = pool->free_chunk;
+    pool->free_chunk             = extra_arr;
 
     /* Step 4 */
-    LinkedPtr* array_start = malloc(sizeof(LinkedPtr));
+    ArrayStart* array_start = malloc(sizeof(ArrayStart));
     if (array_start == NULL) {
-        free(extra_chunk_arr);
+        free(extra_arr);
         return false;
     }
 
     /* Step 5 */
-    array_start->ptr   = extra_chunk_arr;
+    array_start->arr   = extra_arr;
     array_start->next  = pool->array_starts;
     pool->array_starts = array_start;
 
@@ -522,7 +522,7 @@ bool pool_resize(Pool* pool, size_t extra_chunk_num) {
 #+end_src
 
 Just like in the [[fig7][previous figure]], the green and blue regions represent arrays
-allocated independently, but their respective =LinkedPtr= structures are also
+allocated independently, but their respective =ArrayStart= structures are also
 included in the diagram.
 
 #+NAME: fig8
