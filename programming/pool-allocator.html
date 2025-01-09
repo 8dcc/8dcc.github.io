@@ -336,9 +336,9 @@ contain (at most) <code>CHUNK_SZ</code> bytes of data.</li>
 <p>
 As mentioned, these types are &ldquo;implicit&rdquo;. This means that there isn&rsquo;t any <code>flags</code>
 variable that lets us know whether a specified chunk is free; instead, we know
-that a chunk is free because it will be inside a <i>linked list</i> of free
-chunks. When we initialize the pool, since all chunks are free, we will use the
-<code>Chunk.next</code> pointer to link each chunk to its adjacent one, like this:
+that a chunk is free because it will be inside a <a href="https://en.wikipedia.org/wiki/Free_list"><i>linked list</i> of free
+chunks</a>. When we initialize the pool, since all chunks are free, we will use
+the <code>Chunk.next</code> pointer to link each chunk to its adjacent one, like this:
 </p>
 
 

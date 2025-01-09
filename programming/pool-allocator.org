@@ -115,9 +115,9 @@ be two (implicit) types of chunks:
 
 As mentioned, these types are "implicit". This means that there isn't any =flags=
 variable that lets us know whether a specified chunk is free; instead, we know
-that a chunk is free because it will be inside a /linked list/ of free
-chunks. When we initialize the pool, since all chunks are free, we will use the
-=Chunk.next= pointer to link each chunk to its adjacent one, like this:
+that a chunk is free because it will be inside a [[https://en.wikipedia.org/wiki/Free_list][/linked list/ of free
+chunks]]. When we initialize the pool, since all chunks are free, we will use
+the =Chunk.next= pointer to link each chunk to its adjacent one, like this:
 
 #+NAME: fig1
 #+CAPTION: Four free chunks right after initializing the pool.
