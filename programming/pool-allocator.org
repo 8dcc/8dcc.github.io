@@ -532,3 +532,130 @@ included in the diagram.
 Naturally, this second implementation is able to allocate and free chunks with
 the same /O(1)/ efficiency. The memory impact is /slightly/ bigger, but it's
 probably worth it if you ever want to resize a pool.
+
+* Adding valgrind support
+:PROPERTIES:
+:CUSTOM_ID: adding-valgrind-support
+:END:
+
+[[https://valgrind.org/][Valgrind]] is a very useful tool for debugging and profiling programs. Among
+other things, it lets you detect memory leaks and invalid memory
+accesses. Personally, I have been using it for some years for detecting
+memory-related bugs in programs that use the standard library (i.e. =malloc=,
+=free=, etc.), but I didn't know that the valgrind framework also had support for
+custom allocators.
+
+The [[https://valgrind.org/docs/manual/mc-manual.html][Memcheck manual]] contains a lot of useful information for us, specially the
+[[https://valgrind.org/docs/manual/mc-manual.html#mc-manual.mempools][/Memory Pools/ section]]. This [[https://developers.redhat.com/articles/2022/03/23/use-valgrind-memcheck-custom-memory-manager#][Red Hat article]] also contains some useful
+information about how the valgrind framework can be used with other kinds of
+allocators.
+
+First, we will need to include valgrind's headers. You might need to install
+some =valgrind-devel= package, depending on your distribution.
+
+#+begin_src C
+#include <valgrind/valgrind.h>
+#include <valgrind/memcheck.h>
+#+end_src
+
+We will need to register an /anchor address/ (i.e. the address of our =Pool=
+structure) with =VALGRIND_CREATE_MEMPOOL= once, in =pool_new=. This /anchor address/
+is needed to associate each chunk with its specific pool whenever it's allocated
+or freed. We will also have to use =VALGRIND_DESTROY_MEMPOOL= once we are done
+with the pool, in =pool_close=.
+
+The =VALGRIND_MAKE_MEM_NOACCESS= macro will be used when a memory region should be
+inaccessible by the user (e.g. for the =Pool= and =ArrayStart= structures); while
+the =VALGRIND_MAKE_MEM_DEFINED= macro will be used whenever we need to read or
+write to a =NOACCESS= region (e.g. when accessing the =Pool.array_starts= member in
+=pool_expand=). There is also a =VALGRIND_MAKE_MEM_UNDEFINED= macro, but we won't
+need to call it manually.
+
+Finally, we will have to use =VALGRIND_MEMPOOL_ALLOC= when allocating a chunk from
+the pool, and =VALGRIND_MEMPOOL_FREE= when freeing it. These functions will call
+=VALGRIND_MAKE_MEM_UNDEFINED=[fn::If the pool (i.e. the /anchor address/) was
+registered with the =is_zeroed= argument set, valgrind will mark the chunk as
+=DEFINED=, instead of =UNDEFINED=.]  and =VALGRIND_MAKE_MEM_NOACCESS= respectively, so
+we won't have to worry about that.
+
+With all that in mind, this is how our new code would look like:
+
+#+begin_src C
+Pool* pool_new(size_t pool_sz, size_t chunk_sz) {
+    /* ... */
+
+    VALGRIND_MAKE_MEM_NOACCESS(arr, pool_sz * chunk_sz);
+    VALGRIND_MAKE_MEM_NOACCESS(pool->array_starts, sizeof(ArrayStart));
+    VALGRIND_MAKE_MEM_NOACCESS(pool, sizeof(Pool));
+    VALGRIND_CREATE_MEMPOOL(pool, 0, 0);
+
+    return pool;
+}
+
+bool pool_expand(Pool* pool, size_t extra_sz) {
+    if (pool == NULL || extra_sz == 0)
+        return false;
+
+    VALGRIND_MAKE_MEM_DEFINED(pool, sizeof(Pool));
+
+    /* ... */
+
+    VALGRIND_MAKE_MEM_NOACCESS(extra_arr, extra_sz * pool->chunk_sz);
+    VALGRIND_MAKE_MEM_NOACCESS(array_start, sizeof(ArrayStart));
+    VALGRIND_MAKE_MEM_NOACCESS(pool, sizeof(Pool));
+
+    return true;
+}
+
+void pool_close(Pool* pool) {
+    if (pool == NULL)
+        return;
+
+    VALGRIND_MAKE_MEM_DEFINED(pool, sizeof(Pool));
+
+    ArrayStart* array_start = pool->array_starts;
+    while (array_start != NULL) {
+        VALGRIND_MAKE_MEM_DEFINED(array_start, sizeof(ArrayStart));
+        /* ... */
+    }
+
+    VALGRIND_DESTROY_MEMPOOL(pool);
+    free(pool);
+}
+
+void* pool_alloc(Pool* pool) {
+    if (pool == NULL)
+        return NULL;
+    VALGRIND_MAKE_MEM_DEFINED(pool, sizeof(Pool));
+
+    if (pool->free_chunk == NULL)
+        return NULL;
+    VALGRIND_MAKE_MEM_DEFINED(pool->free_chunk, sizeof(void**));
+
+    /* ... */
+
+    VALGRIND_MEMPOOL_ALLOC(pool, result, pool->chunk_sz);
+    VALGRIND_MAKE_MEM_NOACCESS(pool->free_chunk, sizeof(void**));
+    VALGRIND_MAKE_MEM_NOACCESS(pool, sizeof(Pool));
+    return result;
+}
+
+void pool_free(Pool* pool, void* ptr) {
+    if (pool == NULL || ptr == NULL)
+        return;
+
+    VALGRIND_MAKE_MEM_DEFINED(pool, sizeof(Pool));
+
+    /* ... */
+
+    VALGRIND_MAKE_MEM_NOACCESS(pool, sizeof(Pool));
+    VALGRIND_MEMPOOL_FREE(pool, ptr);
+}
+#+end_src
+
+Although it makes the code less readable, adding valgrind support is definitely
+worth it.
+
+As I mentioned, this is the first time I use valgrind with a non-standard
+allocator, so feel free to [[https://github.com/8dcc/8dcc.github.io/pulls][contribute]] if you have any suggestions or
+improvements.
