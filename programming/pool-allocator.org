@@ -40,12 +40,17 @@ initially inspired by [[http://dmitrysoshnikov.com/compilers/writing-a-pool-allo
 that this article was discussed in [[https://news.ycombinator.com/item?id=42605848][Hacker News]].
 
 Similarly to =malloc=, a pool allocator allows the user to allocate memory at run
-time. The pool allocator, however, is much faster than =malloc=, at the cost of
-having a /fixed pool size/. It allows the user to allocate and free memory blocks
-(referred to as /chunks/, from now on) in /O(1)/ linear time. This implementation
-also uses very little memory: when creating the pool, a very small =Pool=
-structure is allocated, along with the pool itself. Free chunks are used to
-store information, so the memory impact is minimal.
+time. The pool allocator, however, is much faster than =malloc=[fn::This depends
+on many factors: the =malloc= implementation, the hardware, the CPU load,
+etc. Using the =benchmark.sh= script from commit [[https://github.com/8dcc/libpool/commit/9b101a79c0fed23207b97b47e0b8f4ca11f3ce3c][=9b101a7=]] of my =libpool= repo
+showed that =malloc= took ~2.25 seconds to allocate 1 million blocks of 10
+kilobytes each, while =libpool= took ~0.75 seconds (3 times faster). Credits to
+/kragen/ for his [[https://news.ycombinator.com/item?id=42605848#42644333][informative replies in HN]].], at the cost of having a /fixed pool
+size/. It allows the user to allocate and free memory blocks (referred to as
+/chunks/, from now on) in /O(1)/ linear time. This implementation also uses very
+little memory: when creating the pool, a very small =Pool= structure is allocated,
+along with the pool itself. Free chunks are used to store information, so the
+memory impact is minimal.
 
 Lastly, I would like to mention that this article is based on my ANSI C library
 for pool allocation, [[https://github.com/8dcc/libpool][libpool]]. In the future, I might make small changes to the
