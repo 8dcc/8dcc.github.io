@@ -174,8 +174,11 @@ Pool* pool_new(size_t pool_sz) {
 
 Here's a brief explanation of each step:
 
-1. We allocate the =Pool= structure that will be returned, using =malloc=. We could
-   use any generic allocation function, not necessarily =malloc=.
+1. We allocate the =Pool= structure that will be returned, using =malloc=[fn::We
+   could allocate the =Pool= and the chunk array with a single call, but I think
+   this would make it less readable. Furthermore, since the =Pool= structure is
+   small, we could even return it directly on the stack, instead allocating it
+   and returning a pointer.].
 2. We allocate the pool itself, that is, the array of =Chunk= unions. We
    initialize both =chunk_arr= and =free_chunk= pointers to the same address, since
    all chunks will be free by default.
