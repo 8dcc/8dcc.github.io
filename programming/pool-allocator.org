@@ -18,12 +18,19 @@ See:
 - https://tex.stackexchange.com/a/598827/292826
 #+end_comment
 
+#+begin_comment org
+TODO: Other interesting topics for this article:
+- Mention alignment.
+- Thread safety.
+- Address sanitizer (ASan).
+#+end_comment
+
 * Introduction
 :PROPERTIES:
 :CUSTOM_ID: introduction
 :END:
 
-#+begin_comment
+#+begin_comment org
 TODO: Link to arena allocator article.
 #+end_comment
 
