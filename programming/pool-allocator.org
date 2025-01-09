@@ -183,8 +183,12 @@ Here's a brief explanation of each step:
    initialize both =chunk_arr= and =free_chunk= pointers to the same address, since
    all chunks will be free by default.
 3. We build the linked list of free chunks. We set the =.next= member of the =Chunk=
-   union to the address of the adjacent chunk, except for the last free chunk,
-   which will point to =NULL=.
+   union to the address of the adjacent chunk[fn::In this case, we store the
+   "absolute address" of the adjacent chunk, but we could use less space by
+   storing an offset relative to the start of the chunk array. This is not a big
+   deal, though, since we will probably want to use the pool allocator with
+   chunks bigger than a pointer in the first place.], except for the last free
+   chunk, which will point to =NULL=.
 
 This is how the pool looks after being returned from =pool_new=:
 
