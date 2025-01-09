@@ -774,8 +774,8 @@ list, freeing each chunk array and each <code>ArrayStart</code> structure in the
 
     <span style="color: #79a8ff;">ArrayStart</span>* <span style="color: #6ae4b9;">array_start</span> = pool-&gt;array_starts;
     <span style="color: #ff6f9f;">while</span> (array_start != <span style="color: #88ca9f;">NULL</span>) {
-        <span style="color: #79a8ff;">ArrayStart</span>* <span style="color: #6ae4b9;">next</span> = array_start&gt;next;
-        free(array_start&gt;arr);
+        <span style="color: #79a8ff;">ArrayStart</span>* <span style="color: #6ae4b9;">next</span> = array_start-&gt;next;
+        free(array_start-&gt;arr);
         free(array_start);
         array_start = next;
     }

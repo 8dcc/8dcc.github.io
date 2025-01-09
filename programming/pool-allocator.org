@@ -464,8 +464,8 @@ void pool_close(Pool* pool) {
 
     ArrayStart* array_start = pool->array_starts;
     while (array_start != NULL) {
-        ArrayStart* next = array_start>next;
-        free(array_start>arr);
+        ArrayStart* next = array_start->next;
+        free(array_start->arr);
         free(array_start);
         array_start = next;
     }
