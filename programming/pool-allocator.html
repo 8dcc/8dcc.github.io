@@ -221,7 +221,7 @@
 <ul>
 <li><a href="#keeping-track-of-the-array-starts">4.1. Keeping track of the array starts</a></li>
 <li><a href="#changes-to-pool-new-and-pool-close">4.2. Changes to <code>pool_new</code> and <code>pool_close</code></a></li>
-<li><a href="#resizing-without-modifying-the-array">4.3. Resizing without modifying the array</a></li>
+<li><a href="#expanding-without-modifying-the-array">4.3. Expanding without modifying the array</a></li>
 </ul>
 </li>
 </ul>
@@ -709,7 +709,7 @@ pointer to the linked list of array starts.
 
 <p>
 This takes a bit more space in memory, but it&rsquo;s worth it. Even if we don&rsquo;t
-resize the pool, only the size 2 more pointers would be needed: one that points
+expand the pool, only the size 2 more pointers would be needed: one that points
 to the <code>ArrayStart</code> structure itself, and the (unused) <code>.next</code> member.
 </p>
 </div>
@@ -786,13 +786,13 @@ list, freeing each chunk array and each <code>ArrayStart</code> structure in the
 </div>
 </div>
 
-<div id="outline-container-resizing-without-modifying-the-array" class="outline-3">
-<h3 id="resizing-without-modifying-the-array"><span class="section-number-3">4.3.</span> Resizing without modifying the array</h3>
-<div class="outline-text-3" id="text-resizing-without-modifying-the-array">
+<div id="outline-container-expanding-without-modifying-the-array" class="outline-3">
+<h3 id="expanding-without-modifying-the-array"><span class="section-number-3">4.3.</span> Expanding without modifying the array</h3>
+<div class="outline-text-3" id="text-expanding-without-modifying-the-array">
 <p>
 Now that we have a way of storing the start addresses of an indefinite number of
-chunk arrays, we can implement the resizing method shown in the <a href="#fig7">previous
-figure</a>. The resizing process is the following:
+chunk arrays, we can implement the expansion method shown in the <a href="#fig7">previous
+figure</a>. The expansion process is the following:
 </p>
 
 <ol class="org-ol">
@@ -811,7 +811,7 @@ And this is the code corresponding to the previous steps.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">pool_resize</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">extra_sz</span>) {
+<pre class="src src-C"><span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">pool_expand</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">extra_sz</span>) {
     <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span> || extra_sz == <span style="color: #88ca9f;">0</span>)
         <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
 
@@ -855,7 +855,7 @@ included in the diagram.
 <div id="fig8" class="figure">
 <p><img src="../img/pool-allocator8.svg" alt="pool-allocator8.svg" class="org-svg" />
 </p>
-<p><span class="figure-number">Figure 8: </span>Layout of a pool after resizing, showing the linked list of array starts.</p>
+<p><span class="figure-number">Figure 8: </span>Layout of a pool after expanding, showing the linked list of array starts.</p>
 </div>
 
 <p>

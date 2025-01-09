@@ -401,7 +401,7 @@ struct Pool {
 #+end_src
 
 This takes a bit more space in memory, but it's worth it. Even if we don't
-resize the pool, only the size 2 more pointers would be needed: one that points
+expand the pool, only the size 2 more pointers would be needed: one that points
 to the =ArrayStart= structure itself, and the (unused) =.next= member.
 
 ** Changes to =pool_new= and =pool_close=
@@ -467,14 +467,14 @@ void pool_close(Pool* pool) {
 }
 #+end_src
 
-** Resizing without modifying the array
+** Expanding without modifying the array
 :PROPERTIES:
-:CUSTOM_ID: resizing-without-modifying-the-array
+:CUSTOM_ID: expanding-without-modifying-the-array
 :END:
 
 Now that we have a way of storing the start addresses of an indefinite number of
-chunk arrays, we can implement the resizing method shown in the [[fig7][previous
-figure]]. The resizing process is the following:
+chunk arrays, we can implement the expansion method shown in the [[fig7][previous
+figure]]. The expansion process is the following:
 
 1. Allocate the array of extra chunks that we are trying to add to the pool.
 2. Link the new chunks together, just like we did when [[*Creating the pool][creating the pool]].
@@ -488,7 +488,7 @@ figure]]. The resizing process is the following:
 And this is the code corresponding to the previous steps.
 
 #+begin_src C
-bool pool_resize(Pool* pool, size_t extra_sz) {
+bool pool_expand(Pool* pool, size_t extra_sz) {
     if (pool == NULL || extra_sz == 0)
         return false;
 
@@ -526,7 +526,7 @@ allocated independently, but their respective =ArrayStart= structures are also
 included in the diagram.
 
 #+NAME: fig8
-#+CAPTION: Layout of a pool after resizing, showing the linked list of array starts.
+#+CAPTION: Layout of a pool after expanding, showing the linked list of array starts.
 [[file:../img/pool-allocator8.svg]]
 
 Naturally, this second implementation is able to allocate and free chunks with
