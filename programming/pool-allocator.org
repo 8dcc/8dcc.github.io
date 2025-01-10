@@ -47,7 +47,7 @@ showed that =malloc= took ~2.25 seconds to allocate 1 million blocks of 10
 kilobytes each, while =libpool= took ~0.75 seconds (3 times faster). Credits to
 /kragen/ for his [[https://news.ycombinator.com/item?id=42605848#42644333][informative replies in HN]].], at the cost of having a /fixed pool
 size/. It allows the user to allocate and free memory blocks (referred to as
-/chunks/, from now on) in /O(1)/ linear time. This implementation also uses very
+/chunks/, from now on) in /O(1)/ constant time. This implementation also uses very
 little memory: when creating the pool, a very small =Pool= structure is allocated,
 along with the pool itself. Free chunks are used to store information, so the
 memory impact is minimal.
@@ -220,7 +220,7 @@ Since this implementation doesn't support pool resizing, the only /O(n)/ algorit
 occurs when creating the pool itself, since we need to iterate each chunk to
 build the linked list described above. The chunk allocation process, on the
 other hand, has /O(1)/ complexity, since we always have a free chunk waiting for
-us at =Pool.free_chunk=. Freeing a chunk is also done in linear time, since we
+us at =Pool.free_chunk=. Freeing a chunk is also done in constant time, since we
 just have to prepend an element to this linked list.
 
 ** Allocating chunks
@@ -255,9 +255,9 @@ union. This is fine, since that chunk is no longer part of our "free chunks"
 list.
 
 Just to emphasize once again, we are not iterating anything, so this process is
-/linear/. Allocating chunks of arbitrary size on linear time obviously has great
-advantages, specially when we have to allocate and free many times per second
-(e.g. many entities in each tick of a simulation).
+/constant/. Allocating chunks of arbitrary size on constant time obviously has
+great advantages, specially when we have to allocate and free many times per
+second (e.g. many entities in each tick of a simulation).
 
 ** Freeing chunks
 :PROPERTIES:
@@ -268,7 +268,7 @@ Freeing chunks is pretty straight-forward, and if you understood the previous
 sections, I recommend you try to write your own function.
 
 The freeing process simply consists of adding (prepending) a chunk back into the
-linked list of free chunks. As you can probably tell, this is also a linear
+linked list of free chunks. As you can probably tell, this is also a constant
 process.
 
 #+begin_src C

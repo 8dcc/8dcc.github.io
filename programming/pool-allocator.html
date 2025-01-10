@@ -243,7 +243,7 @@ that this article was discussed in <a href="https://news.ycombinator.com/item?id
 Similarly to <code>malloc</code>, a pool allocator allows the user to allocate memory at run
 time. The pool allocator, however, is much faster than <code>malloc</code><sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>, at the cost of having a <i>fixed pool
 size</i>. It allows the user to allocate and free memory blocks (referred to as
-<i>chunks</i>, from now on) in <i>O(1)</i> linear time. This implementation also uses very
+<i>chunks</i>, from now on) in <i>O(1)</i> constant time. This implementation also uses very
 little memory: when creating the pool, a very small <code>Pool</code> structure is allocated,
 along with the pool itself. Free chunks are used to store information, so the
 memory impact is minimal.
@@ -459,7 +459,7 @@ Since this implementation doesn&rsquo;t support pool resizing, the only <i>O(n)<
 occurs when creating the pool itself, since we need to iterate each chunk to
 build the linked list described above. The chunk allocation process, on the
 other hand, has <i>O(1)</i> complexity, since we always have a free chunk waiting for
-us at <code>Pool.free_chunk</code>. Freeing a chunk is also done in linear time, since we
+us at <code>Pool.free_chunk</code>. Freeing a chunk is also done in constant time, since we
 just have to prepend an element to this linked list.
 </p>
 </div>
@@ -503,9 +503,9 @@ list.
 
 <p>
 Just to emphasize once again, we are not iterating anything, so this process is
-<i>linear</i>. Allocating chunks of arbitrary size on linear time obviously has great
-advantages, specially when we have to allocate and free many times per second
-(e.g. many entities in each tick of a simulation).
+<i>constant</i>. Allocating chunks of arbitrary size on constant time obviously has
+great advantages, specially when we have to allocate and free many times per
+second (e.g. many entities in each tick of a simulation).
 </p>
 </div>
 </div>
@@ -520,7 +520,7 @@ sections, I recommend you try to write your own function.
 
 <p>
 The freeing process simply consists of adding (prepending) a chunk back into the
-linked list of free chunks. As you can probably tell, this is also a linear
+linked list of free chunks. As you can probably tell, this is also a constant
 process.
 </p>
 
