@@ -1036,7 +1036,7 @@ deal, though, since we will probably want to use the pool allocator with
 chunks bigger than a pointer in the first place.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">An example of this method, which I
-wrote before I noticed the second problem, can be seen on commit <a href="https://github.com/8dcc/libpool/blob/bb0c8a2352b38066a8b25440ef9047ea19a34ece/src/libpool.c#L194-L240">bb0c8a2</a> of
+wrote before I noticed the second problem, can be seen on commit <a href="https://github.com/8dcc/libpool/blob/bb0c8a2352b38066a8b25440ef9047ea19a34ece/src/libpool.c#L194-L240"><code>bb0c8a2</code></a> of
 my <a href="https://github.com/8dcc">libpool</a> repository. That code doesn&rsquo;t use <code>Chunk</code> unions, so the casts make
 it less readable.</p></div></div>
 

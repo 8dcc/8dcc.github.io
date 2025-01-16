@@ -341,7 +341,7 @@ so the address of each chunk will also change. This is a problem because:
 1. The old pointers used to build the linked list of free chunks still point to
    the old array, so they become invalid. There are a few possible fixes for
    this, like recalculating the offsets[fn::An example of this method, which I
-   wrote before I noticed the second problem, can be seen on commit [[https://github.com/8dcc/libpool/blob/bb0c8a2352b38066a8b25440ef9047ea19a34ece/src/libpool.c#L194-L240][bb0c8a2]] of
+   wrote before I noticed the second problem, can be seen on commit [[https://github.com/8dcc/libpool/blob/bb0c8a2352b38066a8b25440ef9047ea19a34ece/src/libpool.c#L194-L240][=bb0c8a2=]] of
    my [[https://github.com/8dcc][libpool]] repository. That code doesn't use =Chunk= unions, so the casts make
    it less readable.] from the old /base address/, storing offsets instead of
    pointers, etc.
