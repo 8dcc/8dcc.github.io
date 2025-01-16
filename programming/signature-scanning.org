@@ -320,7 +320,7 @@ void* sigscan(const char* module, const char* pattern) {
 
 As far as I know, the windows equivalent of =dlopen= would be [[https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibrarya][=LoadLibraryA=]] and
 [[https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-getprocaddress][=GetProcAddress=]]. If you have more information on how this is done on windows,
-feel free to [[https://github.com/8dcc/8dcc.github.io/pulls][contribute]].
+feel free to [[https://github.com/8dcc/8dcc.github.io/issues][contribute]].
 
 In theory, if we wanted to get the bounds of the main binary, we could pass =NULL=
 as the first parameter to =sigscan=, so it gets passed to =dlopen=.

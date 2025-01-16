@@ -669,5 +669,5 @@ Although it makes the code less readable, adding valgrind support is definitely
 worth it.
 
 As I mentioned, this is the first time I use valgrind with a non-standard
-allocator, so feel free to [[https://github.com/8dcc/8dcc.github.io/pulls][contribute]] if you have any suggestions or
+allocator, so feel free to [[https://github.com/8dcc/8dcc.github.io/issues][contribute]] if you have any suggestions or
 improvements.

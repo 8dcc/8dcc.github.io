@@ -386,4 +386,4 @@ by calling ourselves, just like we did in =my-or=.
 
 I will end up adding a 4th version once I add [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html][backquote]] support to my Lisp.
 
-Feel free to [[https://github.com/8dcc/8dcc.github.io/pulls][contribute]] if you have any suggestions or improvements.
+Feel free to [[https://github.com/8dcc/8dcc.github.io/issues][contribute]] if you have any suggestions or improvements.
