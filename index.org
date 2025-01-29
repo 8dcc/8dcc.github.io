@@ -15,8 +15,8 @@ writing articles across my different projects.
 
 The articles in this blog are spread across the following categories.
 
-- [[file:reversing/index.org][Reverse engineering]]
 - [[file:programming/index.org][Programming]]
+- [[file:reversing/index.org][Reverse engineering]]
 - [[file:opinion/index.org][Opinion]]
 - [[file:reference/index.org][Reference]]
 
