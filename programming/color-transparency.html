@@ -432,7 +432,7 @@ ignored, and is assumed to be one.
              <span style="color: #00eff0;">(</span>rgb-scale c2 t2<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
 
   <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #44bc44;">(</span><span style="color: #4ae2ff;">transparencies-relative-reversed</span> colors transparencies<span style="color: #44bc44;">)</span>
-    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">or</span> <span style="color: #338fff;">(</span>null? <span style="color: #ef7fff;">(</span>cdr colors<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
+    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #00eff0;">(</span>null? <span style="color: #338fff;">(</span>cdr colors<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
         <span style="color: #00eff0;">(</span>car colors<span style="color: #00eff0;">)</span>
         <span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #338fff;">(</span><span style="color: #ef7fff;">(</span>cur-transparency <span style="color: #ff5f59;">(</span>car transparencies<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
           <span style="color: #338fff;">(</span>rgb-add <span style="color: #ef7fff;">(</span>rgb-scale <span style="color: #ff5f59;">(</span>car colors<span style="color: #ff5f59;">)</span>
