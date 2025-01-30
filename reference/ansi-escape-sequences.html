@@ -219,6 +219,19 @@
 <div id="outline-container-terminal-colors-and-effects" class="outline-2">
 <h2 id="terminal-colors-and-effects"><span class="section-number-2">1.</span> Terminal colors and effects</h2>
 <div class="outline-text-2" id="text-terminal-colors-and-effects">
+<p>
+The format of a <a href="https://en.wikipedia.org/wiki/ANSI_escape_code">Control Sequence Introducer</a> (CSI) is:
+</p>
+
+<pre class="example" id="example1">
+ESC   [     &lt;semicolon-separated-numbers&gt;  &lt;letter&gt;
+0x1B  0x5B
+</pre>
+
+<p>
+For colors, the <i>letter</i> used will be <code>m</code>, which corresponds to Select Graphic
+Rendition (SGR). For example, <code>\e[31m</code> will set the foreground color to red.
+</p>
 </div>
 
 <div id="outline-container-colors" class="outline-3">
@@ -370,7 +383,7 @@
 </tr>
 
 <tr>
-<td class="org-left">Reverse</td>
+<td class="org-left">Invert</td>
 <td class="org-right">7</td>
 <td class="org-right">27</td>
 </tr>

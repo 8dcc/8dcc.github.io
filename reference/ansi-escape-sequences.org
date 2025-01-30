@@ -11,6 +11,17 @@
 :CUSTOM_ID: terminal-colors-and-effects
 :END:
 
+The format of a [[https://en.wikipedia.org/wiki/ANSI_escape_code][Control Sequence Introducer]] (CSI) is:
+
+#+NAME: example1
+#+begin_example bash
+ESC   [     <semicolon-separated-numbers>  <letter>
+0x1B  0x5B
+#+end_example
+
+For colors, the /letter/ used will be =m=, which corresponds to Select Graphic
+Rendition (SGR). For example, =\e[31m= will set the foreground color to red.
+
 ** Colors
 :PROPERTIES:
 :CUSTOM_ID: colors
@@ -39,7 +50,7 @@
 | Dim       |      2 |      22 |
 | Underline |      4 |      24 |
 | Blink     |      5 |      25 |
-| Reverse   |      7 |      27 |
+| Invert    |      7 |      27 |
 | Hide      |      8 |      28 |
 
 ** Other links
