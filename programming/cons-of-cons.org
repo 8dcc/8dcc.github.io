@@ -1,0 +1,113 @@
+#+TITLE: The pros and cons of Cons
+#+AUTHOR: 8dcc
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+This article is about the advantages and disadvantages of using /cons cells/ in
+the [[https://en.wikipedia.org/wiki/Lisp_(programming_language)][Lisp]] programming language.
+
+I have been working on a [[https://github.com/8dcc/sl][simple Lisp interpreter]] for some months now, and I have
+learned many things from my mistakes. I recently changed how lists are
+internally stored in my interpreter, and I wanted to explain why I decided to
+use my old approach in the beginning, and why I decided to eventually change.
+
+** Cons cells
+:PROPERTIES:
+:CUSTOM_ID: cons-cells
+:END:
+
+If you are familiar with Lisp languages, you probably know what cons cells are,
+but I will still give a brief explanation.
+
+The term "cons" is a bit ambiguous in Lisp, because it's commonly used when
+talking about a data type, but it's also the name of procedure that creates an
+object with that type. Although basically all Lisp dialects have a =cons=
+function, the name used to refer to the data type changes among them: Scheme
+calls them /pairs/, Emacs Lisp calls them /cons cells/, and Common Lisp simply calls
+them /cons/. In this article, I will use the term "cons cell" when referring to
+the data type to avoid confusion.
+
+A cons cell is a Lisp object that simply consists of two pointers to Lisp
+objects. For historical reasons, the first pointer is called the /CAR/, and the
+second pointer is called the /CDR/[fn::Since Lisp was originally implemented on
+the IBM 704 computer, CAR stood for /Contents of the Address part of the
+Register/, and CDR stood for /Contents of the Decrement part of the Register/. See
+[[https://www-formal.stanford.edu/jmc/history/lisp/lisp.html][John McCarthy, History of Lisp (1979)]].]. These CAR and CDR terms are not only
+used when talking about the pointers themselves, but also when talking about the
+values that they point to.
+
+#+NAME: fig1
+[[file:../img/cons-of-cons1.svg]]
+
+These kind of diagrams are called /box-and-pointer, /box-and-arrow/, or simply /box
+diagrams/, and they are very useful for understanding how complex data structures
+are stored internally.
+
+The procedures for accessing the CAR and the CDR of a cons cell are called =car=
+and =cdr=:
+
+#+begin_src lisp
+(car (cons 10 20))
+  ⇒ 10
+
+(cdr (cons 10 20))
+  ⇒ 20
+#+end_src
+
+Finally, I would like to mention /dotted pair/ or /cons pair/ notation. When a dot
+is encountered inside of a list (i.e. between parentheses), the interpreter
+assumes that the element before the dot is the CAR of the current pair, and the
+one after the dot is the CDR.
+
+#+begin_src lisp
+(car '(10 . 20))
+  ⇒ 10
+
+(cdr '(10 . 20))
+  ⇒ 20
+#+end_src
+
+** Lists and syntactic sugar
+:PROPERTIES:
+:CUSTOM_ID: lists-and-syntactic-sugar
+:END:
+
+When people mention /lists/ in the Lisp context, they are usually talking about
+something that looks like:
+
+#+begin_src lisp
+(a b 1 2)
+#+end_src
+
+These are called /proper lists/, but it's important to understand that (usually)
+the lists are internally stored as /chained cons cells/, and that the previous
+notation is just syntactic sugar for:
+
+#+begin_src lisp
+(a . (b . (1 . (2 . nil))))
+#+end_src
+
+As you can see, each element of our list is stored in the CAR of a cons cell,
+and the CDR points to another cons cell which contains the next element. The CDR
+of the inner-most cons cell is the symbol =nil=, used to terminate
+lists[fn::Generally, =nil= is a pretty special symbol: It is considered both a
+symbol and a list (although it's not considered a cons cell according to Common
+Lisp's =consp= or Scheme's =pair?=), it usually evaluates to itself, and in many
+dialects both ~(car nil)~ and ~(cdr nil)~ evaluate to =nil=. It is also often used to
+denote /false/ in boolean operations.] Although not all Lisp dialects use the
+symbol =nil=, there is always a unique value used to terminate proper lists. In
+box diagrams, a crossed box is used to represent this terminator.
+
+#+NAME: fig2
+[[file:../img/cons-of-cons2.svg]]
+
+Let me emphasize that there is no "list type", it's just a data structure that
+is built out of cons cells.
