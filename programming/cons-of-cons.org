@@ -256,6 +256,22 @@ As you can see, each expression has a =next= member, so it will be /implicitly/ 
 list, even if it's isolated like the first expression. This has some important
 consequences that will be explained below.
 
+The following code shows how we would iterate each expression of a list; in this
+case for adding some integers together.
+
+#+begin_src C
+int sum(const Expr* list) {
+    assert(list->type == EXPR_LIST);
+
+    int total = 0;
+    for (Expr* e = list->val.children; e != NULL; e = e->next)
+        if (e->type == EXPR_INTEGER)
+            total += e->val.n;
+
+    return total;
+}
+#+end_src
+
 Before getting into the advantages and disadvantages of the implementation, I
 would like to note that the author of the book I mentioned probably chose this
 approach to deliberately explain how linked lists work (since the book is also
