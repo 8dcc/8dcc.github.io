@@ -13,13 +13,14 @@
 :CUSTOM_ID: introduction
 :END:
 
-This article is about the advantages and disadvantages of using /cons cells/ in
-the [[https://en.wikipedia.org/wiki/Lisp_(programming_language)][Lisp]] programming language.
+This article is about the advantages and disadvantages of using /cons cells/ when
+implementing [[https://en.wikipedia.org/wiki/Lisp_(programming_language)][Lisp]]-like programming language.
 
 I have been working on a [[https://github.com/8dcc/sl][simple Lisp interpreter]] for some months now, and I have
 learned many things from my mistakes. I recently changed how lists are
 internally stored in my interpreter, and I wanted to explain why I decided to
-use my old approach in the beginning, and why I decided to eventually change.
+use my old approach in the beginning, and why I decided to eventually change
+into a more conventional cons cell approach.
 
 ** Cons cells
 :PROPERTIES:
