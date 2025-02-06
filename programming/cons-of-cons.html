@@ -268,6 +268,7 @@ values that they point to.
 <div id="fig1" class="figure">
 <p><img src="../img/cons-of-cons1.svg" alt="cons-of-cons1.svg" class="org-svg" />
 </p>
+<p><span class="figure-number">Figure 1: </span>Box diagram of a cons cell.</p>
 </div>
 
 <p>
@@ -345,6 +346,7 @@ box diagrams, a crossed box is used to represent this terminator.
 <div id="fig2" class="figure">
 <p><img src="../img/cons-of-cons2.svg" alt="cons-of-cons2.svg" class="org-svg" />
 </p>
+<p><span class="figure-number">Figure 2: </span>Box diagram of a proper list.</p>
 </div>
 
 <p>
@@ -376,7 +378,7 @@ idea.
 <div class="outline-text-3" id="text-a-basic-expr-structure">
 <p>
 First, let&rsquo;s have a look at how a very basic Lisp expression would look like
-from C, using a <i>tagged union</i>:
+from C, using a <i>tagged union</i>.
 </p>
 
 <div class="org-src-container">
@@ -402,7 +404,7 @@ from C, using a <i>tagged union</i>:
 I will not spend too much time explaining why tagged unions are useful, since it
 is not the scope of this article, but in case you are not familiar with them,
 just know that they generally have a lower memory impact, and that we could
-access the appropriate value of an expression by checking its <code>type</code> member:
+access the appropriate value of an expression by checking its <code>type</code> member.
 </p>
 
 <div class="org-src-container">
@@ -427,23 +429,23 @@ Now let&rsquo;s have a look at how we could combine simple expressions into more
 complex structures using <i>linked lists</i>. The premise of a linked list is that each
 object in the list contains a pointer to the next one, therefore allowing the
 programmer to link objects that are not adjacent in memory (unlike simple
-arrays). The following diagram shows the memory layout when using a linked list
-of 3 elements.
+arrays).
 </p>
 
 
 <div id="fig3" class="figure">
 <p><img src="../img/cons-of-cons3.svg" alt="cons-of-cons3.svg" class="org-svg" />
 </p>
+<p><span class="figure-number">Figure 3: </span>Memory layout of a generic linked list of 3 elements.</p>
 </div>
 
 <p>
 We could use this linked list method for joining an arbitrary number of
-expressions together. Also note that the lists themselves (just like the cons
+expressions together. Keep in mind that the lists themselves (just like the cons
 cells in conventional implementations) are expressions, so we would need to add
 a new expression type whose value is a pointer to the start of a linked list of
-expressions. This is how the new <code>Expr</code> structure would look like after adding
-the necessary members:
+expressions. The following code shows how the new <code>Expr</code> structure would look like
+after adding the necessary members.
 </p>
 
 <div class="org-src-container">
@@ -500,14 +502,15 @@ list-&gt;val.children-&gt;next-&gt;next-&gt;next-&gt;next = <span style="color: 
 </div>
 
 <p>
-And the following diagram shows how it would be stored in memory with our new
-structure.
+And the following diagram shows how the list would be stored in memory with our
+new structure.
 </p>
 
 
 <div id="fig4" class="figure">
 <p><img src="../img/cons-of-cons4.svg" alt="cons-of-cons4.svg" class="org-svg" />
 </p>
+<p><span class="figure-number">Figure 4: </span>Layout of a list of 4 expressions, using the linked list approach.</p>
 </div>
 
 <p>

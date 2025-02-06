@@ -48,6 +48,7 @@ used when talking about the pointers themselves, but also when talking about the
 values that they point to.
 
 #+NAME: fig1
+#+CAPTION: Box diagram of a cons cell.
 [[file:../img/cons-of-cons1.svg]]
 
 These kind of diagrams are called /box-and-pointer/, /box-and-arrow/, or simply /box
@@ -110,6 +111,7 @@ symbol =nil=, there is always a unique value used to terminate proper lists. In
 box diagrams, a crossed box is used to represent this terminator.
 
 #+NAME: fig2
+#+CAPTION: Box diagram of a proper list.
 [[file:../img/cons-of-cons2.svg]]
 
 Let me emphasize that there is no "list type", it's just a data structure that
@@ -134,7 +136,7 @@ idea.
 :END:
 
 First, let's have a look at how a very basic Lisp expression would look like
-from C, using a /tagged union/:
+from C, using a /tagged union/.
 
 #+begin_src C
 enum EExprType {
@@ -157,7 +159,7 @@ typedef struct Expr {
 I will not spend too much time explaining why tagged unions are useful, since it
 is not the scope of this article, but in case you are not familiar with them,
 just know that they generally have a lower memory impact, and that we could
-access the appropriate value of an expression by checking its =type= member:
+access the appropriate value of an expression by checking its =type= member.
 
 #+begin_src C
 int f(Expr* expr) {
@@ -179,18 +181,18 @@ Now let's have a look at how we could combine simple expressions into more
 complex structures using /linked lists/. The premise of a linked list is that each
 object in the list contains a pointer to the next one, therefore allowing the
 programmer to link objects that are not adjacent in memory (unlike simple
-arrays). The following diagram shows the memory layout when using a linked list
-of 3 elements.
+arrays).
 
 #+NAME: fig3
+#+CAPTION: Memory layout of a generic linked list of 3 elements.
 [[file:../img/cons-of-cons3.svg]]
 
 We could use this linked list method for joining an arbitrary number of
-expressions together. Also note that the lists themselves (just like the cons
+expressions together. Keep in mind that the lists themselves (just like the cons
 cells in conventional implementations) are expressions, so we would need to add
 a new expression type whose value is a pointer to the start of a linked list of
-expressions. This is how the new =Expr= structure would look like after adding
-the necessary members:
+expressions. The following code shows how the new =Expr= structure would look like
+after adding the necessary members.
 
 #+begin_src C
 enum EExprType {
@@ -243,10 +245,11 @@ list->val.children->next->next->next->val.s = 2;
 list->val.children->next->next->next->next = NULL;
 #+end_src
 
-And the following diagram shows how it would be stored in memory with our new
-structure.
+And the following diagram shows how the list would be stored in memory with our
+new structure.
 
 #+NAME: fig4
+#+CAPTION: Layout of a list of 4 expressions, using the linked list approach.
 [[file:../img/cons-of-cons4.svg]]
 
 As you can see, each expression has a =next= member, so it will be /implicitly/ in a
