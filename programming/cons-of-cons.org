@@ -6,6 +6,8 @@
 #+HTML_LINK_UP: index.html
 #+HTML_LINK_HOME: ../index.html
 
+#+MACRO: man [[https://man.cx/$1][=$1=]]
+
 * Introduction
 :PROPERTIES:
 :CUSTOM_ID: introduction
@@ -52,7 +54,7 @@ diagrams/, and they are very useful for understanding how complex data structure
 are stored internally.
 
 The procedures for accessing the CAR and the CDR of a cons cell are called =car=
-and =cdr=:
+and =cdr=.
 
 #+begin_src lisp
 (car (cons 10 20))
@@ -111,3 +113,157 @@ box diagrams, a crossed box is used to represent this terminator.
 
 Let me emphasize that there is no "list type", it's just a data structure that
 is built out of cons cells.
+
+* The initial approach
+:PROPERTIES:
+:CUSTOM_ID: the-initial-approach
+:END:
+
+Now that we know how lists are conventionally represented in Lisps, let's have a
+look at an alternative implementation.
+
+One of the books that inspired me to write a Lisp was [[https://www.buildyourownlisp.com/][Build Your Own Lisp]] by
+Daniel Holden. The author doesn't use the cons cell approach described above,
+and although I didn't follow the book, at first glance it didn't seem like a bad
+idea.
+
+** A basic =Expr= structure
+:PROPERTIES:
+:CUSTOM_ID: a-basic-expr-structure
+:END:
+
+First, let's have a look at how a very basic Lisp expression would look like
+from C, using a /tagged union/:
+
+#+begin_src C
+enum EExprType {
+    EXPR_INTEGER,
+    EXPR_FLOAT,
+    EXPR_SYMBOL,
+};
+
+typedef struct Expr {
+    enum EExprType type;
+
+    union {
+        int n;
+        float f;
+        char* s;
+    } val;
+} Expr;
+#+end_src
+
+I will not spend too much time explaining why tagged unions are useful, since it
+is not the scope of this article, but in case you are not familiar with them,
+just know that they generally have a lower memory impact, and that we could
+access the appropriate value of an expression by checking its =type= member:
+
+#+begin_src C
+int f(Expr* expr) {
+    switch (expr->type) {
+        case EXPR_INTEGER: return expr->val.n;
+        case EXPR_FLOAT:   return (int)expr->val.f;
+        case EXPR_SYMBOL:  return strlen(expr->val.s);
+        default:           abort(); /* ??? */
+    }
+}
+#+end_src
+
+** Combining expressions with linked lists
+:PROPERTIES:
+:CUSTOM_ID: combining-expressions-with-linked-lists
+:END:
+
+Now let's have a look at how we could combine simple expressions into more
+complex structures using /linked lists/. The premise of a linked list is that each
+object in the list contains a pointer to the next one, therefore allowing the
+programmer to link objects that are not adjacent in memory (unlike simple
+arrays). The following diagram shows the memory layout when using a linked list
+of 3 elements.
+
+#+NAME: fig3
+[[file:../img/cons-of-cons3.svg]]
+
+We could use this linked list method for joining an arbitrary number of
+expressions together. Also note that the lists themselves (just like the cons
+cells in conventional implementations) are expressions, so we would need to add
+a new expression type whose value is a pointer to the start of a linked list of
+expressions. This is how the new =Expr= structure would look like after adding
+the necessary members:
+
+#+begin_src C
+enum EExprType {
+    /* ... */
+    EXPR_LIST,
+};
+
+typedef struct Expr {
+    enum EExprType type;
+
+    union {
+        /* ... */
+        struct Expr* children;
+    } val;
+
+    struct Expr* next;
+} Expr;
+#+end_src
+
+Notice how =children= is a member of the union, but =next= is a member of the =Expr=
+structure, so the size of each expression just increased by ~sizeof(Expr*)~, not
+by ~2 * sizeof(Expr*)~.
+
+The following code shows how we would manually create the list ~(a b 1 2)~ from C,
+assuming we defined some =expr_new= function for allocating an expression with the
+specified type, and assuming we can safely store string literals in our
+expression[fn::This is naturally a big assumption, one that doesn't even match
+our previous definition of =Expr=, since string literals are read-only and we are
+storing them in a non-constant =char*=. We would probably need to use some
+function that allocates the string on the heap, like {{{man(strdup(3))}}}. Again, I
+omited this for making the code slightly more readable.].
+
+#+begin_src C
+Expr* list = expr_new(EXPR_LIST);
+list->next = NULL;
+
+list->val.children = expr_new(EXPR_SYMBOL);
+list->val.children->val.s = "a";
+
+list->val.children->next = expr_new(EXPR_SYMBOL);
+list->val.children->next->val.s = "b";
+
+list->val.children->next->next = expr_new(EXPR_INTEGER);
+list->val.children->next->next->val.s = 1;
+
+list->val.children->next->next->next = expr_new(EXPR_INTEGER);
+list->val.children->next->next->next->val.s = 2;
+
+/* Terminate the linked list */
+list->val.children->next->next->next->next = NULL;
+#+end_src
+
+And the following diagram shows how it would be stored in memory with our new
+structure.
+
+#+begin_comment org
+TODO: Make =.val= slightly smaller in diagram.
+#+end_comment
+
+#+NAME: fig4
+[[file:../img/cons-of-cons4.svg]]
+
+As you can see, each expression has a =next= member, so it will be /implicitly/ in a
+list, even if it's isolated like the first expression. This has some important
+consequences that will be explained below.
+
+Before getting into the advantages and disadvantages of the implementation, I
+would like to note that the author of the book I mentioned probably chose this
+approach to deliberately explain how linked lists work (since the book is also
+meant for people learning C).
+
+I would also like to mention that Clojure, a Lisp dialect[fn::Although Richard
+Stallman doesn't agree with this statement, precisely because there aren't
+proper cons cells in Clojure. See [[https://stallman.org/stallman-computing.html][How I do my computing]], retreived in February
+of 2025.], uses a similar linked list approach through /sequences/, as described
+in [[https://insideclojure.org/2015/01/02/sequences/][this article]]. And indeed, this can be seen in the Java source code where the
+[[https://github.com/clojure/clojure/blob/fb22fd778a272b034684a4ee94509552b46ee8a9/src/jvm/clojure/lang/Cons.java#L21-L27][Cons class]] is defined.

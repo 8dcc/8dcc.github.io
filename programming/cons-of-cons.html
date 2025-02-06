@@ -211,6 +211,12 @@
 <li><a href="#lists-and-syntactic-sugar">1.2. Lists and syntactic sugar</a></li>
 </ul>
 </li>
+<li><a href="#the-initial-approach">2. The initial approach</a>
+<ul>
+<li><a href="#a-basic-expr-structure">2.1. A basic <code>Expr</code> structure</a></li>
+<li><a href="#combining-expressions-with-linked-lists">2.2. Combining expressions with linked lists</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -271,7 +277,7 @@ are stored internally.
 
 <p>
 The procedures for accessing the CAR and the CDR of a cons cell are called <code>car</code>
-and <code>cdr</code>:
+and <code>cdr</code>.
 </p>
 
 <div class="org-src-container">
@@ -347,6 +353,183 @@ is built out of cons cells.
 </div>
 </div>
 </div>
+
+<div id="outline-container-the-initial-approach" class="outline-2">
+<h2 id="the-initial-approach"><span class="section-number-2">2.</span> The initial approach</h2>
+<div class="outline-text-2" id="text-the-initial-approach">
+<p>
+Now that we know how lists are conventionally represented in Lisps, let&rsquo;s have a
+look at an alternative implementation.
+</p>
+
+<p>
+One of the books that inspired me to write a Lisp was <a href="https://www.buildyourownlisp.com/">Build Your Own Lisp</a> by
+Daniel Holden. The author doesn&rsquo;t use the cons cell approach described above,
+and although I didn&rsquo;t follow the book, at first glance it didn&rsquo;t seem like a bad
+idea.
+</p>
+</div>
+
+<div id="outline-container-a-basic-expr-structure" class="outline-3">
+<h3 id="a-basic-expr-structure"><span class="section-number-3">2.1.</span> A basic <code>Expr</code> structure</h3>
+<div class="outline-text-3" id="text-a-basic-expr-structure">
+<p>
+First, let&rsquo;s have a look at how a very basic Lisp expression would look like
+from C, using a <i>tagged union</i>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> {
+    <span style="color: #6ae4b9;">EXPR_INTEGER</span>,
+    <span style="color: #6ae4b9;">EXPR_FLOAT</span>,
+    <span style="color: #6ae4b9;">EXPR_SYMBOL</span>,
+};
+
+<span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span> {
+    <span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> <span style="color: #6ae4b9;">type</span>;
+
+    <span style="color: #ff6f9f;">union</span> {
+        <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">n</span>;
+        <span style="color: #79a8ff;">float</span> <span style="color: #6ae4b9;">f</span>;
+        <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">s</span>;
+    } <span style="color: #6ae4b9;">val</span>;
+} <span style="color: #79a8ff;">Expr</span>;
+</pre>
+</div>
+
+<p>
+I will not spend too much time explaining why tagged unions are useful, since it
+is not the scope of this article, but in case you are not familiar with them,
+just know that they generally have a lower memory impact, and that we could
+access the appropriate value of an expression by checking its <code>type</code> member:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">f</span>(<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">expr</span>) {
+    <span style="color: #ff6f9f;">switch</span> (expr-&gt;type) {
+        <span style="color: #ff6f9f;">case</span> EXPR_INTEGER: <span style="color: #ff6f9f;">return</span> expr-&gt;val.n;
+        <span style="color: #ff6f9f;">case</span> EXPR_FLOAT:   <span style="color: #ff6f9f;">return</span> (<span style="color: #79a8ff;">int</span>)expr-&gt;val.f;
+        <span style="color: #ff6f9f;">case</span> EXPR_SYMBOL:  <span style="color: #ff6f9f;">return</span> strlen(expr-&gt;val.s);
+        <span style="color: #ff6f9f;">default</span>:           abort(); <span style="color: #989898;">/* </span><span style="color: #989898;">???</span><span style="color: #989898;"> */</span>
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-combining-expressions-with-linked-lists" class="outline-3">
+<h3 id="combining-expressions-with-linked-lists"><span class="section-number-3">2.2.</span> Combining expressions with linked lists</h3>
+<div class="outline-text-3" id="text-combining-expressions-with-linked-lists">
+<p>
+Now let&rsquo;s have a look at how we could combine simple expressions into more
+complex structures using <i>linked lists</i>. The premise of a linked list is that each
+object in the list contains a pointer to the next one, therefore allowing the
+programmer to link objects that are not adjacent in memory (unlike simple
+arrays). The following diagram shows the memory layout when using a linked list
+of 3 elements.
+</p>
+
+
+<div id="fig3" class="figure">
+<p><img src="../img/cons-of-cons3.svg" alt="cons-of-cons3.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+We could use this linked list method for joining an arbitrary number of
+expressions together. Also note that the lists themselves (just like the cons
+cells in conventional implementations) are expressions, so we would need to add
+a new expression type whose value is a pointer to the start of a linked list of
+expressions. This is how the new <code>Expr</code> structure would look like after adding
+the necessary members:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> {
+    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+    <span style="color: #6ae4b9;">EXPR_LIST</span>,
+};
+
+<span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span> {
+    <span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> <span style="color: #6ae4b9;">type</span>;
+
+    <span style="color: #ff6f9f;">union</span> {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">children</span>;
+    } <span style="color: #6ae4b9;">val</span>;
+
+    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">next</span>;
+} <span style="color: #79a8ff;">Expr</span>;
+</pre>
+</div>
+
+<p>
+Notice how <code>children</code> is a member of the union, but <code>next</code> is a member of the <code>Expr</code>
+structure, so the size of each expression just increased by <code>sizeof(Expr*)</code>, not
+by <code>2 * sizeof(Expr*)</code>.
+</p>
+
+<p>
+The following code shows how we would manually create the list <code>(a b 1 2)</code> from C,
+assuming we defined some <code>expr_new</code> function for allocating an expression with the
+specified type, and assuming we can safely store string literals in our
+expression<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">list</span> = expr_new(EXPR_LIST);
+list-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+
+list-&gt;val.children = expr_new(EXPR_SYMBOL);
+list-&gt;val.children-&gt;val.s = <span style="color: #00d3d0;">"a"</span>;
+
+list-&gt;val.children-&gt;next = expr_new(EXPR_SYMBOL);
+list-&gt;val.children-&gt;next-&gt;val.s = <span style="color: #00d3d0;">"b"</span>;
+
+list-&gt;val.children-&gt;next-&gt;next = expr_new(EXPR_INTEGER);
+list-&gt;val.children-&gt;next-&gt;next-&gt;val.s = <span style="color: #88ca9f;">1</span>;
+
+list-&gt;val.children-&gt;next-&gt;next-&gt;next = expr_new(EXPR_INTEGER);
+list-&gt;val.children-&gt;next-&gt;next-&gt;next-&gt;val.s = <span style="color: #88ca9f;">2</span>;
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Terminate the linked list</span><span style="color: #989898;"> */</span>
+list-&gt;val.children-&gt;next-&gt;next-&gt;next-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+</pre>
+</div>
+
+<p>
+And the following diagram shows how it would be stored in memory with our new
+structure.
+</p>
+
+
+<div id="fig4" class="figure">
+<p><img src="../img/cons-of-cons4.svg" alt="cons-of-cons4.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+As you can see, each expression has a <code>next</code> member, so it will be <i>implicitly</i> in a
+list, even if it&rsquo;s isolated like the first expression. This has some important
+consequences that will be explained below.
+</p>
+
+<p>
+Before getting into the advantages and disadvantages of the implementation, I
+would like to note that the author of the book I mentioned probably chose this
+approach to deliberately explain how linked lists work (since the book is also
+meant for people learning C).
+</p>
+
+<p>
+I would also like to mention that Clojure, a Lisp dialect<sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>, uses a similar linked list approach through <i>sequences</i>, as described
+in <a href="https://insideclojure.org/2015/01/02/sequences/">this article</a>. And indeed, this can be seen in the Java source code where the
+<a href="https://github.com/clojure/clojure/blob/fb22fd778a272b034684a4ee94509552b46ee8a9/src/jvm/clojure/lang/Cons.java#L21-L27">Cons class</a> is defined.
+</p>
+</div>
+</div>
+</div>
 <div id="footnotes">
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
@@ -361,6 +544,17 @@ symbol and a list (although it&rsquo;s not considered a cons cell according to C
 Lisp&rsquo;s <code>consp</code> or Scheme&rsquo;s <code>pair?</code>), it usually evaluates to itself, and in many
 dialects both <code>(car nil)</code> and <code>(cdr nil)</code> evaluate to <code>nil</code>. It is also often used to
 denote <i>false</i> in boolean operations.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This is naturally a big assumption, one that doesn&rsquo;t even match
+our previous definition of <code>Expr</code>, since string literals are read-only and we are
+storing them in a non-constant <code>char*</code>. We would probably need to use some
+function that allocates the string on the heap, like <a href="https://man.cx/strdup(3)"><code>strdup(3)</code></a>. Again, I
+omited this for making the code slightly more readable.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Although Richard
+Stallman doesn&rsquo;t agree with this statement, precisely because there aren&rsquo;t
+proper cons cells in Clojure. See <a href="https://stallman.org/stallman-computing.html">How I do my computing</a>, retreived in February
+of 2025.</p></div></div>
 
 
 </div>
