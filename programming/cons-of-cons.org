@@ -47,7 +47,7 @@ values that they point to.
 #+NAME: fig1
 [[file:../img/cons-of-cons1.svg]]
 
-These kind of diagrams are called /box-and-pointer, /box-and-arrow/, or simply /box
+These kind of diagrams are called /box-and-pointer/, /box-and-arrow/, or simply /box
 diagrams/, and they are very useful for understanding how complex data structures
 are stored internally.
 
