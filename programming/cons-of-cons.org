@@ -245,10 +245,6 @@ list->val.children->next->next->next->next = NULL;
 And the following diagram shows how it would be stored in memory with our new
 structure.
 
-#+begin_comment org
-TODO: Make =.val= slightly smaller in diagram.
-#+end_comment
-
 #+NAME: fig4
 [[file:../img/cons-of-cons4.svg]]
 
