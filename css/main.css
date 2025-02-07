@@ -97,7 +97,7 @@ dl.org-dl dd p:nth-last-child(1) {
     line-height: 1.3em;
 }
 
-p sup, li sup {
+p sup, li sup, p sub, li sub {
     line-height: 0.5em;
 }
 
