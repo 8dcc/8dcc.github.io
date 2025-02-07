@@ -14,7 +14,7 @@
 :END:
 
 This article is about the advantages and disadvantages of using /cons cells/ when
-implementing [[https://en.wikipedia.org/wiki/Lisp_(programming_language)][Lisp]]-like programming language.
+implementing a [[https://en.wikipedia.org/wiki/Lisp_(programming_language)][Lisp]]-like programming language.
 
 I have been working on a [[https://github.com/8dcc/sl][simple Lisp interpreter]] for some months now, and I have
 learned many things from my mistakes. I recently changed how lists are
@@ -226,23 +226,35 @@ function that allocates the string on the heap, like {{{man(strdup(3))}}}. Again
 omited this for making the code slightly more readable.].
 
 #+begin_src C
-Expr* list = expr_new(EXPR_LIST);
-list->next = NULL;
+extern Expr* expr_new(enum EExprType type);
 
-list->val.children = expr_new(EXPR_SYMBOL);
-list->val.children->val.s = "a";
+Expr* get_list(void) {
+    /* Create the list itself */
+    Expr* list = expr_new(EXPR_LIST);
+    list->next = NULL;
 
-list->val.children->next = expr_new(EXPR_SYMBOL);
-list->val.children->next->val.s = "b";
+    /* Write each element */
+    Expr* elt          = expr_new(EXPR_SYMBOL);
+    list->val.children = elt;
+    elt->val.s         = "a";
 
-list->val.children->next->next = expr_new(EXPR_INTEGER);
-list->val.children->next->next->val.s = 1;
+    elt->next  = expr_new(EXPR_SYMBOL);
+    elt        = elt->next;
+    elt->val.s = "b";
 
-list->val.children->next->next->next = expr_new(EXPR_INTEGER);
-list->val.children->next->next->next->val.s = 2;
+    elt->next  = expr_new(EXPR_INTEGER);
+    elt        = elt->next;
+    elt->val.n = 1;
 
-/* Terminate the linked list */
-list->val.children->next->next->next->next = NULL;
+    elt->next  = expr_new(EXPR_INTEGER);
+    elt        = elt->next;
+    elt->val.n = 2;
+
+    /* Terminate the linked list */
+    elt->next = NULL;
+
+    return list;
+}
 #+end_src
 
 And the following diagram shows how the list would be stored in memory with our

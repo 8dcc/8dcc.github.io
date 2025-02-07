@@ -226,7 +226,7 @@
 <div class="outline-text-2" id="text-introduction">
 <p>
 This article is about the advantages and disadvantages of using <i>cons cells</i> when
-implementing <a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a>-like programming language.
+implementing a <a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a>-like programming language.
 </p>
 
 <p>
@@ -481,23 +481,35 @@ expression<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3<
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">list</span> = expr_new(EXPR_LIST);
-list-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+<pre class="src src-C"><span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">expr_new</span>(<span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> <span style="color: #6ae4b9;">type</span>);
 
-list-&gt;val.children = expr_new(EXPR_SYMBOL);
-list-&gt;val.children-&gt;val.s = <span style="color: #00d3d0;">"a"</span>;
+<span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">get_list</span>(<span style="color: #79a8ff;">void</span>) {
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Create the list itself</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">list</span> = expr_new(EXPR_LIST);
+    list-&gt;next = <span style="color: #88ca9f;">NULL</span>;
 
-list-&gt;val.children-&gt;next = expr_new(EXPR_SYMBOL);
-list-&gt;val.children-&gt;next-&gt;val.s = <span style="color: #00d3d0;">"b"</span>;
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Write each element</span><span style="color: #989898;"> */</span>
+    <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">elt</span>          = expr_new(EXPR_SYMBOL);
+    list-&gt;val.children = elt;
+    elt-&gt;val.s         = <span style="color: #00d3d0;">"a"</span>;
 
-list-&gt;val.children-&gt;next-&gt;next = expr_new(EXPR_INTEGER);
-list-&gt;val.children-&gt;next-&gt;next-&gt;val.s = <span style="color: #88ca9f;">1</span>;
+    elt-&gt;next  = expr_new(EXPR_SYMBOL);
+    elt        = elt-&gt;next;
+    elt-&gt;val.s = <span style="color: #00d3d0;">"b"</span>;
 
-list-&gt;val.children-&gt;next-&gt;next-&gt;next = expr_new(EXPR_INTEGER);
-list-&gt;val.children-&gt;next-&gt;next-&gt;next-&gt;val.s = <span style="color: #88ca9f;">2</span>;
+    elt-&gt;next  = expr_new(EXPR_INTEGER);
+    elt        = elt-&gt;next;
+    elt-&gt;val.n = <span style="color: #88ca9f;">1</span>;
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Terminate the linked list</span><span style="color: #989898;"> */</span>
-list-&gt;val.children-&gt;next-&gt;next-&gt;next-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+    elt-&gt;next  = expr_new(EXPR_INTEGER);
+    elt        = elt-&gt;next;
+    elt-&gt;val.n = <span style="color: #88ca9f;">2</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Terminate the linked list</span><span style="color: #989898;"> */</span>
+    elt-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+
+    <span style="color: #ff6f9f;">return</span> list;
+}
 </pre>
 </div>
 
