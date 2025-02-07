@@ -217,6 +217,7 @@
 <li><a href="#combining-expressions-with-linked-lists">2.2. Combining expressions with linked lists</a></li>
 </ul>
 </li>
+<li><a href="#the-conventional-cons-cell-approach">3. The conventional cons cell approach</a></li>
 </ul>
 </div>
 </div>
@@ -565,6 +566,141 @@ in <a href="https://insideclojure.org/2015/01/02/sequences/">this article</a>. A
 </div>
 </div>
 </div>
+
+<div id="outline-container-the-conventional-cons-cell-approach" class="outline-2">
+<h2 id="the-conventional-cons-cell-approach"><span class="section-number-2">3.</span> The conventional cons cell approach</h2>
+<div class="outline-text-2" id="text-the-conventional-cons-cell-approach">
+<p>
+Now that we had a look at how to combine expressions with a linked list, let&rsquo;s
+go back to the cons cell approach that is used in most Lisps. Instead of adding
+&ldquo;list&rdquo; expressions, we will simply add a &ldquo;pair&rdquo; type that contains the CAR and
+CDR pointers, and we will chain them to build lists.
+</p>
+
+<p>
+The following code shows how we could extend our basic <code>Expr</code> structure from <a href="#a-basic-expr-structure">above</a>
+to include pairs.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> {
+    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+    <span style="color: #6ae4b9;">EXPR_PAIR</span>,
+};
+
+<span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">ExprPair</span> {
+    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">car</span>;
+    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">cdr</span>;
+} <span style="color: #79a8ff;">ExprPair</span>;
+
+<span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span> {
+    <span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> <span style="color: #6ae4b9;">type</span>;
+
+    <span style="color: #ff6f9f;">union</span> {
+        <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+        <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">ExprPair</span> <span style="color: #6ae4b9;">pair</span>;
+    } <span style="color: #6ae4b9;">val</span>;
+} <span style="color: #79a8ff;">Expr</span>;
+</pre>
+</div>
+
+<p>
+There are some details I would like to note from the previous code. First,
+notice how the <code>Expr</code> structure doesn&rsquo;t have a <code>next</code> member anymore, so expressions
+are <i>not</i> in an &ldquo;implicit&rdquo; list. Second, notice how the <code>pair</code> union member is an
+<code>ExprPair</code> structure, not a <i>pointer</i> to that structure; this is because the pair
+structure is very small, so there is no need to allocate it separately.
+</p>
+
+
+<p>
+The following code is equivalent to the one shown in the previous section for
+creating the list <code>(a b 1 2)</code>. We assume there is some <code>NIL</code> expression that is used
+to uniquely identify a list terminator, but we could set the last CDR pointer to
+<code>NULL</code> instead.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">expr_new</span>(<span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> <span style="color: #6ae4b9;">type</span>);
+<span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">NIL</span>;
+
+<span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">get_list</span>(<span style="color: #79a8ff;">void</span>) {
+    <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">first</span>              = expr_new(EXPR_PAIR);
+    <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">cur</span>                = first;
+    cur-&gt;val.pair.car        = expr_new(EXPR_SYMBOL); <span style="color: #989898;">/* </span><span style="color: #989898;">CADR</span><span style="color: #989898;"> */</span>
+    cur-&gt;val.pair.car-&gt;val.s = <span style="color: #00d3d0;">"a"</span>;
+
+    cur-&gt;val.pair.cdr        = expr_new(EXPR_PAIR);
+    cur                      = cur-&gt;val.pair.cdr;
+    cur-&gt;val.pair.car        = expr_new(EXPR_SYMBOL); <span style="color: #989898;">/* </span><span style="color: #989898;">CADR</span><span style="color: #989898;"> */</span>
+    cur-&gt;val.pair.car-&gt;val.s = <span style="color: #00d3d0;">"b"</span>;
+
+    cur-&gt;val.pair.cdr        = expr_new(EXPR_PAIR);
+    cur                      = cur-&gt;val.pair.cdr;
+    cur-&gt;val.pair.car        = expr_new(EXPR_INTEGER); <span style="color: #989898;">/* </span><span style="color: #989898;">CADDR</span><span style="color: #989898;"> */</span>
+    cur-&gt;val.pair.car-&gt;val.n = <span style="color: #88ca9f;">1</span>;
+
+    cur-&gt;val.pair.cdr        = expr_new(EXPR_PAIR);
+    cur                      = cur-&gt;val.pair.cdr;
+    cur-&gt;val.pair.car        = expr_new(EXPR_INTEGER); <span style="color: #989898;">/* </span><span style="color: #989898;">CADDDR</span><span style="color: #989898;"> */</span>
+    cur-&gt;val.pair.car-&gt;val.n = <span style="color: #88ca9f;">2</span>;
+
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Terminate the chain of cons cells</span><span style="color: #989898;"> */</span>
+    cur-&gt;val.pair.cdr = NIL;
+
+    <span style="color: #ff6f9f;">return</span> first;
+}
+</pre>
+</div>
+
+<p>
+And the following diagram shows how the list would be stored in memory with our
+new structure.
+</p>
+
+
+<div id="fig5" class="figure">
+<p><img src="../img/cons-of-cons5.svg" alt="cons-of-cons5.svg" class="org-svg" />
+</p>
+<p><span class="figure-number">Figure 5: </span>Layout of a list of 4 expressions, using the cons cell approach.</p>
+</div>
+
+<p>
+The following code shows how we would iterate each element in a (proper<sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup>) list. The previous code is not very readable in my
+opinion, so I added some <code>CAR</code> and <code>CDR</code> macros for (hopefully) making the code a
+bit cleaner.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">CAR</span>(<span style="color: #6ae4b9;">EXPR_PTR</span>) ((EXPR_PTR)-&gt;val.pair.car)
+<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">CDR</span>(<span style="color: #6ae4b9;">EXPR_PTR</span>) ((EXPR_PTR)-&gt;val.pair.cdr)
+
+<span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">is_proper_list</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">expr</span>);
+<span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">is_nil</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">expr</span>);
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">sum</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">list</span>) {
+    assert(is_proper_list(list));
+
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">total</span> = <span style="color: #88ca9f;">0</span>;
+    <span style="color: #ff6f9f;">for</span> (; <span style="color: #ff6740; font-weight: bold;">!</span>is_nil(list); list = CDR(list))
+        <span style="color: #ff6f9f;">if</span> (CAR(list) == EXPR_INTEGER)
+            total += CAR(list)-&gt;val.n;
+
+    <span style="color: #ff6f9f;">return</span> total;
+}
+</pre>
+</div>
+
+<p>
+Notice how we use two functions that we haven&rsquo;t defined: <code>is_proper_list</code> and
+<code>is_nil</code>. It&rsquo;s not necessary to know how these functions are implemented, or even
+what <code>nil</code> really is, as long as we have a reliable way of checking for this
+unique value. This is called <i>wishful thinking</i>, and is a key concept from
+<a href="https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs">Structure and Interpretation of Computer Programs</a>, a great book that I truly
+recommend (not just for Lisp programmers).
+</p>
+</div>
+</div>
 <div id="footnotes">
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
@@ -590,6 +726,13 @@ omited this for making the code slightly more readable.</p></div></div>
 Stallman doesn&rsquo;t agree with this statement, precisely because there aren&rsquo;t
 proper cons cells in Clojure. See <a href="https://stallman.org/stallman-computing.html">How I do my computing</a>, retreived in February
 of 2025.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">As
+explained <a href="#lists-and-syntactic-sugar">above</a>, <i>proper lists</i> are lists of cons cells whose last CDR is
+<code>nil</code>. This is important because we want to stop as soon as we encounter <code>nil</code>, but
+an improper list does not contain a null CDR so we would need a different loop
+condition. Note that <code>nil</code> is also a proper list, and it&rsquo;s a valid input for our
+second <code>sum</code> function.</p></div></div>
 
 
 </div>

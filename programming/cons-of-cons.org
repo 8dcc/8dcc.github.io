@@ -295,3 +295,123 @@ proper cons cells in Clojure. See [[https://stallman.org/stallman-computing.html
 of 2025.], uses a similar linked list approach through /sequences/, as described
 in [[https://insideclojure.org/2015/01/02/sequences/][this article]]. And indeed, this can be seen in the Java source code where the
 [[https://github.com/clojure/clojure/blob/fb22fd778a272b034684a4ee94509552b46ee8a9/src/jvm/clojure/lang/Cons.java#L21-L27][Cons class]] is defined.
+
+* The conventional cons cell approach
+:PROPERTIES:
+:CUSTOM_ID: the-conventional-cons-cell-approach
+:END:
+
+Now that we had a look at how to combine expressions with a linked list, let's
+go back to the cons cell approach that is used in most Lisps. Instead of adding
+"list" expressions, we will simply add a "pair" type that contains the CAR and
+CDR pointers, and we will chain them to build lists.
+
+The following code shows how we could extend our basic =Expr= structure from [[#a-basic-expr-structure][above]]
+to include pairs.
+
+#+begin_src C
+enum EExprType {
+    /* ... */
+    EXPR_PAIR,
+};
+
+typedef struct ExprPair {
+    struct Expr* car;
+    struct Expr* cdr;
+} ExprPair;
+
+typedef struct Expr {
+    enum EExprType type;
+
+    union {
+        /* ... */
+        struct ExprPair pair;
+    } val;
+} Expr;
+#+end_src
+
+There are some details I would like to note from the previous code. First,
+notice how the =Expr= structure doesn't have a =next= member anymore, so expressions
+are /not/ in an "implicit" list. Second, notice how the =pair= union member is an
+=ExprPair= structure, not a /pointer/ to that structure; this is because the pair
+structure is very small, so there is no need to allocate it separately.
+
+
+The following code is equivalent to the one shown in the previous section for
+creating the list ~(a b 1 2)~. We assume there is some =NIL= expression that is used
+to uniquely identify a list terminator, but we could set the last CDR pointer to
+=NULL= instead.
+
+#+begin_src C
+extern Expr* expr_new(enum EExprType type);
+extern Expr* NIL;
+
+Expr* get_list(void) {
+    Expr* first              = expr_new(EXPR_PAIR);
+    Expr* cur                = first;
+    cur->val.pair.car        = expr_new(EXPR_SYMBOL); /* CADR */
+    cur->val.pair.car->val.s = "a";
+
+    cur->val.pair.cdr        = expr_new(EXPR_PAIR);
+    cur                      = cur->val.pair.cdr;
+    cur->val.pair.car        = expr_new(EXPR_SYMBOL); /* CADR */
+    cur->val.pair.car->val.s = "b";
+
+    cur->val.pair.cdr        = expr_new(EXPR_PAIR);
+    cur                      = cur->val.pair.cdr;
+    cur->val.pair.car        = expr_new(EXPR_INTEGER); /* CADDR */
+    cur->val.pair.car->val.n = 1;
+
+    cur->val.pair.cdr        = expr_new(EXPR_PAIR);
+    cur                      = cur->val.pair.cdr;
+    cur->val.pair.car        = expr_new(EXPR_INTEGER); /* CADDDR */
+    cur->val.pair.car->val.n = 2;
+
+    /* Terminate the chain of cons cells */
+    cur->val.pair.cdr = NIL;
+
+    return first;
+}
+#+end_src
+
+And the following diagram shows how the list would be stored in memory with our
+new structure.
+
+#+NAME: fig5
+#+CAPTION: Layout of a list of 4 expressions, using the cons cell approach.
+[[file:../img/cons-of-cons5.svg]]
+
+The following code shows how we would iterate each element in a (proper[fn::As
+explained [[#lists-and-syntactic-sugar][above]], /proper lists/ are lists of cons cells whose last CDR is
+=nil=. This is important because we want to stop as soon as we encounter =nil=, but
+an improper list does not contain a null CDR so we would need a different loop
+condition. Note that =nil= is also a proper list, and it's a valid input for our
+second =sum= function.]) list. The previous code is not very readable in my
+opinion, so I added some =CAR= and =CDR= macros for (hopefully) making the code a
+bit cleaner.
+
+#+begin_src C
+#define CAR(EXPR_PTR) ((EXPR_PTR)->val.pair.car)
+#define CDR(EXPR_PTR) ((EXPR_PTR)->val.pair.cdr)
+
+extern bool is_proper_list(const Expr* expr);
+extern bool is_nil(const Expr* expr);
+
+int sum(const Expr* list) {
+    assert(is_proper_list(list));
+
+    int total = 0;
+    for (; !is_nil(list); list = CDR(list))
+        if (CAR(list) == EXPR_INTEGER)
+            total += CAR(list)->val.n;
+
+    return total;
+}
+#+end_src
+
+Notice how we use two functions that we haven't defined: =is_proper_list= and
+=is_nil=. It's not necessary to know how these functions are implemented, or even
+what =nil= really is, as long as we have a reliable way of checking for this
+unique value. This is called /wishful thinking/, and is a key concept from
+[[https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs][Structure and Interpretation of Computer Programs]], a great book that I truly
+recommend (not just for Lisp programmers).
