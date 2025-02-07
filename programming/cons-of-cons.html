@@ -250,15 +250,15 @@ but I will still give a brief explanation.
 <p>
 The term &ldquo;cons&rdquo; is a bit ambiguous in Lisp, because it&rsquo;s commonly used when
 talking about a data type, but it&rsquo;s also the name of procedure that creates an
-object with that type. Although basically all Lisp dialects have a <code>cons</code>
-function, the name used to refer to the data type changes among them: Scheme
-calls them <i>pairs</i>, Emacs Lisp calls them <i>cons cells</i>, and Common Lisp simply calls
-them <i>cons</i>. In this article, I will use the term &ldquo;cons cell&rdquo; when referring to
-the data type to avoid confusion.
+object of that type. Although basically all Lisp dialects have a <code>cons</code> function,
+the name used to refer to the data type changes among them: Scheme calls them
+<i>pairs</i>, Emacs Lisp calls them <i>cons cells</i>, and Common Lisp simply calls them
+<i>cons</i>. In this article, I will use the term &ldquo;cons cell&rdquo; when referring to the
+data type to avoid confusion.
 </p>
 
 <p>
-A cons cell is a Lisp object that simply consists of two pointers to Lisp
+A cons cell is a Lisp object that simply points to another two to Lisp
 objects. For historical reasons, the first pointer is called the <i>CAR</i>, and the
 second pointer is called the <i>CDR</i><sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>. These CAR and CDR terms are not only
 used when talking about the pointers themselves, but also when talking about the
@@ -314,7 +314,7 @@ one after the dot is the CDR.
 <h3 id="lists-and-syntactic-sugar"><span class="section-number-3">1.2.</span> Lists and syntactic sugar</h3>
 <div class="outline-text-3" id="text-lists-and-syntactic-sugar">
 <p>
-When people mention <i>lists</i> in the Lisp context, they are usually talking about
+When people mention <i>lists</i> in the context of Lisp, they are usually talking about
 something that looks like:
 </p>
 
@@ -338,7 +338,7 @@ notation is just syntactic sugar for:
 As you can see, each element of our list is stored in the CAR of a cons cell,
 and the CDR points to another cons cell which contains the next element. The CDR
 of the inner-most cons cell is the symbol <code>nil</code>, used to terminate
-lists<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup> Although not all Lisp dialects use the
+lists<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>. Although not all Lisp dialects use the
 symbol <code>nil</code>, there is always a unique value used to terminate proper lists. In
 box diagrams, a crossed box is used to represent this terminator.
 </p>
@@ -367,10 +367,11 @@ look at an alternative implementation.
 </p>
 
 <p>
-One of the books that inspired me to write a Lisp was <a href="https://www.buildyourownlisp.com/">Build Your Own Lisp</a> by
-Daniel Holden. The author doesn&rsquo;t use the cons cell approach described above,
-and although I didn&rsquo;t follow the book, at first glance it didn&rsquo;t seem like a bad
-idea.
+One of the books that inspired me to write a Lisp interpreter was <a href="https://www.buildyourownlisp.com/">Build Your Own
+Lisp</a> by Daniel Holden. The author doesn&rsquo;t use the cons cell approach described
+above, and although I didn&rsquo;t follow the book, at first glance it didn&rsquo;t seem
+like a bad idea. This article tries to precisely show its advantages and
+limitations when compared to the traditional approach explained above.
 </p>
 </div>
 
@@ -405,7 +406,7 @@ from C, using a <i>tagged union</i>.
 I will not spend too much time explaining why tagged unions are useful, since it
 is not the scope of this article, but in case you are not familiar with them,
 just know that they generally have a lower memory impact, and that we could
-access the appropriate value of an expression by checking its <code>type</code> member.
+access the appropriate value of an expression by first checking its <code>type</code> member.
 </p>
 
 <div class="org-src-container">
@@ -429,8 +430,8 @@ access the appropriate value of an expression by checking its <code>type</code> 
 Now let&rsquo;s have a look at how we could combine simple expressions into more
 complex structures using <i>linked lists</i>. The premise of a linked list is that each
 object in the list contains a pointer to the next one, therefore allowing the
-programmer to link objects that are not adjacent in memory (unlike simple
-arrays).
+programmer to link objects that are not adjacent in memory, which is a
+limitation when using simple arrays.
 </p>
 
 
@@ -476,9 +477,9 @@ by <code>2 * sizeof(Expr*)</code>.
 
 <p>
 The following code shows how we would manually create the list <code>(a b 1 2)</code> from C,
-assuming we defined some <code>expr_new</code> function for allocating an expression with the
-specified type, and assuming we can safely store string literals in our
-expression<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>.
+assuming that there is some <code>expr_new</code> function that allocates an expression with
+the specified type. For readability, we will also assume that we can safely
+store string literals in our expressions<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>.
 </p>
 
 <div class="org-src-container">
@@ -515,8 +516,8 @@ expression<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3<
 </div>
 
 <p>
-And the following diagram shows how the list would be stored in memory with our
-new structure.
+The following diagram shows how the list would be stored in memory with our new
+structure.
 </p>
 
 
@@ -527,9 +528,9 @@ new structure.
 </div>
 
 <p>
-As you can see, each expression has a <code>next</code> member, so it will be <i>implicitly</i> in a
-list, even if it&rsquo;s isolated like the first expression. This has some important
-consequences that will be explained below.
+As you can see, each expression has a <code>next</code> member, so they will always be
+<i>implicitly</i> in a list, even if an expression isolated like the first one. This
+has some important consequences that will be explained below.
 </p>
 
 <p>
@@ -554,8 +555,8 @@ case for adding some integers together.
 <p>
 Before getting into the advantages and disadvantages of the implementation, I
 would like to note that the author of the book I mentioned probably chose this
-approach to deliberately explain how linked lists work (since the book is also
-meant for people learning C).
+approach to deliberately explain how linked lists work, since the book is also
+meant for people learning C.
 </p>
 
 <p>
@@ -573,8 +574,8 @@ in <a href="https://insideclojure.org/2015/01/02/sequences/">this article</a>. A
 <p>
 Now that we had a look at how to combine expressions with a linked list, let&rsquo;s
 go back to the cons cell approach that is used in most Lisps. Instead of adding
-&ldquo;list&rdquo; expressions, we will simply add a &ldquo;pair&rdquo; type that contains the CAR and
-CDR pointers, and we will chain them to build lists.
+&ldquo;list&rdquo; expressions to our implementation, we will simply add a &ldquo;pair&rdquo; type that
+contains the CAR and CDR pointers, and we will chain them to build lists.
 </p>
 
 <p>
@@ -614,16 +615,16 @@ structure is very small, so there is no need to allocate it separately.
 
 <p>
 We (potentially<sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup>) increased the size of the
-union by <code>sizeof(Expr*)</code>, but also decreased the size of the structure by
-<code>sizeof(Expr*)</code>, so the size of an individual expression was not negatively
+union by <code>sizeof(expr.val.pair.cdr)</code>, but also decreased the size of the structure
+by <code>sizeof(expr.next)</code>, so the size of an individual expression was not negatively
 impacted by this change.
 </p>
 
 <p>
 The following code is equivalent to the one shown in the previous section for
-creating the list <code>(a b 1 2)</code>. We assume there is some <code>NIL</code> expression that is used
-to uniquely identify a list terminator, but we could set the last CDR pointer to
-<code>NULL</code> instead.
+creating the list <code>(a b 1 2)</code>. We assume that there is some <code>NIL</code> expression that is
+used to uniquely identify a list terminator, but we could set the last CDR
+pointer to <code>NULL</code> instead.
 </p>
 
 <div class="org-src-container">
@@ -660,8 +661,8 @@ to uniquely identify a list terminator, but we could set the last CDR pointer to
 </div>
 
 <p>
-And the following diagram shows how the list would be stored in memory with our
-new structure.
+The following diagram shows how the list would be stored in memory with our new
+structure.
 </p>
 
 
@@ -672,9 +673,9 @@ new structure.
 </div>
 
 <p>
-The following code shows how we would iterate each element in a (proper<sup><a id="fnr.6" class="footref" href="#fn.6" role="doc-backlink">6</a></sup>) list. The previous code is not very readable in my
-opinion, so I added some <code>CAR</code> and <code>CDR</code> macros for (hopefully) making the code a
-bit cleaner.
+The following code shows how we would iterate over a (proper<sup><a id="fnr.6" class="footref" href="#fn.6" role="doc-backlink">6</a></sup>) list, accessing each element. Since the previous code is
+not very readable, I added some <code>CAR</code> and <code>CDR</code> macros for (hopefully) making the
+code a bit cleaner.
 </p>
 
 <div class="org-src-container">
@@ -698,12 +699,12 @@ bit cleaner.
 </div>
 
 <p>
-Notice how we use two functions that we haven&rsquo;t defined: <code>is_proper_list</code> and
-<code>is_nil</code>. It&rsquo;s not necessary to know how these functions are implemented, or even
-what <code>nil</code> really is, as long as we have a reliable way of checking for this
-unique value. This is called <i>wishful thinking</i>, and is a key concept from
-<a href="https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs">Structure and Interpretation of Computer Programs</a>, a great book that I truly
-recommend (not just for Lisp programmers).
+Just like with <code>expr_new</code>, notice how we use two functions that we haven&rsquo;t
+defined: <code>is_proper_list</code> and <code>is_nil</code>. It&rsquo;s not necessary to know how these
+functions are implemented, or even what <code>nil</code> really is, as long as we have a
+reliable way of checking for this unique value. This is called <i>wishful thinking</i>,
+and is a key concept from <a href="https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs">Structure and Interpretation of Computer Programs</a>, a
+great book that I truly recommend (not just for Lisp programmers).
 </p>
 </div>
 </div>
@@ -722,11 +723,11 @@ Lisp&rsquo;s <code>consp</code> or Scheme&rsquo;s <code>pair?</code>), it usuall
 dialects both <code>(car nil)</code> and <code>(cdr nil)</code> evaluate to <code>nil</code>. It is also often used to
 denote <i>false</i> in boolean operations.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This is naturally a big assumption, one that doesn&rsquo;t even match
-our previous definition of <code>Expr</code>, since string literals are read-only and we are
-storing them in a non-constant <code>char*</code>. We would probably need to use some
-function that allocates the string on the heap, like <a href="https://man.cx/strdup(3)"><code>strdup(3)</code></a>. Again, I
-omited this for making the code slightly more readable.</p></div></div>
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This is naturally a big assumption,
+one that doesn&rsquo;t even match our previous definition of <code>Expr</code>, since string
+literals are read-only and we are storing them in a non-constant <code>char*</code>. We would
+probably need to use some function that allocates the string on the heap, like
+<a href="https://man.cx/strdup(3)"><code>strdup(3)</code></a>.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Although Richard
 Stallman doesn&rsquo;t agree with this statement, precisely because there aren&rsquo;t
@@ -740,12 +741,12 @@ an <code>Expr</code> structure (since we removed the <code>next</code> pointer).
 union could be storing bigger members is if we kept track of the length of
 symbols/strings along with the actual <code>char*</code> data.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.6" class="footnum" href="#fnr.6" role="doc-backlink">6</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">As
-explained <a href="#lists-and-syntactic-sugar">above</a>, <i>proper lists</i> are lists of cons cells whose last CDR is
-<code>nil</code>. This is important because we want to stop as soon as we encounter <code>nil</code>, but
-an improper list does not contain a null CDR so we would need a different loop
-condition. Note that <code>nil</code> is also a proper list, and it&rsquo;s a valid input for our
-second <code>sum</code> function.</p></div></div>
+<div class="footdef"><sup><a id="fn.6" class="footnum" href="#fnr.6" role="doc-backlink">6</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">As explained
+<a href="#lists-and-syntactic-sugar">above</a>, <i>proper lists</i> are lists of cons cells whose last CDR is <code>nil</code>. This is
+important because we want to stop as soon as we encounter <code>nil</code>, but an improper
+list does not contain a null CDR so we would need a different loop
+condition. Note that <code>nil</code> is also a proper list, and therefore a valid input for
+this <code>sum</code> function.</p></div></div>
 
 
 </div>

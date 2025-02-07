@@ -32,13 +32,13 @@ but I will still give a brief explanation.
 
 The term "cons" is a bit ambiguous in Lisp, because it's commonly used when
 talking about a data type, but it's also the name of procedure that creates an
-object with that type. Although basically all Lisp dialects have a =cons=
-function, the name used to refer to the data type changes among them: Scheme
-calls them /pairs/, Emacs Lisp calls them /cons cells/, and Common Lisp simply calls
-them /cons/. In this article, I will use the term "cons cell" when referring to
-the data type to avoid confusion.
+object of that type. Although basically all Lisp dialects have a =cons= function,
+the name used to refer to the data type changes among them: Scheme calls them
+/pairs/, Emacs Lisp calls them /cons cells/, and Common Lisp simply calls them
+/cons/. In this article, I will use the term "cons cell" when referring to the
+data type to avoid confusion.
 
-A cons cell is a Lisp object that simply consists of two pointers to Lisp
+A cons cell is a Lisp object that simply points to another two to Lisp
 objects. For historical reasons, the first pointer is called the /CAR/, and the
 second pointer is called the /CDR/[fn::Since Lisp was originally implemented on
 the IBM 704 computer, CAR stood for /Contents of the Address part of the
@@ -84,7 +84,7 @@ one after the dot is the CDR.
 :CUSTOM_ID: lists-and-syntactic-sugar
 :END:
 
-When people mention /lists/ in the Lisp context, they are usually talking about
+When people mention /lists/ in the context of Lisp, they are usually talking about
 something that looks like:
 
 #+begin_src lisp
@@ -106,7 +106,7 @@ lists[fn::Generally, =nil= is a pretty special symbol: It is considered both a
 symbol and a list (although it's not considered a cons cell according to Common
 Lisp's =consp= or Scheme's =pair?=), it usually evaluates to itself, and in many
 dialects both ~(car nil)~ and ~(cdr nil)~ evaluate to =nil=. It is also often used to
-denote /false/ in boolean operations.] Although not all Lisp dialects use the
+denote /false/ in boolean operations.]. Although not all Lisp dialects use the
 symbol =nil=, there is always a unique value used to terminate proper lists. In
 box diagrams, a crossed box is used to represent this terminator.
 
@@ -125,10 +125,11 @@ is built out of cons cells.
 Now that we know how lists are conventionally represented in Lisps, let's have a
 look at an alternative implementation.
 
-One of the books that inspired me to write a Lisp was [[https://www.buildyourownlisp.com/][Build Your Own Lisp]] by
-Daniel Holden. The author doesn't use the cons cell approach described above,
-and although I didn't follow the book, at first glance it didn't seem like a bad
-idea.
+One of the books that inspired me to write a Lisp interpreter was [[https://www.buildyourownlisp.com/][Build Your Own
+Lisp]] by Daniel Holden. The author doesn't use the cons cell approach described
+above, and although I didn't follow the book, at first glance it didn't seem
+like a bad idea. This article tries to precisely show its advantages and
+limitations when compared to the traditional approach explained above.
 
 ** A basic =Expr= structure
 :PROPERTIES:
@@ -159,7 +160,7 @@ typedef struct Expr {
 I will not spend too much time explaining why tagged unions are useful, since it
 is not the scope of this article, but in case you are not familiar with them,
 just know that they generally have a lower memory impact, and that we could
-access the appropriate value of an expression by checking its =type= member.
+access the appropriate value of an expression by first checking its =type= member.
 
 #+begin_src C
 int f(Expr* expr) {
@@ -180,8 +181,8 @@ int f(Expr* expr) {
 Now let's have a look at how we could combine simple expressions into more
 complex structures using /linked lists/. The premise of a linked list is that each
 object in the list contains a pointer to the next one, therefore allowing the
-programmer to link objects that are not adjacent in memory (unlike simple
-arrays).
+programmer to link objects that are not adjacent in memory, which is a
+limitation when using simple arrays.
 
 #+NAME: fig3
 #+CAPTION: Memory layout of a generic linked list of 3 elements.
@@ -217,13 +218,13 @@ structure, so the size of each expression just increased by ~sizeof(Expr*)~, not
 by ~2 * sizeof(Expr*)~.
 
 The following code shows how we would manually create the list ~(a b 1 2)~ from C,
-assuming we defined some =expr_new= function for allocating an expression with the
-specified type, and assuming we can safely store string literals in our
-expression[fn::This is naturally a big assumption, one that doesn't even match
-our previous definition of =Expr=, since string literals are read-only and we are
-storing them in a non-constant =char*=. We would probably need to use some
-function that allocates the string on the heap, like {{{man(strdup(3))}}}. Again, I
-omited this for making the code slightly more readable.].
+assuming that there is some =expr_new= function that allocates an expression with
+the specified type. For readability, we will also assume that we can safely
+store string literals in our expressions[fn::This is naturally a big assumption,
+one that doesn't even match our previous definition of =Expr=, since string
+literals are read-only and we are storing them in a non-constant =char*=. We would
+probably need to use some function that allocates the string on the heap, like
+{{{man(strdup(3))}}}.].
 
 #+begin_src C
 extern Expr* expr_new(enum EExprType type);
@@ -257,16 +258,16 @@ Expr* get_list(void) {
 }
 #+end_src
 
-And the following diagram shows how the list would be stored in memory with our
-new structure.
+The following diagram shows how the list would be stored in memory with our new
+structure.
 
 #+NAME: fig4
 #+CAPTION: Layout of a list of 4 expressions, using the linked list approach.
 [[file:../img/cons-of-cons4.svg]]
 
-As you can see, each expression has a =next= member, so it will be /implicitly/ in a
-list, even if it's isolated like the first expression. This has some important
-consequences that will be explained below.
+As you can see, each expression has a =next= member, so they will always be
+/implicitly/ in a list, even if an expression isolated like the first one. This
+has some important consequences that will be explained below.
 
 The following code shows how we would iterate each expression of a list; in this
 case for adding some integers together.
@@ -286,8 +287,8 @@ int sum(const Expr* list) {
 
 Before getting into the advantages and disadvantages of the implementation, I
 would like to note that the author of the book I mentioned probably chose this
-approach to deliberately explain how linked lists work (since the book is also
-meant for people learning C).
+approach to deliberately explain how linked lists work, since the book is also
+meant for people learning C.
 
 I would also like to mention that Clojure, a Lisp dialect[fn::Although Richard
 Stallman doesn't agree with this statement, precisely because there aren't
@@ -301,10 +302,14 @@ in [[https://insideclojure.org/2015/01/02/sequences/][this article]]. And indeed
 :CUSTOM_ID: the-conventional-cons-cell-approach
 :END:
 
+#+begin_comment org
+TODO: Is it confusing that we refer to /cons cells/ as /pairs/ in the code?
+#+end_comment
+
 Now that we had a look at how to combine expressions with a linked list, let's
 go back to the cons cell approach that is used in most Lisps. Instead of adding
-"list" expressions, we will simply add a "pair" type that contains the CAR and
-CDR pointers, and we will chain them to build lists.
+"list" expressions to our implementation, we will simply add a "pair" type that
+contains the CAR and CDR pointers, and we will chain them to build lists.
 
 The following code shows how we could extend our basic =Expr= structure from [[#a-basic-expr-structure][above]]
 to include pairs.
@@ -342,14 +347,14 @@ the size of =ExprPair=, so this change would have actually decreased the size of
 an =Expr= structure (since we removed the =next= pointer). One example where the
 union could be storing bigger members is if we kept track of the length of
 symbols/strings along with the actual =char*= data.]) increased the size of the
-union by ~sizeof(Expr*)~, but also decreased the size of the structure by
-~sizeof(Expr*)~, so the size of an individual expression was not negatively
+union by ~sizeof(expr.val.pair.cdr)~, but also decreased the size of the structure
+by ~sizeof(expr.next)~, so the size of an individual expression was not negatively
 impacted by this change.
 
 The following code is equivalent to the one shown in the previous section for
-creating the list ~(a b 1 2)~. We assume there is some =NIL= expression that is used
-to uniquely identify a list terminator, but we could set the last CDR pointer to
-=NULL= instead.
+creating the list ~(a b 1 2)~. We assume that there is some =NIL= expression that is
+used to uniquely identify a list terminator, but we could set the last CDR
+pointer to =NULL= instead.
 
 #+begin_src C
 extern Expr* expr_new(enum EExprType type);
@@ -383,21 +388,21 @@ Expr* get_list(void) {
 }
 #+end_src
 
-And the following diagram shows how the list would be stored in memory with our
-new structure.
+The following diagram shows how the list would be stored in memory with our new
+structure.
 
 #+NAME: fig5
 #+CAPTION: Layout of a list of 4 expressions, using the cons cell approach.
 [[file:../img/cons-of-cons5.svg]]
 
-The following code shows how we would iterate each element in a (proper[fn::As
-explained [[#lists-and-syntactic-sugar][above]], /proper lists/ are lists of cons cells whose last CDR is
-=nil=. This is important because we want to stop as soon as we encounter =nil=, but
-an improper list does not contain a null CDR so we would need a different loop
-condition. Note that =nil= is also a proper list, and it's a valid input for our
-second =sum= function.]) list. The previous code is not very readable in my
-opinion, so I added some =CAR= and =CDR= macros for (hopefully) making the code a
-bit cleaner.
+The following code shows how we would iterate over a (proper[fn::As explained
+[[#lists-and-syntactic-sugar][above]], /proper lists/ are lists of cons cells whose last CDR is =nil=. This is
+important because we want to stop as soon as we encounter =nil=, but an improper
+list does not contain a null CDR so we would need a different loop
+condition. Note that =nil= is also a proper list, and therefore a valid input for
+this =sum= function.]) list, accessing each element. Since the previous code is
+not very readable, I added some =CAR= and =CDR= macros for (hopefully) making the
+code a bit cleaner.
 
 #+begin_src C
 #define CAR(EXPR_PTR) ((EXPR_PTR)->val.pair.car)
@@ -418,9 +423,9 @@ int sum(const Expr* list) {
 }
 #+end_src
 
-Notice how we use two functions that we haven't defined: =is_proper_list= and
-=is_nil=. It's not necessary to know how these functions are implemented, or even
-what =nil= really is, as long as we have a reliable way of checking for this
-unique value. This is called /wishful thinking/, and is a key concept from
-[[https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs][Structure and Interpretation of Computer Programs]], a great book that I truly
-recommend (not just for Lisp programmers).
+Just like with =expr_new=, notice how we use two functions that we haven't
+defined: =is_proper_list= and =is_nil=. It's not necessary to know how these
+functions are implemented, or even what =nil= really is, as long as we have a
+reliable way of checking for this unique value. This is called /wishful thinking/,
+and is a key concept from [[https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs][Structure and Interpretation of Computer Programs]], a
+great book that I truly recommend (not just for Lisp programmers).
