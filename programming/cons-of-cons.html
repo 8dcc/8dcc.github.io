@@ -237,6 +237,13 @@ internally stored in my interpreter, and I wanted to explain why I decided to
 use my old approach in the beginning, and why I decided to eventually change
 into a more conventional cons cell approach.
 </p>
+
+<p>
+Throughout this article I will use the Lisp syntax from my interpreter, but the
+examples can be ran in most Lisp dialects with some minor modifications. Just
+keep in mind that, unlike in Lisp<sub>2</sub> dialects (e.g. Common Lisp), there isn&rsquo;t a
+separate namespace for functions, so you won&rsquo;t see <code>funcall</code>.
+</p>
 </div>
 
 <div id="outline-container-cons-cells" class="outline-3">
@@ -280,7 +287,8 @@ are stored internally.
 
 <p>
 The procedures for accessing the CAR and the CDR of a cons cell are called <code>car</code>
-and <code>cdr</code>.
+and <code>cdr</code>. There are also wrappers for combining them, so <code>(caddr x)</code> would return
+the <code>car</code> of the <code>cdr</code> of the <code>cdr</code> of <code>x</code>.
 </p>
 
 <div class="org-src-container">

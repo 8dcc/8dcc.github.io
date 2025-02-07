@@ -22,6 +22,11 @@ internally stored in my interpreter, and I wanted to explain why I decided to
 use my old approach in the beginning, and why I decided to eventually change
 into a more conventional cons cell approach.
 
+Throughout this article I will use the Lisp syntax from my interpreter, but the
+examples can be ran in most Lisp dialects with some minor modifications. Just
+keep in mind that, unlike in Lisp_2 dialects (e.g. Common Lisp), there isn't a
+separate namespace for functions, so you won't see =funcall=.
+
 ** Cons cells
 :PROPERTIES:
 :CUSTOM_ID: cons-cells
@@ -56,7 +61,8 @@ diagrams/, and they are very useful for understanding how complex data structure
 are stored internally.
 
 The procedures for accessing the CAR and the CDR of a cons cell are called =car=
-and =cdr=.
+and =cdr=. There are also wrappers for combining them, so ~(caddr x)~ would return
+the =car= of the =cdr= of the =cdr= of =x=.
 
 #+begin_src lisp
 (car (cons 10 20))
@@ -268,6 +274,10 @@ structure.
 As you can see, each expression has a =next= member, so they will always be
 /implicitly/ in a list, even if an expression isolated like the first one. This
 has some important consequences that will be explained below.
+
+#+begin_comment org
+TODO: Link /disadvantage/ section on "below".
+#+end_comment
 
 The following code shows how we would iterate each expression of a list; in this
 case for adding some integers together.
