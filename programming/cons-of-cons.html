@@ -612,6 +612,12 @@ are <i>not</i> in an &ldquo;implicit&rdquo; list. Second, notice how the <code>p
 structure is very small, so there is no need to allocate it separately.
 </p>
 
+<p>
+We (potentially<sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup>) increased the size of the
+union by <code>sizeof(Expr*)</code>, but also decreased the size of the structure by
+<code>sizeof(Expr*)</code>, so the size of an individual expression was not negatively
+impacted by this change.
+</p>
 
 <p>
 The following code is equivalent to the one shown in the previous section for
@@ -666,7 +672,7 @@ new structure.
 </div>
 
 <p>
-The following code shows how we would iterate each element in a (proper<sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup>) list. The previous code is not very readable in my
+The following code shows how we would iterate each element in a (proper<sup><a id="fnr.6" class="footref" href="#fn.6" role="doc-backlink">6</a></sup>) list. The previous code is not very readable in my
 opinion, so I added some <code>CAR</code> and <code>CDR</code> macros for (hopefully) making the code a
 bit cleaner.
 </p>
@@ -727,7 +733,14 @@ Stallman doesn&rsquo;t agree with this statement, precisely because there aren&r
 proper cons cells in Clojure. See <a href="https://stallman.org/stallman-computing.html">How I do my computing</a>, retreived in February
 of 2025.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">As
+<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">I say &ldquo;potentially&rdquo; because, depending on how complex our
+<code>Expr</code> structure was, the size of the union might have been already greater than
+the size of <code>ExprPair</code>, so this change would have actually decreased the size of
+an <code>Expr</code> structure (since we removed the <code>next</code> pointer). One example where the
+union could be storing bigger members is if we kept track of the length of
+symbols/strings along with the actual <code>char*</code> data.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.6" class="footnum" href="#fnr.6" role="doc-backlink">6</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">As
 explained <a href="#lists-and-syntactic-sugar">above</a>, <i>proper lists</i> are lists of cons cells whose last CDR is
 <code>nil</code>. This is important because we want to stop as soon as we encounter <code>nil</code>, but
 an improper list does not contain a null CDR so we would need a different loop

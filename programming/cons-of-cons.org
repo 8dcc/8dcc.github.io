@@ -336,6 +336,15 @@ are /not/ in an "implicit" list. Second, notice how the =pair= union member is a
 =ExprPair= structure, not a /pointer/ to that structure; this is because the pair
 structure is very small, so there is no need to allocate it separately.
 
+We (potentially[fn::I say "potentially" because, depending on how complex our
+=Expr= structure was, the size of the union might have been already greater than
+the size of =ExprPair=, so this change would have actually decreased the size of
+an =Expr= structure (since we removed the =next= pointer). One example where the
+union could be storing bigger members is if we kept track of the length of
+symbols/strings along with the actual =char*= data.]) increased the size of the
+union by ~sizeof(Expr*)~, but also decreased the size of the structure by
+~sizeof(Expr*)~, so the size of an individual expression was not negatively
+impacted by this change.
 
 The following code is equivalent to the one shown in the previous section for
 creating the list ~(a b 1 2)~. We assume there is some =NIL= expression that is used
