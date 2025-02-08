@@ -222,9 +222,10 @@
 <ul>
 <li><a href="#disadvantage-memory-impact">4.1. Disadvantage: Memory impact</a></li>
 <li><a href="#advantage-improper-lists">4.2. Advantage: Improper lists</a></li>
-<li><a href="#advantage-consistent-nil">4.3. Advantage: Consistent <code>nil</code></a></li>
-<li><a href="#advantage-no-list-wrappers">4.4. Advantage: No list wrappers</a></li>
-<li><a href="#advantage-lisp-like-c-code">4.5. Advantage: Lisp-like C code</a></li>
+<li><a href="#advantage-context-independence-reusing-references">4.3. Advantage: Context independence, reusing references</a></li>
+<li><a href="#advantage-consistent-nil">4.4. Advantage: Consistent <code>nil</code></a></li>
+<li><a href="#advantage-no-list-wrappers">4.5. Advantage: No list wrappers</a></li>
+<li><a href="#advantage-lisp-like-c-code">4.6. Advantage: Lisp-like C code</a></li>
 </ul>
 </li>
 </ul>
@@ -803,8 +804,98 @@ approach, since the <code>next</code> member can point to a previous element of 
 </div>
 </div>
 
+<div id="outline-container-advantage-context-independence-reusing-references" class="outline-3">
+<h3 id="advantage-context-independence-reusing-references"><span class="section-number-3">4.3.</span> Advantage: Context independence, reusing references</h3>
+<div class="outline-text-3" id="text-advantage-context-independence-reusing-references">
+<p>
+As mentioned above, when using linked lists, each expression is restricted to
+their context, since they always have a <code>next</code> pointer.
+</p>
+
+<p>
+In the book by Daniel Holden, this isn&rsquo;t a problem because most functions
+returned copies, instead of references. Naturally, this is appropriate for his
+book, since it would be confusing for new C programmers to implement garbage
+collection (or even understand why it&rsquo;s needed), for example.
+</p>
+
+<p>
+Returning copies is not practical when making a real implementation,
+however. Not only does it waste memory and decrease performance (with
+unnecessary calls to the allocator), but it also makes some standard Lisp
+functions like <code>car</code> and <code>cdr</code> counter-intuitive, since they are supposed to return
+references, not copies.
+</p>
+
+<p>
+To further illustrate why the <code>next</code> pointer is a problem, let&rsquo;s look at a
+possible implementation of the <code>car</code> primitive. The following function, written
+for the linked list implementation, receives an expression of type <code>EXPR_LIST</code> and
+is supposed to return its first element.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">expr_clone</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">e</span>) {
+    <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">result</span> = expr_new(e-&gt;type);
+    result-&gt;val  = e-&gt;val;
+    result-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+    <span style="color: #ff6f9f;">return</span> result;
+}
+
+<span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">car</span>(<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">list</span>) {
+    <span style="color: #ff6f9f;">if</span> (is_nil(list))
+        <span style="color: #ff6f9f;">return</span> NIL;
+
+    assert(list-&gt;type == EXPR_LIST);
+    <span style="color: #ff6f9f;">return</span> expr_clone(list-&gt;val.children);
+}
+</pre>
+</div>
+
+<p>
+We can&rsquo;t directly return <code>list-&gt;val.children</code> because the first element still has
+the rest of the list &ldquo;attached&rdquo; through its <code>next</code> pointer, and we can&rsquo;t set
+<code>list-&gt;val.children-&gt;next</code> to <code>NULL</code> to &ldquo;isolate&rdquo; the first element either, because
+we would be overwriting the list <code>(a b c)</code> into becoming <code>(a)</code>, and we could be
+leaking memory. Even if we wanted to directly return the reference, we can&rsquo;t do
+it without breaking the structure of the list we received, so we are <i>forced</i> to
+return a clone.
+</p>
+
+<p>
+However, with the cons cell approach, this is primitive would be much simpler to
+implement, since a list references its contents, but the contents are completely
+independent of their context.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">car</span>(<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">expr</span>) {
+    <span style="color: #ff6f9f;">if</span> (is_nil(expr))
+        <span style="color: #ff6f9f;">return</span> NIL;
+
+    assert(expr-&gt;type == EXPR_PAIR);
+    <span style="color: #ff6f9f;">return</span> expr-&gt;val.pair.car;
+}
+</pre>
+</div>
+
+<p>
+Keep in mind that, since we are returning the reference, if something overwrites
+the value of the expression returned by <code>car</code>, it will also affect the contents of
+the cons cell where it&rsquo;s referenced, but this behavior is expected in Lisp, an
+we could always write another function that returns a copy for this purpose.
+</p>
+
+<p>
+Although this advantage might not look too significant, it allows us to work
+with references, which can potentially save more memory than when using linked
+lists, as explained in <a href="#disadvantage-memory-impact">the disadvantage above</a>.
+</p>
+</div>
+</div>
+
 <div id="outline-container-advantage-consistent-nil" class="outline-3">
-<h3 id="advantage-consistent-nil"><span class="section-number-3">4.3.</span> Advantage: Consistent <code>nil</code></h3>
+<h3 id="advantage-consistent-nil"><span class="section-number-3">4.4.</span> Advantage: Consistent <code>nil</code></h3>
 <div class="outline-text-3" id="text-advantage-consistent-nil">
 <p>
 In Lisp, the symbol <code>nil</code> is often used to represent the empty list. The following
@@ -885,7 +976,7 @@ syntactic sugar for it.
 </div>
 
 <div id="outline-container-advantage-no-list-wrappers" class="outline-3">
-<h3 id="advantage-no-list-wrappers"><span class="section-number-3">4.4.</span> Advantage: No list wrappers</h3>
+<h3 id="advantage-no-list-wrappers"><span class="section-number-3">4.5.</span> Advantage: No list wrappers</h3>
 <div class="outline-text-3" id="text-advantage-no-list-wrappers">
 <p>
 When using linked lists, many wrappers had to be written for internal functions
@@ -955,7 +1046,7 @@ for many operations.
 </div>
 
 <div id="outline-container-advantage-lisp-like-c-code" class="outline-3">
-<h3 id="advantage-lisp-like-c-code"><span class="section-number-3">4.5.</span> Advantage: Lisp-like C code</h3>
+<h3 id="advantage-lisp-like-c-code"><span class="section-number-3">4.6.</span> Advantage: Lisp-like C code</h3>
 <div class="outline-text-3" id="text-advantage-lisp-like-c-code">
 <p>
 Whether we chose to implement lists with one method or the other, the Lisp

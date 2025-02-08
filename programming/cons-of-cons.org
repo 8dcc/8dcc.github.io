@@ -503,6 +503,78 @@ because some cell in the chain is the CDR of a later cons cell". To be
 completely fair, we could still build circular lists with the linked list
 approach, since the =next= member can point to a previous element of the list.
 
+** Advantage: Context independence, reusing references
+:PROPERTIES:
+:CUSTOM_ID: advantage-context-independence-reusing-references
+:END:
+
+As mentioned above, when using linked lists, each expression is restricted to
+their context, since they always have a =next= pointer.
+
+In the book by Daniel Holden, this isn't a problem because most functions
+returned copies, instead of references. Naturally, this is appropriate for his
+book, since it would be confusing for new C programmers to implement garbage
+collection (or even understand why it's needed), for example.
+
+Returning copies is not practical when making a real implementation,
+however. Not only does it waste memory and decrease performance (with
+unnecessary calls to the allocator), but it also makes some standard Lisp
+functions like =car= and =cdr= counter-intuitive, since they are supposed to return
+references, not copies.
+
+To further illustrate why the =next= pointer is a problem, let's look at a
+possible implementation of the =car= primitive. The following function, written
+for the linked list implementation, receives an expression of type =EXPR_LIST= and
+is supposed to return its first element.
+
+#+begin_src C
+Expr* expr_clone(const Expr* e) {
+    Expr* result = expr_new(e->type);
+    result->val  = e->val;
+    result->next = NULL;
+    return result;
+}
+
+Expr* car(Expr* list) {
+    if (is_nil(list))
+        return NIL;
+
+    assert(list->type == EXPR_LIST);
+    return expr_clone(list->val.children);
+}
+#+end_src
+
+We can't directly return =list->val.children= because the first element still has
+the rest of the list "attached" through its =next= pointer, and we can't set
+=list->val.children->next= to =NULL= to "isolate" the first element either, because
+we would be overwriting the list ~(a b c)~ into becoming ~(a)~, and we could be
+leaking memory. Even if we wanted to directly return the reference, we can't do
+it without breaking the structure of the list we received, so we are /forced/ to
+return a clone.
+
+However, with the cons cell approach, this is primitive would be much simpler to
+implement, since a list references its contents, but the contents are completely
+independent of their context.
+
+#+begin_src C
+Expr* car(Expr* expr) {
+    if (is_nil(expr))
+        return NIL;
+
+    assert(expr->type == EXPR_PAIR);
+    return expr->val.pair.car;
+}
+#+end_src
+
+Keep in mind that, since we are returning the reference, if something overwrites
+the value of the expression returned by =car=, it will also affect the contents of
+the cons cell where it's referenced, but this behavior is expected in Lisp, an
+we could always write another function that returns a copy for this purpose.
+
+Although this advantage might not look too significant, it allows us to work
+with references, which can potentially save more memory than when using linked
+lists, as explained in [[#disadvantage-memory-impact][the disadvantage above]].
+
 ** Advantage: Consistent =nil=
 :PROPERTIES:
 :CUSTOM_ID: advantage-consistent-nil
@@ -670,8 +742,3 @@ bool every(Expr* f, Expr* lst) {
 
 This is a small advantage, but I was happy to notice it when I made the change,
 so I decided to include it.
-
-#+begin_comment org
-- TODO: We could not reuse pointers (not the most noticeable change, but perhaps
-  the most important).
-#+end_comment
