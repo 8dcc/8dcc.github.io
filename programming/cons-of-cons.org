@@ -514,14 +514,14 @@ their context, since they always have a =next= pointer.
 
 In the book by Daniel Holden, this isn't a problem because most functions
 returned copies, instead of references. Naturally, this is appropriate for his
-book, since it would be confusing for new C programmers to implement garbage
-collection (or even understand why it's needed), for example.
+book, since it would be confusing for new C programmers to implement a more
+complex memory-management system like garbage collection.
 
 Returning copies is not practical when making a real implementation,
 however. Not only does it waste memory and decrease performance (with
 unnecessary calls to the allocator), but it also makes some standard Lisp
 functions like =car= and =cdr= counter-intuitive, since they are supposed to return
-references, not copies.
+references, instead of copies.
 
 To further illustrate why the =next= pointer is a problem, let's look at a
 possible implementation of the =car= primitive. The following function, written
@@ -548,14 +548,14 @@ Expr* car(Expr* list) {
 We can't directly return =list->val.children= because the first element still has
 the rest of the list "attached" through its =next= pointer, and we can't set
 =list->val.children->next= to =NULL= to "isolate" the first element either, because
-we would be overwriting the list ~(a b c)~ into becoming ~(a)~, and we could be
+we would be overwriting the list ~(a b c)~ into becoming ~(a)~, and we could even be
 leaking memory. Even if we wanted to directly return the reference, we can't do
 it without breaking the structure of the list we received, so we are /forced/ to
 return a clone.
 
 However, with the cons cell approach, this is primitive would be much simpler to
-implement, since a list references its contents, but the contents are completely
-independent of their context.
+implement, since a list references its contents, but the contents themselves are
+completely independent of their context.
 
 #+begin_src C
 Expr* car(Expr* expr) {
@@ -567,10 +567,10 @@ Expr* car(Expr* expr) {
 }
 #+end_src
 
-Keep in mind that, since we are returning the reference, if something overwrites
+Keep in mind that, since we are returning a reference, if something overwrites
 the value of the expression returned by =car=, it will also affect the contents of
-the cons cell where it's referenced, but this behavior is expected in Lisp, and
-we could always write another function that returns a copy for this purpose.
+the cons cell where it's referenced. This behavior is expected in Lisp, and we
+could always write another function that returns a copy for this purpose.
 
 Although this advantage might not look too significant, it allows us to work
 with references, which can potentially save more memory than when using linked
