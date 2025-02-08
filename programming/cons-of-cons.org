@@ -273,11 +273,7 @@ structure.
 
 As you can see, each expression has a =next= member, so they will always be
 /implicitly/ in a list, even if an expression isolated like the first one. This
-has some important consequences that will be explained below.
-
-#+begin_comment org
-TODO: Link /disadvantage/ section on "below".
-#+end_comment
+has some important consequences that will be explained [[#advantage-context-independence-reusing-references][below]].
 
 The following code shows how we would iterate each expression of a list; in this
 case for adding some integers together.
