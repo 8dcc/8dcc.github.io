@@ -23,7 +23,7 @@ use my old approach in the beginning, and why I decided to eventually change
 into a more conventional cons cell approach.
 
 Throughout this article I will use the Lisp syntax from my interpreter, but the
-examples can be ran in most Lisp dialects with some minor modifications. Just
+examples can be run in most Lisp dialects with some minor modifications. Just
 keep in mind that, unlike in Lisp_2 dialects (e.g. Common Lisp), there isn't a
 separate namespace for functions, so you won't see =funcall=.
 
@@ -36,7 +36,7 @@ If you are familiar with Lisp languages, you probably know what cons cells are,
 but I will still give a brief explanation.
 
 The term "cons" is a bit ambiguous in Lisp, because it's commonly used when
-talking about a data type, but it's also the name of procedure that creates an
+talking about a data type, but it's also the name of a procedure that creates an
 object of that type. Although basically all Lisp dialects have a =cons= function,
 the name used to refer to the data type changes among them: Scheme calls them
 /pairs/, Emacs Lisp calls them /cons cells/, and Common Lisp simply calls them
@@ -56,7 +56,7 @@ values that they point to.
 #+CAPTION: Box diagram of a cons cell.
 [[file:../img/cons-of-cons1.svg]]
 
-These kind of diagrams are called /box-and-pointer/, /box-and-arrow/, or simply /box
+These kinds of diagrams are called /box-and-pointer/, /box-and-arrow/, or simply /box
 diagrams/, and they are very useful for understanding how complex data structures
 are stored internally.
 
@@ -73,9 +73,9 @@ the =car= of the =cdr= of the =cdr= of =x=.
 #+end_src
 
 Finally, I would like to mention /dotted pair/ or /cons pair/ notation. When a dot
-is encountered inside of a list (i.e. between parentheses), the interpreter
-assumes that the element before the dot is the CAR of the current pair, and the
-one after the dot is the CDR.
+is encountered inside a list (i.e. between parentheses), the interpreter assumes
+that the element before the dot is the CAR of the current pair, and the one
+after the dot is the CDR.
 
 #+begin_src lisp
 (car '(10 . 20))
@@ -107,7 +107,7 @@ notation is just syntactic sugar for:
 
 As you can see, each element of our list is stored in the CAR of a cons cell,
 and the CDR points to another cons cell which contains the next element. The CDR
-of the inner-most cons cell is the symbol =nil=, used to terminate
+of the innermost cons cell is the symbol =nil=, used to terminate
 lists[fn::Generally, =nil= is a pretty special symbol: It is considered both a
 symbol and a list (although it's not considered a cons cell according to Common
 Lisp's =consp= or Scheme's =pair?=), it usually evaluates to itself, and in many
@@ -228,9 +228,9 @@ assuming that there is some =expr_new= function that allocates an expression wit
 the specified type. For readability, we will also assume that we can safely
 store string literals in our expressions[fn::This is naturally a big assumption,
 one that doesn't even match our previous definition of =Expr=, since string
-literals are read-only and we are storing them in a non-constant =char*=. We would
-probably need to use some function that allocates the string on the heap, like
-{{{man(strdup(3))}}}.].
+literals are read-only, and we are storing them in a non-constant =char*=. We
+would probably need to use some function that allocates the string on the heap,
+like {{{man(strdup(3))}}}.].
 
 #+begin_src C
 extern Expr* expr_new(enum EExprType type);
@@ -303,8 +303,8 @@ meant for people learning C.
 I would also like to mention that Clojure, a Lisp dialect[fn::Although Richard
 Stallman doesn't agree with this statement, precisely because there aren't
 proper cons cells in Clojure. See [[https://stallman.org/stallman-computing.html][How I do my computing]], retreived in February
-of 2025.], uses a similar linked list approach through /sequences/, as described
-in [[https://insideclojure.org/2015/01/02/sequences/][this article]]. And indeed, this can be seen in the Java source code where the
+2025.], uses a similar linked list approach through /sequences/, as described in
+[[https://insideclojure.org/2015/01/02/sequences/][this article]]. And indeed, this can be seen in the Java source code where the
 [[https://github.com/clojure/clojure/blob/fb22fd778a272b034684a4ee94509552b46ee8a9/src/jvm/clojure/lang/Cons.java#L21-L27][Cons class]] is defined.
 
 * The conventional cons cell approach
@@ -445,7 +445,7 @@ great book that I truly recommend (not just for Lisp programmers).
 :CUSTOM_ID: comparing-the-two-methods
 :END:
 
-After considering how the two approaches could be implemented, we can start to
+After considering how the two approaches could be implemented, we can finally
 compare them. I will start with the disadvantages of the conventional cons cell
 approach when compared with the simple linked list.
 
@@ -454,20 +454,21 @@ approach when compared with the simple linked list.
 :CUSTOM_ID: disadvantage-memory-impact
 :END:
 
-If we compare the memory layouts for the [[fig4][linked list]] and [[fig5][cons cell]] approach, we
-can immediately see that the later uses more memory for storing the same list.
+If we compare the memory layouts for the [[fig4][linked list]] and the [[fig5][cons cell]]
+implementations, we can immediately see that the latter uses more memory for
+storing the same list.
 
-Specifically, since the linked list needed an expression for the list itself, we
-would need ~n+1~ expressions for building a list of /n/ elements. When using the
-cons cell approach, each element of the (proper) list is placed inside a cons
-pair, so we would need ~2n~ expressions, assuming that we don't need to allocate a
-=nil= expression for every list, since that is not usually the case.
+Specifically, since the linked list approach needed an expression for the list
+itself, we would need ~n+1~ expressions for building a list of /n/ elements. When
+using the cons cell approach, each element of the (proper) list is placed inside
+a cons pair, so we would need ~2n~ expressions, assuming that we don't need to
+allocate a =nil= expression for every list, since that is not usually the case.
 
-Considering this fact, it's easy to conclude that the linked list approach is
-more memory-efficient, and that there is no point in using the cons cell
-approach. In that regard, I would like to say that even if the implementation
-uses cons cells for building conventional lists, this doesn't prevent us from
-adding another more optimized "vector" or "array" data structure.
+Considering this fact, it's easy to conclude that the linked list implementation
+is more memory-efficient, and that there is no point in using cons cells. In
+that regard, I would like to say that even if the implementation uses cons cells
+for building conventional lists, this doesn't prevent us from adding another
+more optimized "vector" or "array" data structure.
 
 ** Advantage: Improper lists
 :PROPERTIES:
@@ -475,7 +476,7 @@ adding another more optimized "vector" or "array" data structure.
 :END:
 
 When [[#lists-and-syntactic-sugar][describing Lisp lists]], I only mentioned /proper lists/, but in most Lisp
-dialects, there are also /improper lists/. One sub-type of improper lists are
+dialects, there are also /improper lists/. One subtype of improper lists are
 /dotted lists/: lists whose last CDR is not =nil=. Such a list might be defined with
 the dotted pair notation described [[#cons-cells][above]], or by using =cons=.
 
@@ -568,7 +569,7 @@ Expr* car(Expr* expr) {
 
 Keep in mind that, since we are returning the reference, if something overwrites
 the value of the expression returned by =car=, it will also affect the contents of
-the cons cell where it's referenced, but this behavior is expected in Lisp, an
+the cons cell where it's referenced, but this behavior is expected in Lisp, and
 we could always write another function that returns a copy for this purpose.
 
 Although this advantage might not look too significant, it allows us to work
@@ -592,8 +593,8 @@ use =nil= for false and ~()~ for the empty list.
 #+end_quote
 
 When I implemented =nil= in my interpreter, back when I was using linked lists,
-this seemed very confusing. With my implementation at the time, the symbol =nil=
-and the empty list ~()~ were two completely different expressions.
+this description seemed very confusing. With my implementation at the time, the
+symbol =nil= and the empty list ~()~ were two completely different expressions.
 
 #+begin_src C
 /* Symbol: nil */
@@ -680,12 +681,12 @@ bool expr_list_equal(const Expr* a, const Expr* b) {
 #+end_src
 
 This pattern repeated with many internal functions, and many =expr_*= functions
-had their =expr_list_*= equivalent.
+ended up having a =expr_list_*= equivalent.
 
 When using cons cells, comparing two lists (whether they are proper or not) is
-as simple as comparing the CAR and CDR of a pair. This is an example of how cons
-cells are their own independent expression, that don't depend on their context
-for many operations.
+as simple as comparing the CAR and CDR recursively. This is an example of how
+cons cells are their own independent expression, and how most operations can be
+applied without depending on their context.
 
 #+begin_src C
 bool expr_equal(const Expr* a, const Expr* b) {
@@ -726,7 +727,7 @@ call]].
         (tru (every f (cdr lst)))))
 #+end_src
 
-Now compare it to the following implementation as a C primitive.
+Now compare it to the following iterative implementation as a C primitive.
 
 #+begin_src C
 extern Expr* funcall(Expr* func, Expr* arg);

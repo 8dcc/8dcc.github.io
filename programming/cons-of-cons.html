@@ -250,7 +250,7 @@ into a more conventional cons cell approach.
 
 <p>
 Throughout this article I will use the Lisp syntax from my interpreter, but the
-examples can be ran in most Lisp dialects with some minor modifications. Just
+examples can be run in most Lisp dialects with some minor modifications. Just
 keep in mind that, unlike in Lisp<sub>2</sub> dialects (e.g. Common Lisp), there isn&rsquo;t a
 separate namespace for functions, so you won&rsquo;t see <code>funcall</code>.
 </p>
@@ -266,7 +266,7 @@ but I will still give a brief explanation.
 
 <p>
 The term &ldquo;cons&rdquo; is a bit ambiguous in Lisp, because it&rsquo;s commonly used when
-talking about a data type, but it&rsquo;s also the name of procedure that creates an
+talking about a data type, but it&rsquo;s also the name of a procedure that creates an
 object of that type. Although basically all Lisp dialects have a <code>cons</code> function,
 the name used to refer to the data type changes among them: Scheme calls them
 <i>pairs</i>, Emacs Lisp calls them <i>cons cells</i>, and Common Lisp simply calls them
@@ -290,7 +290,7 @@ values that they point to.
 </div>
 
 <p>
-These kind of diagrams are called <i>box-and-pointer</i>, <i>box-and-arrow</i>, or simply <i>box
+These kinds of diagrams are called <i>box-and-pointer</i>, <i>box-and-arrow</i>, or simply <i>box
 diagrams</i>, and they are very useful for understanding how complex data structures
 are stored internally.
 </p>
@@ -312,9 +312,9 @@ the <code>car</code> of the <code>cdr</code> of the <code>cdr</code> of <code>x<
 
 <p>
 Finally, I would like to mention <i>dotted pair</i> or <i>cons pair</i> notation. When a dot
-is encountered inside of a list (i.e. between parentheses), the interpreter
-assumes that the element before the dot is the CAR of the current pair, and the
-one after the dot is the CDR.
+is encountered inside a list (i.e. between parentheses), the interpreter assumes
+that the element before the dot is the CAR of the current pair, and the one
+after the dot is the CDR.
 </p>
 
 <div class="org-src-container">
@@ -355,7 +355,7 @@ notation is just syntactic sugar for:
 <p>
 As you can see, each element of our list is stored in the CAR of a cons cell,
 and the CDR points to another cons cell which contains the next element. The CDR
-of the inner-most cons cell is the symbol <code>nil</code>, used to terminate
+of the innermost cons cell is the symbol <code>nil</code>, used to terminate
 lists<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>. Although not all Lisp dialects use the
 symbol <code>nil</code>, there is always a unique value used to terminate proper lists. In
 box diagrams, a crossed box is used to represent this terminator.
@@ -578,8 +578,8 @@ meant for people learning C.
 </p>
 
 <p>
-I would also like to mention that Clojure, a Lisp dialect<sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>, uses a similar linked list approach through <i>sequences</i>, as described
-in <a href="https://insideclojure.org/2015/01/02/sequences/">this article</a>. And indeed, this can be seen in the Java source code where the
+I would also like to mention that Clojure, a Lisp dialect<sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>, uses a similar linked list approach through <i>sequences</i>, as described in
+<a href="https://insideclojure.org/2015/01/02/sequences/">this article</a>. And indeed, this can be seen in the Java source code where the
 <a href="https://github.com/clojure/clojure/blob/fb22fd778a272b034684a4ee94509552b46ee8a9/src/jvm/clojure/lang/Cons.java#L21-L27">Cons class</a> is defined.
 </p>
 </div>
@@ -731,7 +731,7 @@ great book that I truly recommend (not just for Lisp programmers).
 <h2 id="comparing-the-two-methods"><span class="section-number-2">4.</span> Comparing the two methods</h2>
 <div class="outline-text-2" id="text-comparing-the-two-methods">
 <p>
-After considering how the two approaches could be implemented, we can start to
+After considering how the two approaches could be implemented, we can finally
 compare them. I will start with the disadvantages of the conventional cons cell
 approach when compared with the simple linked list.
 </p>
@@ -741,24 +741,25 @@ approach when compared with the simple linked list.
 <h3 id="disadvantage-memory-impact"><span class="section-number-3">4.1.</span> Disadvantage: Memory impact</h3>
 <div class="outline-text-3" id="text-disadvantage-memory-impact">
 <p>
-If we compare the memory layouts for the <a href="#fig4">linked list</a> and <a href="#fig5">cons cell</a> approach, we
-can immediately see that the later uses more memory for storing the same list.
+If we compare the memory layouts for the <a href="#fig4">linked list</a> and the <a href="#fig5">cons cell</a>
+implementations, we can immediately see that the latter uses more memory for
+storing the same list.
 </p>
 
 <p>
-Specifically, since the linked list needed an expression for the list itself, we
-would need <code>n+1</code> expressions for building a list of <i>n</i> elements. When using the
-cons cell approach, each element of the (proper) list is placed inside a cons
-pair, so we would need <code>2n</code> expressions, assuming that we don&rsquo;t need to allocate a
-<code>nil</code> expression for every list, since that is not usually the case.
+Specifically, since the linked list approach needed an expression for the list
+itself, we would need <code>n+1</code> expressions for building a list of <i>n</i> elements. When
+using the cons cell approach, each element of the (proper) list is placed inside
+a cons pair, so we would need <code>2n</code> expressions, assuming that we don&rsquo;t need to
+allocate a <code>nil</code> expression for every list, since that is not usually the case.
 </p>
 
 <p>
-Considering this fact, it&rsquo;s easy to conclude that the linked list approach is
-more memory-efficient, and that there is no point in using the cons cell
-approach. In that regard, I would like to say that even if the implementation
-uses cons cells for building conventional lists, this doesn&rsquo;t prevent us from
-adding another more optimized &ldquo;vector&rdquo; or &ldquo;array&rdquo; data structure.
+Considering this fact, it&rsquo;s easy to conclude that the linked list implementation
+is more memory-efficient, and that there is no point in using cons cells. In
+that regard, I would like to say that even if the implementation uses cons cells
+for building conventional lists, this doesn&rsquo;t prevent us from adding another
+more optimized &ldquo;vector&rdquo; or &ldquo;array&rdquo; data structure.
 </p>
 </div>
 </div>
@@ -768,7 +769,7 @@ adding another more optimized &ldquo;vector&rdquo; or &ldquo;array&rdquo; data s
 <div class="outline-text-3" id="text-advantage-improper-lists">
 <p>
 When <a href="#lists-and-syntactic-sugar">describing Lisp lists</a>, I only mentioned <i>proper lists</i>, but in most Lisp
-dialects, there are also <i>improper lists</i>. One sub-type of improper lists are
+dialects, there are also <i>improper lists</i>. One subtype of improper lists are
 <i>dotted lists</i>: lists whose last CDR is not <code>nil</code>. Such a list might be defined with
 the dotted pair notation described <a href="#cons-cells">above</a>, or by using <code>cons</code>.
 </p>
@@ -882,7 +883,7 @@ independent of their context.
 <p>
 Keep in mind that, since we are returning the reference, if something overwrites
 the value of the expression returned by <code>car</code>, it will also affect the contents of
-the cons cell where it&rsquo;s referenced, but this behavior is expected in Lisp, an
+the cons cell where it&rsquo;s referenced, but this behavior is expected in Lisp, and
 we could always write another function that returns a copy for this purpose.
 </p>
 
@@ -914,8 +915,8 @@ use <code>nil</code> for false and <code>()</code> for the empty list.
 
 <p>
 When I implemented <code>nil</code> in my interpreter, back when I was using linked lists,
-this seemed very confusing. With my implementation at the time, the symbol <code>nil</code>
-and the empty list <code>()</code> were two completely different expressions.
+this description seemed very confusing. With my implementation at the time, the
+symbol <code>nil</code> and the empty list <code>()</code> were two completely different expressions.
 </p>
 
 <div class="org-src-container">
@@ -1018,14 +1019,14 @@ to compare each element recursively, ideally using an <code>expr_list_equal</cod
 
 <p>
 This pattern repeated with many internal functions, and many <code>expr_*</code> functions
-had their <code>expr_list_*</code> equivalent.
+ended up having a <code>expr_list_*</code> equivalent.
 </p>
 
 <p>
 When using cons cells, comparing two lists (whether they are proper or not) is
-as simple as comparing the CAR and CDR of a pair. This is an example of how cons
-cells are their own independent expression, that don&rsquo;t depend on their context
-for many operations.
+as simple as comparing the CAR and CDR recursively. This is an example of how
+cons cells are their own independent expression, and how most operations can be
+applied without depending on their context.
 </p>
 
 <div class="org-src-container">
@@ -1072,7 +1073,7 @@ call</a>.
 </div>
 
 <p>
-Now compare it to the following implementation as a C primitive.
+Now compare it to the following iterative implementation as a C primitive.
 </p>
 
 <div class="org-src-container">
@@ -1112,14 +1113,14 @@ denote <i>false</i> in boolean operations.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This is naturally a big assumption,
 one that doesn&rsquo;t even match our previous definition of <code>Expr</code>, since string
-literals are read-only and we are storing them in a non-constant <code>char*</code>. We would
-probably need to use some function that allocates the string on the heap, like
-<a href="https://man.cx/strdup(3)"><code>strdup(3)</code></a>.</p></div></div>
+literals are read-only, and we are storing them in a non-constant <code>char*</code>. We
+would probably need to use some function that allocates the string on the heap,
+like <a href="https://man.cx/strdup(3)"><code>strdup(3)</code></a>.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Although Richard
 Stallman doesn&rsquo;t agree with this statement, precisely because there aren&rsquo;t
 proper cons cells in Clojure. See <a href="https://stallman.org/stallman-computing.html">How I do my computing</a>, retreived in February
-of 2025.</p></div></div>
+2025.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">I say &ldquo;potentially&rdquo; because, depending on how complex our
 <code>Expr</code> structure was, the size of the union might have been already greater than
