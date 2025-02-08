@@ -439,3 +439,115 @@ functions are implemented, or even what =nil= really is, as long as we have a
 reliable way of checking for this unique value. This is called /wishful thinking/,
 and is a key concept from [[https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs][Structure and Interpretation of Computer Programs]], a
 great book that I truly recommend (not just for Lisp programmers).
+
+* Comparing the two methods
+:PROPERTIES:
+:CUSTOM_ID: comparing-the-two-methods
+:END:
+
+After considering how the two approaches could be implemented, we can start to
+compare them. I will start with the disadvantages of the conventional cons cell
+approach when compared with the simple linked list.
+
+** Disadvantage: Memory impact
+:PROPERTIES:
+:CUSTOM_ID: disadvantage-memory-impact
+:END:
+
+If we compare the memory layouts for the [[fig4][linked list]] and [[fig5][cons cell]] approach, we
+can immediately see that the later uses more memory for storing the same list.
+
+Specifically, since the linked list needed an expression for the list itself, we
+would need ~n+1~ expressions for building a list of /n/ elements. When using the
+cons cell approach, each element of the (proper) list is placed inside a cons
+pair, so we would need ~2n~ expressions, assuming that we don't need to allocate a
+=nil= expression for every list, since that is not usually the case.
+
+Considering this fact, it's easy to conclude that the linked list approach is
+more memory-efficient, and that there is no point in using the cons cell
+approach. In that regard, I would like to say that even if the implementation
+uses cons cells for building conventional lists, this doesn't prevent us from
+adding another more optimized "vector" or "array" data structure.
+
+** Advantage: Improper lists
+:PROPERTIES:
+:CUSTOM_ID: advantage-improper-lists
+:END:
+
+When [[#lists-and-syntactic-sugar][describing Lisp lists]], I only mentioned /proper lists/, but in most Lisp
+dialects, there are also /improper lists/. One sub-type of improper lists are
+/dotted lists/: lists whose last CDR is not =nil=. Such a list might be defined with
+the dotted pair notation described [[#cons-cells][above]], or by using =cons=.
+
+#+begin_src lisp
+(cdr '(a b . c))
+  ⇒ (b . c)
+
+(cadr '(a b . c))  ; (car (cdr ...))
+  ⇒ b
+
+(cddr '(a b . c))  ; (cdr (cdr ...))
+  ⇒ c
+
+(cons 'a (cons 'b (cons 3 4)))
+  ⇒ (a b 3 . 4)
+#+end_src
+
+This data structure is perfectly possible with the cons cell approach, but
+impossible when using a linked list, since the possible values of the =next=
+member are either the address of another expression or =NULL=.
+
+I would also like to mention /circular lists/, another type of improper list. A
+circular list [[http://clhs.lisp.se/Body/26_glo_c.htm#circular_list][can be defined]] as "a chain of cons cells that has no termination
+because some cell in the chain is the CDR of a later cons cell". To be
+completely fair, we could still build circular lists with the linked list
+approach, since the =next= member can point to a previous element of the list.
+
+** Advantage: Lisp-like C code
+:PROPERTIES:
+:CUSTOM_ID: advantage-lisp-like-c-code
+:END:
+
+Whether we chose to implement lists with one method or the other, the Lisp
+programmer should still have access to the usual =cons=, =car= and =cdr=
+procedures. By using the cons cell approach, our C code will use a similar
+structure to Lisp procedures, even if we decide to define iterative functions,
+rather than recursive ones.
+
+As an example, look at how the following Lisp procedure is implemented. It is a
+recursive /procedure/ that implements an iterative /process/[fn::See [[https://web.mit.edu/6.001/6.037/sicp.pdf#subsection.1.2.1][Section 1.2.1]]
+of /Structure and Interpretation of Computer Programs/ for more information on how
+the implementation of an iterative process can be recursive.] using a [[https://en.wikipedia.org/wiki/Tail_call][tail
+call]].
+
+#+begin_src lisp
+;; Does the function F return non-nil for all elements of LST?
+(defun every (f lst)
+  (cond ((null? lst) tru)
+        ((not (f (car lst))) nil)
+        (tru (every f (cdr lst)))))
+#+end_src
+
+Now compare it to the following implementation as a C primitive.
+
+#+begin_src C
+extern Expr* funcall(Expr* func, Expr* arg);
+
+bool every(Expr* f, Expr* lst) {
+    for (; !is_nil(lst); lst = CDR(lst))
+        if (is_nil(funcall(f, CAR(lst))))
+            return false;
+
+    return true;
+}
+#+end_src
+
+This is a small advantage, but I was happy to notice it when I made the change,
+so I decided to include it.
+
+#+begin_comment org
+- TODO: We could not reuse pointers (not the most noticeable change, but perhaps
+  the most important).
+- TODO: Nil was a symbol and a list (internally).
+- TODO: We had to duplicate multiple functions for operating on lists.
+#+end_comment

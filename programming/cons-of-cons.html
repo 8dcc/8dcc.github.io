@@ -218,6 +218,13 @@
 </ul>
 </li>
 <li><a href="#the-conventional-cons-cell-approach">3. The conventional cons cell approach</a></li>
+<li><a href="#comparing-the-two-methods">4. Comparing the two methods</a>
+<ul>
+<li><a href="#disadvantage-memory-impact">4.1. Disadvantage: Memory impact</a></li>
+<li><a href="#advantage-improper-lists">4.2. Advantage: Improper lists</a></li>
+<li><a href="#advantage-lisp-like-c-code">4.3. Advantage: Lisp-like C code</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -716,6 +723,134 @@ great book that I truly recommend (not just for Lisp programmers).
 </p>
 </div>
 </div>
+
+<div id="outline-container-comparing-the-two-methods" class="outline-2">
+<h2 id="comparing-the-two-methods"><span class="section-number-2">4.</span> Comparing the two methods</h2>
+<div class="outline-text-2" id="text-comparing-the-two-methods">
+<p>
+After considering how the two approaches could be implemented, we can start to
+compare them. I will start with the disadvantages of the conventional cons cell
+approach when compared with the simple linked list.
+</p>
+</div>
+
+<div id="outline-container-disadvantage-memory-impact" class="outline-3">
+<h3 id="disadvantage-memory-impact"><span class="section-number-3">4.1.</span> Disadvantage: Memory impact</h3>
+<div class="outline-text-3" id="text-disadvantage-memory-impact">
+<p>
+If we compare the memory layouts for the <a href="#fig4">linked list</a> and <a href="#fig5">cons cell</a> approach, we
+can immediately see that the later uses more memory for storing the same list.
+</p>
+
+<p>
+Specifically, since the linked list needed an expression for the list itself, we
+would need <code>n+1</code> expressions for building a list of <i>n</i> elements. When using the
+cons cell approach, each element of the (proper) list is placed inside a cons
+pair, so we would need <code>2n</code> expressions, assuming that we don&rsquo;t need to allocate a
+<code>nil</code> expression for every list, since that is not usually the case.
+</p>
+
+<p>
+Considering this fact, it&rsquo;s easy to conclude that the linked list approach is
+more memory-efficient, and that there is no point in using the cons cell
+approach. In that regard, I would like to say that even if the implementation
+uses cons cells for building conventional lists, this doesn&rsquo;t prevent us from
+adding another more optimized &ldquo;vector&rdquo; or &ldquo;array&rdquo; data structure.
+</p>
+</div>
+</div>
+
+<div id="outline-container-advantage-improper-lists" class="outline-3">
+<h3 id="advantage-improper-lists"><span class="section-number-3">4.2.</span> Advantage: Improper lists</h3>
+<div class="outline-text-3" id="text-advantage-improper-lists">
+<p>
+When <a href="#lists-and-syntactic-sugar">describing Lisp lists</a>, I only mentioned <i>proper lists</i>, but in most Lisp
+dialects, there are also <i>improper lists</i>. One sub-type of improper lists are
+<i>dotted lists</i>: lists whose last CDR is not <code>nil</code>. Such a list might be defined with
+the dotted pair notation described <a href="#cons-cells">above</a>, or by using <code>cons</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>cdr '<span style="color: #cabf00;">(</span>a b . c<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  &#8658; <span style="color: #ff5f59;">(</span>b . c<span style="color: #ff5f59;">)</span>
+
+<span style="color: #ff5f59;">(</span>cadr '<span style="color: #cabf00;">(</span>a b . c<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; (car (cdr ...))</span>
+  &#8658; b
+
+<span style="color: #ff5f59;">(</span>cddr '<span style="color: #cabf00;">(</span>a b . c<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; (cdr (cdr ...))</span>
+  &#8658; c
+
+<span style="color: #ff5f59;">(</span>cons 'a <span style="color: #cabf00;">(</span>cons 'b <span style="color: #44bc44;">(</span>cons <span style="color: #88ca9f;">3</span> <span style="color: #88ca9f;">4</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  &#8658; <span style="color: #ff5f59;">(</span>a b <span style="color: #88ca9f;">3</span> . <span style="color: #88ca9f;">4</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+This data structure is perfectly possible with the cons cell approach, but
+impossible when using a linked list, since the possible values of the <code>next</code>
+member are either the address of another expression or <code>NULL</code>.
+</p>
+
+<p>
+I would also like to mention <i>circular lists</i>, another type of improper list. A
+circular list <a href="http://clhs.lisp.se/Body/26_glo_c.htm#circular_list">can be defined</a> as &ldquo;a chain of cons cells that has no termination
+because some cell in the chain is the CDR of a later cons cell&rdquo;. To be
+completely fair, we could still build circular lists with the linked list
+approach, since the <code>next</code> member can point to a previous element of the list.
+</p>
+</div>
+</div>
+
+<div id="outline-container-advantage-lisp-like-c-code" class="outline-3">
+<h3 id="advantage-lisp-like-c-code"><span class="section-number-3">4.3.</span> Advantage: Lisp-like C code</h3>
+<div class="outline-text-3" id="text-advantage-lisp-like-c-code">
+<p>
+Whether we chose to implement lists with one method or the other, the Lisp
+programmer should still have access to the usual <code>cons</code>, <code>car</code> and <code>cdr</code>
+procedures. By using the cons cell approach, our C code will use a similar
+structure to Lisp procedures, even if we decide to define iterative functions,
+rather than recursive ones.
+</p>
+
+<p>
+As an example, look at how the following Lisp procedure is implemented. It is a
+recursive <i>procedure</i> that implements an iterative <i>process</i><sup><a id="fnr.7" class="footref" href="#fn.7" role="doc-backlink">7</a></sup> using a <a href="https://en.wikipedia.org/wiki/Tail_call">tail
+call</a>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #989898;">;; </span><span style="color: #989898;">Does the function F return non-nil for all elements of LST?</span>
+<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defun</span> <span style="color: #4ae2ff;">every</span> <span style="color: #cabf00;">(</span>f lst<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">cond</span> <span style="color: #44bc44;">(</span><span style="color: #00eff0;">(</span>null? lst<span style="color: #00eff0;">)</span> tru<span style="color: #44bc44;">)</span>
+        <span style="color: #44bc44;">(</span><span style="color: #00eff0;">(</span>not <span style="color: #338fff;">(</span>f <span style="color: #ef7fff;">(</span>car lst<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span> nil<span style="color: #44bc44;">)</span>
+        <span style="color: #44bc44;">(</span>tru <span style="color: #00eff0;">(</span>every f <span style="color: #338fff;">(</span>cdr lst<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+Now compare it to the following implementation as a C primitive.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">funcall</span>(<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">func</span>, <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">arg</span>);
+
+<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">every</span>(<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">f</span>, <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">lst</span>) {
+    <span style="color: #ff6f9f;">for</span> (; <span style="color: #ff6740; font-weight: bold;">!</span>is_nil(lst); lst = CDR(lst))
+        <span style="color: #ff6f9f;">if</span> (is_nil(funcall(f, CAR(lst))))
+            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+}
+</pre>
+</div>
+
+<p>
+This is a small advantage, but I was happy to notice it when I made the change,
+so I decided to include it.
+</p>
+</div>
+</div>
+</div>
 <div id="footnotes">
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
@@ -755,6 +890,10 @@ important because we want to stop as soon as we encounter <code>nil</code>, but 
 list does not contain a null CDR so we would need a different loop
 condition. Note that <code>nil</code> is also a proper list, and therefore a valid input for
 this <code>sum</code> function.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.7" class="footnum" href="#fnr.7" role="doc-backlink">7</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See <a href="https://web.mit.edu/6.001/6.037/sicp.pdf#subsection.1.2.1">Section 1.2.1</a>
+of <i>Structure and Interpretation of Computer Programs</i> for more information on how
+the implementation of an iterative process can be recursive.</p></div></div>
 
 
 </div>
