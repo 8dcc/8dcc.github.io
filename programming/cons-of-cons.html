@@ -222,7 +222,9 @@
 <ul>
 <li><a href="#disadvantage-memory-impact">4.1. Disadvantage: Memory impact</a></li>
 <li><a href="#advantage-improper-lists">4.2. Advantage: Improper lists</a></li>
-<li><a href="#advantage-lisp-like-c-code">4.3. Advantage: Lisp-like C code</a></li>
+<li><a href="#advantage-consistent-nil">4.3. Advantage: Consistent <code>nil</code></a></li>
+<li><a href="#advantage-no-list-wrappers">4.4. Advantage: No list wrappers</a></li>
+<li><a href="#advantage-lisp-like-c-code">4.5. Advantage: Lisp-like C code</a></li>
 </ul>
 </li>
 </ul>
@@ -801,8 +803,159 @@ approach, since the <code>next</code> member can point to a previous element of 
 </div>
 </div>
 
+<div id="outline-container-advantage-consistent-nil" class="outline-3">
+<h3 id="advantage-consistent-nil"><span class="section-number-3">4.3.</span> Advantage: Consistent <code>nil</code></h3>
+<div class="outline-text-3" id="text-advantage-consistent-nil">
+<p>
+In Lisp, the symbol <code>nil</code> is often used to represent the empty list. The following
+quote is taken from the <a href="https://www.gnu.org/software/emacs/manual/html_node/eintr/nil-explained.html">Emacs manual</a>:
+</p>
+
+<blockquote>
+<p>
+In Emacs Lisp, the symbol <code>nil</code> has two meanings. First, it means the empty
+list. Second, it means <i>false</i> and is the value returned when a true-or-false-test
+tests false. <code>nil</code> can be written as an empty list, <code>()</code>, or as <code>nil</code>. As far as the
+Lisp interpreter is concerned, <code>()</code> and <code>nil</code> are the same. Humans, however, tend to
+use <code>nil</code> for false and <code>()</code> for the empty list.
+</p>
+</blockquote>
+
+<p>
+When I implemented <code>nil</code> in my interpreter, back when I was using linked lists,
+this seemed very confusing. With my implementation at the time, the symbol <code>nil</code>
+and the empty list <code>()</code> were two completely different expressions.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Symbol: nil</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">sym</span>  = expr_new(EXPR_SYMBOL);
+sym-&gt;val.s = <span style="color: #00d3d0;">"nil"</span>;
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Empty list: ()</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">list</span>         = expr_new(EXPR_LIST);
+list-&gt;val.children = <span style="color: #88ca9f;">NULL</span>;
+</pre>
+</div>
+
+<p>
+At the time, the symbol <code>nil</code> was just like any other variable from the global
+environment, bound to an empty list. However, in most Lisps, the following are
+equivalent:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">nil
+  &#8658; nil
+
+'nil
+  &#8658; nil
+
+<span style="color: #ff5f59;">()</span>
+  &#8658; nil
+
+'<span style="color: #ff5f59;">()</span>
+  &#8658; nil
+</pre>
+</div>
+
+<p>
+This happens because, as explained above, lists are syntactic sugar, so an empty
+list is converted to the symbol <code>nil</code> by the parser. This makes many internal
+functions more consistent (and efficient), since you don&rsquo;t have to check for
+multiple expression types.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Old, inconsistent</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">is_nil</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">e</span>) {
+    <span style="color: #ff6f9f;">return</span> (e-&gt;type == EXPR_LIST &amp;&amp; e-&gt;val.children == <span style="color: #88ca9f;">NULL</span>) ||
+           (e-&gt;type == EXPR_SYMBOL &amp;&amp; e-&gt;val.s != <span style="color: #88ca9f;">NULL</span> &amp;&amp;
+            <span style="color: #ff6740; font-weight: bold;">!</span>strcmp(e-&gt;val.s, <span style="color: #00d3d0;">"nil"</span>));
+}
+</pre>
+</div>
+
+<p>
+When using the new approach, <code>nil</code> is a normal symbol that evaluates to itself
+(it&rsquo;s simply used as a special indicator), and the empty list <code>()</code> is just
+syntactic sugar for it.
+</p>
+</div>
+</div>
+
+<div id="outline-container-advantage-no-list-wrappers" class="outline-3">
+<h3 id="advantage-no-list-wrappers"><span class="section-number-3">4.4.</span> Advantage: No list wrappers</h3>
+<div class="outline-text-3" id="text-advantage-no-list-wrappers">
+<p>
+When using linked lists, many wrappers had to be written for internal functions
+that operated on individual expressions.
+</p>
+
+<p>
+For example, assume there is an <code>expr_equal</code> function that checks whether two
+expressions have the same value. When an <code>EXPR_LIST</code> is encountered, it would have
+to compare each element recursively, ideally using an <code>expr_list_equal</code> wrapper.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">expr_equal</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">a</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">b</span>) {
+    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+
+    <span style="color: #ff6f9f;">switch</span> (a-&gt;type) {
+        <span style="color: #ff6f9f;">case</span> EXPR_LIST:
+            <span style="color: #ff6f9f;">return</span> expr_list_equal(a, b);
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+    }
+}
+
+<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">expr_list_equal</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">a</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">b</span>) {
+    <span style="color: #989898;">/* </span><span style="color: #989898;">Similar to strcmp(3)</span><span style="color: #989898;"> */</span>
+    <span style="color: #ff6f9f;">while</span> (expr_equal(a, b)) {
+        <span style="color: #ff6f9f;">if</span> (a == <span style="color: #88ca9f;">NULL</span>)
+            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+
+        a = a-&gt;next;
+        b = b-&gt;next;
+    }
+
+    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+}
+</pre>
+</div>
+
+<p>
+This pattern repeated with many internal functions, and many <code>expr_*</code> functions
+had their <code>expr_list_*</code> equivalent.
+</p>
+
+<p>
+When using cons cells, comparing two lists (whether they are proper or not) is
+as simple as comparing the CAR and CDR of a pair. This is an example of how cons
+cells are their own independent expression, that don&rsquo;t depend on their context
+for many operations.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">expr_equal</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">a</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">b</span>) {
+    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+
+    <span style="color: #ff6f9f;">switch</span> (a-&gt;type) {
+        <span style="color: #ff6f9f;">case</span> EXPR_PAIR:
+            <span style="color: #ff6f9f;">return</span> expr_equal(CAR(a), CAR(b))
+                &amp;&amp; expr_equal(CDR(a), CDR(b));
+
+        <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
 <div id="outline-container-advantage-lisp-like-c-code" class="outline-3">
-<h3 id="advantage-lisp-like-c-code"><span class="section-number-3">4.3.</span> Advantage: Lisp-like C code</h3>
+<h3 id="advantage-lisp-like-c-code"><span class="section-number-3">4.5.</span> Advantage: Lisp-like C code</h3>
 <div class="outline-text-3" id="text-advantage-lisp-like-c-code">
 <p>
 Whether we chose to implement lists with one method or the other, the Lisp

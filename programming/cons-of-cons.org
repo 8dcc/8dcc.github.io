@@ -503,6 +503,132 @@ because some cell in the chain is the CDR of a later cons cell". To be
 completely fair, we could still build circular lists with the linked list
 approach, since the =next= member can point to a previous element of the list.
 
+** Advantage: Consistent =nil=
+:PROPERTIES:
+:CUSTOM_ID: advantage-consistent-nil
+:END:
+
+In Lisp, the symbol =nil= is often used to represent the empty list. The following
+quote is taken from the [[https://www.gnu.org/software/emacs/manual/html_node/eintr/nil-explained.html][Emacs manual]]:
+
+#+begin_quote
+In Emacs Lisp, the symbol =nil= has two meanings. First, it means the empty
+list. Second, it means /false/ and is the value returned when a true-or-false-test
+tests false. =nil= can be written as an empty list, ~()~, or as =nil=. As far as the
+Lisp interpreter is concerned, ~()~ and =nil= are the same. Humans, however, tend to
+use =nil= for false and ~()~ for the empty list.
+#+end_quote
+
+When I implemented =nil= in my interpreter, back when I was using linked lists,
+this seemed very confusing. With my implementation at the time, the symbol =nil=
+and the empty list ~()~ were two completely different expressions.
+
+#+begin_src C
+/* Symbol: nil */
+Expr* sym  = expr_new(EXPR_SYMBOL);
+sym->val.s = "nil";
+
+/* Empty list: () */
+Expr* list         = expr_new(EXPR_LIST);
+list->val.children = NULL;
+#+end_src
+
+At the time, the symbol =nil= was just like any other variable from the global
+environment, bound to an empty list. However, in most Lisps, the following are
+equivalent:
+
+#+begin_src lisp
+nil
+  ⇒ nil
+
+'nil
+  ⇒ nil
+
+()
+  ⇒ nil
+
+'()
+  ⇒ nil
+#+end_src
+
+This happens because, as explained above, lists are syntactic sugar, so an empty
+list is converted to the symbol =nil= by the parser. This makes many internal
+functions more consistent (and efficient), since you don't have to check for
+multiple expression types.
+
+#+begin_src C
+/* Old, inconsistent */
+bool is_nil(const Expr* e) {
+    return (e->type == EXPR_LIST && e->val.children == NULL) ||
+           (e->type == EXPR_SYMBOL && e->val.s != NULL &&
+            !strcmp(e->val.s, "nil"));
+}
+#+end_src
+
+When using the new approach, =nil= is a normal symbol that evaluates to itself
+(it's simply used as a special indicator), and the empty list ~()~ is just
+syntactic sugar for it.
+
+** Advantage: No list wrappers
+:PROPERTIES:
+:CUSTOM_ID: advantage-no-list-wrappers
+:END:
+
+When using linked lists, many wrappers had to be written for internal functions
+that operated on individual expressions.
+
+For example, assume there is an =expr_equal= function that checks whether two
+expressions have the same value. When an =EXPR_LIST= is encountered, it would have
+to compare each element recursively, ideally using an =expr_list_equal= wrapper.
+
+#+begin_src C
+bool expr_equal(const Expr* a, const Expr* b) {
+    /* ... */
+
+    switch (a->type) {
+        case EXPR_LIST:
+            return expr_list_equal(a, b);
+
+        /* ... */
+    }
+}
+
+bool expr_list_equal(const Expr* a, const Expr* b) {
+    /* Similar to strcmp(3) */
+    while (expr_equal(a, b)) {
+        if (a == NULL)
+            return true;
+
+        a = a->next;
+        b = b->next;
+    }
+
+    return false;
+}
+#+end_src
+
+This pattern repeated with many internal functions, and many =expr_*= functions
+had their =expr_list_*= equivalent.
+
+When using cons cells, comparing two lists (whether they are proper or not) is
+as simple as comparing the CAR and CDR of a pair. This is an example of how cons
+cells are their own independent expression, that don't depend on their context
+for many operations.
+
+#+begin_src C
+bool expr_equal(const Expr* a, const Expr* b) {
+    /* ... */
+
+    switch (a->type) {
+        case EXPR_PAIR:
+            return expr_equal(CAR(a), CAR(b))
+                && expr_equal(CDR(a), CDR(b));
+
+        /* ... */
+    }
+}
+#+end_src
+
 ** Advantage: Lisp-like C code
 :PROPERTIES:
 :CUSTOM_ID: advantage-lisp-like-c-code
@@ -548,6 +674,4 @@ so I decided to include it.
 #+begin_comment org
 - TODO: We could not reuse pointers (not the most noticeable change, but perhaps
   the most important).
-- TODO: Nil was a symbol and a list (internally).
-- TODO: We had to duplicate multiple functions for operating on lists.
 #+end_comment
