@@ -380,18 +380,18 @@ For example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp">&gt; <span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defmacro</span> <span style="color: #4ae2ff;">my-macro</span> <span style="color: #cabf00;">(</span>name<span style="color: #cabf00;">)</span>
-    <span style="color: #cabf00;">(</span>list 'define name <span style="color: #88ca9f;">123</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
-&lt;macro&gt;
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defmacro</span> <span style="color: #4ae2ff;">my-macro</span> <span style="color: #cabf00;">(</span>name<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span>list 'define name <span style="color: #88ca9f;">123</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  &#8658; &lt;macro&gt;
 
-&gt; <span style="color: #ff5f59;">(</span>my-macro some-name<span style="color: #ff5f59;">)</span>
-<span style="color: #88ca9f;">123</span>
+<span style="color: #ff5f59;">(</span>my-macro some-name<span style="color: #ff5f59;">)</span>
+  &#8658; <span style="color: #88ca9f;">123</span>
 
-&gt; <span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-macro some-name<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
-<span style="color: #ff5f59;">(</span>define some-name <span style="color: #88ca9f;">123</span><span style="color: #ff5f59;">)</span>
+<span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-macro some-name<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  &#8658; <span style="color: #ff5f59;">(</span>define some-name <span style="color: #88ca9f;">123</span><span style="color: #ff5f59;">)</span>
 
-&gt; some-name
-<span style="color: #88ca9f;">123</span>
+some-name
+  &#8658; <span style="color: #88ca9f;">123</span>
 </pre>
 </div>
 </div>
@@ -504,26 +504,26 @@ Here are some examples of the macro:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp">&gt; <span style="color: #ff5f59;">(</span>my-or nil 'A 'B<span style="color: #ff5f59;">)</span>
-A
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>my-or nil 'A 'B<span style="color: #ff5f59;">)</span>
+  &#8658; A
 
-&gt; <span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or 'A 'B 'C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; God almighty...</span>
-<span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>result<span style="color: #44bc44;">)</span>
-   <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> result result
-     <span style="color: #00eff0;">(</span><span style="color: #338fff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ef7fff;">(</span>result<span style="color: #ef7fff;">)</span>
-        <span style="color: #ef7fff;">(</span><span style="color: #ff6f9f;">if</span> result result
-          <span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>result<span style="color: #44bc44;">)</span>
-             <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> result result
-               nil<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
-           'C<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
-      'B<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
- 'A<span style="color: #ff5f59;">)</span>
+<span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or 'A 'B 'C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; God almighty...</span>
+  &#8658; <span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>result<span style="color: #44bc44;">)</span>
+       <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> result result
+         <span style="color: #00eff0;">(</span><span style="color: #338fff;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #ef7fff;">(</span>result<span style="color: #ef7fff;">)</span>
+            <span style="color: #ef7fff;">(</span><span style="color: #ff6f9f;">if</span> result result
+              <span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>result<span style="color: #44bc44;">)</span>
+                 <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> result result
+                   nil<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+               'C<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
+          'B<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+     'A<span style="color: #ff5f59;">)</span>
 
-&gt; <span style="color: #ff5f59;">(</span>my-or<span style="color: #ff5f59;">)</span>
-nil
+<span style="color: #ff5f59;">(</span>my-or<span style="color: #ff5f59;">)</span>
+  &#8658; nil
 
-&gt; <span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
-nil
+<span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  &#8658; nil
 </pre>
 </div>
 
@@ -584,14 +584,14 @@ Some examples of the second version:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp">&gt; <span style="color: #ff5f59;">(</span>my-or nil 'A 'B<span style="color: #ff5f59;">)</span>
-A
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>my-or nil 'A 'B<span style="color: #ff5f59;">)</span>
+  &#8658; A
 
-&gt; <span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or 'A 'B 'C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; Much more readable</span>
-<span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>result<span style="color: #44bc44;">)</span>
-   <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> result result
-     <span style="color: #00eff0;">(</span>my-or <span style="color: #338fff;">(</span>'B 'C<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
- 'A<span style="color: #ff5f59;">)</span>
+<span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or 'A 'B 'C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; Much more readable</span>
+  &#8658; <span style="color: #ff5f59;">(</span><span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">lambda</span> <span style="color: #44bc44;">(</span>result<span style="color: #44bc44;">)</span>
+       <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> result result
+         <span style="color: #00eff0;">(</span>my-or <span style="color: #338fff;">(</span>'B 'C<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+     'A<span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 </div>
@@ -621,13 +621,13 @@ Some examples of the third version:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp">&gt; <span style="color: #ff5f59;">(</span>my-or nil 'A 'B<span style="color: #ff5f59;">)</span>
-A
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>my-or nil 'A 'B<span style="color: #ff5f59;">)</span>
+  &#8658; A
 
-&gt; <span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or 'A 'B 'C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; Much more readable</span>
-<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>result 'A<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
-  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> result result
-    <span style="color: #44bc44;">(</span>my-or 'B 'C<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+<span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or 'A 'B 'C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; Much more readable</span>
+  &#8658; <span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>result 'A<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+      <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> result result
+        <span style="color: #44bc44;">(</span>my-or 'B 'C<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 </div>

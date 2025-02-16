@@ -131,18 +131,18 @@ Bind arguments -> Evaluate body -> Evaluate expansion
 For example:
 
 #+begin_src lisp
-> (defmacro my-macro (name)
-    (list 'define name 123))
-<macro>
+(defmacro my-macro (name)
+  (list 'define name 123))
+  ⇒ <macro>
 
-> (my-macro some-name)
-123
+(my-macro some-name)
+  ⇒ 123
 
-> (macroexpand '(my-macro some-name))
-(define some-name 123)
+(macroexpand '(my-macro some-name))
+  ⇒ (define some-name 123)
 
-> some-name
-123
+some-name
+  ⇒ 123
 #+end_src
 
 * The =or= macro
@@ -232,26 +232,26 @@ implementation, we should use some function like Emacs Lisp's [[https://www.gnu.
 Here are some examples of the macro:
 
 #+begin_src lisp
-> (my-or nil 'A 'B)
-A
+(my-or nil 'A 'B)
+  ⇒ A
 
-> (macroexpand '(my-or 'A 'B 'C))  ; God almighty...
-((lambda (result)
-   (if result result
-     ((lambda (result)
-        (if result result
-          ((lambda (result)
-             (if result result
-               nil))
-           'C)))
-      'B)))
- 'A)
+(macroexpand '(my-or 'A 'B 'C))  ; God almighty...
+  ⇒ ((lambda (result)
+       (if result result
+         ((lambda (result)
+            (if result result
+              ((lambda (result)
+                 (if result result
+                   nil))
+               'C)))
+          'B)))
+     'A)
 
-> (my-or)
-nil
+(my-or)
+  ⇒ nil
 
-> (macroexpand '(my-or))
-nil
+(macroexpand '(my-or))
+  ⇒ nil
 #+end_src
 
 Throughout this article I will make some minor changes to the interpreter output
@@ -301,14 +301,14 @@ list to avoid evaluating the =cdr= as another function call:
 Some examples of the second version:
 
 #+begin_src lisp
-> (my-or nil 'A 'B)
-A
+(my-or nil 'A 'B)
+  ⇒ A
 
-> (macroexpand '(my-or 'A 'B 'C))  ; Much more readable
-((lambda (result)
-   (if result result
-     (my-or ('B 'C))))
- 'A)
+(macroexpand '(my-or 'A 'B 'C))  ; Much more readable
+  ⇒ ((lambda (result)
+       (if result result
+         (my-or ('B 'C))))
+     'A)
 #+end_src
 
 ** Version 3
@@ -332,13 +332,13 @@ call by using the =let= macro. This version is probably a bit less efficient sin
 Some examples of the third version:
 
 #+begin_src lisp
-> (my-or nil 'A 'B)
-A
+(my-or nil 'A 'B)
+  ⇒ A
 
-> (macroexpand '(my-or 'A 'B 'C))  ; Much more readable
-(let ((result 'A))
-  (if result result
-    (my-or 'B 'C)))
+(macroexpand '(my-or 'A 'B 'C))  ; Much more readable
+  ⇒ (let ((result 'A))
+      (if result result
+        (my-or 'B 'C)))
 #+end_src
 
 * The =and= macro
