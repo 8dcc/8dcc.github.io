@@ -229,11 +229,12 @@
 <h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-introduction">
 <p>
-Some months ago I started writing <a href="https://github.com/8dcc/sl">my own Lisp</a>. I decided to implement the <code>or</code> and
-<code>and</code> procedures as <i>special form</i> C primitives, but I wanted to explain in the
-documentation that they don&rsquo;t <i>need</i> to be C primitives, since we can define them
-as macros that use <code>if</code>. When writing the example for the documentation, I wrote a
-few different alternatives that I consider worth sharing here.
+Some months ago I started writing <a href="https://github.com/8dcc/sl">my own Lisp interpreter</a>. I decided to
+implement the <code>or</code> and <code>and</code> procedures as <a href="https://www.lispworks.com/documentation/HyperSpec/Body/03_ababa.htm">special form</a> C primitives, but I wanted
+to explain in the documentation that they don&rsquo;t <i>need</i> to be C primitives, since
+we can define them as macros that use <code>if</code>. When writing the example for the
+documentation, I wrote a few different alternatives that I consider worth
+sharing here.
 </p>
 
 <p>

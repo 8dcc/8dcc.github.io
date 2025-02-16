@@ -11,11 +11,12 @@
 :CUSTOM_ID: introduction
 :END:
 
-Some months ago I started writing [[https://github.com/8dcc/sl][my own Lisp]]. I decided to implement the =or= and
-=and= procedures as /special form/ C primitives, but I wanted to explain in the
-documentation that they don't /need/ to be C primitives, since we can define them
-as macros that use =if=. When writing the example for the documentation, I wrote a
-few different alternatives that I consider worth sharing here.
+Some months ago I started writing [[https://github.com/8dcc/sl][my own Lisp interpreter]]. I decided to
+implement the =or= and =and= procedures as [[https://www.lispworks.com/documentation/HyperSpec/Body/03_ababa.htm][special form]] C primitives, but I wanted
+to explain in the documentation that they don't /need/ to be C primitives, since
+we can define them as macros that use =if=. When writing the example for the
+documentation, I wrote a few different alternatives that I consider worth
+sharing here.
 
 Before getting into the macros, I will briefly explain some of these
 concepts. Keep in mind that I will be referring to these concepts in the context
@@ -111,6 +112,10 @@ procedures, but have a few key differences:
    will be used to compute the actual value returned by the macro.
 
 In other words the general process when calling a procedure is:
+
+#+begin_comment org
+TODO Use diagrams instead.
+#+end_comment
 
 #+NAME: example1
 #+begin_example
