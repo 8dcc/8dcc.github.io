@@ -27,6 +27,9 @@ examples can be run in most Lisp dialects with some minor modifications. Just
 keep in mind that, unlike in Lisp_2 dialects (e.g. Common Lisp), there isn't a
 separate namespace for functions, so you won't see =funcall=.
 
+First of all, I would like to credit [[https://turtleware.eu/][Daniel Kochmański]] for his help some months
+ago, and for linking me this [[https://www.xach.com/naggum/articles/3092837184154309@naggum.no.html][email by Erik Naggum]], which you might find useful.
+
 ** Cons cells
 :PROPERTIES:
 :CUSTOM_ID: cons-cells
