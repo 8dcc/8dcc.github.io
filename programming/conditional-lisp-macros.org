@@ -346,6 +346,64 @@ Some examples of the third version:
         (my-or 'B 'C)))
 #+end_src
 
+** Version 4
+:PROPERTIES:
+:CUSTOM_ID: version-4
+:END:
+
+This is not how most Lisp programmers declare macros, though. Similarly to how
+the =quote= special form can be used for delaying evaluation, the backquote (=`=)
+can be used to /selectively/ delay evaluation.
+
+For example, in the following code, the elements marked for unquoting (=,=) are
+evaluated, while the rest of the list remains unchanged.
+
+#+begin_src lisp
+`(a b ,(list 1 2 3) c d)
+  ⇒ (a b (1 2 3) c d)
+
+`(a b (c d ,(null? 789)) e f)
+  ⇒ (a b (c d nil) e f)
+#+end_src
+
+Furthermore, the splice operator can be used on an expression that evaluates to
+a list to place its contents inside another list. We will use it when calling
+our macro recursively, instead of using =cons=.
+
+#+begin_src lisp
+`(a b ,(list 1 2 3) c d)
+  ⇒ (a b (1 2 3) c d)
+
+`(a b ,@(list 1 2 3) c d)
+  ⇒ (a b 1 2 3 c d)
+#+end_src
+
+With this in mind, we can define the fourth version of our macro.
+
+#+begin_src lisp
+(defmacro my-or (&rest exprs)
+  (if (null? exprs)
+      nil
+      `(let ((result ,(car exprs)))
+         (if result result
+             (my-or ,@(cdr exprs))))))
+#+end_src
+
+Some examples of the fourth version:
+
+#+begin_src lisp
+(my-or nil 'A 'B)
+  ⇒ A
+
+(macroexpand '(my-or 'A 'B 'C))
+  ⇒ (let ((result 'A))
+      (if result result
+          (my-or 'B 'C)))
+#+end_src
+
+As you can see, it works exactly like the third version, but the definition is
+more readable.
+
 * The =and= macro
 :PROPERTIES:
 :CUSTOM_ID: the-and-macro
@@ -384,11 +442,16 @@ by calling ourselves, just like we did in =my-or=.
     nil))
 #+end_src
 
-* Final note
+* COMMENT The =some= macro
 :PROPERTIES:
-:CUSTOM_ID: final-note
+:CUSTOM_ID: the-some-macro
 :END:
 
-I will end up adding a 4th version once I add [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html][backquote]] support to my Lisp.
+TODO
 
-Feel free to [[https://github.com/8dcc/8dcc.github.io/issues][contribute]] if you have any suggestions or improvements.
+* COMMENT The =every= macro
+:PROPERTIES:
+:CUSTOM_ID: the-every-macro
+:END:
+
+TODO

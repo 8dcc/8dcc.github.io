@@ -217,10 +217,10 @@
 <li><a href="#version-1">2.1. Version 1</a></li>
 <li><a href="#version-2">2.2. Version 2</a></li>
 <li><a href="#version-3">2.3. Version 3</a></li>
+<li><a href="#version-4">2.4. Version 4</a></li>
 </ul>
 </li>
 <li><a href="#the-and-macro">3. The <code>and</code> macro</a></li>
-<li><a href="#final-note">4. Final note</a></li>
 </ul>
 </div>
 </div>
@@ -633,64 +633,157 @@ Some examples of the third version:
 </div>
 </div>
 </div>
+
+<div id="outline-container-version-4" class="outline-3">
+<h3 id="version-4"><span class="section-number-3">2.4.</span> Version 4</h3>
+<div class="outline-text-3" id="text-version-4">
+<p>
+This is not how most Lisp programmers declare macros, though. Similarly to how
+the <code>quote</code> special form can be used for delaying evaluation, the backquote (<code>`</code>)
+can be used to <i>selectively</i> delay evaluation.
+</p>
+
+<p>
+For example, in the following code, the elements marked for unquoting (<code>,</code>) are
+evaluated, while the rest of the list remains unchanged.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">`<span style="color: #ff5f59;">(</span>a b ,<span style="color: #cabf00;">(</span>list <span style="color: #88ca9f;">1</span> <span style="color: #88ca9f;">2</span> <span style="color: #88ca9f;">3</span><span style="color: #cabf00;">)</span> c d<span style="color: #ff5f59;">)</span>
+  &#8658; <span style="color: #ff5f59;">(</span>a b <span style="color: #cabf00;">(</span><span style="color: #88ca9f;">1</span> <span style="color: #88ca9f;">2</span> <span style="color: #88ca9f;">3</span><span style="color: #cabf00;">)</span> c d<span style="color: #ff5f59;">)</span>
+
+`<span style="color: #ff5f59;">(</span>a b <span style="color: #cabf00;">(</span>c d ,<span style="color: #44bc44;">(</span>null? <span style="color: #88ca9f;">789</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span> e f<span style="color: #ff5f59;">)</span>
+  &#8658; <span style="color: #ff5f59;">(</span>a b <span style="color: #cabf00;">(</span>c d nil<span style="color: #cabf00;">)</span> e f<span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+Furthermore, the splice operator can be used on an expression that evaluates to
+a list to place its contents inside another list. We will use it when calling
+our macro recursively, instead of using <code>cons</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">`<span style="color: #ff5f59;">(</span>a b ,<span style="color: #cabf00;">(</span>list <span style="color: #88ca9f;">1</span> <span style="color: #88ca9f;">2</span> <span style="color: #88ca9f;">3</span><span style="color: #cabf00;">)</span> c d<span style="color: #ff5f59;">)</span>
+  &#8658; <span style="color: #ff5f59;">(</span>a b <span style="color: #cabf00;">(</span><span style="color: #88ca9f;">1</span> <span style="color: #88ca9f;">2</span> <span style="color: #88ca9f;">3</span><span style="color: #cabf00;">)</span> c d<span style="color: #ff5f59;">)</span>
+
+`<span style="color: #ff5f59;">(</span>a b ,@<span style="color: #cabf00;">(</span>list <span style="color: #88ca9f;">1</span> <span style="color: #88ca9f;">2</span> <span style="color: #88ca9f;">3</span><span style="color: #cabf00;">)</span> c d<span style="color: #ff5f59;">)</span>
+  &#8658; <span style="color: #ff5f59;">(</span>a b <span style="color: #88ca9f;">1</span> <span style="color: #88ca9f;">2</span> <span style="color: #88ca9f;">3</span> c d<span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+With this in mind, we can define the fourth version of our macro.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defmacro</span> <span style="color: #4ae2ff;">my-or</span> <span style="color: #cabf00;">(</span><span style="color: #79a8ff;">&amp;rest</span> exprs<span style="color: #cabf00;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>null? exprs<span style="color: #44bc44;">)</span>
+      nil
+      `<span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #00eff0;">(</span><span style="color: #338fff;">(</span>result ,<span style="color: #ef7fff;">(</span>car exprs<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
+         <span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">if</span> result result
+             <span style="color: #338fff;">(</span>my-or ,@<span style="color: #ef7fff;">(</span>cdr exprs<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+Some examples of the fourth version:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>my-or nil 'A 'B<span style="color: #ff5f59;">)</span>
+  &#8658; A
+
+<span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-or 'A 'B 'C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  &#8658; <span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>result 'A<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+      <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> result result
+          <span style="color: #44bc44;">(</span>my-or 'B 'C<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+As you can see, it works exactly like the third version, but the definition is
+more readable.
+</p>
+</div>
+</div>
 </div>
 
 <div id="outline-container-the-and-macro" class="outline-2">
 <h2 id="the-and-macro"><span class="section-number-2">3.</span> The <code>and</code> macro</h2>
 <div class="outline-text-2" id="text-the-and-macro">
 <p>
-This version of <code>my-and</code> is based on the third version of <code>my-or</code>, so it also
+This version of <code>my-and</code> is based on the fourth version of <code>my-or</code>, but with some
+important differences that will be explained below. Note that this version also
 overwrites the <code>result</code> symbol.
 </p>
 
 <div class="org-src-container">
 <pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defmacro</span> <span style="color: #4ae2ff;">my-and</span> <span style="color: #cabf00;">(</span><span style="color: #79a8ff;">&amp;rest</span> exprs<span style="color: #cabf00;">)</span>
-  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>null? exprs<span style="color: #44bc44;">)</span>
-      tru
-      <span style="color: #44bc44;">(</span>list 'let <span style="color: #00eff0;">(</span>list <span style="color: #338fff;">(</span>list 'result <span style="color: #ef7fff;">(</span>car exprs<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
-            <span style="color: #00eff0;">(</span>list 'if
-                  'result
-                  <span style="color: #338fff;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #ef7fff;">(</span>null? <span style="color: #ff5f59;">(</span>cdr exprs<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span>
-                      'result
-                      <span style="color: #ef7fff;">(</span>cons 'my-and <span style="color: #ff5f59;">(</span>cdr exprs<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
-                  nil<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">cond</span> <span style="color: #44bc44;">(</span><span style="color: #00eff0;">(</span>null? exprs<span style="color: #00eff0;">)</span> tru<span style="color: #44bc44;">)</span>
+        <span style="color: #44bc44;">(</span><span style="color: #00eff0;">(</span>null? <span style="color: #338fff;">(</span>cdr exprs<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span> <span style="color: #00eff0;">(</span>car exprs<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span>
+        <span style="color: #44bc44;">(</span>tru `<span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #338fff;">(</span><span style="color: #ef7fff;">(</span>result ,<span style="color: #ff5f59;">(</span>car exprs<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
+                <span style="color: #338fff;">(</span><span style="color: #ff6f9f;">if</span> result
+                    <span style="color: #ef7fff;">(</span>my-and ,@<span style="color: #ff5f59;">(</span>cdr exprs<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span>
+                    nil<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
 </pre>
 </div>
 
 <p>
-The first difference is that, when <code>expr</code> is empty, <code>tru</code> is returned instead of
-<code>nil</code>. Again, this is the expected behavior in Scheme and in my Lisp.
+The first difference is that we use <code>cond</code> instead of <code>if</code>. This is because we want
+to check multiple conditions sequentially, and it&rsquo;s more readable this way.
 </p>
 
 <p>
-Then, a conditional is introduced when expanding the macro. Just to be clear,
-this conditional, the one that checks if <code>(cdr exprs)</code> is empty, will be performed
-when the macro is <i>expanded</i>, not when the expansion is <i>evaluated</i>. This
-conditional is needed because, if we reached the last argument, we want to
-return it if it&rsquo;s non-nil. If we are not on the last argument, we keep checking
-by calling ourselves, just like we did in <code>my-or</code>.
+The first condition checks if we received no arguments. You might notice that,
+when called with no arguments, the function returns <code>tru</code> instead of <code>nil</code>. Again,
+this is the expected behavior in Scheme and in my Lisp.
+</p>
+
+<p>
+The second condition checks if we only received one argument. If we did, then we
+simply want to return it, and its evaluation will determine whether it was <code>nil</code>
+or not. This is important, since we will call ourselves recursively.
+</p>
+
+<p>
+Otherwise, if we got two or more arguments, we will evaluate the first one and,
+if it evaluates to non-nil, we will continue checking the rest of the arguments
+by calling ourselves recursively. If an argument evaluates to <code>nil</code>, the call to
+<code>my-and</code> returns <code>nil</code>.
+</p>
+
+<p>
+Some example calls to <code>my-and</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>result 'A<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
-  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> result
-    <span style="color: #44bc44;">(</span>my-and 'B 'C<span style="color: #44bc44;">)</span>
-    nil<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>my-and<span style="color: #ff5f59;">)</span>
+  &#8658; tru
+
+<span style="color: #ff5f59;">(</span>my-and 'A 'B 'C<span style="color: #ff5f59;">)</span>
+  &#8658; C
+
+<span style="color: #ff5f59;">(</span>my-and 'A nil 'C<span style="color: #ff5f59;">)</span>
+  &#8658; nil
 </pre>
 </div>
-</div>
-</div>
-
-<div id="outline-container-final-note" class="outline-2">
-<h2 id="final-note"><span class="section-number-2">4.</span> Final note</h2>
-<div class="outline-text-2" id="text-final-note">
-<p>
-I will end up adding a 4th version once I add <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html">backquote</a> support to my Lisp.
-</p>
 
 <p>
-Feel free to <a href="https://github.com/8dcc/8dcc.github.io/issues">contribute</a> if you have any suggestions or improvements.
+And some macro expansions.
 </p>
+
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-and 'A 'B 'C<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  &#8658; <span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span>result 'A<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+      <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> result
+          <span style="color: #44bc44;">(</span>my-and 'B 'C<span style="color: #44bc44;">)</span>
+          nil<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+
+<span style="color: #ff5f59;">(</span>macroexpand '<span style="color: #cabf00;">(</span>my-and 'A<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  &#8658; 'A
+</pre>
+</div>
 </div>
 </div>
 </div>
