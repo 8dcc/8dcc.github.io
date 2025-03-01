@@ -409,37 +409,60 @@ more readable.
 :CUSTOM_ID: the-and-macro
 :END:
 
-This version of =my-and= is based on the third version of =my-or=, so it also
+This version of =my-and= is based on the fourth version of =my-or=, but with some
+important differences that will be explained below. Note that this version also
 overwrites the =result= symbol.
 
 #+begin_src lisp
 (defmacro my-and (&rest exprs)
-  (if (null? exprs)
-      tru
-      (list 'let (list (list 'result (car exprs)))
-            (list 'if
-                  'result
-                  (if (null? (cdr exprs))
-                      'result
-                      (cons 'my-and (cdr exprs)))
-                  nil))))
+  (cond ((null? exprs) tru)
+        ((null? (cdr exprs)) (car exprs))
+        (tru `(let ((result ,(car exprs)))
+                (if result
+                    (my-and ,@(cdr exprs))
+                    nil)))))
 #+end_src
 
-The first difference is that, when =expr= is empty, =tru= is returned instead of
-=nil=. Again, this is the expected behavior in Scheme and in my Lisp.
+The first difference is that we use =cond= instead of =if=. This is because we want
+to check multiple conditions sequentially, and it's more readable this way.
 
-Then, a conditional is introduced when expanding the macro. Just to be clear,
-this conditional, the one that checks if =(cdr exprs)= is empty, will be performed
-when the macro is /expanded/, not when the expansion is /evaluated/. This
-conditional is needed because, if we reached the last argument, we want to
-return it if it's non-nil. If we are not on the last argument, we keep checking
-by calling ourselves, just like we did in =my-or=.
+The first condition checks if we received no arguments. You might notice that,
+when called with no arguments, the function returns =tru= instead of =nil=. Again,
+this is the expected behavior in Scheme and in my Lisp.
+
+The second condition checks if we only received one argument. If we did, then we
+simply want to return it, and its evaluation will determine whether it was =nil=
+or not. This is important, since we will call ourselves recursively.
+
+Otherwise, if we got two or more arguments, we will evaluate the first one and,
+if it evaluates to non-nil, we will continue checking the rest of the arguments
+by calling ourselves recursively. If an argument evaluates to =nil=, the call to
+=my-and= returns =nil=.
+
+Some example calls to =my-and=.
 
 #+begin_src lisp
-(let ((result 'A))
-  (if result
-    (my-and 'B 'C)
-    nil))
+(my-and)
+  ⇒ tru
+
+(my-and 'A 'B 'C)
+  ⇒ C
+
+(my-and 'A nil 'C)
+  ⇒ nil
+#+end_src
+
+And some macro expansions.
+
+#+begin_src lisp
+(macroexpand '(my-and 'A 'B 'C))
+  ⇒ (let ((result 'A))
+      (if result
+          (my-and 'B 'C)
+          nil))
+
+(macroexpand '(my-and 'A))
+  ⇒ 'A
 #+end_src
 
 * COMMENT The =some= macro
