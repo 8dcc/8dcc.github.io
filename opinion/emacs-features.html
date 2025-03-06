@@ -717,19 +717,21 @@ You can create new directories with <code>+</code>.
 </p></dd>
 
 <dt>Search, replace and compare</dt><dd><p>
-You can search for regular expressions in marked files with <code>A</code>. It&rsquo;s a variant
-of <code>xref-find-references</code> (in my config bound to <code>SPC j x</code>), so it displays an
-<code>*xref*</code> buffer (or a fancy completion, if overwriting <code>xref-show-xrefs-function</code>
-with something like <a href="https://github.com/minad/consult">consult</a>).
+You can search for regular expressions in marked files with <code>A</code>
+(<code>dired-do-find-regexp</code>). It&rsquo;s similar to <code>xref-find-references</code> (which in my
+config is bound to <code>SPC j x</code>), and it displays an <code>*xref*</code> buffer, or a fancy
+completion if you are overwriting <code>xref-show-xrefs-function</code> with something like
+<a href="https://github.com/minad/consult">consult</a>.
 </p>
 
 <p>
-You can replace text (with <code>query-replace-regexp</code>) in the marked buffers with
-<code>Q</code>. This is a very useful feature. In addition to normal query replace
-commands, you can use <code>Y</code> to confirm all replacements on all target files. If
-you exit the query replace loop, you can use <code>r</code> in the <code>*xref*</code> buffer to
-continue replacing. If there are marked directories in the current buffer when
-invoking, they are searched recursively.
+You can replace text (similarly to <code>query-replace-regexp</code>) in the marked buffers
+with <code>Q</code> (<code>dired-do-find-regexp-and-replace</code>). This is a very useful feature. In
+addition to normal query replace commands, you can use <code>Y</code> to confirm all
+replacements on all target files. If you exit the query replace loop, you can
+use <code>r</code> in the <code>*xref*</code> buffer to continue replacing. If there are marked
+directories in the current buffer when invoking, they are searched
+recursively.
 </p>
 
 <p>

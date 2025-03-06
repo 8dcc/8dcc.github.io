@@ -322,17 +322,19 @@ the Emacs manual.
 
 - Search, replace and compare ::
 
-  You can search for regular expressions in marked files with =A=. It's a variant
-  of =xref-find-references= (in my config bound to =SPC j x=), so it displays an
-  =*xref*= buffer (or a fancy completion, if overwriting =xref-show-xrefs-function=
-  with something like [[https://github.com/minad/consult][consult]]).
+  You can search for regular expressions in marked files with =A=
+  (=dired-do-find-regexp=). It's similar to =xref-find-references= (which in my
+  config is bound to =SPC j x=), and it displays an =*xref*= buffer, or a fancy
+  completion if you are overwriting =xref-show-xrefs-function= with something like
+  [[https://github.com/minad/consult][consult]].
 
-  You can replace text (with =query-replace-regexp=) in the marked buffers with
-  =Q=. This is a very useful feature. In addition to normal query replace
-  commands, you can use =Y= to confirm all replacements on all target files. If
-  you exit the query replace loop, you can use =r= in the =*xref*= buffer to
-  continue replacing. If there are marked directories in the current buffer when
-  invoking, they are searched recursively.
+  You can replace text (similarly to =query-replace-regexp=) in the marked buffers
+  with =Q= (=dired-do-find-regexp-and-replace=). This is a very useful feature. In
+  addition to normal query replace commands, you can use =Y= to confirm all
+  replacements on all target files. If you exit the query replace loop, you can
+  use =r= in the =*xref*= buffer to continue replacing. If there are marked
+  directories in the current buffer when invoking, they are searched
+  recursively.
 
   You can compare two files (the file at point with a second prompted file) in a
   =*Diff*= buffer with ~=~.
