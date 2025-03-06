@@ -193,7 +193,7 @@ different sources, filtering by language. I use this for my [[https://github.com
 and it allows me to put the code snippets between the markdown text, rather than
 using very long plain comments within a single source.
 
-#+NAME: fig1
+#+NAME: emacs-org
 [[file:../img/emacs-org.png]]
 
 See also: [[https://orgmode.org/manuals.html][Org-mode manual]].
@@ -220,7 +220,7 @@ setting the following variables, and then running =M-x gdb=.
 
 Behold, the beauty of GNU Emacs (at least since version 22.1).
 
-#+NAME: fig2
+#+NAME: emacs-gdb
 [[file:../img/emacs-gdb.png]]
 
 All 6 windows have been opened by =gdb=, but don't worry, your previous layout
@@ -363,7 +363,7 @@ You can run =grep= commands from within Emacs. The basic form is with =M-x grep=
 which simply runs a grep command (or a command with a similar output) and
 displays the matches in an interactive buffer.
 
-#+NAME: fig3
+#+NAME: emacs-grep
 [[file:../img/emacs-grep.png]]
 
 You can jump to each of those lines.
@@ -395,7 +395,7 @@ similar commands, so make sure you check it out.
 This package allows you to compare files, buffers and much more. It's similar to
 the =diff= command, but much more interactive and integrated with Emacs and Magit.
 
-#+NAME: fig4
+#+NAME: emacs-ediff
 [[file:../img/emacs-ediff.png]]
 
 ** Browser and external documentation
@@ -600,7 +600,7 @@ repository]].
 This package provides a great interface for Git, and is very well integrated
 with Emacs.
 
-#+NAME: fig5
+#+NAME: emacs-magit
 [[file:../img/emacs-magit.png]]
 
 It's a very well known package, but this is it's [[https://magit.vc/][homepage]].
@@ -621,7 +621,7 @@ package to be useful sometimes, specially in large projects.
 The following figure shows a C buffer (from my [[https://github.com/8dcc/sl][SL project]]) with eglot and [[#eldoc-box][eldoc
 box]] enabled.
 
-#+NAME: fig6
+#+NAME: emacs-eglot
 [[file:../img/emacs-eglot.png]]
 
 This package, uses Emacs' [[https://www.gnu.org/software/emacs/manual/html_node/flymake/index.html][flymake]] for syntax checking. I personally don't like
@@ -643,7 +643,7 @@ The [[https://www.flycheck.org/en/latest/][flycheck]] package provides syntax ch
 indicators for notes, warnings and errors from many external tools (compilers,
 syntax checkers, etc.), along with descriptions of the errors themselves.
 
-#+NAME: fig7
+#+NAME: emacs-flycheck
 [[file:../img/emacs-flycheck.png]]
 
 Unlike eglot, which I manually enable when needed, I automatically enable
