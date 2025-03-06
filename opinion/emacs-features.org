@@ -605,6 +605,51 @@ with Emacs.
 
 It's a very well known package, but this is it's [[https://magit.vc/][homepage]].
 
+** Eglot
+:PROPERTIES:
+:CUSTOM_ID: eglot
+:END:
+
+The [[https://github.com/joaotavora/eglot][eglot]] package, currently built into Emacs, provides a [[https://en.wikipedia.org/wiki/Language_Server_Protocol][Language Server
+Protocol]] (LSP) client.
+
+Although it might seem ironic in the Emacs context, I would like to say that I
+am not a big fan of big and bloated tools (specially IDEs), so I try to keep my
+emacs configuration pretty lightweight. With that being said, I find this
+package to be useful sometimes, specially in large projects.
+
+The following figure shows a C buffer (from my [[https://github.com/8dcc/sl][SL project]]) with eglot and [[#eldoc-box][eldoc
+box]] enabled.
+
+#+NAME: fig6
+[[file:../img/emacs-eglot.png]]
+
+This package, uses Emacs' [[https://www.gnu.org/software/emacs/manual/html_node/flymake/index.html][flymake]] for syntax checking. I personally don't like
+it, so I disable it by setting =eglot-stay-out-of=, and replace it with [[#flycheck][flycheck]].
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-stay-out-of 'flymake))
+#+end_src
+
+For more information, see the [[https://joaotavora.github.io/eglot/][Eglot manual]].
+
+** Flycheck
+:PROPERTIES:
+:CUSTOM_ID: flycheck
+:END:
+
+The [[https://www.flycheck.org/en/latest/][flycheck]] package provides syntax checking for many major modes. It shows
+indicators for notes, warnings and errors from many external tools (compilers,
+syntax checkers, etc.), along with descriptions of the errors themselves.
+
+#+NAME: fig7
+[[file:../img/emacs-flycheck.png]]
+
+Unlike eglot, which I manually enable when needed, I automatically enable
+flycheck in some major modes, since it's not very intrusive, and effectively
+just highlights compilation warnings while editing.
+
 ** Vundo
 :PROPERTIES:
 :CUSTOM_ID: vundo
@@ -615,3 +660,15 @@ change history as a /tree/ rather than a /linear history/. This makes it a bit
 harder to get used to (tip: use =undo-redo=), but ensures that no change is lost.
 
 The [[https://github.com/casouri/vundo][vundo]] package provides a (navigable) graph for the Emacs undo system.
+
+** Eldoc box
+:PROPERTIES:
+:CUSTOM_ID: eldoc-box
+:END:
+
+This package provides a way of visualizing [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Programming-Language-Doc.html][eldoc]] messages in a childframe,
+rather than on the minibuffer. This is specially useful if you use [[https://github.com/nflath/c-eldoc][c-eldoc]] or
+[[#eglot][eglot]]. For a screenshot of how this package looks, see [[#eglot][eglot]] above.
+
+This is the [[https://github.com/casouri/eldoc-box][repository link]]. The package is written by [[https://github.com/casouri][Yuan Fu]], the author of
+the [[#vundo][vundo]] described above.

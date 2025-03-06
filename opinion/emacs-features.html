@@ -247,7 +247,10 @@
 <ul>
 <li><a href="#evil-mode">4.1. Evil mode</a></li>
 <li><a href="#magit">4.2. Magit</a></li>
-<li><a href="#vundo">4.3. Vundo</a></li>
+<li><a href="#eglot">4.3. Eglot</a></li>
+<li><a href="#flycheck">4.4. Flycheck</a></li>
+<li><a href="#vundo">4.5. Vundo</a></li>
+<li><a href="#eldoc-box">4.6. Eldoc box</a></li>
 </ul>
 </li>
 </ul>
@@ -1128,8 +1131,74 @@ It&rsquo;s a very well known package, but this is it&rsquo;s <a href="https://ma
 </div>
 </div>
 
+<div id="outline-container-eglot" class="outline-3">
+<h3 id="eglot"><span class="section-number-3">4.3.</span> Eglot</h3>
+<div class="outline-text-3" id="text-eglot">
+<p>
+The <a href="https://github.com/joaotavora/eglot">eglot</a> package, currently built into Emacs, provides a <a href="https://en.wikipedia.org/wiki/Language_Server_Protocol">Language Server
+Protocol</a> (LSP) client.
+</p>
+
+<p>
+Although it might seem ironic in the Emacs context, I would like to say that I
+am not a big fan of big and bloated tools (specially IDEs), so I try to keep my
+emacs configuration pretty lightweight. With that being said, I find this
+package to be useful sometimes, specially in large projects.
+</p>
+
+<p>
+The following figure shows a C buffer (from my <a href="https://github.com/8dcc/sl">SL project</a>) with eglot and <a href="#eldoc-box">eldoc
+box</a> enabled.
+</p>
+
+
+<div id="fig6" class="figure">
+<p><img src="../img/emacs-eglot.png" alt="emacs-eglot.png" />
+</p>
+</div>
+
+<p>
+This package, uses Emacs&rsquo; <a href="https://www.gnu.org/software/emacs/manual/html_node/flymake/index.html">flymake</a> for syntax checking. I personally don&rsquo;t like
+it, so I disable it by setting <code>eglot-stay-out-of</code>, and replace it with <a href="#flycheck">flycheck</a>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">with-eval-after-load</span> 'eglot
+  <span style="color: #cabf00;">(</span>add-to-list 'eglot-stay-out-of 'flymake<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+</pre>
+</div>
+
+<p>
+For more information, see the <a href="https://joaotavora.github.io/eglot/">Eglot manual</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-flycheck" class="outline-3">
+<h3 id="flycheck"><span class="section-number-3">4.4.</span> Flycheck</h3>
+<div class="outline-text-3" id="text-flycheck">
+<p>
+The <a href="https://www.flycheck.org/en/latest/">flycheck</a> package provides syntax checking for many major modes. It shows
+indicators for notes, warnings and errors from many external tools (compilers,
+syntax checkers, etc.), along with descriptions of the errors themselves.
+</p>
+
+
+<div id="fig7" class="figure">
+<p><img src="../img/emacs-flycheck.png" alt="emacs-flycheck.png" />
+</p>
+</div>
+
+<p>
+Unlike eglot, which I manually enable when needed, I automatically enable
+flycheck in some major modes, since it&rsquo;s not very intrusive, and effectively
+just highlights compilation warnings while editing.
+</p>
+</div>
+</div>
+
 <div id="outline-container-vundo" class="outline-3">
-<h3 id="vundo"><span class="section-number-3">4.3.</span> Vundo</h3>
+<h3 id="vundo"><span class="section-number-3">4.5.</span> Vundo</h3>
 <div class="outline-text-3" id="text-vundo">
 <p>
 The Emacs undo system is great because, unlike many other editors, treats the
@@ -1139,6 +1208,22 @@ harder to get used to (tip: use <code>undo-redo</code>), but ensures that no cha
 
 <p>
 The <a href="https://github.com/casouri/vundo">vundo</a> package provides a (navigable) graph for the Emacs undo system.
+</p>
+</div>
+</div>
+
+<div id="outline-container-eldoc-box" class="outline-3">
+<h3 id="eldoc-box"><span class="section-number-3">4.6.</span> Eldoc box</h3>
+<div class="outline-text-3" id="text-eldoc-box">
+<p>
+This package provides a way of visualizing <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Programming-Language-Doc.html">eldoc</a> messages in a childframe,
+rather than on the minibuffer. This is specially useful if you use <a href="https://github.com/nflath/c-eldoc">c-eldoc</a> or
+<a href="#eglot">eglot</a>. For a screenshot of how this package looks, see <a href="#eglot">eglot</a> above.
+</p>
+
+<p>
+This is the <a href="https://github.com/casouri/eldoc-box">repository link</a>. The package is written by <a href="https://github.com/casouri">Yuan Fu</a>, the author of
+the <a href="#vundo">vundo</a> described above.
 </p>
 </div>
 </div>
