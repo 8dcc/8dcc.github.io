@@ -610,22 +610,43 @@ It's a very well known package, but this is it's [[https://magit.vc/][homepage]]
 :CUSTOM_ID: eglot
 :END:
 
-The [[https://github.com/joaotavora/eglot][eglot]] package, currently built into Emacs, provides a [[https://en.wikipedia.org/wiki/Language_Server_Protocol][Language Server
+The [[https://github.com/joaotavora/eglot][Eglot]] package, currently built into Emacs, provides a [[https://en.wikipedia.org/wiki/Language_Server_Protocol][Language Server
 Protocol]] (LSP) client.
+
+Here are some of the [[https://www.gnu.org/software/emacs/manual/html_node/eglot/Eglot-Features.html][Eglot features]] I use when working on big C/C++ projects:
+
+1. *At-point documentation*. About a function, structure, etc. I would like to
+   mention something that I have never seen[fn::If you know of a reliable
+   method, tool or compiler option for displaying the actual size and alignment
+   of a structure, please [[mailto:8dcc.git@gmail.com][let me know]].] anywhere else, and that I find very
+   useful: if you place the point in a structure name, its actual size in bytes
+   and alignment will be displayed.
+2. *Finding definitions and uses of identifiers*. It provides an accurate backend
+   for Emacs' [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Xref.html][Xref]], better than other regex-based alternatives like [[https://github.com/jacktasia/dumb-jump][dumb-jump]],
+   while also avoiding having to use an annoying [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Tags-Tables.html][tag table]].
+3. *Better buffer navigation*. It overwrites the indexing functions for [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Imenu.html][Imenu]],
+   providing more accurate information about structure members, etc. This change
+   alone would not make me use an LSP, but it's still a small improvement over
+   the default function-only index.
+4. *Function parameter names in calls*. This is useful, but can be a bit annoying,
+   specially considering that, as far as I know, it can't be directly configured
+   from Eglot. If this was an option, and it wasn't on by default, I honestly
+   would not bother turning it on.
 
 Although it might seem ironic in the Emacs context, I would like to say that I
 am not a big fan of big and bloated tools (specially IDEs), so I try to keep my
 emacs configuration pretty lightweight. With that being said, I find this
 package to be useful sometimes, specially in large projects.
 
-The following figure shows a C buffer (from my [[https://github.com/8dcc/sl][SL project]]) with eglot and [[#eldoc-box][eldoc
+The following figure shows a C buffer (from my [[https://github.com/8dcc/sl][SL project]]) with Eglot and [[#eldoc-box][eldoc
 box]] enabled.
 
 #+NAME: emacs-eglot
 [[file:../img/emacs-eglot.png]]
 
-This package, uses Emacs' [[https://www.gnu.org/software/emacs/manual/html_node/flymake/index.html][flymake]] for syntax checking. I personally don't like
-it, so I disable it by setting =eglot-stay-out-of=, and replace it with [[#flycheck][flycheck]].
+Regarding the previous list of features, I would like to say that this package
+uses Emacs' [[https://www.gnu.org/software/emacs/manual/html_node/flymake/index.html][flymake]] for syntax checking. I personally don't like it, so I
+disable it by setting =eglot-stay-out-of=, and replace it with [[#flycheck][flycheck]].
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'eglot

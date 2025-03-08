@@ -1135,9 +1135,31 @@ It&rsquo;s a very well known package, but this is it&rsquo;s <a href="https://ma
 <h3 id="eglot"><span class="section-number-3">4.3.</span> Eglot</h3>
 <div class="outline-text-3" id="text-eglot">
 <p>
-The <a href="https://github.com/joaotavora/eglot">eglot</a> package, currently built into Emacs, provides a <a href="https://en.wikipedia.org/wiki/Language_Server_Protocol">Language Server
+The <a href="https://github.com/joaotavora/eglot">Eglot</a> package, currently built into Emacs, provides a <a href="https://en.wikipedia.org/wiki/Language_Server_Protocol">Language Server
 Protocol</a> (LSP) client.
 </p>
+
+<p>
+Here are some of the <a href="https://www.gnu.org/software/emacs/manual/html_node/eglot/Eglot-Features.html">Eglot features</a> I use when working on big C/C++ projects:
+</p>
+
+<ol class="org-ol">
+<li><b>At-point documentation</b>. About a function, structure, etc. I would like to
+mention something that I have never seen<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup> anywhere else, and that I find very
+useful: if you place the point in a structure name, its actual size in bytes
+and alignment will be displayed.</li>
+<li><b>Finding definitions and uses of identifiers</b>. It provides an accurate backend
+for Emacs&rsquo; <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Xref.html">Xref</a>, better than other regex-based alternatives like <a href="https://github.com/jacktasia/dumb-jump">dumb-jump</a>,
+while also avoiding having to use an annoying <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Tags-Tables.html">tag table</a>.</li>
+<li><b>Better buffer navigation</b>. It overwrites the indexing functions for <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Imenu.html">Imenu</a>,
+providing more accurate information about structure members, etc. This change
+alone would not make me use an LSP, but it&rsquo;s still a small improvement over
+the default function-only index.</li>
+<li><b>Function parameter names in calls</b>. This is useful, but can be a bit annoying,
+specially considering that, as far as I know, it can&rsquo;t be directly configured
+from Eglot. If this was an option, and it wasn&rsquo;t on by default, I honestly
+would not bother turning it on.</li>
+</ol>
 
 <p>
 Although it might seem ironic in the Emacs context, I would like to say that I
@@ -1147,7 +1169,7 @@ package to be useful sometimes, specially in large projects.
 </p>
 
 <p>
-The following figure shows a C buffer (from my <a href="https://github.com/8dcc/sl">SL project</a>) with eglot and <a href="#eldoc-box">eldoc
+The following figure shows a C buffer (from my <a href="https://github.com/8dcc/sl">SL project</a>) with Eglot and <a href="#eldoc-box">eldoc
 box</a> enabled.
 </p>
 
@@ -1158,8 +1180,9 @@ box</a> enabled.
 </div>
 
 <p>
-This package, uses Emacs&rsquo; <a href="https://www.gnu.org/software/emacs/manual/html_node/flymake/index.html">flymake</a> for syntax checking. I personally don&rsquo;t like
-it, so I disable it by setting <code>eglot-stay-out-of</code>, and replace it with <a href="#flycheck">flycheck</a>.
+Regarding the previous list of features, I would like to say that this package
+uses Emacs&rsquo; <a href="https://www.gnu.org/software/emacs/manual/html_node/flymake/index.html">flymake</a> for syntax checking. I personally don&rsquo;t like it, so I
+disable it by setting <code>eglot-stay-out-of</code>, and replace it with <a href="#flycheck">flycheck</a>.
 </p>
 
 <div class="org-src-container">
@@ -1228,6 +1251,16 @@ the <a href="#vundo">vundo</a> described above.
 </div>
 </div>
 </div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">If you know of a reliable
+method, tool or compiler option for displaying the actual size and alignment
+of a structure, please <a href="mailto:8dcc.git@gmail.com">let me know</a>.</p></div></div>
+
+
 </div>
+</div></div>
 </body>
 </html>
