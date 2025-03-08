@@ -628,10 +628,9 @@ Here are some of the [[https://www.gnu.org/software/emacs/manual/html_node/eglot
    providing more accurate information about structure members, etc. This change
    alone would not make me use an LSP, but it's still a small improvement over
    the default function-only index.
-4. *Function parameter names in calls*. This is useful, but can be a bit annoying,
-   specially considering that, as far as I know, it can't be directly configured
-   from Eglot. If this was an option, and it wasn't on by default, I honestly
-   would not bother turning it on.
+4. *Function parameter names in calls*. This is useful, but can be a bit annoying
+   sometimes. You can toggle it with the =eglot-inlay-hints-mode= minor mode, and
+   it wasn't on by default, I honestly would not bother turning it on.
 
 Although it might seem ironic in the Emacs context, I would like to say that I
 am not a big fan of big and bloated tools (specially IDEs), so I try to keep my
