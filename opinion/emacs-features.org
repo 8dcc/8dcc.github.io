@@ -373,6 +373,23 @@ a term recursively in the specified folder.
 
 See also [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Grep-Searching.html][GNU Emacs Manual]].
 
+** Occur
+:PROPERTIES:
+:CUSTOM_ID: occur
+:END:
+
+Similar to [[#grep][Grep]], the =occur= command allows you to list all occurrences of a
+regular expression in the current buffer.
+
+One of the features I would like to highlight is =occur-edit-mode=, which lets you
+edit the matches from the ~*Occur*~ buffer, and then write them to their
+respective buffer. You can easily enable =occur-edit-mode= in an ~*Occur*~ buffer
+with the =e= key (or =i=, if you are using [[#evil-mode][Evil mode]]). You can combine this feature
+with =multi-occur-in-matching-buffers= (or with my custom
+=x8dcc/dired-do-multi-occur= function) to easily edit matches in multiple files.
+
+See also [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Other-Repeating-Search.html][GNU Emacs Manual]] and [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mastering Emacs website]].
+
 ** Compilation
 :PROPERTIES:
 :CUSTOM_ID: compilation

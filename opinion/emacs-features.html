@@ -229,18 +229,19 @@
 <li><a href="#eshell">3.3. Eshell</a></li>
 <li><a href="#dired">3.4. Dired</a></li>
 <li><a href="#grep">3.5. Grep</a></li>
-<li><a href="#compilation">3.6. Compilation</a></li>
-<li><a href="#ediff">3.7. Ediff</a></li>
-<li><a href="#browser-and-external-documentation">3.8. Browser and external documentation</a></li>
-<li><a href="#erc">3.9. ERC</a></li>
-<li><a href="#c-macro-expansion">3.10. C macro expansion</a></li>
-<li><a href="#calculator">3.11. Calculator</a>
+<li><a href="#occur">3.6. Occur</a></li>
+<li><a href="#compilation">3.7. Compilation</a></li>
+<li><a href="#ediff">3.8. Ediff</a></li>
+<li><a href="#browser-and-external-documentation">3.9. Browser and external documentation</a></li>
+<li><a href="#erc">3.10. ERC</a></li>
+<li><a href="#c-macro-expansion">3.11. C macro expansion</a></li>
+<li><a href="#calculator">3.12. Calculator</a>
 <ul>
-<li><a href="#quick-calculator">3.11.1. Quick calculator</a></li>
-<li><a href="#personal-reference-card">3.11.2. Personal reference card</a></li>
+<li><a href="#quick-calculator">3.12.1. Quick calculator</a></li>
+<li><a href="#personal-reference-card">3.12.2. Personal reference card</a></li>
 </ul>
 </li>
-<li><a href="#macros">3.12. Macros</a></li>
+<li><a href="#macros">3.13. Macros</a></li>
 </ul>
 </li>
 <li><a href="#external-packages">4. External packages</a>
@@ -790,8 +791,31 @@ See also <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Grep
 </div>
 </div>
 
+<div id="outline-container-occur" class="outline-3">
+<h3 id="occur"><span class="section-number-3">3.6.</span> Occur</h3>
+<div class="outline-text-3" id="text-occur">
+<p>
+Similar to <a href="#grep">Grep</a>, the <code>occur</code> command allows you to list all occurrences of a
+regular expression in the current buffer.
+</p>
+
+<p>
+One of the features I would like to highlight is <code>occur-edit-mode</code>, which lets you
+edit the matches from the <code>*Occur*</code> buffer, and then write them to their
+respective buffer. You can easily enable <code>occur-edit-mode</code> in an <code>*Occur*</code> buffer
+with the <code>e</code> key (or <code>i</code>, if you are using <a href="#evil-mode">Evil mode</a>). You can combine this feature
+with <code>multi-occur-in-matching-buffers</code> (or with my custom
+<code>x8dcc/dired-do-multi-occur</code> function) to easily edit matches in multiple files.
+</p>
+
+<p>
+See also <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Other-Repeating-Search.html">GNU Emacs Manual</a> and <a href="https://www.masteringemacs.org/article/searching-buffers-occur-mode">Mastering Emacs website</a>.
+</p>
+</div>
+</div>
+
 <div id="outline-container-compilation" class="outline-3">
-<h3 id="compilation"><span class="section-number-3">3.6.</span> Compilation</h3>
+<h3 id="compilation"><span class="section-number-3">3.7.</span> Compilation</h3>
 <div class="outline-text-3" id="text-compilation">
 <p>
 In Emacs, you can run compilers and build tools, feeding the output into an
@@ -809,7 +833,7 @@ similar commands, so make sure you check it out.
 </div>
 
 <div id="outline-container-ediff" class="outline-3">
-<h3 id="ediff"><span class="section-number-3">3.7.</span> Ediff</h3>
+<h3 id="ediff"><span class="section-number-3">3.8.</span> Ediff</h3>
 <div class="outline-text-3" id="text-ediff">
 <p>
 This package allows you to compare files, buffers and much more. It&rsquo;s similar to
@@ -825,7 +849,7 @@ the <code>diff</code> command, but much more interactive and integrated with Ema
 </div>
 
 <div id="outline-container-browser-and-external-documentation" class="outline-3">
-<h3 id="browser-and-external-documentation"><span class="section-number-3">3.8.</span> Browser and external documentation</h3>
+<h3 id="browser-and-external-documentation"><span class="section-number-3">3.9.</span> Browser and external documentation</h3>
 <div class="outline-text-3" id="text-browser-and-external-documentation">
 <p>
 Emacs has many commands related to documentation, but one of the most useful
@@ -863,7 +887,7 @@ whatever text I wanted to add afterwards.</li>
 </div>
 
 <div id="outline-container-erc" class="outline-3">
-<h3 id="erc"><span class="section-number-3">3.9.</span> ERC</h3>
+<h3 id="erc"><span class="section-number-3">3.10.</span> ERC</h3>
 <div class="outline-text-3" id="text-erc">
 <p>
 <a href="https://www.gnu.org/software/emacs/manual/html_mono/erc.html">ERC</a> is a powerful <a href="https://es.wikipedia.org/wiki/Internet_Relay_Chat">IRC</a> client for Emacs, and it&rsquo;s included since version 22.3. I
@@ -888,7 +912,7 @@ from the manual:
 </div>
 
 <div id="outline-container-c-macro-expansion" class="outline-3">
-<h3 id="c-macro-expansion"><span class="section-number-3">3.10.</span> C macro expansion</h3>
+<h3 id="c-macro-expansion"><span class="section-number-3">3.11.</span> C macro expansion</h3>
 <div class="outline-text-3" id="text-c-macro-expansion">
 <p>
 Emacs allows you to expand C macros with <code>M-x c-macro-expand</code>. This is very useful
@@ -935,7 +959,7 @@ Emacs.
 </div>
 
 <div id="outline-container-calculator" class="outline-3">
-<h3 id="calculator"><span class="section-number-3">3.11.</span> Calculator</h3>
+<h3 id="calculator"><span class="section-number-3">3.12.</span> Calculator</h3>
 <div class="outline-text-3" id="text-calculator">
 <p>
 You can open the Emacs calculator with <code>M-x calc</code>. It uses <a href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">Reverse Polish Notation</a>
@@ -974,7 +998,7 @@ it&rsquo;s worth learning. See also the <a href="https://www.gnu.org/software/em
 </div>
 
 <div id="outline-container-quick-calculator" class="outline-4">
-<h4 id="quick-calculator"><span class="section-number-4">3.11.1.</span> Quick calculator</h4>
+<h4 id="quick-calculator"><span class="section-number-4">3.12.1.</span> Quick calculator</h4>
 <div class="outline-text-4" id="text-quick-calculator">
 <p>
 If you find this overwhelming, you might want to at least consider using
@@ -998,7 +1022,7 @@ Result: 3 x = 2 x + 18 =&gt;  x = 18
 </div>
 
 <div id="outline-container-personal-reference-card" class="outline-4">
-<h4 id="personal-reference-card"><span class="section-number-4">3.11.2.</span> Personal reference card</h4>
+<h4 id="personal-reference-card"><span class="section-number-4">3.12.2.</span> Personal reference card</h4>
 <div class="outline-text-4" id="text-personal-reference-card">
 <p>
 These are some keybinds that I use often, appart from the basic operations and
@@ -1077,7 +1101,7 @@ Some other keybinds, related to the trail:
 </div>
 
 <div id="outline-container-macros" class="outline-3">
-<h3 id="macros"><span class="section-number-3">3.12.</span> Macros</h3>
+<h3 id="macros"><span class="section-number-3">3.13.</span> Macros</h3>
 <div class="outline-text-3" id="text-macros">
 <p>
 I can&rsquo;t say much about Emacs macros, since I use <a href="#evil-mode">Evil mode</a> and I don&rsquo;t how much
