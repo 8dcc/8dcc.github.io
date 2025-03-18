@@ -21,6 +21,7 @@ require JavaScript, since it uses the [[https://www.mathjax.org/][MathJax librar
 - [[file:cons-of-cons.org][The pros and cons of Cons]]
 - [[file:understanding-y-combinator.org][Understanding the Y combinator]]
 - [[file:understanding-entropy.org][Understanding entropy]]
+- [[file:understanding-fat.org][Understanding the FAT file system]]
 - [[file:netref.org][C Network Programming Reference]]
 - [[file:switch-statement.org][Switch statements from a low-level perspective]]
 - [[file:asm-loop-conditionals.org][Optimizing loop conditions in assembly]]
