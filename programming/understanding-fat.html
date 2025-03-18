@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Understanding the FAT file system</title>
+<meta property="og:title" content="Understanding the FAT file system" />
+<meta name="author" content="8dcc" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
+</head>
+<body>
+<div id="org-div-home-and-up">
+  <a accesskey="u" href="index.html">Up</a> | <a accesskey="h" href="../index.html">Home</a>
+</div><div id="content" class="content">
+<h1 class="title">Understanding the FAT file system</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#introduction">1. Introduction</a></li>
+<li><a href="#chs-and-lba-notations">2. CHS and LBA notations</a></li>
+<li><a href="#boot-sector">3. Boot sector</a>
+<ul>
+<li><a href="#initial-bytes">3.1. Initial bytes</a></li>
+<li><a href="#bios-parameter-block-bpb">3.2. Bios Parameter Block (BPB)</a></li>
+<li><a href="#fs-information-sector">3.3. FS Information Sector</a></li>
+<li><a href="#bootable-code-and-magic-value">3.4. Bootable code and magic value</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-introduction" class="outline-2">
+<h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-introduction">
+<p>
+The FAT file system was originally developed by Microsoft for the MS-DOS
+operating system. I have been working on a <a href="https://github.com/8dcc/dump-fat">FAT parsing tool</a> for some days, and I
+wanted to explain some of the things I have learned.
+</p>
+
+<p>
+For now I will be focusing on the first FAT file system, FAT12, but I might
+update this article in the future, if I decide to work on newer FAT versions.
+</p>
+</div>
+</div>
+
+<div id="outline-container-chs-and-lba-notations" class="outline-2">
+<h2 id="chs-and-lba-notations"><span class="section-number-2">2.</span> CHS and LBA notations</h2>
+<div class="outline-text-2" id="text-chs-and-lba-notations">
+<p>
+When referring to locations of a disk, I will be using one of the following two
+notations, so I will describe them briefly.
+</p>
+
+<dl class="org-dl">
+<dt>Cylinder-Head-Sector (CHS) notation</dt><dd><p>
+A group of 3 numbers used to designate the physical location of a block of
+data in a hard disk. The <i>cylinder</i> or <i>track</i> indicates the radial coordinate
+relative to the center of the platter, the <i>head</i> indicates the platter and side
+where the data is, and the <i>sector</i> indicates the angular coordinate relative to
+the platter. The following figure shows these 3 coordinates in a hard disk.
+</p>
+
+
+<div id="fig1" class="figure">
+<p><img src="../img/understanding-fat1.svg" alt="understanding-fat1.svg" class="org-svg" />
+</p>
+<p><span class="figure-number">Figure 1: </span>Cylinder-Head-Sector representation on a hard disk.</p>
+</div>
+
+<p>
+See also the <a href="https://en.wikipedia.org/wiki/Cylinder-head-sector">Wikipedia page</a>.
+</p></dd>
+
+<dt>Logical Block Addressing (LBA) notation</dt><dd>Single index, starting from 0, used to linearly identify a block of data
+(usually a <a href="https://en.wikipedia.org/wiki/Disk_sector">sector</a>, as described in the CHS notation) in a hard disk.</dd>
+</dl>
+</div>
+</div>
+
+<div id="outline-container-boot-sector" class="outline-2">
+<h2 id="boot-sector"><span class="section-number-2">3.</span> Boot sector</h2>
+<div class="outline-text-2" id="text-boot-sector">
+<p>
+The first sector of the FAT volume is the <i>Boot Sector</i>. It has a CHS address of
+0/0/1 or an LBA address of 0.
+</p>
+</div>
+
+<div id="outline-container-initial-bytes" class="outline-3">
+<h3 id="initial-bytes"><span class="section-number-3">3.1.</span> Initial bytes</h3>
+<div class="outline-text-3" id="text-initial-bytes">
+<p>
+The first 3 bytes of the sector are a short <code>jmp</code> instruction followed by a <code>nop</code>
+byte, used if the volume is bootable.
+</p>
+
+<p>
+The next 8 bytes are the <a href="https://en.wikipedia.org/wiki/Original_equipment_manufacturer">OEM</a> name, padded with spaces (<code>0x20</code>). This is usually
+the name of the tool that was used to build the file system image
+(e.g. <code>mkfs.fat</code>).
+</p>
+</div>
+</div>
+
+<div id="outline-container-bios-parameter-block-bpb" class="outline-3">
+<h3 id="bios-parameter-block-bpb"><span class="section-number-3">3.2.</span> Bios Parameter Block (BPB)</h3>
+<div class="outline-text-3" id="text-bios-parameter-block-bpb">
+<p>
+After the OEM name, it comes the <a href="https://en.wikipedia.org/wiki/BIOS_Parameter_Block">BIOS Parameter Block</a> (BPB), a data structure
+describing the layout of the volume. Depending on the DOS version, the contents
+of the BPB changed, but the one used for the FAT filesystems is the <i>Extended
+BIOS Parameter Block</i> (EBPB), and its contents are described briefly in the
+following table.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 1:</span> Layout of the Extended Bios Parameter Block for DOS 4.0</caption>
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">BPB Offset</th>
+<th scope="col" class="org-left">Type</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>0x00</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Bytes per logical sector</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x02</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">Logical sectors per cluster</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x03</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Reserved logical sectors</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x05</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">Number of FATs</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x06</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Root directory entries</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x08</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Total logical sectors</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x0A</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">Media descriptor</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x0B</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Logical sectors per FAT</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x0D</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Physical sectors per track</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x0F</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Number of heads</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x11</code></td>
+<td class="org-left"><code>uint32_t</code></td>
+<td class="org-left">Hidden sectors</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x15</code></td>
+<td class="org-left"><code>uint32_t</code></td>
+<td class="org-left">Large total logical sectors</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x19</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">Physical drive number</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x1A</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">Reserved</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x1B</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">Extended boot signature (<code>0x29</code>, see below)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x1C</code></td>
+<td class="org-left"><code>uint32_t</code></td>
+<td class="org-left">Volume serial number</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x20</code></td>
+<td class="org-left"><code>char[11]</code></td>
+<td class="org-left">Volume label (padded with spaces)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x2B</code></td>
+<td class="org-left"><code>char[8]</code></td>
+<td class="org-left">File-system type  (padded with spaces)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note that the value of the <i>Extended boot signature</i> field should be <code>0x29</code> to
+indicate that there are 3 fields left, since this is the DOS 4.0 version. A
+value of <code>0x28</code> indicates that we are using the DOS 3.4 EBPB, and that there is
+only one field left, the <i>Volume serial number</i>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-fs-information-sector" class="outline-3">
+<h3 id="fs-information-sector"><span class="section-number-3">3.3.</span> FS Information Sector</h3>
+<div class="outline-text-3" id="text-fs-information-sector">
+<p>
+This part is specific to FAT32, so I haven&rsquo;t looked at it yet. For now, you
+might want to check the <a href="https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#FS_Information_Sector">Wikipedia section</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-bootable-code-and-magic-value" class="outline-3">
+<h3 id="bootable-code-and-magic-value"><span class="section-number-3">3.4.</span> Bootable code and magic value</h3>
+<div class="outline-text-3" id="text-bootable-code-and-magic-value">
+<p>
+The remainder of the sector can be used to store executable instructions, so the
+first <a href="#initial-bytes"><code>jmp</code> instruction</a> can jump to them on boot.
+</p>
+
+<p>
+The bytes at offset 510 and 511 should be <code>0x55</code> and <code>0xAA</code>, respectively, to
+indicate the BIOS that the sector is bootable. Note that this magic value might
+be written as <code>0x55AA</code> or <code>0xAA55</code> depending on the machine&rsquo;s <a href="https://en.wikipedia.org/wiki/Endianness">endianness</a>, but the
+BIOS will expect byte <code>0x55</code> first, followed by <code>0xAA</code>, so it&rsquo;s better to write them
+separately to avoid confusion.
+</p>
+
+<p>
+These two bytes are usually the last ones of the first sector, since the <i>Bytes
+per logical sector</i> field of the BPB structure is usually 512, but they don&rsquo;t
+necessarily have to be. The BIOS will check the bytes at offset 510 and 511, not
+the end of the sector.
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

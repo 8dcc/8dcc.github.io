@@ -1,0 +1,135 @@
+#+TITLE: Understanding the FAT file system
+#+AUTHOR: 8dcc
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+The FAT file system was originally developed by Microsoft for the MS-DOS
+operating system. I have been working on a [[https://github.com/8dcc/dump-fat][FAT parsing tool]] for some days, and I
+wanted to explain some of the things I have learned.
+
+For now I will be focusing on the first FAT file system, FAT12, but I might
+update this article in the future, if I decide to work on newer FAT versions.
+
+* CHS and LBA notations
+:PROPERTIES:
+:CUSTOM_ID: chs-and-lba-notations
+:END:
+
+When referring to locations of a disk, I will be using one of the following two
+notations, so I will describe them briefly.
+
+- Cylinder-Head-Sector (CHS) notation ::
+
+  A group of 3 numbers used to designate the physical location of a block of
+  data in a hard disk. The /cylinder/ or /track/ indicates the radial coordinate
+  relative to the center of the platter, the /head/ indicates the platter and side
+  where the data is, and the /sector/ indicates the angular coordinate relative to
+  the platter. The following figure shows these 3 coordinates in a hard disk.
+
+  #+NAME: fig1
+  #+CAPTION: Cylinder-Head-Sector representation on a hard disk.
+  [[file:../img/understanding-fat1.svg]]
+
+  See also the [[https://en.wikipedia.org/wiki/Cylinder-head-sector][Wikipedia page]].
+
+- Logical Block Addressing (LBA) notation ::
+
+  Single index, starting from 0, used to linearly identify a block of data
+  (usually a [[https://en.wikipedia.org/wiki/Disk_sector][sector]], as described in the CHS notation) in a hard disk.
+
+#+begin_comment org
+TODO: Perhaps add conversion formulas, although they are easy to find.
+#+end_comment
+
+* Boot sector
+:PROPERTIES:
+:CUSTOM_ID: boot-sector
+:END:
+
+The first sector of the FAT volume is the /Boot Sector/. It has a CHS address of
+0/0/1 or an LBA address of 0.
+
+** Initial bytes
+:PROPERTIES:
+:CUSTOM_ID: initial-bytes
+:END:
+
+The first 3 bytes of the sector are a short =jmp= instruction followed by a =nop=
+byte, used if the volume is bootable.
+
+The next 8 bytes are the [[https://en.wikipedia.org/wiki/Original_equipment_manufacturer][OEM]] name, padded with spaces (~0x20~). This is usually
+the name of the tool that was used to build the file system image
+(e.g. =mkfs.fat=).
+
+** Bios Parameter Block (BPB)
+:PROPERTIES:
+:CUSTOM_ID: bios-parameter-block-bpb
+:END:
+
+After the OEM name, it comes the [[https://en.wikipedia.org/wiki/BIOS_Parameter_Block][BIOS Parameter Block]] (BPB), a data structure
+describing the layout of the volume. Depending on the DOS version, the contents
+of the BPB changed, but the one used for the FAT filesystems is the /Extended
+BIOS Parameter Block/ (EBPB), and its contents are described briefly in the
+following table.
+
+#+CAPTION: Layout of the Extended Bios Parameter Block for DOS 4.0
+| BPB Offset | Type     | Description                               |
+|------------+----------+-------------------------------------------|
+| ~0x00~       | ~uint16_t~ | Bytes per logical sector                  |
+| ~0x02~       | ~uint8_t~  | Logical sectors per cluster               |
+| ~0x03~       | ~uint16_t~ | Reserved logical sectors                  |
+| ~0x05~       | ~uint8_t~  | Number of FATs                            |
+| ~0x06~       | ~uint16_t~ | Root directory entries                    |
+| ~0x08~       | ~uint16_t~ | Total logical sectors                     |
+| ~0x0A~       | ~uint8_t~  | Media descriptor                          |
+| ~0x0B~       | ~uint16_t~ | Logical sectors per FAT                   |
+| ~0x0D~       | ~uint16_t~ | Physical sectors per track                |
+| ~0x0F~       | ~uint16_t~ | Number of heads                           |
+| ~0x11~       | ~uint32_t~ | Hidden sectors                            |
+| ~0x15~       | ~uint32_t~ | Large total logical sectors               |
+| ~0x19~       | ~uint8_t~  | Physical drive number                     |
+| ~0x1A~       | ~uint8_t~  | Reserved                                  |
+| ~0x1B~       | ~uint8_t~  | Extended boot signature (~0x29~, see below) |
+| ~0x1C~       | ~uint32_t~ | Volume serial number                      |
+| ~0x20~       | ~char[11]~ | Volume label (padded with spaces)         |
+| ~0x2B~       | ~char[8]~  | File-system type  (padded with spaces)    |
+
+Note that the value of the /Extended boot signature/ field should be ~0x29~ to
+indicate that there are 3 fields left, since this is the DOS 4.0 version. A
+value of ~0x28~ indicates that we are using the DOS 3.4 EBPB, and that there is
+only one field left, the /Volume serial number/.
+
+** FS Information Sector
+:PROPERTIES:
+:CUSTOM_ID: fs-information-sector
+:END:
+
+This part is specific to FAT32, so I haven't looked at it yet. For now, you
+might want to check the [[https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#FS_Information_Sector][Wikipedia section]].
+
+** Bootable code and magic value
+:PROPERTIES:
+:CUSTOM_ID: bootable-code-and-magic-value
+:END:
+
+The remainder of the sector can be used to store executable instructions, so the
+first [[*Initial bytes][=jmp= instruction]] can jump to them on boot.
+
+The bytes at offset 510 and 511 should be ~0x55~ and ~0xAA~, respectively, to
+indicate the BIOS that the sector is bootable. Note that this magic value might
+be written as ~0x55AA~ or ~0xAA55~ depending on the machine's [[https://en.wikipedia.org/wiki/Endianness][endianness]], but the
+BIOS will expect byte ~0x55~ first, followed by ~0xAA~, so it's better to write them
+separately to avoid confusion.
+
+These two bytes are usually the last ones of the first sector, since the /Bytes
+per logical sector/ field of the BPB structure is usually 512, but they don't
+necessarily have to be. The BIOS will check the bytes at offset 510 and 511, not
+the end of the sector.
