@@ -65,11 +65,13 @@ TODO: Perhaps add conversion formulas, although they are easy to find.
 :END:
 
 The first sector of the FAT volume is the /Boot Sector/. It has a CHS address of
-0/0/1 or an LBA address of 0.
+~0/0/1~, which is the same as LBA address 0. The following figure shows the
+highlighted hexdump of a FAT12 boot sector, with the different parts that will
+be explained below.
 
-#+begin_comment org
-TODO: Add highlighted hexdump.
-#+end_comment
+#+NAME: fig3
+#+CAPTION: Layout of a FAT12 boot sector.
+[[file:../img/understanding-fat3.svg]]
 
 ** Initial bytes
 :PROPERTIES:

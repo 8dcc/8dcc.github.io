@@ -289,8 +289,17 @@ See also the <a href="https://en.wikipedia.org/wiki/Cylinder-head-sector">Wikipe
 <div class="outline-text-2" id="text-boot-sector">
 <p>
 The first sector of the FAT volume is the <i>Boot Sector</i>. It has a CHS address of
-0/0/1 or an LBA address of 0.
+<code>0/0/1</code>, which is the same as LBA address 0. The following figure shows the
+highlighted hexdump of a FAT12 boot sector, with the different parts that will
+be explained below.
 </p>
+
+
+<div id="fig3" class="figure">
+<p><img src="../img/understanding-fat3.svg" alt="understanding-fat3.svg" class="org-svg" />
+</p>
+<p><span class="figure-number">Figure 3: </span>Layout of a FAT12 boot sector.</p>
+</div>
 </div>
 
 <div id="outline-container-initial-bytes" class="outline-3">
