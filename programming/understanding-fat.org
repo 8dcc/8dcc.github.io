@@ -20,9 +20,9 @@ update this article in the future, if I decide to work on newer FAT
 versions. The following figure shows the general layout of a FAT12/FAT16 volume,
 which will be described in detail below.
 
-#+NAME: fig2
+#+NAME: fig1
 #+CAPTION: General layout of a FAT12/FAT16 volume.
-[[file:../img/understanding-fat2.svg]]
+[[file:../img/understanding-fat1.svg]]
 
 Throughout this article I might reference the "FAT specification", that is,
 version 1.03 of the "FAT32 File System Specification", which can be found as
@@ -44,9 +44,9 @@ notations, so I will describe them briefly.
   where the data is, and the /sector/ indicates the angular coordinate relative to
   the platter. The following figure shows these 3 coordinates in a hard disk.
 
-  #+NAME: fig1
+  #+NAME: fig2
   #+CAPTION: Cylinder-Head-Sector representation on a hard disk.
-  [[file:../img/understanding-fat1.svg]]
+  [[file:../img/understanding-fat2.svg]]
 
   See also the [[https://en.wikipedia.org/wiki/Cylinder-head-sector][Wikipedia page]].
 
