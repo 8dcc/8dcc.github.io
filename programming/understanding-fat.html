@@ -323,14 +323,12 @@ the name of the tool that was used to build the file system image
 <div class="outline-text-3" id="text-bios-parameter-block-bpb">
 <p>
 After the OEM name, it comes the <a href="https://en.wikipedia.org/wiki/BIOS_Parameter_Block">BIOS Parameter Block</a> (BPB), a data structure
-describing the layout of the volume. Depending on the DOS version, the contents
-of the BPB changed, but the one used for the FAT filesystems is the <i>Extended
-BIOS Parameter Block</i> (EBPB), and its contents are described briefly in the
-following table.
+describing the layout of the volume. The following table describes the contents
+of the base BPB, common in all FAT filesystems.
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-<caption class="t-above"><span class="table-number">Table 1:</span> Layout of the Extended Bios Parameter Block for DOS 4.0</caption>
+<caption class="t-above"><span class="table-number">Table 1:</span> Layout of the Bios Parameter Block for DOS 3.31.</caption>
 
 <colgroup>
 <col  class="org-left" />
@@ -418,7 +416,36 @@ following table.
 <td class="org-left"><code>uint32_t</code></td>
 <td class="org-left">Large total logical sectors</td>
 </tr>
+</tbody>
+</table>
 
+<p>
+FAT filesystems extend this structure with different fields, but the final
+structure is usually called <i>Extended BIOS Parameter Block</i> (EBPB).
+</p>
+
+<p>
+The following table describes the extra fields used in FAT12 and FAT16 volumes.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 2:</span> Layout of the Extended BPB for DOS 4.0, used in FAT12 and FAT16.</caption>
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">BPB Offset</th>
+<th scope="col" class="org-left">Type</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td class="org-left"><code>0x19</code></td>
 <td class="org-left"><code>uint8_t</code></td>
@@ -452,16 +479,119 @@ following table.
 <tr>
 <td class="org-left"><code>0x2B</code></td>
 <td class="org-left"><code>char[8]</code></td>
-<td class="org-left">File-system type  (padded with spaces)</td>
+<td class="org-left">File-system type (padded with spaces)</td>
 </tr>
 </tbody>
 </table>
 
 <p>
-Note that the value of the <i>Extended boot signature</i> field should be <code>0x29</code> to
-indicate that there are 3 fields left, since this is the DOS 4.0 version. A
-value of <code>0x28</code> indicates that we are using the DOS 3.4 EBPB, and that there is
-only one field left, the <i>Volume serial number</i>.
+And the following table describes the extra fields used in FAT12 volumes.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 3:</span> Layout of the Extended BPB for DOS 4.0, used in FAT12 and FAT16.</caption>
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">BPB Offset</th>
+<th scope="col" class="org-left">Type</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>0x19</code></td>
+<td class="org-left"><code>uint32_t</code></td>
+<td class="org-left">Logical sectors per FAT</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x1D</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Mirroring flags etc.</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x1F</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Version</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x21</code></td>
+<td class="org-left"><code>uint32_t</code></td>
+<td class="org-left">Root directory cluster</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x25</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Location of FS Information Sector</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x27</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Location of backup sector(s)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x29</code></td>
+<td class="org-left"><code>char[12]</code></td>
+<td class="org-left">Reserved</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x35</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">Physical drive number</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x36</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">Reserved</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x37</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">Extended boot signature (<code>0x29</code>)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x38</code></td>
+<td class="org-left"><code>uint32_t</code></td>
+<td class="org-left">Volume serial number</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x3C</code></td>
+<td class="org-left"><code>char[11]</code></td>
+<td class="org-left">Volume label (padded with spaces)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x47</code></td>
+<td class="org-left"><code>char[8]</code></td>
+<td class="org-left">File-system type (padded with spaces)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note that, in both the FAT12/FAT16 and FAT32 versions, the value of the <i>Extended
+boot signature</i> field should be <code>0x29</code> to indicate that there are 3 fields left,
+since a value of <code>0x28</code> indicates that there is only one field left, the <i>Volume
+serial number</i>. Originally, byte <code>0x28</code> was used to indicate that the volume was
+using the DOS 3.4 EBPB, while byte <code>0x29</code> indicated the EBPB for DOS 4.0 version.
 </p>
 </div>
 </div>

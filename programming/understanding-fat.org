@@ -91,12 +91,10 @@ the name of the tool that was used to build the file system image
 :END:
 
 After the OEM name, it comes the [[https://en.wikipedia.org/wiki/BIOS_Parameter_Block][BIOS Parameter Block]] (BPB), a data structure
-describing the layout of the volume. Depending on the DOS version, the contents
-of the BPB changed, but the one used for the FAT filesystems is the /Extended
-BIOS Parameter Block/ (EBPB), and its contents are described briefly in the
-following table.
+describing the layout of the volume. The following table describes the contents
+of the base BPB, common in all FAT filesystems.
 
-#+CAPTION: Layout of the Extended Bios Parameter Block for DOS 4.0
+#+CAPTION: Layout of the Bios Parameter Block for DOS 3.31.
 | BPB Offset | Type     | Description                               |
 |------------+----------+-------------------------------------------|
 | ~0x00~       | ~uint16_t~ | Bytes per logical sector                  |
@@ -111,17 +109,50 @@ following table.
 | ~0x0F~       | ~uint16_t~ | Number of heads                           |
 | ~0x11~       | ~uint32_t~ | Hidden sectors                            |
 | ~0x15~       | ~uint32_t~ | Large total logical sectors               |
+
+FAT filesystems extend this structure with different fields, but the final
+structure is usually called /Extended BIOS Parameter Block/ (EBPB).
+
+#+begin_comment org
+TODO: Determining the FAT type.
+#+end_comment
+
+The following table describes the extra fields used in FAT12 and FAT16 volumes.
+
+#+CAPTION: Layout of the Extended BPB for DOS 4.0, used in FAT12 and FAT16.
+| BPB Offset | Type     | Description                               |
+|------------+----------+-------------------------------------------|
 | ~0x19~       | ~uint8_t~  | Physical drive number                     |
 | ~0x1A~       | ~uint8_t~  | Reserved                                  |
 | ~0x1B~       | ~uint8_t~  | Extended boot signature (~0x29~, see below) |
 | ~0x1C~       | ~uint32_t~ | Volume serial number                      |
 | ~0x20~       | ~char[11]~ | Volume label (padded with spaces)         |
-| ~0x2B~       | ~char[8]~  | File-system type  (padded with spaces)    |
+| ~0x2B~       | ~char[8]~  | File-system type (padded with spaces)     |
 
-Note that the value of the /Extended boot signature/ field should be ~0x29~ to
-indicate that there are 3 fields left, since this is the DOS 4.0 version. A
-value of ~0x28~ indicates that we are using the DOS 3.4 EBPB, and that there is
-only one field left, the /Volume serial number/.
+And the following table describes the extra fields used in FAT12 volumes.
+
+#+CAPTION: Layout of the Extended BPB for DOS 4.0, used in FAT12 and FAT16.
+| BPB Offset | Type     | Description                           |
+|------------+----------+---------------------------------------|
+| ~0x19~       | ~uint32_t~ | Logical sectors per FAT               |
+| ~0x1D~       | ~uint16_t~ | Mirroring flags etc.                  |
+| ~0x1F~       | ~uint16_t~ | Version                               |
+| ~0x21~       | ~uint32_t~ | Root directory cluster                |
+| ~0x25~       | ~uint16_t~ | Location of FS Information Sector     |
+| ~0x27~       | ~uint16_t~ | Location of backup sector(s)          |
+| ~0x29~       | ~char[12]~ | Reserved                              |
+| ~0x35~       | ~uint8_t~  | Physical drive number                 |
+| ~0x36~       | ~uint8_t~  | Reserved                              |
+| ~0x37~       | ~uint8_t~  | Extended boot signature (~0x29~)        |
+| ~0x38~       | ~uint32_t~ | Volume serial number                  |
+| ~0x3C~       | ~char[11]~ | Volume label (padded with spaces)     |
+| ~0x47~       | ~char[8]~  | File-system type (padded with spaces) |
+
+Note that, in both the FAT12/FAT16 and FAT32 versions, the value of the /Extended
+boot signature/ field should be ~0x29~ to indicate that there are 3 fields left,
+since a value of ~0x28~ indicates that there is only one field left, the /Volume
+serial number/. Originally, byte ~0x28~ was used to indicate that the volume was
+using the DOS 3.4 EBPB, while byte ~0x29~ indicated the EBPB for DOS 4.0 version.
 
 ** FS Information Sector
 :PROPERTIES:
