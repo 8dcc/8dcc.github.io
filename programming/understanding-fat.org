@@ -195,3 +195,62 @@ large.
 
 For now, you might want to check the [[https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#FS_Information_Sector][Wikipedia section]], and pages 21-22 of the
 FAT32 specification.
+
+* File Allocation Table (FAT)
+:PROPERTIES:
+:CUSTOM_ID: file-allocation-table-fat
+:END:
+
+The next important data structure is the /File Allocation Table/ itself. There may
+be more than one FAT, depending on the fourth field of the BPB, but the first
+FAT is always located right after the reserved sectors (such as the boot
+sector). We can obtain the number of reserved sectors from the third field of
+the BPB, and we can obtain the FAT offset in bytes by multiplying the /Reserved
+logical sectors/ and /Bytes per logical sector/ fields of the BPB.
+
+** The purpose of the FAT
+:PROPERTIES:
+:CUSTOM_ID: the-purpose-of-the-fat
+:END:
+
+The FAT is an array of entries that are used to defined a [[https://en.wikipedia.org/wiki/Linked_list][linked list]] of the
+clusters that form the contents of a file. This definition might be a bit
+overwhelming, so lets focus on some of these terms first.
+
+A /cluster/ is simply a fixed-size group of contiguous sectors. The number of
+sectors that form a cluster can be obtained from the second field of the
+BPB. For example, if each cluster is 4 sectors (according to the second field),
+and each sector is 512 bytes (according to the first field), a cluster would use
+2048 contiguous bytes.
+
+The meaning of the term /file/ can vary depending on the context and the level of
+abstraction, but I will use it to talk about a data structure that contains
+information (i.e. [[https://en.wikipedia.org/wiki/Metadata][metadata]]) about its contents (i.e. an arbitrary amount of
+data/bytes). A file structure, which will take the name =DirectoryEntry= below,
+contains information such as the filename, the size of the data in bytes, or the
+creation and access dates.
+
+While this file metadata is stored in some place that will be discussed below,
+the actual contents of the file are stored in one or more clusters in the /data
+region/ (located after the root directory, as shown in [[fig1][Figure 1]]). The purpose of
+the FAT is to store, for each file, a list of the cluster numbers that hold its
+data.
+
+** The layout of the FAT
+:PROPERTIES:
+:CUSTOM_ID: the-layout-of-the-fat
+:END:
+
+The size of each FAT entry changes depending on the filesystem version, in fact,
+the 12/16/32 number indicates the size of a FAT entry in bits.
+
+When explaining the layout of the FAT, I will use the 16-bit version, since each
+entry is two bytes, and therefore easier to understand. The 12-bit version,
+which uses one bit and a half (i.e. 3 [[https://en.wikipedia.org/wiki/Nibble][nibbles]]), is a bit more tricky, so it will
+be explained in detail below.
+
+TODO
+
+* COMMENT Root directory
+
+https://en.wikipedia.org/wiki/8.3_filename
