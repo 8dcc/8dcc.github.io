@@ -15,10 +15,14 @@ The FAT file system was originally developed by Microsoft for the MS-DOS
 operating system. I have been working on a [[https://github.com/8dcc/dump-fat][FAT parsing tool]] for some days, and I
 wanted to explain some of the things I have learned.
 
-For now I will be focusing on FAT12, which is used in floppy disks, but I might
-update this article in the future, if I decide to work on newer FAT
-versions. The following figure shows the general layout of a FAT12/FAT16 volume,
-which will be described in detail below.
+Although I will try to cover all FAT filesystems, note that I currently have
+experience with FAT12, which is used in floppy disks; if I work on newer FAT
+versions in the future, I will update this article with any relevant
+information. The exFAT filesystem is not covered in this article.
+
+The following figure shows the general layout of a FAT12/FAT16 volume (although
+the FAT32 layout is very similar), each of which will be described in detail
+below.
 
 #+NAME: fig1
 #+CAPTION: General layout of a FAT12/FAT16 volume.
