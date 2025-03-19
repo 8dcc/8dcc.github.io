@@ -15,8 +15,18 @@ The FAT file system was originally developed by Microsoft for the MS-DOS
 operating system. I have been working on a [[https://github.com/8dcc/dump-fat][FAT parsing tool]] for some days, and I
 wanted to explain some of the things I have learned.
 
-For now I will be focusing on the first FAT file system, FAT12, but I might
-update this article in the future, if I decide to work on newer FAT versions.
+For now I will be focusing on FAT12, which is used in floppy disks, but I might
+update this article in the future, if I decide to work on newer FAT
+versions. The following figure shows the general layout of a FAT12/FAT16 volume,
+which will be described in detail below.
+
+#+NAME: fig2
+#+CAPTION: General layout of a FAT12/FAT16 volume.
+[[file:../img/understanding-fat2.svg]]
+
+Throughout this article I might reference the "FAT specification", that is,
+version 1.03 of the "FAT32 File System Specification", which can be found as
+[[file:../external/fatgen103.pdf][=fatgen103.pdf=]].
 
 * CHS and LBA notations
 :PROPERTIES:
@@ -56,6 +66,10 @@ TODO: Perhaps add conversion formulas, although they are easy to find.
 
 The first sector of the FAT volume is the /Boot Sector/. It has a CHS address of
 0/0/1 or an LBA address of 0.
+
+#+begin_comment org
+TODO: Add highlighted hexdump.
+#+end_comment
 
 ** Initial bytes
 :PROPERTIES:

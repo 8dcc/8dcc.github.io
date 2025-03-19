@@ -229,8 +229,23 @@ wanted to explain some of the things I have learned.
 </p>
 
 <p>
-For now I will be focusing on the first FAT file system, FAT12, but I might
-update this article in the future, if I decide to work on newer FAT versions.
+For now I will be focusing on FAT12, which is used in floppy disks, but I might
+update this article in the future, if I decide to work on newer FAT
+versions. The following figure shows the general layout of a FAT12/FAT16 volume,
+which will be described in detail below.
+</p>
+
+
+<div id="fig2" class="figure">
+<p><img src="../img/understanding-fat2.svg" alt="understanding-fat2.svg" class="org-svg" />
+</p>
+<p><span class="figure-number">Figure 1: </span>General layout of a FAT12/FAT16 volume.</p>
+</div>
+
+<p>
+Throughout this article I might reference the &ldquo;FAT specification&rdquo;, that is,
+version 1.03 of the &ldquo;FAT32 File System Specification&rdquo;, which can be found as
+<a href="../external/fatgen103.pdf"><code>fatgen103.pdf</code></a>.
 </p>
 </div>
 </div>
@@ -256,7 +271,7 @@ the platter. The following figure shows these 3 coordinates in a hard disk.
 <div id="fig1" class="figure">
 <p><img src="../img/understanding-fat1.svg" alt="understanding-fat1.svg" class="org-svg" />
 </p>
-<p><span class="figure-number">Figure 1: </span>Cylinder-Head-Sector representation on a hard disk.</p>
+<p><span class="figure-number">Figure 2: </span>Cylinder-Head-Sector representation on a hard disk.</p>
 </div>
 
 <p>
