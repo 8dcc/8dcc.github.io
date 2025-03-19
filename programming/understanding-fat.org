@@ -138,7 +138,7 @@ And the following table describes the extra fields used in FAT12 volumes.
 | ~0x1D~       | ~uint16_t~ | Mirroring flags etc.                  |
 | ~0x1F~       | ~uint16_t~ | Version                               |
 | ~0x21~       | ~uint32_t~ | Root directory cluster                |
-| ~0x25~       | ~uint16_t~ | Location of FS Information Sector     |
+| ~0x25~       | ~uint16_t~ | Location of FSInfo sector             |
 | ~0x27~       | ~uint16_t~ | Location of backup sector(s)          |
 | ~0x29~       | ~char[12]~ | Reserved                              |
 | ~0x35~       | ~uint8_t~  | Physical drive number                 |
@@ -153,14 +153,6 @@ boot signature/ field should be ~0x29~ to indicate that there are 3 fields left,
 since a value of ~0x28~ indicates that there is only one field left, the /Volume
 serial number/. Originally, byte ~0x28~ was used to indicate that the volume was
 using the DOS 3.4 EBPB, while byte ~0x29~ indicated the EBPB for DOS 4.0 version.
-
-** FS Information Sector
-:PROPERTIES:
-:CUSTOM_ID: fs-information-sector
-:END:
-
-This part is specific to FAT32, so I haven't looked at it yet. For now, you
-might want to check the [[https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#FS_Information_Sector][Wikipedia section]].
 
 ** Bootable code and magic value
 :PROPERTIES:
@@ -180,3 +172,22 @@ These two bytes are usually the last ones of the first sector, since the /Bytes
 per logical sector/ field of the BPB structure is usually 512, but they don't
 necessarily have to be. The BIOS will check the bytes at offset 510 and 511, not
 the end of the sector.
+
+* FSInfo sector (FAT32 only)
+:PROPERTIES:
+:CUSTOM_ID: fsinfo-sector-fat32-only
+:END:
+
+This data structure is specific to FAT32, so I haven't used it at this point,
+but I will still mention it. It's usually located in the second sector (sector
+1), but this is determined by the /Location of FSInfo sector/ field of the FAT32
+EBPB.
+
+The FSInfo data structure contains, among some hard-coded signatures, the last
+known number of free sectors in the volume and the cluster number where the
+driver should start looking for free clusters. This information is not strictly
+necessary, but it helps with performance, since the 32-bit FAT can be quite
+large.
+
+For now, you might want to check the [[https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#FS_Information_Sector][Wikipedia section]], and pages 21-22 of the
+FAT32 specification.

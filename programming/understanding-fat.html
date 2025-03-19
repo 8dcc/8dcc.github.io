@@ -211,10 +211,10 @@
 <ul>
 <li><a href="#initial-bytes">3.1. Initial bytes</a></li>
 <li><a href="#bios-parameter-block-bpb">3.2. Bios Parameter Block (BPB)</a></li>
-<li><a href="#fs-information-sector">3.3. FS Information Sector</a></li>
-<li><a href="#bootable-code-and-magic-value">3.4. Bootable code and magic value</a></li>
+<li><a href="#bootable-code-and-magic-value">3.3. Bootable code and magic value</a></li>
 </ul>
 </li>
+<li><a href="#fsinfo-sector-fat32-only">4. FSInfo sector (FAT32 only)</a></li>
 </ul>
 </div>
 </div>
@@ -533,7 +533,7 @@ And the following table describes the extra fields used in FAT12 volumes.
 <tr>
 <td class="org-left"><code>0x25</code></td>
 <td class="org-left"><code>uint16_t</code></td>
-<td class="org-left">Location of FS Information Sector</td>
+<td class="org-left">Location of FSInfo sector</td>
 </tr>
 
 <tr>
@@ -596,18 +596,8 @@ using the DOS 3.4 EBPB, while byte <code>0x29</code> indicated the EBPB for DOS 
 </div>
 </div>
 
-<div id="outline-container-fs-information-sector" class="outline-3">
-<h3 id="fs-information-sector"><span class="section-number-3">3.3.</span> FS Information Sector</h3>
-<div class="outline-text-3" id="text-fs-information-sector">
-<p>
-This part is specific to FAT32, so I haven&rsquo;t looked at it yet. For now, you
-might want to check the <a href="https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#FS_Information_Sector">Wikipedia section</a>.
-</p>
-</div>
-</div>
-
 <div id="outline-container-bootable-code-and-magic-value" class="outline-3">
-<h3 id="bootable-code-and-magic-value"><span class="section-number-3">3.4.</span> Bootable code and magic value</h3>
+<h3 id="bootable-code-and-magic-value"><span class="section-number-3">3.3.</span> Bootable code and magic value</h3>
 <div class="outline-text-3" id="text-bootable-code-and-magic-value">
 <p>
 The remainder of the sector can be used to store executable instructions, so the
@@ -629,6 +619,31 @@ necessarily have to be. The BIOS will check the bytes at offset 510 and 511, not
 the end of the sector.
 </p>
 </div>
+</div>
+</div>
+
+<div id="outline-container-fsinfo-sector-fat32-only" class="outline-2">
+<h2 id="fsinfo-sector-fat32-only"><span class="section-number-2">4.</span> FSInfo sector (FAT32 only)</h2>
+<div class="outline-text-2" id="text-fsinfo-sector-fat32-only">
+<p>
+This data structure is specific to FAT32, so I haven&rsquo;t used it at this point,
+but I will still mention it. It&rsquo;s usually located in the second sector (sector
+1), but this is determined by the <i>Location of FSInfo sector</i> field of the FAT32
+EBPB.
+</p>
+
+<p>
+The FSInfo data structure contains, among some hard-coded signatures, the last
+known number of free sectors in the volume and the cluster number where the
+driver should start looking for free clusters. This information is not strictly
+necessary, but it helps with performance, since the 32-bit FAT can be quite
+large.
+</p>
+
+<p>
+For now, you might want to check the <a href="https://en.wikipedia.org/wiki/Design_of_the_FAT_file_system#FS_Information_Sector">Wikipedia section</a>, and pages 21-22 of the
+FAT32 specification.
+</p>
 </div>
 </div>
 </div>
