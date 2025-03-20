@@ -700,10 +700,34 @@ creation and access dates.
 
 <p>
 While this file metadata is stored in some place that will be discussed below,
-the actual contents of the file are stored in one or more clusters in the <i>data
-region</i> (located after the root directory, as shown in <a href="#fig1">Figure 1</a>). The purpose of
-the FAT is to store, for each file, a list of the cluster numbers that hold its
-data.
+the actual contents of the file are stored in one or more clusters (not
+necessarily adjacent to each other) in the <i>data region</i> (located after the root
+directory, as shown in <a href="#fig1">Figure 1</a>). For example, if each cluster is 2KiB and we
+wanted to store an 11KiB file, the FAT would need to somehow build a 6-element
+list that kept track of the sectors that store this file&rsquo;s data (the last one
+won&rsquo;t be full, but still &ldquo;owned&rdquo; by this file).
+</p>
+
+<p>
+Given a specific cluster index, there would need to be some way of retrieving
+the index of the next cluster on its list. To accomplish this, each cluster in
+the volume is assigned an entry in the FAT sequentially, so the first cluster
+would be assigned to the entry 0 of the FAT (this is not entirely accurate, as
+explained below). Each entry in the FAT will then contain the cluster index of
+its next element, or a special marker to indicate the end of the linked list (a
+value bigger or equal than <code>0xFF8</code>).
+</p>
+
+<p>
+For example, if the contents of a file were stored in clusters 0, 3 and 5, the
+first entry of the FAT will contain the number 3, the fourth entry would contain
+the number 5, and the sixth entry would contain an <i>end-of-chain</i> indicator such
+as <code>0xFFFF</code>.
+</p>
+
+<p>
+Therefore, the FAT can be used to keep track of the clusters that store the
+contents of files, by building linked lists with their cluster indexes.
 </p>
 </div>
 </div>
@@ -712,19 +736,42 @@ data.
 <h3 id="the-layout-of-the-fat"><span class="section-number-3">5.2.</span> The layout of the FAT</h3>
 <div class="outline-text-3" id="text-the-layout-of-the-fat">
 <p>
-The size of each FAT entry changes depending on the filesystem version, in fact,
-the 12/16/32 number indicates the size of a FAT entry in bits.
+The size of each FAT entry changes depending on the filesystem version, and that
+is precisely what the 12/16/32 number indicates: the size of a FAT entry in
+bits. The 16-bit version will be used for explaining the layout of the FAT,
+since each entry is two bytes, and therefore easier to understand. The 12-bit
+version, which uses one bit and a half (i.e. 3 <a href="https://en.wikipedia.org/wiki/Nibble">nibbles</a>), is a bit more tricky,
+so it will be explained in detail below.
 </p>
 
 <p>
-When explaining the layout of the FAT, I will use the 16-bit version, since each
-entry is two bytes, and therefore easier to understand. The 12-bit version,
-which uses one bit and a half (i.e. 3 <a href="https://en.wikipedia.org/wiki/Nibble">nibbles</a>), is a bit more tricky, so it will
-be explained in detail below.
+The following figure shows the hexdump of the first 64 bytes of a 16-bit
+FAT. Each (non-empty) entry has been highlighted to show their linked
+list. Please note that the offsets in the previous figure are expressed in
+bytes, but the FAT stores the linked lists with indexes to other 16-bit entries.
+</p>
+
+
+<div id="fig4" class="figure">
+<p><img src="../img/understanding-fat4.png" alt="understanding-fat4.png" />
+</p>
+<p><span class="figure-number">Figure 4: </span>Layout of a 16-bit File Allocation Table.</p>
+</div>
+
+
+<p>
+The first two entries of the FAT are reserved, the first one usually being the
+<i>FAT ID</i>, and the second usually being the <i>end-of-chain</i> marker. Therefore, the
+first data cluster would correspond to the third entry of the FAT, not the first
+one. Since the linked lists themselves are built using &ldquo;absolute&rdquo; indexes in the
+FAT, the real cluster indexes can be calculated by subtracting 2 from the value
+stored in the FAT.
 </p>
 
 <p>
-TODO
+For example, in the previous figure, entry 4 of the FAT contains the value 5, so
+the real index of the next cluster in the list would be 3, since it&rsquo;s the fourth
+actual cluster in the volume.
 </p>
 </div>
 </div>
