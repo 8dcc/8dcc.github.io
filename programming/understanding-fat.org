@@ -286,9 +286,9 @@ FAT. Each (non-empty) entry has been highlighted to show their linked
 list. Please note that the offsets in the previous figure are expressed in
 bytes, but the FAT stores the linked lists with indexes to other 16-bit entries.
 
-#+NAME: fig4
+#+NAME: fig5
 #+CAPTION: Layout of a 16-bit File Allocation Table.
-[[file:../img/understanding-fat4.png]]
+[[file:../img/understanding-fat5.png]]
 
 
 #+begin_comment org
