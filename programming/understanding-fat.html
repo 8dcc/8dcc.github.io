@@ -722,19 +722,28 @@ the volume is assigned an entry in the FAT sequentially, so the first cluster
 would be assigned to the entry 0 of the FAT (this is not entirely accurate, as
 explained below). Each entry in the FAT will then contain the cluster index of
 its <i>next</i> element, or a special marker to indicate the end of the linked list (a
-value bigger or equal than <code>0xFF8</code>).
+value bigger or equal than <code>0xFFF8</code>, for FAT16).
 </p>
 
 <p>
-For example, if the contents of a file were stored in clusters 0, 3 and 5, the
-first entry of the FAT will contain the number 3, the fourth entry would contain
-the number 5, and the sixth entry would contain an <i>end-of-chain</i> indicator such
-as <code>0xFFFF</code>.
+For example, using the cluster indexes from the last figure, the contents of the
+FAT could be described using the following pseudo-code.
 </p>
 
+<pre class="example" id="example1">
+fat[0] = 2;      /* Cluster 1 is skipped */
+fat[2] = 3;
+fat[3] = 4;
+fat[4] = 5;
+fat[5] = 7;      /* Cluster 6 is skipped */
+fat[7] = 0xFFFF; /* Mark end of chain */
+</pre>
+
 <p>
-Therefore, the FAT can be used to keep track of the clusters that store the
-contents of files, by building linked lists with their cluster indexes.
+As shown below, this is not entirely accurate, since the first data cluster is
+not the first one. Either way, the FAT is used to keep track of the clusters
+that store the contents of files, by building linked lists with their cluster
+indexes.
 </p>
 </div>
 </div>
