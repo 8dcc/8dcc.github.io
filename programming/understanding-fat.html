@@ -676,7 +676,7 @@ logical sectors</i> and <i>Bytes per logical sector</i> fields of the BPB.
 <h3 id="the-purpose-of-the-fat"><span class="section-number-3">5.1.</span> The purpose of the FAT</h3>
 <div class="outline-text-3" id="text-the-purpose-of-the-fat">
 <p>
-The FAT is an array of entries that are used to defined a <a href="https://en.wikipedia.org/wiki/Linked_list">linked list</a> of the
+The FAT is an array of numbers that is used to define <a href="https://en.wikipedia.org/wiki/Linked_list">linked lists</a> of the
 clusters that form the contents of a file. This definition might be a bit
 overwhelming, so lets focus on some of these terms first.
 </p>
@@ -694,19 +694,26 @@ The meaning of the term <i>file</i> can vary depending on the context and the le
 abstraction, but I will use it to talk about a data structure that contains
 information (i.e. <a href="https://en.wikipedia.org/wiki/Metadata">metadata</a>) about its contents (i.e. an arbitrary amount of
 data/bytes). A file structure, which will take the name <code>DirectoryEntry</code> below,
-contains information such as the filename, the size of the data in bytes, or the
-creation and access dates.
+contains information such as the filename, the size of the data in bytes, and
+the creation and access dates.
 </p>
 
 <p>
 While this file metadata is stored in some place that will be discussed below,
 the actual contents of the file are stored in one or more clusters (not
-necessarily adjacent to each other) in the <i>data region</i> (located after the root
-directory, as shown in <a href="#fig1">Figure 1</a>). For example, if each cluster is 2KiB and we
-wanted to store an 11KiB file, the FAT would need to somehow build a 6-element
-list that kept track of the sectors that store this file&rsquo;s data (the last one
+necessarily adjacent to each other) in the <i>data region</i> (which is located after
+the root directory, as shown in <a href="#fig1">Figure 1</a>). For example, if each cluster is 2KiB
+and we wanted to store an 11KiB file, we would need to somehow build a 6-element
+list that kept track of the sectors that store that file&rsquo;s data (the last one
 won&rsquo;t be full, but still &ldquo;owned&rdquo; by this file).
 </p>
+
+
+<div id="fig4" class="figure">
+<p><img src="../img/understanding-fat4.svg" alt="understanding-fat4.svg" class="org-svg" />
+</p>
+<p><span class="figure-number">Figure 4: </span>File contents stored in 6 non-adjacent clusters.</p>
+</div>
 
 <p>
 Given a specific cluster index, there would need to be some way of retrieving
@@ -714,7 +721,7 @@ the index of the next cluster on its list. To accomplish this, each cluster in
 the volume is assigned an entry in the FAT sequentially, so the first cluster
 would be assigned to the entry 0 of the FAT (this is not entirely accurate, as
 explained below). Each entry in the FAT will then contain the cluster index of
-its next element, or a special marker to indicate the end of the linked list (a
+its <i>next</i> element, or a special marker to indicate the end of the linked list (a
 value bigger or equal than <code>0xFF8</code>).
 </p>
 
