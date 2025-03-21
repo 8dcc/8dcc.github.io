@@ -52,7 +52,8 @@ notations, so I will describe them briefly.
   #+CAPTION: Cylinder-Head-Sector representation on a hard disk.
   [[file:../img/understanding-fat2.svg]]
 
-  See also the [[https://en.wikipedia.org/wiki/Cylinder-head-sector][Wikipedia page]].
+  See also the [[https://en.wikipedia.org/wiki/Cylinder-head-sector][Wikipedia page]] for Cylinder-Head-Sector, where that image is
+  from.
 
 - Logical Block Addressing (LBA) notation ::
 
@@ -69,13 +70,16 @@ TODO: Perhaps add conversion formulas, although they are easy to find.
 :END:
 
 The first sector of the FAT volume is the /Boot Sector/. It has a CHS address of
-~0/0/1~, which is the same as LBA address 0. The following figure shows the
-highlighted hexdump of a FAT12 boot sector, with the different parts that will
-be explained below.
+~0/0/1~, which is the same as LBA address 0. The following figure[fn::Some
+diagrams in this article have been exported as PNG because some browsers didn't
+display the text highlighting correctly. The SVG version, which can be edited
+using [[https://app.diagrams.net/][draw.io]], is also available, just change the file extension from =.png= to
+=.svg=.] shows the highlighted hexdump of a FAT12 boot sector, with the different
+parts that will be explained below.
 
 #+NAME: fig3
 #+CAPTION: Layout of a FAT12 boot sector.
-[[file:../img/understanding-fat3.svg]]
+[[file:../img/understanding-fat3.png]]
 
 #+begin_comment org
 TODO: Export to PNG, keep both versions.
