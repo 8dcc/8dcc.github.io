@@ -250,16 +250,19 @@ won't be full, but still "owned" by this file).
 #+CAPTION: File contents stored in 6 non-adjacent clusters.
 [[file:../img/understanding-fat4.svg]]
 
-Given a specific cluster index, there would need to be some way of retrieving
-the index of the next cluster on its list. To accomplish this, each cluster in
-the volume is assigned an entry in the FAT sequentially, so the first cluster
-would be assigned to the entry 0 of the FAT (this is not entirely accurate, as
-explained below). Each entry in the FAT will then contain the cluster index of
-its /next/ element, or a special marker to indicate the end of the linked list (a
-value bigger or equal than ~0xFFF8~, for FAT16).
+Given a specific cluster index, there would need to be a way of retrieving the
+index of the next cluster on its list. To accomplish this, each cluster in the
+volume is assigned an entry in the FAT sequentially, so the first cluster would
+be assigned to entry 0 of the FAT, the second element to entry 1, and so on
+(this is not entirely accurate, as explained below). Each entry in the FAT will
+then contain the cluster index of its /next/ element, or a special marker to
+indicate the end of the linked list[fn::For FAT12, this /end-of-chain/ marker is
+any value greater or equal than ~0xFF8~; for FAT16, any value greater or equal
+than ~0xFFF8~; and for FAT32, any value greater or equal than ~0xFFFFFFF8~.].
 
-For example, using the cluster indexes from the last figure, the contents of the
-FAT could be described using the following pseudo-code.
+For example, in order to build the cluster list represented in the previous
+figure, the following pseudo-code could be used, assuming the =fat= variable is an
+array of 16-bit unsigned integers.
 
 #+NAME: example1
 #+begin_example
@@ -272,9 +275,9 @@ fat[7] = 0xFFFF; /* Mark end of chain */
 #+end_example
 
 As shown below, this is not entirely accurate, since the first data cluster is
-not the first one. Either way, the FAT is used to keep track of the clusters
-that store the contents of files, by building linked lists with their cluster
-indexes.
+not mapped to the first element of the FAT. Either way, the FAT is used to keep
+track of the clusters that store the contents of files, by building linked lists
+with their cluster indexes.
 
 ** The layout of the FAT
 :PROPERTIES:
@@ -297,21 +300,49 @@ bytes, but the FAT stores the linked lists with indexes to other 16-bit entries.
 #+CAPTION: Layout of a 16-bit File Allocation Table.
 [[file:../img/understanding-fat5.png]]
 
-
-#+begin_comment org
-TODO: Mention endianness, always little-endian.
-#+end_comment
+The first thing that should be noted about the FAT, and about the filesystem in
+general, is that it's /strictly little-endian/, meaning that the least-significant
+bytes are stored at a smaller offset in the disk (i.e. the value ~0xAABBCCDD~
+would be stored as ~DD CC BB AA~). The previous figure shows a hexdump, and
+although the bytes are grouped in pairs, they are dumped one by one, in the
+order in which they are stored in the disk. For example, the contents of the
+third 16-bit entry are displayed as ~0300~, but actually corresponds to the value
+~0x0003~. This will be specially important later when describing the layout of a
+12-bit FAT, since each entry is one byte and a half.
 
 The first two entries of the FAT are reserved, the first one usually being the
-/FAT ID/, and the second usually being the /end-of-chain/ marker. Therefore, the
-first data cluster would correspond to the third entry of the FAT, not the first
-one. Since the linked lists themselves are built using "absolute" indexes in the
-FAT, the real cluster indexes can be calculated by subtracting 2 from the value
-stored in the FAT.
+/FAT ID/, and the second usually being the value used as the /end-of-chain/
+marker. Therefore, the first data cluster would correspond to the third entry of
+the FAT, not the first one. Since the linked lists themselves are built using
+"absolute" indexes in the FAT, the real cluster indexes can be calculated by
+subtracting 2 from the value stored in the FAT. For example, in the previous
+figure, entry 4 of the FAT contains the value 5, so the real index of the next
+cluster in the list would be 3, since it's the fourth actual cluster in the
+volume.
 
-For example, in the previous figure, entry 4 of the FAT contains the value 5, so
-the real index of the next cluster in the list would be 3, since it's the fourth
-actual cluster in the volume.
+#+begin_comment org
+TODO: At this point of the article, some concepts haven't been shown yet, so
+this whole list might be better in another section.
+#+end_comment
+
+This is the general algorithm for reading the contents of a file:
+
+1. Somehow obtain the *first FAT index* for the file (this will be explained
+   below). Note that this index won't be the cluster index in the volume
+   (i.e. the subtraction is not yet made).
+2. Calculate the *cluster index* by subtracting 2 (i.e. the number of reserved FAT
+   entries) from the FAT index.
+3. Calculate the *sector number* by multiplying the cluster index by the number of
+   /Logical sectors per cluster/ (second element of the BPB), and adding that to
+   the number of sectors before the /Data region/ (obtaining this value will be
+   shown below as well).
+4. Somehow read the cluster from the disk, starting at that sector.
+5. Obtain the *next FAT index* by reading the value stored at the FAT entry
+   corresponding to the current FAT index (i.e. ~fat_idx = fat[fat_idx]~). Again,
+   note that this step might be more complicated depending on the endianness of
+   the machine.
+6. If the new FAT index is smaller than the /end-of-chain/ marker, go back to
+   step 2. Otherwise, we are done with the file.
 
 * COMMENT Root directory
 

@@ -716,18 +716,19 @@ won&rsquo;t be full, but still &ldquo;owned&rdquo; by this file).
 </div>
 
 <p>
-Given a specific cluster index, there would need to be some way of retrieving
-the index of the next cluster on its list. To accomplish this, each cluster in
-the volume is assigned an entry in the FAT sequentially, so the first cluster
-would be assigned to the entry 0 of the FAT (this is not entirely accurate, as
-explained below). Each entry in the FAT will then contain the cluster index of
-its <i>next</i> element, or a special marker to indicate the end of the linked list (a
-value bigger or equal than <code>0xFFF8</code>, for FAT16).
+Given a specific cluster index, there would need to be a way of retrieving the
+index of the next cluster on its list. To accomplish this, each cluster in the
+volume is assigned an entry in the FAT sequentially, so the first cluster would
+be assigned to entry 0 of the FAT, the second element to entry 1, and so on
+(this is not entirely accurate, as explained below). Each entry in the FAT will
+then contain the cluster index of its <i>next</i> element, or a special marker to
+indicate the end of the linked list<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>.
 </p>
 
 <p>
-For example, using the cluster indexes from the last figure, the contents of the
-FAT could be described using the following pseudo-code.
+For example, in order to build the cluster list represented in the previous
+figure, the following pseudo-code could be used, assuming the <code>fat</code> variable is an
+array of 16-bit unsigned integers.
 </p>
 
 <pre class="example" id="example1">
@@ -741,9 +742,9 @@ fat[7] = 0xFFFF; /* Mark end of chain */
 
 <p>
 As shown below, this is not entirely accurate, since the first data cluster is
-not the first one. Either way, the FAT is used to keep track of the clusters
-that store the contents of files, by building linked lists with their cluster
-indexes.
+not mapped to the first element of the FAT. Either way, the FAT is used to keep
+track of the clusters that store the contents of files, by building linked lists
+with their cluster indexes.
 </p>
 </div>
 </div>
@@ -774,21 +775,52 @@ bytes, but the FAT stores the linked lists with indexes to other 16-bit entries.
 <p><span class="figure-number">Figure 5: </span>Layout of a 16-bit File Allocation Table.</p>
 </div>
 
+<p>
+The first thing that should be noted about the FAT, and about the filesystem in
+general, is that it&rsquo;s <i>strictly little-endian</i>, meaning that the least-significant
+bytes are stored at a smaller offset in the disk (i.e. the value <code>0xAABBCCDD</code>
+would be stored as <code>DD CC BB AA</code>). The previous figure shows a hexdump, and
+although the bytes are grouped in pairs, they are dumped one by one, in the
+order in which they are stored in the disk. For example, the contents of the
+third 16-bit entry are displayed as <code>0300</code>, but actually corresponds to the value
+<code>0x0003</code>. This will be specially important later when describing the layout of a
+12-bit FAT, since each entry is one byte and a half.
+</p>
 
 <p>
 The first two entries of the FAT are reserved, the first one usually being the
-<i>FAT ID</i>, and the second usually being the <i>end-of-chain</i> marker. Therefore, the
-first data cluster would correspond to the third entry of the FAT, not the first
-one. Since the linked lists themselves are built using &ldquo;absolute&rdquo; indexes in the
-FAT, the real cluster indexes can be calculated by subtracting 2 from the value
-stored in the FAT.
+<i>FAT ID</i>, and the second usually being the value used as the <i>end-of-chain</i>
+marker. Therefore, the first data cluster would correspond to the third entry of
+the FAT, not the first one. Since the linked lists themselves are built using
+&ldquo;absolute&rdquo; indexes in the FAT, the real cluster indexes can be calculated by
+subtracting 2 from the value stored in the FAT. For example, in the previous
+figure, entry 4 of the FAT contains the value 5, so the real index of the next
+cluster in the list would be 3, since it&rsquo;s the fourth actual cluster in the
+volume.
 </p>
 
 <p>
-For example, in the previous figure, entry 4 of the FAT contains the value 5, so
-the real index of the next cluster in the list would be 3, since it&rsquo;s the fourth
-actual cluster in the volume.
+This is the general algorithm for reading the contents of a file:
 </p>
+
+<ol class="org-ol">
+<li>Somehow obtain the <b>first FAT index</b> for the file (this will be explained
+below). Note that this index won&rsquo;t be the cluster index in the volume
+(i.e. the subtraction is not yet made).</li>
+<li>Calculate the <b>cluster index</b> by subtracting 2 (i.e. the number of reserved FAT
+entries) from the FAT index.</li>
+<li>Calculate the <b>sector number</b> by multiplying the cluster index by the number of
+<i>Logical sectors per cluster</i> (second element of the BPB), and adding that to
+the number of sectors before the <i>Data region</i> (obtaining this value will be
+shown below as well).</li>
+<li>Somehow read the cluster from the disk, starting at that sector.</li>
+<li>Obtain the <b>next FAT index</b> by reading the value stored at the FAT entry
+corresponding to the current FAT index (i.e. <code>fat_idx = fat[fat_idx]</code>). Again,
+note that this step might be more complicated depending on the endianness of
+the machine.</li>
+<li>If the new FAT index is smaller than the <i>end-of-chain</i> marker, go back to
+step 2. Otherwise, we are done with the file.</li>
+</ol>
 </div>
 </div>
 </div>
@@ -801,6 +833,10 @@ diagrams in this article have been exported as PNG because some browsers didn&rs
 display the text highlighting correctly. The SVG version, which can be edited
 using <a href="https://app.diagrams.net/">draw.io</a>, is also available, just change the file extension from <code>.png</code> to
 <code>.svg</code>.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">For FAT12, this <i>end-of-chain</i> marker is
+any value greater or equal than <code>0xFF8</code>; for FAT16, any value greater or equal
+than <code>0xFFF8</code>; and for FAT32, any value greater or equal than <code>0xFFFFFFF8</code>.</p></div></div>
 
 
 </div>
