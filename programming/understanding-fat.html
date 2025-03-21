@@ -221,6 +221,18 @@
 <li><a href="#the-layout-of-the-fat">5.2. The layout of the FAT</a></li>
 </ul>
 </li>
+<li><a href="#root-directory">6. Root directory</a>
+<ul>
+<li><a href="#the-directoryentry-structure">6.1. The <code>DirectoryEntry</code> structure</a></li>
+<li><a href="#location-and-size-of-the-root-directory">6.2. Location and size of the root directory</a></li>
+</ul>
+</li>
+<li><a href="#data-region">7. Data region</a>
+<ul>
+<li><a href="#calculating-the-size-of-the-root-directory">7.1. Calculating the size of the root directory</a></li>
+<li><a href="#calculating-the-first-data-sector">7.2. Calculating the first data sector</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -824,6 +836,331 @@ the machine.</li>
 <li>If the new FAT index is smaller than the <i>end-of-chain</i> marker, go back to
 step 2. Otherwise, we are done with the file.</li>
 </ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-root-directory" class="outline-2">
+<h2 id="root-directory"><span class="section-number-2">6.</span> Root directory</h2>
+<div class="outline-text-2" id="text-root-directory">
+<p>
+As mentioned above, the metadata that was refered to as a <i>file</i> is represented as
+a data structure called <code>DirectoryEntry</code>. The root directory is simply an array of
+these structures. Before explaining how to determine the array location and
+size, the layout of each element needs to be defined.
+</p>
+</div>
+
+<div id="outline-container-the-directoryentry-structure" class="outline-3">
+<h3 id="the-directoryentry-structure"><span class="section-number-3">6.1.</span> The <code>DirectoryEntry</code> structure</h3>
+<div class="outline-text-3" id="text-the-directoryentry-structure">
+<p>
+The following table shows the fields of the <code>DirectoryEntry</code> structure.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 4:</span> Layout of a Directory Entry.</caption>
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Offset</th>
+<th scope="col" class="org-left">Type</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>0x00</code></td>
+<td class="org-left"><code>char[11]</code></td>
+<td class="org-left">Short file name</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x0B</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">File attributes</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x0C</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">Reserved</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x0D</code></td>
+<td class="org-left"><code>uint8_t</code></td>
+<td class="org-left">Creation time (tenths of a second)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x0E</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Creation time (hour, minute, second)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x10</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Creation date (year, month, day)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x12</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Last access date (year, month, day)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x14</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">High word of the first cluster index (for FAT32)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x16</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Modification time (hour, minute, second)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x18</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Modification date (year, month, day)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x1A</code></td>
+<td class="org-left"><code>uint16_t</code></td>
+<td class="org-left">Low word of the first cluster index</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x16</code></td>
+<td class="org-left"><code>uint32_t</code></td>
+<td class="org-left">Size in bytes</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The name field follows the <a href="https://en.wikipedia.org/wiki/8.3_filename">8.3 filename scheme</a>, where the first 8 bytes of the
+array are the file name padded with spaces, and the last 3 bytes are the file
+extension.
+</p>
+
+<p>
+Each bit in the <i>File attributes</i> field indicates a different property, according
+to the following table.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 5:</span> File attribute bits.</caption>
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Mask (hex)</th>
+<th scope="col" class="org-left">Mask (binary)</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>0x01</code></td>
+<td class="org-left"><code>0b00000001</code></td>
+<td class="org-left">Read only</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x02</code></td>
+<td class="org-left"><code>0b00000010</code></td>
+<td class="org-left">Hidden</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x04</code></td>
+<td class="org-left"><code>0b00000100</code></td>
+<td class="org-left">System</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x08</code></td>
+<td class="org-left"><code>0b00001000</code></td>
+<td class="org-left">Volume ID</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x10</code></td>
+<td class="org-left"><code>0b00010000</code></td>
+<td class="org-left">Directory</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x20</code></td>
+<td class="org-left"><code>0b00100000</code></td>
+<td class="org-left">Archive</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x40</code></td>
+<td class="org-left"><code>0b01000000</code></td>
+<td class="org-left">Reserved (device)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x80</code></td>
+<td class="org-left"><code>0b10000000</code></td>
+<td class="org-left">Reserved</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>0x0F</code></td>
+<td class="org-left"><code>0b00001111</code></td>
+<td class="org-left">Long name</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The third field of a <code>DirectoryEntry</code> contains the creation time in tenths of a
+second, and its value range is <code>[0..199]</code>. The dates and times in the structure
+are stored as 16-bit integers with the following layouts:
+</p>
+
+<pre class="example" id="example2">
+Time: hhhhhhmmmmmsssss
+      `----´`---´`---´
+       Hour  Min  Sec
+
+Date: yyyyyyymmmmddddd
+      `-----´`--´`---´
+       Year   Mon Day
+</pre>
+</div>
+</div>
+
+<div id="outline-container-location-and-size-of-the-root-directory" class="outline-3">
+<h3 id="location-and-size-of-the-root-directory"><span class="section-number-3">6.2.</span> Location and size of the root directory</h3>
+<div class="outline-text-3" id="text-location-and-size-of-the-root-directory">
+<p>
+The method for determining the location and size of the root directoy changes
+depending on the filesystem version.
+</p>
+
+<dl class="org-dl">
+<dt>Location and size in FAT12 and FAT16</dt><dd><p>
+In FAT12 and FAT16, this array is located right after the FAT(s), so
+the sector number can be calculated by multiplying the number of FATs by the
+size of a FAT, and adding that to the number of reserved sectors. All three of
+these values can be obtained from the base BPB.
+</p>
+
+<p>
+The number of <code>DirectoryEntry</code> elements of the array is determined by the <i>Root
+directory entries</i> field of the BPB.
+</p></dd>
+
+<dt>Location and size in FAT32</dt><dd><p>
+In FAT32 filesystems, the location of the root directory is determined by the
+<i>Root directory cluster</i> entry of the EBPB, which usually has a value of 2, but
+not necessarily.
+</p>
+
+<p>
+In FAT32 filesystems, the <i>Root directory entries</i> field of the BPB must be set
+to zero, so the number of entries is calculated by following the chain of
+cluster indexes that is stored in the FAT, just like any other directory.
+</p></dd>
+</dl>
+
+<p>
+Once the location and size of the root directory is known, it can be accessed
+like a normal array, each element being 32 bytes.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-data-region" class="outline-2">
+<h2 id="data-region"><span class="section-number-2">7.</span> Data region</h2>
+<div class="outline-text-2" id="text-data-region">
+</div>
+
+<div id="outline-container-calculating-the-size-of-the-root-directory" class="outline-3">
+<h3 id="calculating-the-size-of-the-root-directory"><span class="section-number-3">7.1.</span> Calculating the size of the root directory</h3>
+<div class="outline-text-3" id="text-calculating-the-size-of-the-root-directory">
+<p>
+The size of the root directory in sectors can be calculated by multiplying its
+number of entries by the size of a single entry in bytes, dividing that by the
+number of bytes per sector, and rounding up:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_bytes</span> =
+    bpb-&gt;root_dir_entry_count * <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">DirectoryEntry</span>);
+
+<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_sectors</span> = root_dir_bytes / bpb-&gt;bytes_per_sector;
+<span style="color: #ff6f9f;">if</span> (root_dir_bytes % bpb-&gt;bytes_per_sector != <span style="color: #88ca9f;">0</span>)
+    root_dir_sectors++;
+</pre>
+</div>
+
+<p>
+Alternatively, as recommended in page 13 of the FAT specification, one can round
+up by adding the number of bytes per sector minus one before performing the
+integer division:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_bytes</span> =
+    bpb-&gt;root_dir_entry_count * <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">DirectoryEntry</span>);
+
+<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_sectors</span> =
+  (root_dir_bytes + (bpb-&gt;bytes_per_sector - <span style="color: #88ca9f;">1</span>)) /
+    bpb-&gt;bytes_per_sector;
+</pre>
+</div>
+
+<p>
+Note that on FAT32, the <i>Root directory entries</i> field of the BPB is zero, so the
+result of these operations will also be zero. This is expected when calculating
+the first data sector below.
+</p>
+</div>
+</div>
+
+<div id="outline-container-calculating-the-first-data-sector" class="outline-3">
+<h3 id="calculating-the-first-data-sector"><span class="section-number-3">7.2.</span> Calculating the first data sector</h3>
+<div class="outline-text-3" id="text-calculating-the-first-data-sector">
+<p>
+The first data sector can be calculated by adding the number of reserved sectors
+(such as the boot sector), the number of sectors used by the FAT(s), and the
+number of sectors used by the root directory.
+</p>
+
+<p>
+The number of reserved sectors can be obtained from the third field of the BPB,
+as explained when <a href="#file-allocation-table-fat">calculating the location of the FAT</a>. The number of sectors
+used by the FAT is determined by either the <i>Logical sectors per FAT</i> field of the
+base BPB, or, if it&rsquo;s zero, by the <i>Logical sectors per FAT</i> field of the FAT32
+EBPB. The number of sectors of the root directory is calculated using any of the
+methods from the <a href="#calculating-the-size-of-the-root-directory">previous section</a>; again, note that this value is expected to be
+zero in FAT32.
+</p>
 </div>
 </div>
 </div>

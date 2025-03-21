@@ -326,6 +326,7 @@ volume.
 #+begin_comment org
 TODO: At this point of the article, some concepts haven't been shown yet, so
 this whole list might be better in another section.
+TODO: Explain how directories are read.
 #+end_comment
 
 This is the general algorithm for reading the contents of a file:
@@ -347,6 +348,170 @@ This is the general algorithm for reading the contents of a file:
 6. If the new FAT index is smaller than the /end-of-chain/ marker, go back to
    step 2. Otherwise, we are done with the file.
 
-* COMMENT Root directory
+#+begin_comment org
+TODO: Why can there be more than one FAT in a volume? (Redundancy)
+#+end_comment
 
-https://en.wikipedia.org/wiki/8.3_filename
+* Root directory
+:PROPERTIES:
+:CUSTOM_ID: root-directory
+:END:
+
+As mentioned above, the metadata that was refered to as a /file/ is represented as
+a data structure called =DirectoryEntry=. The root directory is simply an array of
+these structures. Before explaining how to determine the array location and
+size, the layout of each element needs to be defined.
+
+** The =DirectoryEntry= structure
+:PROPERTIES:
+:CUSTOM_ID: the-directoryentry-structure
+:END:
+
+The following table shows the fields of the =DirectoryEntry= structure.
+
+#+CAPTION: Layout of a Directory Entry.
+| Offset | Type     | Description                                      |
+|--------+----------+--------------------------------------------------|
+| ~0x00~   | ~char[11]~ | Short file name                                  |
+| ~0x0B~   | ~uint8_t~  | File attributes                                  |
+| ~0x0C~   | ~uint8_t~  | Reserved                                         |
+| ~0x0D~   | ~uint8_t~  | Creation time (tenths of a second)               |
+| ~0x0E~   | ~uint16_t~ | Creation time (hour, minute, second)             |
+| ~0x10~   | ~uint16_t~ | Creation date (year, month, day)                 |
+| ~0x12~   | ~uint16_t~ | Last access date (year, month, day)              |
+| ~0x14~   | ~uint16_t~ | High word of the first cluster index (for FAT32) |
+| ~0x16~   | ~uint16_t~ | Modification time (hour, minute, second)         |
+| ~0x18~   | ~uint16_t~ | Modification date (year, month, day)             |
+| ~0x1A~   | ~uint16_t~ | Low word of the first cluster index              |
+| ~0x16~   | ~uint32_t~ | Size in bytes                                    |
+
+The name field follows the [[https://en.wikipedia.org/wiki/8.3_filename][8.3 filename scheme]], where the first 8 bytes of the
+array are the file name padded with spaces, and the last 3 bytes are the file
+extension.
+
+Each bit in the /File attributes/ field indicates a different property, according
+to the following table.
+
+#+CAPTION: File attribute bits.
+| Mask (hex) | Mask (binary) | Description       |
+|------------+---------------+-------------------|
+| ~0x01~       | ~0b00000001~    | Read only         |
+| ~0x02~       | ~0b00000010~    | Hidden            |
+| ~0x04~       | ~0b00000100~    | System            |
+| ~0x08~       | ~0b00001000~    | Volume ID         |
+| ~0x10~       | ~0b00010000~    | Directory         |
+| ~0x20~       | ~0b00100000~    | Archive           |
+| ~0x40~       | ~0b01000000~    | Reserved (device) |
+| ~0x80~       | ~0b10000000~    | Reserved          |
+| ~0x0F~       | ~0b00001111~    | Long name         |
+
+#+begin_comment org
+TODO: Expain long names (who needs them, anyway).
+#+end_comment
+
+The third field of a =DirectoryEntry= contains the creation time in tenths of a
+second, and its value range is ~[0..199]~. The dates and times in the structure
+are stored as 16-bit integers with the following layouts:
+
+#+begin_comment org
+TODO: Perhaps turn into a proper diagram with bit numbering, if I am too bored.
+#+end_comment
+
+#+NAME: example2
+#+begin_example
+Time: hhhhhhmmmmmsssss
+      `----´`---´`---´
+       Hour  Min  Sec
+
+Date: yyyyyyymmmmddddd
+      `-----´`--´`---´
+       Year   Mon Day
+#+end_example
+
+** Location and size of the root directory
+:PROPERTIES:
+:CUSTOM_ID: location-and-size-of-the-root-directory
+:END:
+
+The method for determining the location and size of the root directoy changes
+depending on the filesystem version.
+
+- Location and size in FAT12 and FAT16 ::
+
+  In FAT12 and FAT16, this array is located right after the FAT(s), so
+  the sector number can be calculated by multiplying the number of FATs by the
+  size of a FAT, and adding that to the number of reserved sectors. All three of
+  these values can be obtained from the base BPB.
+
+  The number of =DirectoryEntry= elements of the array is determined by the /Root
+  directory entries/ field of the BPB.
+
+- Location and size in FAT32 ::
+
+  In FAT32 filesystems, the location of the root directory is determined by the
+  /Root directory cluster/ entry of the EBPB, which usually has a value of 2, but
+  not necessarily.
+
+  In FAT32 filesystems, the /Root directory entries/ field of the BPB must be set
+  to zero, so the number of entries is calculated by following the chain of
+  cluster indexes that is stored in the FAT, just like any other directory.
+
+Once the location and size of the root directory is known, it can be accessed
+like a normal array, each element being 32 bytes.
+
+* Data region
+:PROPERTIES:
+:CUSTOM_ID: data-region
+:END:
+
+** Calculating the size of the root directory
+:PROPERTIES:
+:CUSTOM_ID: calculating-the-size-of-the-root-directory
+:END:
+
+The size of the root directory in sectors can be calculated by multiplying its
+number of entries by the size of a single entry in bytes, dividing that by the
+number of bytes per sector, and rounding up:
+
+#+begin_src C
+const uint32_t root_dir_bytes =
+    bpb->root_dir_entry_count * sizeof(struct DirectoryEntry);
+
+uint32_t root_dir_sectors = root_dir_bytes / bpb->bytes_per_sector;
+if (root_dir_bytes % bpb->bytes_per_sector != 0)
+    root_dir_sectors++;
+#+end_src
+
+Alternatively, as recommended in page 13 of the FAT specification, one can round
+up by adding the number of bytes per sector minus one before performing the
+integer division:
+
+#+begin_src C
+const uint32_t root_dir_bytes =
+    bpb->root_dir_entry_count * sizeof(struct DirectoryEntry);
+
+const uint32_t root_dir_sectors =
+  (root_dir_bytes + (bpb->bytes_per_sector - 1)) /
+    bpb->bytes_per_sector;
+#+end_src
+
+Note that on FAT32, the /Root directory entries/ field of the BPB is zero, so the
+result of these operations will also be zero. This is expected when calculating
+the first data sector below.
+
+** Calculating the first data sector
+:PROPERTIES:
+:CUSTOM_ID: calculating-the-first-data-sector
+:END:
+
+The first data sector can be calculated by adding the number of reserved sectors
+(such as the boot sector), the number of sectors used by the FAT(s), and the
+number of sectors used by the root directory.
+
+The number of reserved sectors can be obtained from the third field of the BPB,
+as explained when [[#file-allocation-table-fat][calculating the location of the FAT]]. The number of sectors
+used by the FAT is determined by either the /Logical sectors per FAT/ field of the
+base BPB, or, if it's zero, by the /Logical sectors per FAT/ field of the FAT32
+EBPB. The number of sectors of the root directory is calculated using any of the
+methods from the [[#calculating-the-size-of-the-root-directory][previous section]]; again, note that this value is expected to be
+zero in FAT32.
