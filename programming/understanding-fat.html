@@ -231,6 +231,7 @@
 <ul>
 <li><a href="#calculating-the-size-of-the-root-directory">7.1. Calculating the size of the root directory</a></li>
 <li><a href="#calculating-the-first-data-sector">7.2. Calculating the first data sector</a></li>
+<li><a href="#reading-the-contents-of-a-file">7.3. Reading the contents of a file</a></li>
 </ul>
 </li>
 </ul>
@@ -813,29 +814,6 @@ figure, entry 4 of the FAT contains the value 5, so the real index of the next
 cluster in the list would be 3, since it&rsquo;s the fourth actual cluster in the
 volume.
 </p>
-
-<p>
-This is the general algorithm for reading the contents of a file:
-</p>
-
-<ol class="org-ol">
-<li>Somehow obtain the <b>first FAT index</b> for the file (this will be explained
-below). Note that this index won&rsquo;t be the cluster index in the volume
-(i.e. the subtraction is not yet made).</li>
-<li>Calculate the <b>cluster index</b> by subtracting 2 (i.e. the number of reserved FAT
-entries) from the FAT index.</li>
-<li>Calculate the <b>sector number</b> by multiplying the cluster index by the number of
-<i>Logical sectors per cluster</i> (second element of the BPB), and adding that to
-the number of sectors before the <i>Data region</i> (obtaining this value will be
-shown below as well).</li>
-<li>Somehow read the cluster from the disk, starting at that sector.</li>
-<li>Obtain the <b>next FAT index</b> by reading the value stored at the FAT entry
-corresponding to the current FAT index (i.e. <code>fat_idx = fat[fat_idx]</code>). Again,
-note that this step might be more complicated depending on the endianness of
-the machine.</li>
-<li>If the new FAT index is smaller than the <i>end-of-chain</i> marker, go back to
-step 2. Otherwise, we are done with the file.</li>
-</ol>
 </div>
 </div>
 </div>
@@ -1160,6 +1138,49 @@ base BPB, or, if it&rsquo;s zero, by the <i>Logical sectors per FAT</i> field of
 EBPB. The number of sectors of the root directory is calculated using any of the
 methods from the <a href="#calculating-the-size-of-the-root-directory">previous section</a>; again, note that this value is expected to be
 zero in FAT32.
+</p>
+</div>
+</div>
+
+<div id="outline-container-reading-the-contents-of-a-file" class="outline-3">
+<h3 id="reading-the-contents-of-a-file"><span class="section-number-3">7.3.</span> Reading the contents of a file</h3>
+<div class="outline-text-3" id="text-reading-the-contents-of-a-file">
+<p>
+This is the general algorithm for reading the contents of a file:
+</p>
+
+<ol class="org-ol">
+<li>Obtain the sector where the FAT starts, the sector where the root directory
+starts, and the size in sectors of the root directory. All this has been
+explained above.</li>
+<li>Search for the file by iterating the root directory until the <i>name</i> field of a
+<code>DirectoryEntry</code> structure matches the filename you are looking for.</li>
+<li>Obtain the <b>first FAT index</b> in the chain of clusters that hold the contents of the
+file. This index can be obtained from the <i>Low word of the first cluster index</i>
+field of the <code>DirectoryEntry</code>. Note that this index is for the FAT, it&rsquo;s not
+the real cluster number in the volume.</li>
+<li>Calculate the <b>real cluster number</b> by subtracting 2 (i.e. the number of
+reserved FAT entries) from the FAT index that was just obtained.</li>
+<li>Calculate the <b>sector number</b> by multiplying the real cluster number by the
+number of <i>Logical sectors per cluster</i> (second element of the BPB), and adding
+that to the number of sectors before the <i>Data region</i>, as explained above.</li>
+<li>Somehow <b>read from the disk</b> a cluster worth of sectors, starting at the sector
+number from the previous step.</li>
+<li>Obtain the <b>next FAT index</b> by reading the value stored at the FAT entry
+corresponding to the current FAT index (i.e. <code>fat_idx = fat[fat_idx]</code>).</li>
+<li>If the new FAT index is smaller than the <i>end-of-chain</i> marker, go back to
+step 2. Otherwise, we are done with the file.</li>
+</ol>
+
+<p>
+In FAT32, when reading the FAT index, you will need to also use the <i>High word of
+the first cluster index</i> field of the <code>DirectoryEntry</code>.
+</p>
+
+<p>
+Also note that, as explained above, getting the <i>next FAT index</i> might be more
+complicated depending on the endianness of the machine, since all the structures
+in the FAT filesystem are little-endian.
 </p>
 </div>
 </div>

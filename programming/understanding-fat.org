@@ -81,10 +81,6 @@ parts that will be explained below.
 #+CAPTION: Layout of a FAT12 boot sector.
 [[file:../img/understanding-fat3.png]]
 
-#+begin_comment org
-TODO: Export to PNG, keep both versions.
-#+end_comment
-
 ** Initial bytes
 :PROPERTIES:
 :CUSTOM_ID: initial-bytes
@@ -324,31 +320,6 @@ cluster in the list would be 3, since it's the fourth actual cluster in the
 volume.
 
 #+begin_comment org
-TODO: At this point of the article, some concepts haven't been shown yet, so
-this whole list might be better in another section.
-TODO: Explain how directories are read.
-#+end_comment
-
-This is the general algorithm for reading the contents of a file:
-
-1. Somehow obtain the *first FAT index* for the file (this will be explained
-   below). Note that this index won't be the cluster index in the volume
-   (i.e. the subtraction is not yet made).
-2. Calculate the *cluster index* by subtracting 2 (i.e. the number of reserved FAT
-   entries) from the FAT index.
-3. Calculate the *sector number* by multiplying the cluster index by the number of
-   /Logical sectors per cluster/ (second element of the BPB), and adding that to
-   the number of sectors before the /Data region/ (obtaining this value will be
-   shown below as well).
-4. Somehow read the cluster from the disk, starting at that sector.
-5. Obtain the *next FAT index* by reading the value stored at the FAT entry
-   corresponding to the current FAT index (i.e. ~fat_idx = fat[fat_idx]~). Again,
-   note that this step might be more complicated depending on the endianness of
-   the machine.
-6. If the new FAT index is smaller than the /end-of-chain/ marker, go back to
-   step 2. Otherwise, we are done with the file.
-
-#+begin_comment org
 TODO: Why can there be more than one FAT in a volume? (Redundancy)
 #+end_comment
 
@@ -515,3 +486,42 @@ base BPB, or, if it's zero, by the /Logical sectors per FAT/ field of the FAT32
 EBPB. The number of sectors of the root directory is calculated using any of the
 methods from the [[#calculating-the-size-of-the-root-directory][previous section]]; again, note that this value is expected to be
 zero in FAT32.
+
+** Reading the contents of a file
+:PROPERTIES:
+:CUSTOM_ID: reading-the-contents-of-a-file
+:END:
+
+This is the general algorithm for reading the contents of a file:
+
+1. Obtain the sector where the FAT starts, the sector where the root directory
+   starts, and the size in sectors of the root directory. All this has been
+   explained above.
+2. Search for the file by iterating the root directory until the /name/ field of a
+   =DirectoryEntry= structure matches the filename you are looking for.
+3. Obtain the *first FAT index* in the chain of clusters that hold the contents of the
+   file. This index can be obtained from the /Low word of the first cluster index/
+   field of the =DirectoryEntry=. Note that this index is for the FAT, it's not
+   the real cluster number in the volume.
+4. Calculate the *real cluster number* by subtracting 2 (i.e. the number of
+   reserved FAT entries) from the FAT index that was just obtained.
+5. Calculate the *sector number* by multiplying the real cluster number by the
+   number of /Logical sectors per cluster/ (second element of the BPB), and adding
+   that to the number of sectors before the /Data region/, as explained above.
+6. Somehow *read from the disk* a cluster worth of sectors, starting at the sector
+   number from the previous step.
+7. Obtain the *next FAT index* by reading the value stored at the FAT entry
+   corresponding to the current FAT index (i.e. ~fat_idx = fat[fat_idx]~).
+8. If the new FAT index is smaller than the /end-of-chain/ marker, go back to
+   step 2. Otherwise, we are done with the file.
+
+In FAT32, when reading the FAT index, you will need to also use the /High word of
+the first cluster index/ field of the =DirectoryEntry=.
+
+Also note that, as explained above, getting the /next FAT index/ might be more
+complicated depending on the endianness of the machine, since all the structures
+in the FAT filesystem are little-endian.
+
+#+begin_comment org
+TODO: Explain how directories are read.
+#+end_comment
