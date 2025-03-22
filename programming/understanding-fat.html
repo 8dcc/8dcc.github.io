@@ -783,9 +783,10 @@ files, by building linked lists with their cluster indexes.
 The size of each FAT entry changes depending on the filesystem version, and that
 is precisely what the 12/16/32 number indicates: the size of a FAT entry in
 bits. The 16-bit version will be used for explaining the layout of the FAT,
-since each entry is two bytes, and therefore easier to understand. The 12-bit
-version, which uses one bit and a half (i.e. 3 <a href="https://en.wikipedia.org/wiki/Nibble">nibbles</a>), is a bit more tricky,
-so it will be explained in detail below.
+since each entry is two bytes, and therefore easier to understand. The layout of
+a 32-bit FAT is pretty similar, the size of each element is just twice as
+big. The 12-bit version, however, is more tricky since it uses one bit and a
+half (i.e. 3 <a href="https://en.wikipedia.org/wiki/Nibble">nibbles</a>), so it will be explained in detail below.
 </p>
 
 <p>
@@ -826,6 +827,50 @@ figure, entry 4 of the FAT contains the value 5, so the real index of the next
 cluster in the list would be 3, since it&rsquo;s the fourth actual cluster in the
 volume.
 </p>
+
+<p>
+As noted above, the 12-bit FAT is a bit more complicated, because each entry is
+one byte and a half. To The following figure shows how the previous 16-bit FAT
+would be represented with 12-bits per entry. Since each entry is 3 nibbles, and
+the structure is little-endian, nibbles in entries with an odd index have been
+highlighted in bold, to hopefully make it easier to visualize.
+</p>
+
+
+<div id="fig6" class="figure">
+<p><img src="../img/understanding-fat6.png" alt="understanding-fat6.png" />
+</p>
+<p><span class="figure-number">Figure 6: </span>Layout of a 12-bit File Allocation Table.</p>
+</div>
+
+<p>
+Also note how there are 15 bytes per row in this figure, instead of 16 like in
+the previous one. This has been done to avoid having one byte of the entry in
+one line (e.g. the <code>0x14</code> at offset <code>0x0F</code>) and the third nibble in another line
+(e.g. the lower half of the byte at offset <code>0x10</code>).
+</p>
+
+<p>
+Just to emphasize again, since the byte ordering can be confusing in this
+version, the following example shows how the entries are distributed and nibbles
+ordered in the 12-bit FAT.
+</p>
+
+<pre class="example" id="org945b5dc">
+Entry distribution:
+
+  AA BA BB CC DC DD EE FE FF ...
+  `------´ `------´ `------´
+   Two      Two      Two
+   entries  entries  entries
+
+Nibble order:
+
+  23 61 45 89 C7 AB EF 3D 12 ...
+  `------´ `------´ `------´
+   0x123,   0x789,   0xDEF,
+   0x456    0xABC    0x123
+</pre>
 </div>
 </div>
 </div>
