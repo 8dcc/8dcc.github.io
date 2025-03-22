@@ -234,6 +234,7 @@
 <li><a href="#reading-the-contents-of-a-file">7.3. Reading the contents of a file</a></li>
 </ul>
 </li>
+<li><a href="#final-note">8. Final note</a></li>
 </ul>
 </div>
 </div>
@@ -790,8 +791,9 @@ so it will be explained in detail below.
 <p>
 The following figure shows the hexdump of the first 64 bytes of a 16-bit
 FAT. Each (non-empty) entry has been highlighted to show their linked
-list. Please note that the offsets in the previous figure are expressed in
-bytes, but the FAT stores the linked lists with indexes to other 16-bit entries.
+list. Please note that the hexadecimal offsets in the following figure are
+expressed in bytes, but the FAT stores the linked lists with indexes to other
+16-bit entries.
 </p>
 
 
@@ -808,7 +810,7 @@ bytes are stored at a smaller offset in the disk (i.e. the value <code>0xAABBCCD
 would be stored as <code>DD CC BB AA</code>). The previous figure shows a hexdump, and
 although the bytes are grouped in pairs, they are dumped one by one, in the
 order in which they are stored in the disk. For example, the contents of the
-third 16-bit entry are displayed as <code>0300</code>, but actually corresponds to the value
+third 16-bit entry are displayed as <code>0300</code>, but actually correspond to the value
 <code>0x0003</code>. This will be specially important later when describing the layout of a
 12-bit FAT, since each entry is one byte and a half.
 </p>
@@ -835,7 +837,7 @@ volume.
 As mentioned above, the metadata that was refered to as a <i>file</i> is represented as
 a data structure called <code>DirectoryEntry</code>. The root directory is simply an array of
 these structures. Before explaining how to determine the array location and
-size, the layout of each element needs to be defined.
+size, the layout of a single element needs to be defined.
 </p>
 </div>
 
@@ -1045,8 +1047,9 @@ Date: yyyyyyymmmmddddd
 <h3 id="location-and-size-of-the-root-directory"><span class="section-number-3">6.2.</span> Location and size of the root directory</h3>
 <div class="outline-text-3" id="text-location-and-size-of-the-root-directory">
 <p>
-The method for determining the location and size of the root directoy changes
-depending on the filesystem version.
+Just like the EBPB changes between FAT12/FAT16 and FAT32, the method for
+determining the location and size of the root directory also change. These
+differences will be explained now.
 </p>
 
 <dl class="org-dl">
@@ -1086,6 +1089,26 @@ like a normal array, each element being 32 bytes.
 <div id="outline-container-data-region" class="outline-2">
 <h2 id="data-region"><span class="section-number-2">7.</span> Data region</h2>
 <div class="outline-text-2" id="text-data-region">
+<p>
+At this point, it has been explained how to access the data in the EBPB, how to
+access and navigate the FAT, and how to obtain the array of <code>DirectoryEntry</code>
+structures in the root directory. With this information, it should be possible to:
+</p>
+
+<ol class="org-ol">
+<li>Iterate the root directory, searching for files that match certain properties
+(e.g. whose name matches <i>X</i>, that was created before the <i>Y</i> date).</li>
+<li>Obtain the first cluster index of that file.</li>
+<li>Traverse the linked list of cluster indexes through the FAT.</li>
+</ol>
+
+<p>
+However, it&rsquo;s necessary to know where these clusters are, and how they can be
+accesses to read the actual contents of files. The contents of the files are
+stored in the <i>data</i> region, so the sector where this region starts should be
+calculated first. Before explaining how the first data sector is calculated,
+it&rsquo;s necessary to know how to calculate the size of the root directory.
+</p>
 </div>
 
 <div id="outline-container-calculating-the-size-of-the-root-directory" class="outline-3">
@@ -1098,11 +1121,11 @@ number of bytes per sector, and rounding up:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_bytes</span> =
-    bpb-&gt;root_dir_entry_count * <span style="color: #972500;">sizeof</span>(<span style="color: #972500;">struct</span> <span style="color: #0031a9;">DirectoryEntry</span>);
+<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_bytes</span> =
+    bpb-&gt;root_dir_entry_count * <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">DirectoryEntry</span>);
 
-<span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_sectors</span> = root_dir_bytes / bpb-&gt;bytes_per_sector;
-<span style="color: #972500;">if</span> (root_dir_bytes % bpb-&gt;bytes_per_sector != <span style="color: #2a5045;">0</span>)
+<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_sectors</span> = root_dir_bytes / bpb-&gt;bytes_per_sector;
+<span style="color: #ff6f9f;">if</span> (root_dir_bytes % bpb-&gt;bytes_per_sector != <span style="color: #88ca9f;">0</span>)
     root_dir_sectors++;
 </pre>
 </div>
@@ -1114,17 +1137,17 @@ integer division:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_bytes</span> =
-    bpb-&gt;root_dir_entry_count * <span style="color: #972500;">sizeof</span>(<span style="color: #972500;">struct</span> <span style="color: #0031a9;">DirectoryEntry</span>);
+<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_bytes</span> =
+    bpb-&gt;root_dir_entry_count * <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">DirectoryEntry</span>);
 
-<span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_sectors</span> =
-  (root_dir_bytes + (bpb-&gt;bytes_per_sector - <span style="color: #2a5045;">1</span>)) /
+<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_sectors</span> =
+  (root_dir_bytes + (bpb-&gt;bytes_per_sector - <span style="color: #88ca9f;">1</span>)) /
     bpb-&gt;bytes_per_sector;
 </pre>
 </div>
 
 <p>
-Note that on FAT32, the <i>Root directory entries</i> field of the BPB is zero, so the
+Note that, on FAT32, the <i>Root directory entries</i> field of the BPB is zero, so the
 result of these operations will also be zero. This is expected when calculating
 the first data sector below.
 </p>
@@ -1149,6 +1172,20 @@ EBPB. The number of sectors of the root directory is calculated using any of the
 methods from the <a href="#calculating-the-size-of-the-root-directory">previous section</a>; again, note that this value is expected to be
 zero in FAT32.
 </p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">sectors_per_fat</span> = (bpb-&gt;sectors_per_fat_16 == <span style="color: #88ca9f;">0</span>)
+                                 ? bpb-&gt;sectors_per_fat_16
+                                 : ebpb-&gt;sectors_per_fat_32;
+
+<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint16_t</span> <span style="color: #6ae4b9;">reserved_sectors</span>  = bpb-&gt;reserved_sectors;
+<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">total_fat_sectors</span> = bpb-&gt;fat_count * sectors_per_fat;
+<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_sectors</span>  = <span style="color: #989898;">/* </span><span style="color: #989898;">Shown above</span><span style="color: #989898;"> */</span>;
+
+<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">first_data_sector</span> =
+  reserved_sectors + total_fat_sectors + root_dir_sectors;
+</pre>
+</div>
 </div>
 </div>
 
@@ -1156,7 +1193,10 @@ zero in FAT32.
 <h3 id="reading-the-contents-of-a-file"><span class="section-number-3">7.3.</span> Reading the contents of a file</h3>
 <div class="outline-text-3" id="text-reading-the-contents-of-a-file">
 <p>
-This is the general algorithm for reading the contents of a file:
+With this information in mind, it should be possible to calculate the clusters
+numbers where the file contents are stored, and the sector when the data region
+starts, therefore allowing us to read all the necessary sectors that contain the
+file contents. This is the general algorithm for accomplishing this:
 </p>
 
 <ol class="org-ol">
@@ -1193,6 +1233,18 @@ complicated depending on the endianness of the machine, since all the structures
 in the FAT filesystem are little-endian.
 </p>
 </div>
+</div>
+</div>
+
+<div id="outline-container-final-note" class="outline-2">
+<h2 id="final-note"><span class="section-number-2">8.</span> Final note</h2>
+<div class="outline-text-2" id="text-final-note">
+<p>
+As explained in the introduction, I have only worked with FAT12, and although I
+tried to include as much information about FAT16 and FAT32 as possible, it&rsquo;s
+very likely that I have made some mistakes or left some information out. If you
+find any errors, or have any suggestions, feel free to <a href="../index.html#contributing">contribute</a>.
+</p>
 </div>
 </div>
 <div id="footnotes">

@@ -306,8 +306,9 @@ so it will be explained in detail below.
 
 The following figure shows the hexdump of the first 64 bytes of a 16-bit
 FAT. Each (non-empty) entry has been highlighted to show their linked
-list. Please note that the offsets in the previous figure are expressed in
-bytes, but the FAT stores the linked lists with indexes to other 16-bit entries.
+list. Please note that the hexadecimal offsets in the following figure are
+expressed in bytes, but the FAT stores the linked lists with indexes to other
+16-bit entries.
 
 #+NAME: fig5
 #+CAPTION: Layout of a 16-bit File Allocation Table.
@@ -319,7 +320,7 @@ bytes are stored at a smaller offset in the disk (i.e. the value ~0xAABBCCDD~
 would be stored as ~DD CC BB AA~). The previous figure shows a hexdump, and
 although the bytes are grouped in pairs, they are dumped one by one, in the
 order in which they are stored in the disk. For example, the contents of the
-third 16-bit entry are displayed as ~0300~, but actually corresponds to the value
+third 16-bit entry are displayed as ~0300~, but actually correspond to the value
 ~0x0003~. This will be specially important later when describing the layout of a
 12-bit FAT, since each entry is one byte and a half.
 
@@ -337,6 +338,10 @@ volume.
 TODO: Why can there be more than one FAT in a volume? (Redundancy)
 #+end_comment
 
+#+begin_comment org
+TODO: Explain differences between the 12-bit and 16-bit FAT.
+#+end_comment
+
 * Root directory
 :PROPERTIES:
 :CUSTOM_ID: root-directory
@@ -345,7 +350,7 @@ TODO: Why can there be more than one FAT in a volume? (Redundancy)
 As mentioned above, the metadata that was refered to as a /file/ is represented as
 a data structure called =DirectoryEntry=. The root directory is simply an array of
 these structures. Before explaining how to determine the array location and
-size, the layout of each element needs to be defined.
+size, the layout of a single element needs to be defined.
 
 ** The =DirectoryEntry= structure
 :PROPERTIES:
@@ -418,8 +423,9 @@ Date: yyyyyyymmmmddddd
 :CUSTOM_ID: location-and-size-of-the-root-directory
 :END:
 
-The method for determining the location and size of the root directoy changes
-depending on the filesystem version.
+Just like the EBPB changes between FAT12/FAT16 and FAT32, the method for
+determining the location and size of the root directory also change. These
+differences will be explained now.
 
 - Location and size in FAT12 and FAT16 ::
 
@@ -448,6 +454,21 @@ like a normal array, each element being 32 bytes.
 :PROPERTIES:
 :CUSTOM_ID: data-region
 :END:
+
+At this point, it has been explained how to access the data in the EBPB, how to
+access and navigate the FAT, and how to obtain the array of =DirectoryEntry=
+structures in the root directory. With this information, it should be possible to:
+
+1. Iterate the root directory, searching for files that match certain properties
+   (e.g. whose name matches /X/, that was created before the /Y/ date).
+2. Obtain the first cluster index of that file.
+3. Traverse the linked list of cluster indexes through the FAT.
+
+However, it's necessary to know where these clusters are, and how they can be
+accesses to read the actual contents of files. The contents of the files are
+stored in the /data/ region, so the sector where this region starts should be
+calculated first. Before explaining how the first data sector is calculated,
+it's necessary to know how to calculate the size of the root directory.
 
 ** Calculating the size of the root directory
 :PROPERTIES:
@@ -480,7 +501,7 @@ const uint32_t root_dir_sectors =
     bpb->bytes_per_sector;
 #+end_src
 
-Note that on FAT32, the /Root directory entries/ field of the BPB is zero, so the
+Note that, on FAT32, the /Root directory entries/ field of the BPB is zero, so the
 result of these operations will also be zero. This is expected when calculating
 the first data sector below.
 
@@ -501,12 +522,28 @@ EBPB. The number of sectors of the root directory is calculated using any of the
 methods from the [[#calculating-the-size-of-the-root-directory][previous section]]; again, note that this value is expected to be
 zero in FAT32.
 
+#+begin_src C
+const size_t sectors_per_fat = (bpb->sectors_per_fat_16 == 0)
+                                 ? bpb->sectors_per_fat_16
+                                 : ebpb->sectors_per_fat_32;
+
+const uint16_t reserved_sectors  = bpb->reserved_sectors;
+const uint32_t total_fat_sectors = bpb->fat_count * sectors_per_fat;
+const uint32_t root_dir_sectors  = /* Shown above */;
+
+const uint32_t first_data_sector =
+  reserved_sectors + total_fat_sectors + root_dir_sectors;
+#+end_src
+
 ** Reading the contents of a file
 :PROPERTIES:
 :CUSTOM_ID: reading-the-contents-of-a-file
 :END:
 
-This is the general algorithm for reading the contents of a file:
+With this information in mind, it should be possible to calculate the clusters
+numbers where the file contents are stored, and the sector when the data region
+starts, therefore allowing us to read all the necessary sectors that contain the
+file contents. This is the general algorithm for accomplishing this:
 
 1. Obtain the sector where the FAT starts, the sector where the root directory
    starts, and the size in sectors of the root directory. All this has been
@@ -539,3 +576,13 @@ in the FAT filesystem are little-endian.
 #+begin_comment org
 TODO: Explain how directories are read.
 #+end_comment
+
+* Final note
+:PROPERTIES:
+:CUSTOM_ID: final-note
+:END:
+
+As explained in the introduction, I have only worked with FAT12, and although I
+tried to include as much information about FAT16 and FAT32 as possible, it's
+very likely that I have made some mistakes or left some information out. If you
+find any errors, or have any suggestions, feel free to [[file:../index.org::#contributing][contribute]].
