@@ -358,6 +358,7 @@ Just to emphasize again, since the byte ordering can be confusing in this
 version, the following example shows how the entries are distributed and nibbles
 ordered in the 12-bit FAT.
 
+#+NAME: example2
 #+begin_example
 Entry distribution:
 
@@ -443,7 +444,7 @@ are stored as 16-bit integers with the following layouts:
 TODO: Perhaps turn into a proper diagram with bit numbering, if I am too bored.
 #+end_comment
 
-#+NAME: example2
+#+NAME: example3
 #+begin_example
 Time: hhhhhhmmmmmsssss
       `----´`---´`---´
