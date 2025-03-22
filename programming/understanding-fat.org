@@ -37,13 +37,17 @@ version 1.03 of the "FAT32 File System Specification", which can be found as
 :CUSTOM_ID: chs-and-lba-notations
 :END:
 
-When referring to locations of a disk, I will be using one of the following two
-notations, so I will describe them briefly.
+When referring to locations of a disk, the term /sector/ is commonly used. A
+[[https://en.wikipedia.org/wiki/Disk_sector][sector]] is simply a fixed-size block of contiguous bytes, which is the minimum
+storage unit of a hard drive. There are two common notations used to describe
+the position of a sector in the disk, /Cylinder-Head-Sector/ and /Logical Block
+Addressing/; although only the latter will be used in this article, both of them
+will be briefly explained here.
 
 - Cylinder-Head-Sector (CHS) notation ::
 
-  A group of 3 numbers used to designate the physical location of a block of
-  data in a hard disk. The /cylinder/ or /track/ indicates the radial coordinate
+  A group of 3 numbers in used to designate the physical location of a block of
+  data in a hard disk. The /cylinder/ (or /track/) indicates the radial coordinate
   relative to the center of the platter, the /head/ indicates the platter and side
   where the data is, and the /sector/ indicates the angular coordinate relative to
   the platter. The following figure shows these 3 coordinates in a hard disk.
@@ -52,13 +56,16 @@ notations, so I will describe them briefly.
   #+CAPTION: Cylinder-Head-Sector representation on a hard disk.
   [[file:../img/understanding-fat2.svg]]
 
-  See also the [[https://en.wikipedia.org/wiki/Cylinder-head-sector][Wikipedia page]] for Cylinder-Head-Sector, where that image is
+  Note that the cylinder and head numbers start at 0, but the first sector
+  number in CHS notation is 1, not 0. For more information, see the [[https://en.wikipedia.org/wiki/Cylinder-head-sector][Wikipedia
+  page]] for Cylinder-Head-Sector, where that image was originally extracted
   from.
 
 - Logical Block Addressing (LBA) notation ::
 
-  Single index, starting from 0, used to linearly identify a block of data
-  (usually a [[https://en.wikipedia.org/wiki/Disk_sector][sector]], as described in the CHS notation) in a hard disk.
+  A single index, starting from 0, is used to linearly identify a block of data
+  (usually a single sector) in a hard disk. Therefore, LBA address 0 corresponds
+  to CHS address ~0/0/1~.
 
 #+begin_comment org
 TODO: Perhaps add conversion formulas, although they are easy to find.
@@ -69,13 +76,12 @@ TODO: Perhaps add conversion formulas, although they are easy to find.
 :CUSTOM_ID: boot-sector
 :END:
 
-The first sector of the FAT volume is the /Boot Sector/. It has a CHS address of
-~0/0/1~, which is the same as LBA address 0. The following figure[fn::Some
-diagrams in this article have been exported as PNG because some browsers didn't
-display the text highlighting correctly. The SVG version, which can be edited
-using [[https://app.diagrams.net/][draw.io]], is also available, just change the file extension from =.png= to
-=.svg=.] shows the highlighted hexdump of a FAT12 boot sector, with the different
-parts that will be explained below.
+The first sector of the FAT volume is the /Boot Sector/. The following
+figure[fn::Some diagrams in this article have been exported as PNG because some
+browsers didn't display the text highlighting correctly. The SVG version, which
+can be edited using [[https://app.diagrams.net/][draw.io]], is also available, just change the file extension
+from =.png= to =.svg=.] shows the highlighted hexdump of a FAT12 boot sector,
+showing the different parts that will be explained below.
 
 #+NAME: fig3
 #+CAPTION: Layout of a FAT12 boot sector.
@@ -87,11 +93,9 @@ parts that will be explained below.
 :END:
 
 The first 3 bytes of the sector are a short =jmp= instruction followed by a =nop=
-byte, used if the volume is bootable.
-
-The next 8 bytes are the [[https://en.wikipedia.org/wiki/Original_equipment_manufacturer][OEM]] name, padded with spaces (~0x20~). This is usually
-the name of the tool that was used to build the file system image
-(e.g. =mkfs.fat=).
+byte, used if the volume is bootable. The next 8 bytes are the [[https://en.wikipedia.org/wiki/Original_equipment_manufacturer][OEM]] name, padded
+with spaces (~0x20~). This is usually the name of the tool that was used to build
+the filesystem image (e.g. =mkfs.fat=).
 
 ** Bios Parameter Block (BPB)
 :PROPERTIES:
@@ -118,17 +122,18 @@ of the base BPB, common in all FAT filesystems.
 | ~0x11~       | ~uint32_t~ | Hidden sectors                            |
 | ~0x15~       | ~uint32_t~ | Large total logical sectors               |
 
-FAT filesystems extend this structure with different fields, but the final
+FAT filesystems extend this structure with different fields, and the final
 structure is usually called /Extended BIOS Parameter Block/ (EBPB). Please note
-that the term "BPB" will be used when refering to the base structure from the
-first table, which is shared by all filesystem versions, while the term "EBPB"
-will be used when refering to one of the other two tables and its contents.
+that the term "BPB" will be used when refering to the base structure described
+in the first table, which is shared by all filesystem versions, while the term
+"EBPB" will be used when refering to one of the other two tables and its
+contents.
 
 #+begin_comment org
 TODO: Determining the FAT type.
 #+end_comment
 
-The following table describes the extra fields used in FAT12 and FAT16 volumes.
+The following table describes the extra fields in FAT12 and FAT16 volumes.
 
 #+CAPTION: Layout of the Extended BPB for DOS 4.0, used in FAT12 and FAT16.
 | BPB Offset | Type     | Description                               |
@@ -140,7 +145,7 @@ The following table describes the extra fields used in FAT12 and FAT16 volumes.
 | ~0x20~       | ~char[11]~ | Volume label (padded with spaces)         |
 | ~0x2B~       | ~char[8]~  | File-system type (padded with spaces)     |
 
-And the following table describes the extra fields used in FAT12 volumes.
+And the next table describes the extra fields in FAT12 volumes.
 
 #+CAPTION: Layout of the Extended BPB for DOS 4.0, used in FAT12 and FAT16.
 | BPB Offset | Type     | Description                           |
@@ -160,29 +165,32 @@ And the following table describes the extra fields used in FAT12 volumes.
 | ~0x47~       | ~char[8]~  | File-system type (padded with spaces) |
 
 Note that, in both the FAT12/FAT16 and FAT32 versions, the value of the /Extended
-boot signature/ field should be ~0x29~ to indicate that there are 3 fields left,
-since a value of ~0x28~ indicates that there is only one field left, the /Volume
-serial number/. Originally, byte ~0x28~ was used to indicate that the volume was
-using the DOS 3.4 EBPB, while byte ~0x29~ indicated the EBPB for DOS 4.0 version.
+boot signature/ field should be ~0x29~ to indicate that there are 3 fields left at
+that point; a value of ~0x28~, on the other hand, would indicate that there is
+only one field left, the /Volume serial number/. Originally, byte ~0x28~ was used to
+indicate that the volume was using the DOS 3.4 EBPB, while byte ~0x29~ indicated
+the EBPB for DOS 4.0 version.
 
-** Bootable code and magic value
+** Extra data and magic value
 :PROPERTIES:
-:CUSTOM_ID: bootable-code-and-magic-value
+:CUSTOM_ID: extra-data-and-magic-value
 :END:
 
-The remainder of the sector can be used to store executable instructions, so the
-first [[*Initial bytes][=jmp= instruction]] can jump to them on boot.
+The remainder of the sector (up to offset 509, included) can be used to store
+executable instructions, which are normally the destination of the =jmp=
+instruction mentioned [[*Initial bytes][above]]; or to store any extra data that the system might
+need.
 
-The bytes at offset 510 and 511 should be ~0x55~ and ~0xAA~, respectively, to
-indicate the BIOS that the sector is bootable. Note that this magic value might
-be written as ~0x55AA~ or ~0xAA55~ depending on the machine's [[https://en.wikipedia.org/wiki/Endianness][endianness]], but the
-BIOS will expect byte ~0x55~ first, followed by ~0xAA~, so it's better to write them
-separately to avoid confusion.
+The bytes at offset 510 and 511 should be ~0x55~ and ~0xAA~, respectively, a magic
+value that indicates the BIOS that the sector is bootable. Note that this magic
+value might be written as ~0x55AA~ or ~0xAA55~ depending on the machine's
+[[https://en.wikipedia.org/wiki/Endianness][endianness]], but the BIOS will expect byte ~0x55~ first, followed by ~0xAA~, so it's
+better to write them separately to avoid confusion.
 
 These two bytes are usually the last ones of the first sector, since the /Bytes
 per logical sector/ field of the BPB structure is usually 512, but they don't
 necessarily have to be. The BIOS will check the bytes at offset 510 and 511, not
-the end of the sector.
+at the end of the sector.
 
 * FSInfo sector (FAT32 only)
 :PROPERTIES:
@@ -212,8 +220,7 @@ The next important data structure is the /File Allocation Table/ itself. There m
 be more than one FAT, depending on the fourth field of the BPB, but the first
 FAT is always located right after the reserved sectors (such as the boot
 sector). We can obtain the number of reserved sectors from the third field of
-the BPB, and we can obtain the FAT offset in bytes by multiplying the /Reserved
-logical sectors/ and /Bytes per logical sector/ fields of the BPB.
+the BPB.
 
 ** The purpose of the FAT
 :PROPERTIES:
@@ -221,29 +228,36 @@ logical sectors/ and /Bytes per logical sector/ fields of the BPB.
 :END:
 
 The FAT is an array of numbers that is used to define [[https://en.wikipedia.org/wiki/Linked_list][linked lists]] of the
-clusters that form the contents of a file. This definition might be a bit
-overwhelming, so lets focus on some of these terms first.
+clusters that form the contents of a file. In order to fully understand this
+definition, some concepts need to be explained first.
 
-A /cluster/ is simply a fixed-size group of contiguous sectors. The number of
-sectors that form a cluster can be obtained from the second field of the
-BPB. For example, if each cluster is 4 sectors (according to the second field),
-and each sector is 512 bytes (according to the first field), a cluster would use
-2048 contiguous bytes.
+Just like a sector is a fixed-size block of contiguous bytes, a /cluster/ is
+simply a fixed-size group of contiguous sectors. The number of sectors that form
+a cluster can be obtained from the second field of the BPB. For example, if each
+cluster is 4 sectors (according to the second field), and each sector is 512
+bytes (according to the first field), a cluster would use 2048 contiguous bytes.
+
+#+begin_comment org
+TODO: Perhaps add a figure that illustrates sectors and clusters, by dividing a
+couple of clusters into sectors and bytes.
+#+end_comment
 
 The meaning of the term /file/ can vary depending on the context and the level of
-abstraction, but I will use it to talk about a data structure that contains
-information (i.e. [[https://en.wikipedia.org/wiki/Metadata][metadata]]) about its contents (i.e. an arbitrary amount of
-data/bytes). A file structure, which will take the name =DirectoryEntry= below,
-contains information such as the filename, the size of the data in bytes, and
-the creation and access dates.
+abstraction, but it will be used in this context to refer to a data structure
+that contains information (i.e. [[https://en.wikipedia.org/wiki/Metadata][metadata]]) about some arbitrary amount of data
+(i.e. the actual file contents). A file structure, which will take the name
+=DirectoryEntry= below, contains information such as the filename, the size of the
+data in bytes, and the creation and access dates.
 
 While this file metadata is stored in some place that will be discussed below,
-the actual contents of the file are stored in one or more clusters (not
-necessarily adjacent to each other) in the /data region/ (which is located after
-the root directory, as shown in [[fig1][Figure 1]]). For example, if each cluster is 2KiB
-and we wanted to store an 11KiB file, we would need to somehow build a 6-element
-list that kept track of the sectors that store that file's data (the last one
-won't be full, but still "owned" by this file).
+the actual contents of the file are stored in one or more clusters (which are
+not necessarily adjacent to each other) in the /data region/. The data region is
+located after the root directory, as shown in [[fig1][Figure 1]].
+
+For example, if the cluster size was 2KiB and we wanted to store an 11KiB file,
+we would need to somehow build a 6-element list that kept track of the clusters
+that store that file's data (the last one won't be full, but still "owned" by
+this file).
 
 #+NAME: fig4
 #+CAPTION: File contents stored in 6 non-adjacent clusters.
@@ -260,8 +274,8 @@ any value greater or equal than ~0xFF8~; for FAT16, any value greater or equal
 than ~0xFFF8~; and for FAT32, any value greater or equal than ~0xFFFFFFF8~.].
 
 For example, in order to build the cluster list represented in the previous
-figure, the following pseudo-code could be used, assuming the =fat= variable is an
-array of 16-bit unsigned integers.
+figure, the following pseudo-code could be used. In this case, value of the
+/end-of-chain/ marker assumes that this is a 16-bit FAT.
 
 #+NAME: example1
 #+begin_example
@@ -274,9 +288,9 @@ fat[7] = 0xFFFF; /* Mark end of chain */
 #+end_example
 
 As shown below, this is not entirely accurate, since the first data cluster is
-not mapped to the first element of the FAT. Either way, the FAT is used to keep
-track of the clusters that store the contents of files, by building linked lists
-with their cluster indexes.
+not mapped to the first element of the FAT. Either way, the important note is
+that the FAT is used to keep track of the clusters that store the contents of
+files, by building linked lists with their cluster indexes.
 
 ** The layout of the FAT
 :PROPERTIES:

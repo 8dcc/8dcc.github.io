@@ -211,7 +211,7 @@
 <ul>
 <li><a href="#initial-bytes">3.1. Initial bytes</a></li>
 <li><a href="#bios-parameter-block-bpb">3.2. Bios Parameter Block (BPB)</a></li>
-<li><a href="#bootable-code-and-magic-value">3.3. Bootable code and magic value</a></li>
+<li><a href="#extra-data-and-magic-value">3.3. Extra data and magic value</a></li>
 </ul>
 </li>
 <li><a href="#fsinfo-sector-fat32-only">4. FSInfo sector (FAT32 only)</a></li>
@@ -279,14 +279,18 @@ version 1.03 of the &ldquo;FAT32 File System Specification&rdquo;, which can be 
 <h2 id="chs-and-lba-notations"><span class="section-number-2">2.</span> CHS and LBA notations</h2>
 <div class="outline-text-2" id="text-chs-and-lba-notations">
 <p>
-When referring to locations of a disk, I will be using one of the following two
-notations, so I will describe them briefly.
+When referring to locations of a disk, the term <i>sector</i> is commonly used. A
+<a href="https://en.wikipedia.org/wiki/Disk_sector">sector</a> is simply a fixed-size block of contiguous bytes, which is the minimum
+storage unit of a hard drive. There are two common notations used to describe
+the position of a sector in the disk, <i>Cylinder-Head-Sector</i> and <i>Logical Block
+Addressing</i>; although only the latter will be used in this article, both of them
+will be briefly explained here.
 </p>
 
 <dl class="org-dl">
 <dt>Cylinder-Head-Sector (CHS) notation</dt><dd><p>
-A group of 3 numbers used to designate the physical location of a block of
-data in a hard disk. The <i>cylinder</i> or <i>track</i> indicates the radial coordinate
+A group of 3 numbers in used to designate the physical location of a block of
+data in a hard disk. The <i>cylinder</i> (or <i>track</i>) indicates the radial coordinate
 relative to the center of the platter, the <i>head</i> indicates the platter and side
 where the data is, and the <i>sector</i> indicates the angular coordinate relative to
 the platter. The following figure shows these 3 coordinates in a hard disk.
@@ -300,12 +304,15 @@ the platter. The following figure shows these 3 coordinates in a hard disk.
 </div>
 
 <p>
-See also the <a href="https://en.wikipedia.org/wiki/Cylinder-head-sector">Wikipedia page</a> for Cylinder-Head-Sector, where that image is
+Note that the cylinder and head numbers start at 0, but the first sector
+number in CHS notation is 1, not 0. For more information, see the <a href="https://en.wikipedia.org/wiki/Cylinder-head-sector">Wikipedia
+page</a> for Cylinder-Head-Sector, where that image was originally extracted
 from.
 </p></dd>
 
-<dt>Logical Block Addressing (LBA) notation</dt><dd>Single index, starting from 0, used to linearly identify a block of data
-(usually a <a href="https://en.wikipedia.org/wiki/Disk_sector">sector</a>, as described in the CHS notation) in a hard disk.</dd>
+<dt>Logical Block Addressing (LBA) notation</dt><dd>A single index, starting from 0, is used to linearly identify a block of data
+(usually a single sector) in a hard disk. Therefore, LBA address 0 corresponds
+to CHS address <code>0/0/1</code>.</dd>
 </dl>
 </div>
 </div>
@@ -314,9 +321,9 @@ from.
 <h2 id="boot-sector"><span class="section-number-2">3.</span> Boot sector</h2>
 <div class="outline-text-2" id="text-boot-sector">
 <p>
-The first sector of the FAT volume is the <i>Boot Sector</i>. It has a CHS address of
-<code>0/0/1</code>, which is the same as LBA address 0. The following figure<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup> shows the highlighted hexdump of a FAT12 boot sector, with the different
-parts that will be explained below.
+The first sector of the FAT volume is the <i>Boot Sector</i>. The following
+figure<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup> shows the highlighted hexdump of a FAT12 boot sector,
+showing the different parts that will be explained below.
 </p>
 
 
@@ -332,13 +339,9 @@ parts that will be explained below.
 <div class="outline-text-3" id="text-initial-bytes">
 <p>
 The first 3 bytes of the sector are a short <code>jmp</code> instruction followed by a <code>nop</code>
-byte, used if the volume is bootable.
-</p>
-
-<p>
-The next 8 bytes are the <a href="https://en.wikipedia.org/wiki/Original_equipment_manufacturer">OEM</a> name, padded with spaces (<code>0x20</code>). This is usually
-the name of the tool that was used to build the file system image
-(e.g. <code>mkfs.fat</code>).
+byte, used if the volume is bootable. The next 8 bytes are the <a href="https://en.wikipedia.org/wiki/Original_equipment_manufacturer">OEM</a> name, padded
+with spaces (<code>0x20</code>). This is usually the name of the tool that was used to build
+the filesystem image (e.g. <code>mkfs.fat</code>).
 </p>
 </div>
 </div>
@@ -445,15 +448,16 @@ of the base BPB, common in all FAT filesystems.
 </table>
 
 <p>
-FAT filesystems extend this structure with different fields, but the final
+FAT filesystems extend this structure with different fields, and the final
 structure is usually called <i>Extended BIOS Parameter Block</i> (EBPB). Please note
-that the term &ldquo;BPB&rdquo; will be used when refering to the base structure from the
-first table, which is shared by all filesystem versions, while the term &ldquo;EBPB&rdquo;
-will be used when refering to one of the other two tables and its contents.
+that the term &ldquo;BPB&rdquo; will be used when refering to the base structure described
+in the first table, which is shared by all filesystem versions, while the term
+&ldquo;EBPB&rdquo; will be used when refering to one of the other two tables and its
+contents.
 </p>
 
 <p>
-The following table describes the extra fields used in FAT12 and FAT16 volumes.
+The following table describes the extra fields in FAT12 and FAT16 volumes.
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -513,7 +517,7 @@ The following table describes the extra fields used in FAT12 and FAT16 volumes.
 </table>
 
 <p>
-And the following table describes the extra fields used in FAT12 volumes.
+And the next table describes the extra fields in FAT12 volumes.
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -616,35 +620,38 @@ And the following table describes the extra fields used in FAT12 volumes.
 
 <p>
 Note that, in both the FAT12/FAT16 and FAT32 versions, the value of the <i>Extended
-boot signature</i> field should be <code>0x29</code> to indicate that there are 3 fields left,
-since a value of <code>0x28</code> indicates that there is only one field left, the <i>Volume
-serial number</i>. Originally, byte <code>0x28</code> was used to indicate that the volume was
-using the DOS 3.4 EBPB, while byte <code>0x29</code> indicated the EBPB for DOS 4.0 version.
+boot signature</i> field should be <code>0x29</code> to indicate that there are 3 fields left at
+that point; a value of <code>0x28</code>, on the other hand, would indicate that there is
+only one field left, the <i>Volume serial number</i>. Originally, byte <code>0x28</code> was used to
+indicate that the volume was using the DOS 3.4 EBPB, while byte <code>0x29</code> indicated
+the EBPB for DOS 4.0 version.
 </p>
 </div>
 </div>
 
-<div id="outline-container-bootable-code-and-magic-value" class="outline-3">
-<h3 id="bootable-code-and-magic-value"><span class="section-number-3">3.3.</span> Bootable code and magic value</h3>
-<div class="outline-text-3" id="text-bootable-code-and-magic-value">
+<div id="outline-container-extra-data-and-magic-value" class="outline-3">
+<h3 id="extra-data-and-magic-value"><span class="section-number-3">3.3.</span> Extra data and magic value</h3>
+<div class="outline-text-3" id="text-extra-data-and-magic-value">
 <p>
-The remainder of the sector can be used to store executable instructions, so the
-first <a href="#initial-bytes"><code>jmp</code> instruction</a> can jump to them on boot.
+The remainder of the sector (up to offset 509, included) can be used to store
+executable instructions, which are normally the destination of the <code>jmp</code>
+instruction mentioned <a href="#initial-bytes">above</a>; or to store any extra data that the system might
+need.
 </p>
 
 <p>
-The bytes at offset 510 and 511 should be <code>0x55</code> and <code>0xAA</code>, respectively, to
-indicate the BIOS that the sector is bootable. Note that this magic value might
-be written as <code>0x55AA</code> or <code>0xAA55</code> depending on the machine&rsquo;s <a href="https://en.wikipedia.org/wiki/Endianness">endianness</a>, but the
-BIOS will expect byte <code>0x55</code> first, followed by <code>0xAA</code>, so it&rsquo;s better to write them
-separately to avoid confusion.
+The bytes at offset 510 and 511 should be <code>0x55</code> and <code>0xAA</code>, respectively, a magic
+value that indicates the BIOS that the sector is bootable. Note that this magic
+value might be written as <code>0x55AA</code> or <code>0xAA55</code> depending on the machine&rsquo;s
+<a href="https://en.wikipedia.org/wiki/Endianness">endianness</a>, but the BIOS will expect byte <code>0x55</code> first, followed by <code>0xAA</code>, so it&rsquo;s
+better to write them separately to avoid confusion.
 </p>
 
 <p>
 These two bytes are usually the last ones of the first sector, since the <i>Bytes
 per logical sector</i> field of the BPB structure is usually 512, but they don&rsquo;t
 necessarily have to be. The BIOS will check the bytes at offset 510 and 511, not
-the end of the sector.
+at the end of the sector.
 </p>
 </div>
 </div>
@@ -683,8 +690,7 @@ The next important data structure is the <i>File Allocation Table</i> itself. Th
 be more than one FAT, depending on the fourth field of the BPB, but the first
 FAT is always located right after the reserved sectors (such as the boot
 sector). We can obtain the number of reserved sectors from the third field of
-the BPB, and we can obtain the FAT offset in bytes by multiplying the <i>Reserved
-logical sectors</i> and <i>Bytes per logical sector</i> fields of the BPB.
+the BPB.
 </p>
 </div>
 
@@ -693,35 +699,39 @@ logical sectors</i> and <i>Bytes per logical sector</i> fields of the BPB.
 <div class="outline-text-3" id="text-the-purpose-of-the-fat">
 <p>
 The FAT is an array of numbers that is used to define <a href="https://en.wikipedia.org/wiki/Linked_list">linked lists</a> of the
-clusters that form the contents of a file. This definition might be a bit
-overwhelming, so lets focus on some of these terms first.
+clusters that form the contents of a file. In order to fully understand this
+definition, some concepts need to be explained first.
 </p>
 
 <p>
-A <i>cluster</i> is simply a fixed-size group of contiguous sectors. The number of
-sectors that form a cluster can be obtained from the second field of the
-BPB. For example, if each cluster is 4 sectors (according to the second field),
-and each sector is 512 bytes (according to the first field), a cluster would use
-2048 contiguous bytes.
+Just like a sector is a fixed-size block of contiguous bytes, a <i>cluster</i> is
+simply a fixed-size group of contiguous sectors. The number of sectors that form
+a cluster can be obtained from the second field of the BPB. For example, if each
+cluster is 4 sectors (according to the second field), and each sector is 512
+bytes (according to the first field), a cluster would use 2048 contiguous bytes.
 </p>
 
 <p>
 The meaning of the term <i>file</i> can vary depending on the context and the level of
-abstraction, but I will use it to talk about a data structure that contains
-information (i.e. <a href="https://en.wikipedia.org/wiki/Metadata">metadata</a>) about its contents (i.e. an arbitrary amount of
-data/bytes). A file structure, which will take the name <code>DirectoryEntry</code> below,
-contains information such as the filename, the size of the data in bytes, and
-the creation and access dates.
+abstraction, but it will be used in this context to refer to a data structure
+that contains information (i.e. <a href="https://en.wikipedia.org/wiki/Metadata">metadata</a>) about some arbitrary amount of data
+(i.e. the actual file contents). A file structure, which will take the name
+<code>DirectoryEntry</code> below, contains information such as the filename, the size of the
+data in bytes, and the creation and access dates.
 </p>
 
 <p>
 While this file metadata is stored in some place that will be discussed below,
-the actual contents of the file are stored in one or more clusters (not
-necessarily adjacent to each other) in the <i>data region</i> (which is located after
-the root directory, as shown in <a href="#fig1">Figure 1</a>). For example, if each cluster is 2KiB
-and we wanted to store an 11KiB file, we would need to somehow build a 6-element
-list that kept track of the sectors that store that file&rsquo;s data (the last one
-won&rsquo;t be full, but still &ldquo;owned&rdquo; by this file).
+the actual contents of the file are stored in one or more clusters (which are
+not necessarily adjacent to each other) in the <i>data region</i>. The data region is
+located after the root directory, as shown in <a href="#fig1">Figure 1</a>.
+</p>
+
+<p>
+For example, if the cluster size was 2KiB and we wanted to store an 11KiB file,
+we would need to somehow build a 6-element list that kept track of the clusters
+that store that file&rsquo;s data (the last one won&rsquo;t be full, but still &ldquo;owned&rdquo; by
+this file).
 </p>
 
 
@@ -743,8 +753,8 @@ indicate the end of the linked list<sup><a id="fnr.2" class="footref" href="#fn.
 
 <p>
 For example, in order to build the cluster list represented in the previous
-figure, the following pseudo-code could be used, assuming the <code>fat</code> variable is an
-array of 16-bit unsigned integers.
+figure, the following pseudo-code could be used. In this case, value of the
+<i>end-of-chain</i> marker assumes that this is a 16-bit FAT.
 </p>
 
 <pre class="example" id="example1">
@@ -758,9 +768,9 @@ fat[7] = 0xFFFF; /* Mark end of chain */
 
 <p>
 As shown below, this is not entirely accurate, since the first data cluster is
-not mapped to the first element of the FAT. Either way, the FAT is used to keep
-track of the clusters that store the contents of files, by building linked lists
-with their cluster indexes.
+not mapped to the first element of the FAT. Either way, the important note is
+that the FAT is used to keep track of the clusters that store the contents of
+files, by building linked lists with their cluster indexes.
 </p>
 </div>
 </div>
@@ -1088,11 +1098,11 @@ number of bytes per sector, and rounding up:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_bytes</span> =
-    bpb-&gt;root_dir_entry_count * <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">DirectoryEntry</span>);
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_bytes</span> =
+    bpb-&gt;root_dir_entry_count * <span style="color: #972500;">sizeof</span>(<span style="color: #972500;">struct</span> <span style="color: #0031a9;">DirectoryEntry</span>);
 
-<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_sectors</span> = root_dir_bytes / bpb-&gt;bytes_per_sector;
-<span style="color: #ff6f9f;">if</span> (root_dir_bytes % bpb-&gt;bytes_per_sector != <span style="color: #88ca9f;">0</span>)
+<span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_sectors</span> = root_dir_bytes / bpb-&gt;bytes_per_sector;
+<span style="color: #972500;">if</span> (root_dir_bytes % bpb-&gt;bytes_per_sector != <span style="color: #2a5045;">0</span>)
     root_dir_sectors++;
 </pre>
 </div>
@@ -1104,11 +1114,11 @@ integer division:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_bytes</span> =
-    bpb-&gt;root_dir_entry_count * <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">DirectoryEntry</span>);
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_bytes</span> =
+    bpb-&gt;root_dir_entry_count * <span style="color: #972500;">sizeof</span>(<span style="color: #972500;">struct</span> <span style="color: #0031a9;">DirectoryEntry</span>);
 
-<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_sectors</span> =
-  (root_dir_bytes + (bpb-&gt;bytes_per_sector - <span style="color: #88ca9f;">1</span>)) /
+<span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_sectors</span> =
+  (root_dir_bytes + (bpb-&gt;bytes_per_sector - <span style="color: #2a5045;">1</span>)) /
     bpb-&gt;bytes_per_sector;
 </pre>
 </div>
@@ -1189,11 +1199,10 @@ in the FAT filesystem are little-endian.
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Some
-diagrams in this article have been exported as PNG because some browsers didn&rsquo;t
-display the text highlighting correctly. The SVG version, which can be edited
-using <a href="https://app.diagrams.net/">draw.io</a>, is also available, just change the file extension from <code>.png</code> to
-<code>.svg</code>.</p></div></div>
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Some diagrams in this article have been exported as PNG because some
+browsers didn&rsquo;t display the text highlighting correctly. The SVG version, which
+can be edited using <a href="https://app.diagrams.net/">draw.io</a>, is also available, just change the file extension
+from <code>.png</code> to <code>.svg</code>.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">For FAT12, this <i>end-of-chain</i> marker is
 any value greater or equal than <code>0xFF8</code>; for FAT16, any value greater or equal
