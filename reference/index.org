@@ -18,6 +18,7 @@ blog, but I still decided to make them public in case they are useful for
 anyone.
 
 - [[file:c-notes.org][C/C++ notes]]
+- [[file:gpg.org][GNU Privacy Guard (GPG) reference]]
 - [[file:guix-connman.org][Connecting to a Wi-Fi network from Guix using ConnMan]]
 - [[file:ansi-escape-sequences.org][ANSI Escape Sequences]]
 
