@@ -1,0 +1,172 @@
+#+TITLE: GNU Privacy Guard (GPG) reference
+#+AUTHOR: 8dcc
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
+
+* Creating new keys
+:PROPERTIES:
+:CUSTOM_ID: creating-new-keys
+:END:
+
+The following command can be used to create a new key interactively. See [[https://www.linuxbabe.com/security/a-practical-guide-to-gpg-part-1-generate-your-keypair][this
+article]] for more information.
+
+#+begin_src bash
+gpg --full-generate-key
+# ...
+#
+# Please select what kind of key you want:
+#    (1) RSA and RSA
+#    (2) DSA and Elgamal
+#    (3) DSA (sign only)
+#    (4) RSA (sign only)
+#    (9) ECC (sign and encrypt) *default*
+#   (10) ECC (sign only)
+#   (14) Existing key from card
+# Your selection? 1
+# RSA keys may be between 1024 and 4096 bits long.
+# What keysize do you want? (3072) 4096
+# Requested keysize is 4096 bits
+# Please specify how long the key should be valid.
+#          0 = key does not expire
+#       <n>  = key expires in n days
+#       <n>w = key expires in n weeks
+#       <n>m = key expires in n months
+#       <n>y = key expires in n years
+# Key is valid for? (0) 0
+# Key does not expire at all
+# Is this correct? (y/N) y
+#
+# ...
+#+end_src
+
+* Listing keys
+:PROPERTIES:
+:CUSTOM_ID: listing-keys
+:END:
+
+The following command can be used to list the private keys on your machine.
+
+#+begin_src bash
+gpg --list-secret-keys
+#+end_src
+
+By adding the following option, the command will use the key format expected by
+Git (the =XXX= part will be needed in [[#git-integration-with-gpg][Git integration]]).
+
+#+begin_src bash
+gpg --list-secret-keys --keyid-format=long
+
+# [keyboxd]
+# ---------
+# sec   ed25519/XXXXXXXXXXXXXXXX 2024-03-29 [SC] [expires: 2027-03-29]
+#       YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+# uid                 [ultimate] Foo Bar <foo.bar@example.com>
+# ssb   cv25519/ZZZZZZZZZZZZZZZZ 2024-03-29 [E]
+#+end_src
+
+* Exporting keys
+:PROPERTIES:
+:CUSTOM_ID: exporting-keys
+:END:
+
+See this [[https://unix.stackexchange.com/a/482559/526380][StackOverflow answer]] for more information on these commands.
+
+The following command will export an ASCII-armored version of the /public/ key.
+
+#+begin_src bash
+gpg --output public.pgp \
+    --armor             \
+    --export            \
+    'foo.bar@example.com'
+#+end_src
+
+The following command will export an ASCII-armored version of the /secret/
+(i.e. private) key.
+
+#+begin_src bash
+gpg --output private.pgp \
+    --armor              \
+    --export-secret-key  \
+    'foo.bar@example.com'
+#+end_src
+
+If it's a backup, the following should be used.
+
+#+begin_src bash
+gpg --output backup.pgp            \
+    --armor                        \
+    --export-secret-keys           \
+    --export-options export-backup \
+    'foo.bar@example.com'
+#+end_src
+
+* Importing keys
+:PROPERTIES:
+:CUSTOM_ID: importing-keys
+:END:
+
+A previously-exported key can be imported with the following command.
+
+#+begin_comment org
+TODO: Is this supposed to be the private, or backup file from the previous step?
+Use correct filename and mention it in paragraph.
+#+end_comment
+
+#+begin_src bash
+gpg --import private.gpg
+#+end_src
+
+The following should be better, but it failed for me on Gentoo, while the
+previous worked fine.
+
+#+begin_src bash
+gpg --import-options restore \
+    --import                 \
+    backup.pgp
+#+end_src
+
+* Changing the trust level of keys
+:PROPERTIES:
+:CUSTOM_ID: changing-the-trust-level-of-keys
+:END:
+
+The trust level of a key is displayed between square brackets when [[#listing-keys][listing
+them]]. This trust level can be changed with the following command.
+
+#+begin_src bash
+$ gpg --edit-key 'foo.bar@example.com'
+# ...
+gpg> trust
+# Please decide how far you trust this user to correctly verify other users' keys
+# (by looking at passports, checking fingerprints from different sources, etc.)
+#
+#   1 = I don't know or won't say
+#   2 = I do NOT trust
+#   3 = I trust marginally
+#   4 = I trust fully
+#   5 = I trust ultimately
+#   m = back to the main menu
+#
+# Your decision?
+gpg> 5
+#+end_src
+
+* Git integration with GPG
+:PROPERTIES:
+:CUSTOM_ID: git-integration-with-gpg
+:END:
+
+The following shows how to add a PGP key to Git, and how to enable commit
+signing by default. Note that this command enables this settings globally, but
+they can also be set in the current repository by removing the =--global= flag.
+
+The =XXX= part is supposed to be the key shown in [[#listing-keys][Listing]].
+
+#+begin_src bash
+git config --global user.signingkey "XXXXXXXXXXXXXXXX"
+git config --global commit.gpgsign true
+#+end_src
