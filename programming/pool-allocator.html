@@ -241,12 +241,12 @@ that this article was discussed in <a href="https://news.ycombinator.com/item?id
 
 <p>
 Similarly to <code>malloc</code>, a pool allocator allows the user to allocate memory at run
-time. The pool allocator, however, is much faster than <code>malloc</code><sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>, at the cost of having a <i>fixed pool
-size</i>. It allows the user to allocate and free memory blocks (referred to as
-<i>chunks</i>, from now on) in <i>O(1)</i> constant time. This implementation also uses very
-little memory: when creating the pool, a very small <code>Pool</code> structure is allocated,
-along with the pool itself. Free chunks are used to store information, so the
-memory impact is minimal.
+time. The pool allocator, however, is much faster than <code>malloc</code><sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>, at the cost of having a <i>fixed pool size</i>. It allows
+the user to allocate and free memory blocks (referred to as <i>chunks</i>, from now on)
+in <i>O(1)</i> constant time. This implementation also uses very little memory: when
+creating the pool, a very small <code>Pool</code> structure is allocated, along with the pool
+itself. Free chunks are used to store information, so the memory impact is
+minimal.
 </p>
 
 <p>
@@ -1020,8 +1020,9 @@ improvements.
 on many factors: the <code>malloc</code> implementation, the hardware, the CPU load,
 etc. Using the <code>benchmark.sh</code> script from commit <a href="https://github.com/8dcc/libpool/commit/9b101a79c0fed23207b97b47e0b8f4ca11f3ce3c"><code>9b101a7</code></a> of my <code>libpool</code> repo
 showed that <code>malloc</code> took ~2.25 seconds to allocate 1 million blocks of 10
-kilobytes each, while <code>libpool</code> took ~0.75 seconds (3 times faster). Credits to
-<i>kragen</i> for his <a href="https://news.ycombinator.com/item?id=42605848#42644333">informative replies in HN</a>.</p></div></div>
+kilobytes each, while <code>libpool</code> took ~0.75 seconds (3 times faster). See also the
+<a href="https://github.com/8dcc/libpool/tree/87db7e1#benchmarking-against-malloc">README</a> of the repository for the benchmark graphs. Credits to <i>kragen</i> for his
+<a href="https://news.ycombinator.com/item?id=42605848#42644333">informative replies in HN</a>.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">We
 could allocate the <code>Pool</code> and the chunk array with a single call, but I think
