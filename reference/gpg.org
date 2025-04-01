@@ -109,15 +109,10 @@ gpg --output backup.pgp            \
 :CUSTOM_ID: importing-keys
 :END:
 
-A previously-exported key can be imported with the following command.
-
-#+begin_comment org
-TODO: Is this supposed to be the private, or backup file from the previous step?
-Use correct filename and mention it in paragraph.
-#+end_comment
+A previously-exported backup key can be imported with the following command.
 
 #+begin_src bash
-gpg --import private.gpg
+gpg --import backup.gpg
 #+end_src
 
 The following should be better, but it failed for me on Gentoo, while the
