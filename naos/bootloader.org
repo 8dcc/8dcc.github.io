@@ -76,6 +76,40 @@ TODO
 
 TODO
 
+** Enabling the A20 line
+:PROPERTIES:
+:CUSTOM_ID: enabling-the-a20-line
+:END:
+
+In order to understand what the [[https://en.wikipedia.org/wiki/A20_line][A20 line]] is, and how it can be enabled, it's
+important to understand how [[https://en.wikipedia.org/wiki/X86_memory_segmentation][segmentation]] works in 16-bit [[https://en.wikipedia.org/wiki/Real_mode][real mode]]. The Intel
+8086 processor had 20 address lines, numbered A0 to A19; with these, the
+processor could access 2^20 bytes, or 1 MB. Internal address registers of this
+processor were 16 bits wide. To access a 20-bit address space, an external
+memory reference was made up of a 16-bit offset address added to a 16-bit
+segment number[fn::For more information on 16-bit segmentation, see [[https://courses.cs.umbc.edu/undergraduate/CMSC211/fall01/burt/lectures/Chap12/segmentsOffsets.html][this article]]
+by [[https://userpages.cs.umbc.edu/burt/][Gary Burt]].], shifted 4 bits to the left so as to produce a 20-bit physical
+address.
+
+The following code shows how the real address would be calculated from a segment
+and an offset.
+
+#+begin_src nasm
+; Set data segment (DS) through intermediate register (AX).
+mov     ax, 0x13A5
+mov     ds, ax
+
+; Write offset to the source index (SI), since not all registers can
+; be used for addressing.
+mov     si, 0x3327
+
+;   13A5   (Segment: DS)
+; +  3327  (Offset: SI)
+; -------
+;   16D77  (Address)
+mov     ax, [ds:si]
+#+end_src
+
 * COMMENT Building the disk image
 :PROPERTIES:
 :CUSTOM_ID: comment-building-the-disk-image
