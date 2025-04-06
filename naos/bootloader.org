@@ -7,6 +7,23 @@
 #+HTML_LINK_HOME: ../index.html
 
 * Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+The [[https://en.wikipedia.org/wiki/Bootloader][bootloader]] is a computer program responsible for booting the operating
+system. The main responsibilities of the bootloader are:
+
+1. Obtain information about the system. This information usually needs to be
+   provided to the kernel somehow.
+2. Switch to the specific environment that is expected by the kernel. This
+   normally includes switching to [[https://en.wikipedia.org/wiki/Protected_mode][Protected Mode]] (i.e. 32-bit mode) and enabling
+   the [[https://en.wikipedia.org/wiki/A20_line][A20 line]].
+3. Load the kernel into memory, and jump to it.
+
+#+begin_comment org
+TODO: Link =kernel.org= file above after it's added.
+#+end_comment
 
 This project uses a tiny bootloader written from scratch, that aims to be
 compliant with the [[https://www.gnu.org/software/grub/manual/multiboot/html_node/Specification.html#Specification][Multiboot 1 protocol]]. This way, since the kernel is also
@@ -18,6 +35,9 @@ mainly needed because of size restrictions of the Stage 1 binary, as explained
 below.
 
 * Startup and BIOS
+:PROPERTIES:
+:CUSTOM_ID: startup-and-bios
+:END:
 
 When the machine is turned on, the CPU immediately starts execution at the [[https://en.wikipedia.org/wiki/BIOS][BIOS
 program]], which usually stored in some [[https://en.wikipedia.org/wiki/Read-only_memory][Read-Only Memory]] (ROM). This program
@@ -33,21 +53,32 @@ and halt.
 Once the BIOS has found a valid bootable device[fn::Actually, the BIOS starts by
 loading the first 512 bytes, and then checks for the boot signature.], it will
 load its first 512 bytes into the physical address ~0x7C00~, and jump there,
-executing the instructions it just loaded.
+executing the instructions it just loaded. In our case, the first 510 bytes of
+the device can be used for the Stage 1 bootloader, which will then load the
+Stage 2 binary.
 
 #+begin_comment org
 TODO: Mention that some BIOSes load the sector at =0000:7C00= but some at
 =07c0:0000=.
 #+end_comment
 
-* COMMENT Stage 1
+* Stage 1
+:PROPERTIES:
+:CUSTOM_ID: stage-1
+:END:
 
 TODO
 
 * COMMENT Stage 2
+:PROPERTIES:
+:CUSTOM_ID: stage-2
+:END:
 
 TODO
 
 * COMMENT Building the disk image
+:PROPERTIES:
+:CUSTOM_ID: comment-building-the-disk-image
+:END:
 
 TODO

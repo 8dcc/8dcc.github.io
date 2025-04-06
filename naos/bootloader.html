@@ -205,15 +205,30 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org10a9e15">1. Introduction</a></li>
-<li><a href="#orga92ce32">2. Startup and BIOS</a></li>
+<li><a href="#introduction">1. Introduction</a></li>
+<li><a href="#startup-and-bios">2. Startup and BIOS</a></li>
+<li><a href="#stage-1">3. Stage 1</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org10a9e15" class="outline-2">
-<h2 id="org10a9e15"><span class="section-number-2">1.</span> Introduction</h2>
-<div class="outline-text-2" id="text-1">
+<div id="outline-container-introduction" class="outline-2">
+<h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-introduction">
+<p>
+The <a href="https://en.wikipedia.org/wiki/Bootloader">bootloader</a> is a computer program responsible for booting the operating
+system. The main responsibilities of the bootloader are:
+</p>
+
+<ol class="org-ol">
+<li>Obtain information about the system. This information usually needs to be
+provided to the kernel somehow.</li>
+<li>Switch to the specific environment that is expected by the kernel. This
+normally includes switching to <a href="https://en.wikipedia.org/wiki/Protected_mode">Protected Mode</a> (i.e. 32-bit mode) and enabling
+the <a href="https://en.wikipedia.org/wiki/A20_line">A20 line</a>.</li>
+<li>Load the kernel into memory, and jump to it.</li>
+</ol>
+
 <p>
 This project uses a tiny bootloader written from scratch, that aims to be
 compliant with the <a href="https://www.gnu.org/software/grub/manual/multiboot/html_node/Specification.html#Specification">Multiboot 1 protocol</a>. This way, since the kernel is also
@@ -229,9 +244,9 @@ below.
 </div>
 </div>
 
-<div id="outline-container-orga92ce32" class="outline-2">
-<h2 id="orga92ce32"><span class="section-number-2">2.</span> Startup and BIOS</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-startup-and-bios" class="outline-2">
+<h2 id="startup-and-bios"><span class="section-number-2">2.</span> Startup and BIOS</h2>
+<div class="outline-text-2" id="text-startup-and-bios">
 <p>
 When the machine is turned on, the CPU immediately starts execution at the <a href="https://en.wikipedia.org/wiki/BIOS">BIOS
 program</a>, which usually stored in some <a href="https://en.wikipedia.org/wiki/Read-only_memory">Read-Only Memory</a> (ROM). This program
@@ -250,7 +265,18 @@ and halt.
 <p>
 Once the BIOS has found a valid bootable device<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>, it will
 load its first 512 bytes into the physical address <code>0x7C00</code>, and jump there,
-executing the instructions it just loaded.
+executing the instructions it just loaded. In our case, the first 510 bytes of
+the device can be used for the Stage 1 bootloader, which will then load the
+Stage 2 binary.
+</p>
+</div>
+</div>
+
+<div id="outline-container-stage-1" class="outline-2">
+<h2 id="stage-1"><span class="section-number-2">3.</span> Stage 1</h2>
+<div class="outline-text-2" id="text-stage-1">
+<p>
+TODO
 </p>
 </div>
 </div>
