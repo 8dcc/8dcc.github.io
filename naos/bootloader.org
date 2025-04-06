@@ -1,0 +1,53 @@
+#+TITLE: Bootloader
+#+AUTHOR: 8dcc
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
+
+* Introduction
+
+This project uses a tiny bootloader written from scratch, that aims to be
+compliant with the [[https://www.gnu.org/software/grub/manual/multiboot/html_node/Specification.html#Specification][Multiboot 1 protocol]]. This way, since the kernel is also
+compliant with this protocol, the kernel and the bootloader should work with any
+other component that follows the Multiboot 1 standard.
+
+The bootloader is divided into two stages, Stage 1 and Stage 2. This division is
+mainly needed because of size restrictions of the Stage 1 binary, as explained
+below.
+
+* Startup and BIOS
+
+When the machine is turned on, the CPU immediately starts execution at the [[https://en.wikipedia.org/wiki/BIOS][BIOS
+program]], which usually stored in some [[https://en.wikipedia.org/wiki/Read-only_memory][Read-Only Memory]] (ROM). This program
+performs basic hardware initialization, before transferring control to a
+bootable device.
+
+To find a valid bootable device, the BIOS looks for bytes ~0x55~ and ~0xAA~ in
+offsets 510 and 511 of each possible device. The order in which the BIOS
+searches for bootable devices (called the /boot sequence/) is stored in the
+[[https://en.wikipedia.org/wiki/Nonvolatile_BIOS_memory][CMOS]]. If the BIOS doesn't find a valid bootable device, it will show an error
+and halt.
+
+Once the BIOS has found a valid bootable device[fn::Actually, the BIOS starts by
+loading the first 512 bytes, and then checks for the boot signature.], it will
+load its first 512 bytes into the physical address ~0x7C00~, and jump there,
+executing the instructions it just loaded.
+
+#+begin_comment org
+TODO: Mention that some BIOSes load the sector at =0000:7C00= but some at
+=07c0:0000=.
+#+end_comment
+
+* COMMENT Stage 1
+
+TODO
+
+* COMMENT Stage 2
+
+TODO
+
+* COMMENT Building the disk image
+
+TODO
