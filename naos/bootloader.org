@@ -6,6 +6,11 @@
 #+HTML_LINK_UP: index.html
 #+HTML_LINK_HOME: ../index.html
 
+#+MACRO: isdm-page    Intel SDM, Vol. $1, p. $2
+#+MACRO: isdm-chapter Intel SDM, Vol. $1, ch. $2
+#+MACRO: isdm-figure  Intel SDM, Vol. $1, fig. $2
+#+MACRO: isdm-table   Intel SDM, Vol. $1, tab. $2
+
 * Introduction
 :PROPERTIES:
 :CUSTOM_ID: introduction
@@ -67,7 +72,155 @@ TODO: Mention that some BIOSes load the sector at =0000:7C00= but some at
 :CUSTOM_ID: stage-1
 :END:
 
-TODO
+As explained above, the BIOS only loads the first 512 bytes of the bootable
+device, so there isn't a lot of space for the bootloader to do everything that
+it needs to do. For this reason, the bootloader is divided in two stages; the
+main purpose of Stage 1 is to load the Stage 2 binary, usually located in the
+same device where the Stage 1 is, and jump to it.
+
+The Stage 2 binary is usually stored in the device using some standard file
+system, like [[https://en.wikipedia.org/wiki/File_Allocation_Table][FAT32]] or [[https://en.wikipedia.org/wiki/Ext4][ext4]], so the Stage 1 code should be able to at least
+locate the file, and read the sectors where the file contents are
+stored. Furthermore, since the Stage 1 code must be stored in the first 512
+bytes, and many file systems also use this region for storing data structures,
+the actual space left for the code (including things like strings for error
+messages) could be closer to 450 bytes.
+
+In the NAOS bootloader, the Stage 2 binary is stored in the root directory of a
+FAT12 file system as =stage2.bin=[fn::Since FAT12 uses the [[https://en.wikipedia.org/wiki/8.3_filename][8.3 filename]]
+convention, the actual stored name, the one that the Stage 1 should look for, is
+=STAGE2 BIN=.]. The data structure used for storing the volume information on FAT
+file systems is called the /Extended BIOS Parameter Block/ (EBPB), and its size
+and elements change depending on the FAT version. For FAT12 and FAT16, this
+structure is the [[https://en.wikipedia.org/wiki/DOS_4.0_EBPB][DOS 4.0 EBPB]], which is 51 bytes wide and should be placed at
+offset ~0xB~ of the disk.
+
+The first 2 bytes of the disk are a short jump to the actual entry point of the
+bootloader, right after the EBPB.
+
+** Register initialization
+:PROPERTIES:
+:CUSTOM_ID: register-initialization
+:END:
+
+The very first thing that the bootloader does is setting up the Data Segment
+(=DS=), Extra Segment (=ES=) and Stack Segment (=SS=) registers to ~0x0000~. Since we
+can't =MOV= immediate values, we need to first clear =AX=, and then use that to set
+these segment registers.
+
+Next, the Stack Pointer (=SP=) is set to ~0x7C00~, the physical address where the
+BIOS loaded us; since the stack grows downwards, we will use the memory region
+adjacent to us for the stack[fn::Keep in mind that the free memory region before
+the Stage 1 binary usually goes from physical address ~0x0500~ to ~0x7BFF~, and
+going below that ~0x0500~ address would overwrite the BIOS Data Area (BDA). See
+the [[https://wiki.osdev.org/Memory_Map_(x86)][OSDev wiki]] for more information.]. At first glance, this address might seem
+incorrect, since the first =PUSH= would overwrite the first 2 bytes of our Stage 1
+binary; this is incorrect, because the =PUSH= instruction decreases the Stack
+Pointer /before/ writing the pushed value to the address at =SS:SP= (see
+{{{isdm-page(1, 1235)}}}).
+
+Next, a far jump is performed to ensure that the Code Segment (=CS=) and
+Instruction Pointer (=IP=) are set to ~0000:7C00~[fn::This address is meant to
+illustrate the difference between the two main possible values set by the BIOS,
+but the bootloader jumps to the adjacent instruction, which would be at an
+offset like ~0x7C46~.], rather than ~07C0:0000~, which is used by some BIOSes.
+
+** Reading disk information with the BIOS
+:PROPERTIES:
+:CUSTOM_ID: reading-disk-information-with-the-bios
+:END:
+
+Although the EBPB is defined in that same Stage 1 binary with some basic
+information, it's better to ask the BIOS for the actual disk information. This
+can be done by using the [[https://en.wikipedia.org/wiki/INT_13H][disk BIOS interrupt]] (~0x13~) with the =AH= register set to
+~0x08~.
+
+#+begin_src nasm
+    ; Set Carry Flag (CF), set AH to "Read Drive Parameters", and
+    ; call the "Disk" BIOS interrupt.
+    stc
+    mov     ah, 0x8
+    int     0x13
+
+    ; Jump if the Carry Flag was cleared by the BIOS.
+    jnc     .success
+
+.error:
+    ; ...
+
+.success:
+    ; Read relevant values, mainly from DH and CX.
+#+end_src
+
+Specifically, the bootloader writes the /Sectors per track/ and /Head count/ values
+returned by the BIOS into the EBPB.
+
+** Loading the Stage 2 binary
+:PROPERTIES:
+:CUSTOM_ID: loading-the-stage-2-binary
+:END:
+
+In order for the Stage 1 to load the Stage 2 binary, it needs to find it
+first. Specifically, it needs to find the /directory entry/ of the Stage 2 binary
+by traversing the FAT12 root directory, and then obtain the /first cluster index/
+where the actual contents of the Stage 2 file are stored.
+
+Then, after knowing that first cluster number, it traverses the linked list of
+cluster indexes that is stored in the File Allocation Table (FAT), reading each
+cluster into memory.
+
+If the reader is interested in more information about the FAT file system, and
+how this part should be implemented, see my [[file:../programming/understanding-fat.org][Understanding the FAT file system]]
+article. However, it's worth noting that the actual operation for reading from
+the disk is performed using the disk BIOS interrupt (~0x13~) with the =AH= register
+set to ~0x02~.
+
+** Jumping to the Stage 2 code
+:PROPERTIES:
+:CUSTOM_ID: jumping-to-the-stage-2-code
+:END:
+
+Once all the clusters of the Stage 2 binary have been read, the Stage 1 binary
+jumps to the address where it was loaded, using a far jump. Since the Stage 2
+binary was loaded into the address at ~ES:BX~, the bootloader should be able to
+just jump there.
+
+#+begin_src nasm
+; NOTE: Invalid.
+jmp     es:bx
+#+end_src
+
+However, there isn't a =JMP= instruction that allows the programmer to do a far
+jump to a segment and offset contained in registers. However, it allows the
+programmer to specify a pointer to a 32-bit memory location where the segment
+and offset are specified.
+
+#+begin_src nasm
+my_addr: resw 2
+
+mov     word [my_addr + 0], bx
+mov     word [my_addr + 2], es
+jmp     far [my_addr]
+#+end_src
+
+However, this is not the best method, since the opcodes for these instructions
+take up many bytes, and 4 extra bytes are needed for the buffer. Alternatively,
+one can use two =PUSH= instructions and a far =RET= to accomplish the same thing,
+without using an intermediate buffer, and with shorter instructions.
+
+#+begin_src nasm
+push    es
+push    bx
+retf            ; Alternatively: RET FAR
+#+end_src
+
+The far jump method used a total of 16 bytes, while the far return method used
+only 3. This wouldn't make much difference in a normal binary, but these extra
+13 bytes can become really useful as the Stage 1 binary grows.
+
+Note that, as mentioned, the jump is made to the first byte of the Stage 2
+binary, not to the entry point of an ELF file, so the Stage 2 binary must be
+built with this in mind.
 
 * COMMENT Stage 2
 :PROPERTIES:
@@ -115,4 +268,4 @@ mov     ax, [ds:si]
 :CUSTOM_ID: comment-building-the-disk-image
 :END:
 
-TODO
+TODO: Mention =copy-fat12-boot.sh= script.

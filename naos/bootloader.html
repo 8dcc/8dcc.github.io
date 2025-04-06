@@ -207,7 +207,14 @@
 <ul>
 <li><a href="#introduction">1. Introduction</a></li>
 <li><a href="#startup-and-bios">2. Startup and BIOS</a></li>
-<li><a href="#stage-1">3. Stage 1</a></li>
+<li><a href="#stage-1">3. Stage 1</a>
+<ul>
+<li><a href="#register-initialization">3.1. Register initialization</a></li>
+<li><a href="#reading-disk-information-with-the-bios">3.2. Reading disk information with the BIOS</a></li>
+<li><a href="#loading-the-stage-2-binary">3.3. Loading the Stage 2 binary</a></li>
+<li><a href="#jumping-to-the-stage-2-code">3.4. Jumping to the Stage 2 code</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -276,8 +283,184 @@ Stage 2 binary.
 <h2 id="stage-1"><span class="section-number-2">3.</span> Stage 1</h2>
 <div class="outline-text-2" id="text-stage-1">
 <p>
-TODO
+As explained above, the BIOS only loads the first 512 bytes of the bootable
+device, so there isn&rsquo;t a lot of space for the bootloader to do everything that
+it needs to do. For this reason, the bootloader is divided in two stages; the
+main purpose of Stage 1 is to load the Stage 2 binary, usually located in the
+same device where the Stage 1 is, and jump to it.
 </p>
+
+<p>
+The Stage 2 binary is usually stored in the device using some standard file
+system, like <a href="https://en.wikipedia.org/wiki/File_Allocation_Table">FAT32</a> or <a href="https://en.wikipedia.org/wiki/Ext4">ext4</a>, so the Stage 1 code should be able to at least
+locate the file, and read the sectors where the file contents are
+stored. Furthermore, since the Stage 1 code must be stored in the first 512
+bytes, and many file systems also use this region for storing data structures,
+the actual space left for the code (including things like strings for error
+messages) could be closer to 450 bytes.
+</p>
+
+<p>
+In the NAOS bootloader, the Stage 2 binary is stored in the root directory of a
+FAT12 file system as <code>stage2.bin</code><sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>. The data structure used for storing the volume information on FAT
+file systems is called the <i>Extended BIOS Parameter Block</i> (EBPB), and its size
+and elements change depending on the FAT version. For FAT12 and FAT16, this
+structure is the <a href="https://en.wikipedia.org/wiki/DOS_4.0_EBPB">DOS 4.0 EBPB</a>, which is 51 bytes wide and should be placed at
+offset <code>0xB</code> of the disk.
+</p>
+
+<p>
+The first 2 bytes of the disk are a short jump to the actual entry point of the
+bootloader, right after the EBPB.
+</p>
+</div>
+
+<div id="outline-container-register-initialization" class="outline-3">
+<h3 id="register-initialization"><span class="section-number-3">3.1.</span> Register initialization</h3>
+<div class="outline-text-3" id="text-register-initialization">
+<p>
+The very first thing that the bootloader does is setting up the Data Segment
+(<code>DS</code>), Extra Segment (<code>ES</code>) and Stack Segment (<code>SS</code>) registers to <code>0x0000</code>. Since we
+can&rsquo;t <code>MOV</code> immediate values, we need to first clear <code>AX</code>, and then use that to set
+these segment registers.
+</p>
+
+<p>
+Next, the Stack Pointer (<code>SP</code>) is set to <code>0x7C00</code>, the physical address where the
+BIOS loaded us; since the stack grows downwards, we will use the memory region
+adjacent to us for the stack<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>. At first glance, this address might seem
+incorrect, since the first <code>PUSH</code> would overwrite the first 2 bytes of our Stage 1
+binary; this is incorrect, because the <code>PUSH</code> instruction decreases the Stack
+Pointer <i>before</i> writing the pushed value to the address at <code>SS:SP</code> (see
+Intel SDM, Vol. 1, p.  1235).
+</p>
+
+<p>
+Next, a far jump is performed to ensure that the Code Segment (<code>CS</code>) and
+Instruction Pointer (<code>IP</code>) are set to <code>0000:7C00</code><sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>, rather than <code>07C0:0000</code>, which is used by some BIOSes.
+</p>
+</div>
+</div>
+
+<div id="outline-container-reading-disk-information-with-the-bios" class="outline-3">
+<h3 id="reading-disk-information-with-the-bios"><span class="section-number-3">3.2.</span> Reading disk information with the BIOS</h3>
+<div class="outline-text-3" id="text-reading-disk-information-with-the-bios">
+<p>
+Although the EBPB is defined in that same Stage 1 binary with some basic
+information, it&rsquo;s better to ask the BIOS for the actual disk information. This
+can be done by using the <a href="https://en.wikipedia.org/wiki/INT_13H">disk BIOS interrupt</a> (<code>0x13</code>) with the <code>AH</code> register set to
+<code>0x08</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm">    <span style="color: #989898;">; </span><span style="color: #989898;">Set Carry Flag (CF), set AH to "Read Drive Parameters", and</span>
+    <span style="color: #989898;">; </span><span style="color: #989898;">call the "Disk" BIOS interrupt.</span>
+    <span style="color: #feacd0;">stc</span>
+    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">ah</span>, <span style="color: #88ca9f;">0x8</span>
+    <span style="color: #feacd0;">int</span>     <span style="color: #88ca9f;">0x13</span>
+
+    <span style="color: #989898;">; </span><span style="color: #989898;">Jump if the Carry Flag was cleared by the BIOS.</span>
+    <span style="color: #feacd0;">jnc</span>     .success
+
+<span style="color: #4ae2ff;">.error</span>:
+    <span style="color: #989898;">; </span><span style="color: #989898;">...</span>
+
+<span style="color: #4ae2ff;">.success</span>:
+    <span style="color: #989898;">; </span><span style="color: #989898;">Read relevant values, mainly from DH and CX.</span>
+</pre>
+</div>
+
+<p>
+Specifically, the bootloader writes the <i>Sectors per track</i> and <i>Head count</i> values
+returned by the BIOS into the EBPB.
+</p>
+</div>
+</div>
+
+<div id="outline-container-loading-the-stage-2-binary" class="outline-3">
+<h3 id="loading-the-stage-2-binary"><span class="section-number-3">3.3.</span> Loading the Stage 2 binary</h3>
+<div class="outline-text-3" id="text-loading-the-stage-2-binary">
+<p>
+In order for the Stage 1 to load the Stage 2 binary, it needs to find it
+first. Specifically, it needs to find the <i>directory entry</i> of the Stage 2 binary
+by traversing the FAT12 root directory, and then obtain the <i>first cluster index</i>
+where the actual contents of the Stage 2 file are stored.
+</p>
+
+<p>
+Then, after knowing that first cluster number, it traverses the linked list of
+cluster indexes that is stored in the File Allocation Table (FAT), reading each
+cluster into memory.
+</p>
+
+<p>
+If the reader is interested in more information about the FAT file system, and
+how this part should be implemented, see my <a href="../programming/understanding-fat.html">Understanding the FAT file system</a>
+article. However, it&rsquo;s worth noting that the actual operation for reading from
+the disk is performed using the disk BIOS interrupt (<code>0x13</code>) with the <code>AH</code> register
+set to <code>0x02</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-jumping-to-the-stage-2-code" class="outline-3">
+<h3 id="jumping-to-the-stage-2-code"><span class="section-number-3">3.4.</span> Jumping to the Stage 2 code</h3>
+<div class="outline-text-3" id="text-jumping-to-the-stage-2-code">
+<p>
+Once all the clusters of the Stage 2 binary have been read, the Stage 1 binary
+jumps to the address where it was loaded, using a far jump. Since the Stage 2
+binary was loaded into the address at <code>ES:BX</code>, the bootloader should be able to
+just jump there.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #44bc44; font-weight: bold;">NOTE:</span><span style="color: #989898;"> Invalid.</span>
+<span style="color: #feacd0;">jmp</span>     <span style="color: #6ae4b9;">es</span>:<span style="color: #6ae4b9;">bx</span>
+</pre>
+</div>
+
+<p>
+However, there isn&rsquo;t a <code>JMP</code> instruction that allows the programmer to do a far
+jump to a segment and offset contained in registers. However, it allows the
+programmer to specify a pointer to a 32-bit memory location where the segment
+and offset are specified.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #4ae2ff;">my_addr</span>: <span style="color: #feacd0;">resw</span> <span style="color: #88ca9f;">2</span>
+
+<span style="color: #feacd0;">mov</span>     <span style="color: #79a8ff;">word</span> [my_addr + <span style="color: #88ca9f;">0</span>], <span style="color: #6ae4b9;">bx</span>
+<span style="color: #feacd0;">mov</span>     <span style="color: #79a8ff;">word</span> [my_addr + <span style="color: #88ca9f;">2</span>], <span style="color: #6ae4b9;">es</span>
+<span style="color: #feacd0;">jmp</span>     <span style="color: #79a8ff;">far</span> [my_addr]
+</pre>
+</div>
+
+<p>
+However, this is not the best method, since the opcodes for these instructions
+take up many bytes, and 4 extra bytes are needed for the buffer. Alternatively,
+one can use two <code>PUSH</code> instructions and a far <code>RET</code> to accomplish the same thing,
+without using an intermediate buffer, and with shorter instructions.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">es</span>
+<span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">bx</span>
+<span style="color: #feacd0;">retf</span>            <span style="color: #989898;">; </span><span style="color: #989898;">Alternatively: RET FAR</span>
+</pre>
+</div>
+
+<p>
+The far jump method used a total of 16 bytes, while the far return method used
+only 3. This wouldn&rsquo;t make much difference in a normal binary, but these extra
+13 bytes can become really useful as the Stage 1 binary grows.
+</p>
+
+<p>
+Note that, as mentioned, the jump is made to the first byte of the Stage 2
+binary, not to the entry point of an ELF file, so the Stage 2 binary must be
+built with this in mind.
+</p>
+</div>
 </div>
 </div>
 <div id="footnotes">
@@ -286,6 +469,20 @@ TODO
 
 <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Actually, the BIOS starts by
 loading the first 512 bytes, and then checks for the boot signature.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Since FAT12 uses the <a href="https://en.wikipedia.org/wiki/8.3_filename">8.3 filename</a>
+convention, the actual stored name, the one that the Stage 1 should look for, is
+<code>STAGE2 BIN</code>.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Keep in mind that the free memory region before
+the Stage 1 binary usually goes from physical address <code>0x0500</code> to <code>0x7BFF</code>, and
+going below that <code>0x0500</code> address would overwrite the BIOS Data Area (BDA). See
+the <a href="https://wiki.osdev.org/Memory_Map_(x86)">OSDev wiki</a> for more information.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This address is meant to
+illustrate the difference between the two main possible values set by the BIOS,
+but the bootloader jumps to the adjacent instruction, which would be at an
+offset like <code>0x7C46</code>.</p></div></div>
 
 
 </div>
