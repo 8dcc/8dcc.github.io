@@ -19,6 +19,10 @@ There are a few ways of accomplishing this depending on the input type and the
 kind of transparency we want to apply. I will show two kinds of transparencies
 that I chose to call /absolute/ and /relative/.
 
+The code in this article has been used, for example, on my [[https://github.com/8dcc/soft-comment.el][soft-comment.el]] Emacs
+package, which sets the font color of comments based on the current foreground
+color, the background color, and a specific ratio.
+
 ** Calculating absolute transparencies
 :PROPERTIES:
 :CUSTOM_ID: calculating-absolute-transparencies
