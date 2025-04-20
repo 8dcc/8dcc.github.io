@@ -222,14 +222,29 @@ Note that, as mentioned, the jump is made to the first byte of the Stage 2
 binary, not to the entry point of an ELF file, so the Stage 2 binary must be
 built with this in mind.
 
-* COMMENT Stage 2
+* Stage 2
 :PROPERTIES:
 :CUSTOM_ID: stage-2
 :END:
 
-TODO
+The Stage 2 binary is a flat binary (i.e. it is /not/ an ELF file) located in the
+root directory of the FAT12 file system of the Stage 1. One of the main goals of
+Stage 1, because of its binary size limitations, is to search for this Stage 2
+binary, load it into memory, and jump to it.
 
-** Enabling the A20 line
+Therefore, the Stage 1 code should know where to load the Stage 2 binary, and
+the Stage 2 code should know the address where it's going to be loaded. This
+consensus is achieved through two =STAGE2_ADDR= macros, defined in two different
+files, but that /must match/.  The first one is defined in
+=bootloader/src/include/boot_config.asm= (used by Stage 1) and the other in
+=bootloader/linker/boot_config.ld= (used when linking Stage 2).
+
+Once the Stage 2 binary is loaded, it can perform all of the bootloader
+initialization without worrying about size limitations. First, the Stage 2 shows
+an information message using the BIOS I/O functions, and then it tries to enable
+the A20 line.
+
+** COMMENT Enabling the A20 line
 :PROPERTIES:
 :CUSTOM_ID: enabling-the-a20-line
 :END:

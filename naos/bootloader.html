@@ -215,6 +215,7 @@
 <li><a href="#jumping-to-the-stage-2-code">3.4. Jumping to the Stage 2 code</a></li>
 </ul>
 </li>
+<li><a href="#stage-2">4. Stage 2</a></li>
 </ul>
 </div>
 </div>
@@ -461,6 +462,34 @@ binary, not to the entry point of an ELF file, so the Stage 2 binary must be
 built with this in mind.
 </p>
 </div>
+</div>
+</div>
+
+<div id="outline-container-stage-2" class="outline-2">
+<h2 id="stage-2"><span class="section-number-2">4.</span> Stage 2</h2>
+<div class="outline-text-2" id="text-stage-2">
+<p>
+The Stage 2 binary is a flat binary (i.e. it is <i>not</i> an ELF file) located in the
+root directory of the FAT12 file system of the Stage 1. One of the main goals of
+Stage 1, because of its binary size limitations, is to search for this Stage 2
+binary, load it into memory, and jump to it.
+</p>
+
+<p>
+Therefore, the Stage 1 code should know where to load the Stage 2 binary, and
+the Stage 2 code should know the address where it&rsquo;s going to be loaded. This
+consensus is achieved through two <code>STAGE2_ADDR</code> macros, defined in two different
+files, but that <i>must match</i>.  The first one is defined in
+<code>bootloader/src/include/boot_config.asm</code> (used by Stage 1) and the other in
+<code>bootloader/linker/boot_config.ld</code> (used when linking Stage 2).
+</p>
+
+<p>
+Once the Stage 2 binary is loaded, it can perform all of the bootloader
+initialization without worrying about size limitations. First, the Stage 2 shows
+an information message using the BIOS I/O functions, and then it tries to enable
+the A20 line.
+</p>
 </div>
 </div>
 <div id="footnotes">
