@@ -7,9 +7,9 @@
 #+HTML_LINK_HOME: ../index.html
 
 #+MACRO: isdm-page    Intel SDM, Vol. $1, p. $2
-#+MACRO: isdm-chapter Intel SDM, Vol. $1, ch. $2
-#+MACRO: isdm-figure  Intel SDM, Vol. $1, fig. $2
-#+MACRO: isdm-table   Intel SDM, Vol. $1, tab. $2
+#+MACRO: isdm-section Intel SDM, Vol. $1, Section $2
+#+MACRO: isdm-figure  Intel SDM, Vol. $1, Figure $2
+#+MACRO: isdm-table   Intel SDM, Vol. $1, Table $2
 
 * Introduction
 :PROPERTIES:
