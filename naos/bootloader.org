@@ -62,11 +62,6 @@ executing the instructions it just loaded. In our case, the first 510 bytes of
 the device can be used for the Stage 1 bootloader, which will then load the
 Stage 2 binary.
 
-#+begin_comment org
-TODO: Mention that some BIOSes load the sector at =0000:7C00= but some at
-=07c0:0000=.
-#+end_comment
-
 * Stage 1
 :PROPERTIES:
 :CUSTOM_ID: stage-1
@@ -182,7 +177,7 @@ set to ~0x02~.
 
 Once all the clusters of the Stage 2 binary have been read, the Stage 1 binary
 jumps to the address where it was loaded, using a far jump. Since the Stage 2
-binary was loaded into the address at ~ES:BX~, the bootloader should be able to
+binary was loaded into the address at =ES:BX=, the bootloader should be able to
 just jump there.
 
 #+begin_src nasm
@@ -244,16 +239,20 @@ initialization without worrying about size limitations. First, the Stage 2 shows
 an information message using the BIOS I/O functions, and then it tries to enable
 the A20 line.
 
-** COMMENT Enabling the A20 line
+** Enabling the A20 line
 :PROPERTIES:
 :CUSTOM_ID: enabling-the-a20-line
 :END:
 
-In order to understand what the [[https://en.wikipedia.org/wiki/A20_line][A20 line]] is, and how it can be enabled, it's
-important to understand how [[https://en.wikipedia.org/wiki/X86_memory_segmentation][segmentation]] works in 16-bit [[https://en.wikipedia.org/wiki/Real_mode][real mode]]. The Intel
-8086 processor had 20 address lines, numbered A0 to A19; with these, the
-processor could access 2^20 bytes, or 1 MB. Internal address registers of this
-processor were 16 bits wide. To access a 20-bit address space, an external
+The [[https://en.wikipedia.org/wiki/A20_line][A20 line]], which is disabled by default, limits the addressable memory to 1
+MiB, and should be enabled by the bootloader before transferring control to the
+kernel, or simply for [[*Switching to protected mode][switching to protected mode]]. In order to understand what
+the A20 line is, and how it can be enabled, it's important to know a bit of
+processor history, starting with how [[https://en.wikipedia.org/wiki/X86_memory_segmentation][segmentation]] works in 16-bit [[https://en.wikipedia.org/wiki/Real_mode][real mode]].
+
+The [[https://en.wikipedia.org/wiki/Intel_8086][Intel 8086]] processor had 20 address lines, numbered A0 to A19; with these,
+the processor could access 2^20 bytes, or 1 MiB. Internal address registers of
+this processor were 16 bits wide. To access a 20-bit address space, an external
 memory reference was made up of a 16-bit offset address added to a 16-bit
 segment number[fn::For more information on 16-bit segmentation, see [[https://courses.cs.umbc.edu/undergraduate/CMSC211/fall01/burt/lectures/Chap12/segmentsOffsets.html][this article]]
 by [[https://userpages.cs.umbc.edu/burt/][Gary Burt]].], shifted 4 bits to the left so as to produce a 20-bit physical
@@ -278,9 +277,74 @@ mov     si, 0x3327
 mov     ax, [ds:si]
 #+end_src
 
+Another important detail about this old processors is that, since they only had
+20 address lines, addresses over 1 MiB caused the actual address to wrap
+around. For example, ~F800:8000~, which should translate physical address
+~0x00100000~, actually translates to address ~0x00000000~, since the 21st bit is
+discarded.
+
+As processors evolved, starting from the [[https://en.wikipedia.org/wiki/Intel_80286][Intel 80286]], they were able to address
+more than 1 MiB of memory. However, for backwards compatibility, they were still
+supposed to emulate the behavior of a 8086 processor when booting up, which
+meant that they had to force this wrap-around behavior, since some programs
+depended on this. To control this wrap-around behavior, a [[https://en.wikipedia.org/wiki/Logic_gate][logic gate]] was
+inserted in the A20 line between the processor and [[https://en.wikipedia.org/wiki/System_bus][system bus]], which got named
+Gate-A20.
+
+This logic gate was supposed to be controlled from software, originally through
+the Intel 8042 keyboard controller. Since then, other more efficient methods are
+available, but they might not all work, so it's best to try as many of them as
+possible. Without getting into much detail, these are the methods used in the
+bootloader, starting with the most likely to work:
+
+1. Check if the A20 line was already enabled. This is done by comparing a known
+   value at some address with the value located 1 MiB higher; if they match, we
+   assume that it wrapped around, so the A20 line is disabled.
+2. Try to enable it through the BIOS. This is done through BIOS interrupt ~0x15~.
+3. Try to enable it through the original keyboard method.
+
+If the bootloader can't enable the A20 line, it shows an error message and
+stops.
+
+** Loading the GDT
+:PROPERTIES:
+:CUSTOM_ID: loading-the-gdt
+:END:
+
+Before switching to protected mode, we have to load a Global Descriptor Table
+(GDT).
+
+#+begin_comment org
+TODO: About why we have to subtract one from the size of the GDT, when defining its
+pseudo-descriptor.
+
+From {{{isdm-section(3, 3.5.1)}}}:
+
+#+begin_quote
+The limit value for the GDT is expressed in bytes. As with segments, the limit
+value is added to the base address to get the address of the last valid byte. A
+limit value of 0 results in exactly one valid byte.
+#+end_quote
+#+end_comment
+
+** Switching to protected mode
+:PROPERTIES:
+:CUSTOM_ID: switching-to-protected-mode
+:END:
+
+Before transferring access to the kernel, we have to switch to protected mode.
+
+#+begin_comment org
+TODO: Link sections:
+  - 3.1 Memory Management Overview
+  - 9.9.1 Switching to Protected Mode
+#+end_comment
+
 * COMMENT Building the disk image
 :PROPERTIES:
 :CUSTOM_ID: comment-building-the-disk-image
 :END:
 
-TODO: Mention =copy-fat12-boot.sh= script.
+- TODO: Mention =copy-fat12-boot.sh= script.
+- TODO: Mention =file.asm= --(assembler)--> ELF --(linker)--> Flat binary. Use
+  pretty graph?

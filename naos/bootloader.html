@@ -215,7 +215,13 @@
 <li><a href="#jumping-to-the-stage-2-code">3.4. Jumping to the Stage 2 code</a></li>
 </ul>
 </li>
-<li><a href="#stage-2">4. Stage 2</a></li>
+<li><a href="#stage-2">4. Stage 2</a>
+<ul>
+<li><a href="#enabling-the-a20-line">4.1. Enabling the A20 line</a></li>
+<li><a href="#loading-the-gdt">4.2. Loading the GDT</a></li>
+<li><a href="#switching-to-protected-mode">4.3. Switching to protected mode</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -491,6 +497,108 @@ an information message using the BIOS I/O functions, and then it tries to enable
 the A20 line.
 </p>
 </div>
+
+<div id="outline-container-enabling-the-a20-line" class="outline-3">
+<h3 id="enabling-the-a20-line"><span class="section-number-3">4.1.</span> Enabling the A20 line</h3>
+<div class="outline-text-3" id="text-enabling-the-a20-line">
+<p>
+The <a href="https://en.wikipedia.org/wiki/A20_line">A20 line</a>, which is disabled by default, limits the addressable memory to 1
+MiB, and should be enabled by the bootloader before transferring control to the
+kernel, or simply for <a href="#switching-to-protected-mode">switching to protected mode</a>. In order to understand what
+the A20 line is, and how it can be enabled, it&rsquo;s important to know a bit of
+processor history, starting with how <a href="https://en.wikipedia.org/wiki/X86_memory_segmentation">segmentation</a> works in 16-bit <a href="https://en.wikipedia.org/wiki/Real_mode">real mode</a>.
+</p>
+
+<p>
+The <a href="https://en.wikipedia.org/wiki/Intel_8086">Intel 8086</a> processor had 20 address lines, numbered A0 to A19; with these,
+the processor could access 2<sup>20</sup> bytes, or 1 MiB. Internal address registers of
+this processor were 16 bits wide. To access a 20-bit address space, an external
+memory reference was made up of a 16-bit offset address added to a 16-bit
+segment number<sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup>, shifted 4 bits to the left so as to produce a 20-bit physical
+address.
+</p>
+
+<p>
+The following code shows how the real address would be calculated from a segment
+and an offset.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">Set data segment (DS) through intermediate register (AX).</span>
+<span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">ax</span>, <span style="color: #88ca9f;">0x13A5</span>
+<span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">ds</span>, <span style="color: #6ae4b9;">ax</span>
+
+<span style="color: #989898;">; </span><span style="color: #989898;">Write offset to the source index (SI), since not all registers can</span>
+<span style="color: #989898;">; </span><span style="color: #989898;">be used for addressing.</span>
+<span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">si</span>, <span style="color: #88ca9f;">0x3327</span>
+
+<span style="color: #989898;">;   </span><span style="color: #989898;">13A5   (Segment: DS)</span>
+<span style="color: #989898;">; </span><span style="color: #989898;">+  3327  (Offset: SI)</span>
+<span style="color: #989898;">; </span><span style="color: #989898;">-------</span>
+<span style="color: #989898;">;   </span><span style="color: #989898;">16D77  (Address)</span>
+<span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">ax</span>, [<span style="color: #6ae4b9;">ds</span>:<span style="color: #6ae4b9;">si</span>]
+</pre>
+</div>
+
+<p>
+Another important detail about this old processors is that, since they only had
+20 address lines, addresses over 1 MiB caused the actual address to wrap
+around. For example, <code>F800:8000</code>, which should translate physical address
+<code>0x00100000</code>, actually translates to address <code>0x00000000</code>, since the 21st bit is
+discarded.
+</p>
+
+<p>
+As processors evolved, starting from the <a href="https://en.wikipedia.org/wiki/Intel_80286">Intel 80286</a>, they were able to address
+more than 1 MiB of memory. However, for backwards compatibility, they were still
+supposed to emulate the behavior of a 8086 processor when booting up, which
+meant that they had to force this wrap-around behavior, since some programs
+depended on this. To control this wrap-around behavior, a <a href="https://en.wikipedia.org/wiki/Logic_gate">logic gate</a> was
+inserted in the A20 line between the processor and <a href="https://en.wikipedia.org/wiki/System_bus">system bus</a>, which got named
+Gate-A20.
+</p>
+
+<p>
+This logic gate was supposed to be controlled from software, originally through
+the Intel 8042 keyboard controller. Since then, other more efficient methods are
+available, but they might not all work, so it&rsquo;s best to try as many of them as
+possible. Without getting into much detail, these are the methods used in the
+bootloader, starting with the most likely to work:
+</p>
+
+<ol class="org-ol">
+<li>Check if the A20 line was already enabled. This is done by comparing a known
+value at some address with the value located 1 MiB higher; if they match, we
+assume that it wrapped around, so the A20 line is disabled.</li>
+<li>Try to enable it through the BIOS. This is done through BIOS interrupt <code>0x15</code>.</li>
+<li>Try to enable it through the original keyboard method.</li>
+</ol>
+
+<p>
+If the bootloader can&rsquo;t enable the A20 line, it shows an error message and
+stops.
+</p>
+</div>
+</div>
+
+<div id="outline-container-loading-the-gdt" class="outline-3">
+<h3 id="loading-the-gdt"><span class="section-number-3">4.2.</span> Loading the GDT</h3>
+<div class="outline-text-3" id="text-loading-the-gdt">
+<p>
+Before switching to protected mode, we have to load a Global Descriptor Table
+(GDT).
+</p>
+</div>
+</div>
+
+<div id="outline-container-switching-to-protected-mode" class="outline-3">
+<h3 id="switching-to-protected-mode"><span class="section-number-3">4.3.</span> Switching to protected mode</h3>
+<div class="outline-text-3" id="text-switching-to-protected-mode">
+<p>
+Before transferring access to the kernel, we have to switch to protected mode.
+</p>
+</div>
+</div>
 </div>
 <div id="footnotes">
 <h2 class="footnotes">Footnotes: </h2>
@@ -512,6 +620,9 @@ the <a href="https://wiki.osdev.org/Memory_Map_(x86)">OSDev wiki</a> for more in
 illustrate the difference between the two main possible values set by the BIOS,
 but the bootloader jumps to the adjacent instruction, which would be at an
 offset like <code>0x7C46</code>.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">For more information on 16-bit segmentation, see <a href="https://courses.cs.umbc.edu/undergraduate/CMSC211/fall01/burt/lectures/Chap12/segmentsOffsets.html">this article</a>
+by <a href="https://userpages.cs.umbc.edu/burt/">Gary Burt</a>.</p></div></div>
 
 
 </div>
