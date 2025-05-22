@@ -230,7 +230,15 @@
 <h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-introduction">
 <p>
-The <a href="https://en.wikipedia.org/wiki/Bootloader">bootloader</a> is a computer program responsible for booting the operating
+This article explains the code and overall design of <a href="https://github.com/8dcc/bootloader">8dcc&rsquo;s bootloader</a>, which
+was originally designed for the <a href="https://github.com/8dcc/naos">NAOS kernel</a>. This tiny bootloader, written from
+scratch, aims to be compliant with the <a href="https://www.gnu.org/software/grub/manual/multiboot/html_node/Specification.html#Specification">Multiboot 1 protocol</a>. This way, since the
+kernel is also compliant with this protocol, the kernel and the bootloader
+should work with any other component that follows the Multiboot 1 standard.
+</p>
+
+<p>
+A <a href="https://en.wikipedia.org/wiki/Bootloader">bootloader</a> is a computer program responsible for booting the operating
 system. The main responsibilities of the bootloader are:
 </p>
 
@@ -244,16 +252,9 @@ the <a href="https://en.wikipedia.org/wiki/A20_line">A20 line</a>.</li>
 </ol>
 
 <p>
-This project uses a tiny bootloader written from scratch, that aims to be
-compliant with the <a href="https://www.gnu.org/software/grub/manual/multiboot/html_node/Specification.html#Specification">Multiboot 1 protocol</a>. This way, since the kernel is also
-compliant with this protocol, the kernel and the bootloader should work with any
-other component that follows the Multiboot 1 standard.
-</p>
-
-<p>
-The bootloader is divided into two stages, Stage 1 and Stage 2. This division is
-mainly needed because of size restrictions of the Stage 1 binary, as explained
-below.
+This bootloader is divided into two stages, Stage 1 and Stage 2. This division
+is mainly needed because of size restrictions of the Stage 1 binary, as
+explained below.
 </p>
 </div>
 </div>

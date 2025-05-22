@@ -16,7 +16,13 @@
 :CUSTOM_ID: introduction
 :END:
 
-The [[https://en.wikipedia.org/wiki/Bootloader][bootloader]] is a computer program responsible for booting the operating
+This article explains the code and overall design of [[https://github.com/8dcc/bootloader][8dcc's bootloader]], which
+was originally designed for the [[https://github.com/8dcc/naos][NAOS kernel]]. This tiny bootloader, written from
+scratch, aims to be compliant with the [[https://www.gnu.org/software/grub/manual/multiboot/html_node/Specification.html#Specification][Multiboot 1 protocol]]. This way, since the
+kernel is also compliant with this protocol, the kernel and the bootloader
+should work with any other component that follows the Multiboot 1 standard.
+
+A [[https://en.wikipedia.org/wiki/Bootloader][bootloader]] is a computer program responsible for booting the operating
 system. The main responsibilities of the bootloader are:
 
 1. Obtain information about the system. This information usually needs to be
@@ -26,18 +32,9 @@ system. The main responsibilities of the bootloader are:
    the [[https://en.wikipedia.org/wiki/A20_line][A20 line]].
 3. Load the kernel into memory, and jump to it.
 
-#+begin_comment org
-TODO: Link =kernel.org= file above after it's added.
-#+end_comment
-
-This project uses a tiny bootloader written from scratch, that aims to be
-compliant with the [[https://www.gnu.org/software/grub/manual/multiboot/html_node/Specification.html#Specification][Multiboot 1 protocol]]. This way, since the kernel is also
-compliant with this protocol, the kernel and the bootloader should work with any
-other component that follows the Multiboot 1 standard.
-
-The bootloader is divided into two stages, Stage 1 and Stage 2. This division is
-mainly needed because of size restrictions of the Stage 1 binary, as explained
-below.
+This bootloader is divided into two stages, Stage 1 and Stage 2. This division
+is mainly needed because of size restrictions of the Stage 1 binary, as
+explained below.
 
 * Startup and BIOS
 :PROPERTIES:
