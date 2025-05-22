@@ -1,4 +1,4 @@
-#+TITLE: Bootloader
+#+TITLE: The design of a simple bootloader
 #+AUTHOR: 8dcc
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">

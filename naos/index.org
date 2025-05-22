@@ -19,6 +19,7 @@ TODO
 :CUSTOM_ID: sections
 :END:
 
-These are the currently available sections.
+These articles are about projects that are related to the OS project, but could
+be considered independent.
 
-- [[file:bootloader.org][Bootloader]]
+- [[file:bootloader.org][The design of a simple bootloader]]
