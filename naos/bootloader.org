@@ -337,11 +337,38 @@ TODO: Link sections:
   - 9.9.1 Switching to Protected Mode
 #+end_comment
 
-* COMMENT Building the disk image
+* Building and debugging the disk image
 :PROPERTIES:
-:CUSTOM_ID: comment-building-the-disk-image
+:CUSTOM_ID: building-and-debugging-the-disk-image
 :END:
 
-- TODO: Mention =copy-fat12-boot.sh= script.
-- TODO: Mention =file.asm= --(assembler)--> ELF --(linker)--> Flat binary. Use
-  pretty graph?
+The build process of the disk image has a few steps that are worth mentioning
+here. The target of the build process is to obtain a file that can be flashed
+into a device, making it bootable with our bootloader.
+
+First, the assembly sources are assembled using =nasm= into a 32-bit ELF object
+file. This object file is then linked into a /flat binary/ using an [[https://github.com/8dcc/i686-cross-compiler][i686
+cross-compiler]], using an appropriate linker script. Furthermore, the ELF object
+file produced by NASM can be linked into an ELF binary, which can be used for
+debugging, as shown below. The following diagram explains the build process of
+an assembly file.
+
+[[file:../img/bootloader-assembly-build.svg]]
+
+Once the Stage 1 and Stage 2 binaries are built, they can be inserted into the
+filesystem of the final image. First, an empty image is created with =dd=, and
+then the filesystem itself is created with =mkfs.fat=. Then, the =mcopy= (from the
+=mtools= package) is used to copy the files into the image that was just created.
+
+To make the device bootable, however, we need to make sure that the Stage 1
+image is placed in the first sector of the image. Some of the FAT12 filesystem
+information, such as the Bios Parameter Block (BPB), is also located on this
+sector, though, so we will only copy certain chunks of the Stage 1 binary. To do
+this, the =copy-fat12-boot.sh= script is used, which just calls =dd= with some
+special flags. For more information on the FAT12 file system, check out my
+[[file:~/01-Git/8dcc.github.io/programming/understanding-fat.org][Understanding the FAT file system]] article.
+
+For debugging the image, as noted above, the ELF binaries can be used. They can
+both be loaded into GDB with the =add-symbol-file= commands, or used with many
+tools like =addr2line=. For more information on debugging, check out the
+bootloader repository's, linked above.

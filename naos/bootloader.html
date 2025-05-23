@@ -222,6 +222,7 @@
 <li><a href="#switching-to-protected-mode">4.3. Switching to protected mode</a></li>
 </ul>
 </li>
+<li><a href="#building-and-debugging-the-disk-image">5. Building and debugging the disk image</a></li>
 </ul>
 </div>
 </div>
@@ -599,6 +600,56 @@ Before switching to protected mode, we have to load a Global Descriptor Table
 Before transferring access to the kernel, we have to switch to protected mode.
 </p>
 </div>
+</div>
+</div>
+
+<div id="outline-container-building-and-debugging-the-disk-image" class="outline-2">
+<h2 id="building-and-debugging-the-disk-image"><span class="section-number-2">5.</span> Building and debugging the disk image</h2>
+<div class="outline-text-2" id="text-building-and-debugging-the-disk-image">
+<p>
+The build process of the disk image has a few steps that are worth mentioning
+here. The target of the build process is to obtain a file that can be flashed
+into a device, making it bootable with our bootloader.
+</p>
+
+<p>
+First, the assembly sources are assembled using <code>nasm</code> into a 32-bit ELF object
+file. This object file is then linked into a <i>flat binary</i> using an <a href="https://github.com/8dcc/i686-cross-compiler">i686
+cross-compiler</a>, using an appropriate linker script. Furthermore, the ELF object
+file produced by NASM can be linked into an ELF binary, which can be used for
+debugging, as shown below. The following diagram explains the build process of
+an assembly file.
+</p>
+
+
+<div id="org4e08438" class="figure">
+<p><img src="../img/bootloader-assembly-build.svg" alt="bootloader-assembly-build.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+Once the Stage 1 and Stage 2 binaries are built, they can be inserted into the
+filesystem of the final image. First, an empty image is created with <code>dd</code>, and
+then the filesystem itself is created with <code>mkfs.fat</code>. Then, the <code>mcopy</code> (from the
+<code>mtools</code> package) is used to copy the files into the image that was just created.
+</p>
+
+<p>
+To make the device bootable, however, we need to make sure that the Stage 1
+image is placed in the first sector of the image. Some of the FAT12 filesystem
+information, such as the Bios Parameter Block (BPB), is also located on this
+sector, though, so we will only copy certain chunks of the Stage 1 binary. To do
+this, the <code>copy-fat12-boot.sh</code> script is used, which just calls <code>dd</code> with some
+special flags. For more information on the FAT12 file system, check out my
+<a href="file:///home/username/01-Git/8dcc.github.io/programming/understanding-fat.html">Understanding the FAT file system</a> article.
+</p>
+
+<p>
+For debugging the image, as noted above, the ELF binaries can be used. They can
+both be loaded into GDB with the <code>add-symbol-file</code> commands, or used with many
+tools like <code>addr2line</code>. For more information on debugging, check out the
+bootloader repository&rsquo;s, linked above.
+</p>
 </div>
 </div>
 <div id="footnotes">
