@@ -329,19 +329,19 @@ bootloader, right after the EBPB.
 <div class="outline-text-3" id="text-register-initialization">
 <p>
 The very first thing that the bootloader does is setting up the Data Segment
-(<code>DS</code>), Extra Segment (<code>ES</code>) and Stack Segment (<code>SS</code>) registers to <code>0x0000</code>. Since we
-can&rsquo;t <code>MOV</code> immediate values, we need to first clear <code>AX</code>, and then use that to set
-these segment registers.
+(<code>DS</code>), Extra Segment (<code>ES</code>) and Stack Segment (<code>SS</code>) registers to <code>0x0000</code>. Since the
+<code>MOV</code> instruction doesn&rsquo;t support assigning immediate values to segment registers,
+the <code>AX</code> register is first cleared and then used to set those segment registers.
 </p>
 
 <p>
 Next, the Stack Pointer (<code>SP</code>) is set to <code>0x7C00</code>, the physical address where the
-BIOS loaded us; since the stack grows downwards, we will use the memory region
-adjacent to us for the stack<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>. At first glance, this address might seem
-incorrect, since the first <code>PUSH</code> would overwrite the first 2 bytes of our Stage 1
-binary; this is incorrect, because the <code>PUSH</code> instruction decreases the Stack
-Pointer <i>before</i> writing the pushed value to the address at <code>SS:SP</code> (see
-Intel SDM, Vol. 1, p.  1235).
+BIOS loaded the Stage 1 binary; since the stack grows downwards, the memory
+region right below this address can be used for the stack<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>. At first
+glance, this address might seem incorrect, since the first <code>PUSH</code> would overwrite
+the first 2 bytes of our Stage 1 binary; this is incorrect, because the <code>PUSH</code>
+instruction decreases the Stack Pointer <i>before</i> writing the pushed value to the
+address at <code>SS:SP</code> (see Intel SDM, Vol. 1, p.  1235).
 </p>
 
 <p>
@@ -570,8 +570,8 @@ bootloader, starting with the most likely to work:
 
 <ol class="org-ol">
 <li>Check if the A20 line was already enabled. This is done by comparing a known
-value at some address with the value located 1 MiB higher; if they match, we
-assume that it wrapped around, so the A20 line is disabled.</li>
+value at some address with the value located 1 MiB higher; if they match,
+it&rsquo;s safe to assume that it wrapped around, so the A20 line is disabled.</li>
 <li>Try to enable it through the BIOS. This is done through BIOS interrupt <code>0x15</code>.</li>
 <li>Try to enable it through the original keyboard method.</li>
 </ol>
@@ -587,8 +587,8 @@ stops.
 <h3 id="loading-the-gdt"><span class="section-number-3">4.2.</span> Loading the GDT</h3>
 <div class="outline-text-3" id="text-loading-the-gdt">
 <p>
-Before switching to protected mode, we have to load a Global Descriptor Table
-(GDT).
+Before switching to protected mode, the Global Descriptor Table (GDT) has to be
+loaded.
 </p>
 </div>
 </div>
@@ -597,7 +597,8 @@ Before switching to protected mode, we have to load a Global Descriptor Table
 <h3 id="switching-to-protected-mode"><span class="section-number-3">4.3.</span> Switching to protected mode</h3>
 <div class="outline-text-3" id="text-switching-to-protected-mode">
 <p>
-Before transferring access to the kernel, we have to switch to protected mode.
+Before transferring access to the kernel, the bootloader has to switch to
+protected mode.
 </p>
 </div>
 </div>
@@ -622,7 +623,7 @@ an assembly file.
 </p>
 
 
-<div id="org4e08438" class="figure">
+<div id="org42b7e49" class="figure">
 <p><img src="../img/bootloader-assembly-build.svg" alt="bootloader-assembly-build.svg" class="org-svg" />
 </p>
 </div>
@@ -663,10 +664,10 @@ loading the first 512 bytes, and then checks for the boot signature.</p></div></
 convention, the actual stored name, the one that the Stage 1 should look for, is
 <code>STAGE2 BIN</code>.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Keep in mind that the free memory region before
-the Stage 1 binary usually goes from physical address <code>0x0500</code> to <code>0x7BFF</code>, and
-going below that <code>0x0500</code> address would overwrite the BIOS Data Area (BDA). See
-the <a href="https://wiki.osdev.org/Memory_Map_(x86)">OSDev wiki</a> for more information.</p></div></div>
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Keep in mind that
+the free memory region before the Stage 1 binary usually goes from physical
+address <code>0x0500</code> to <code>0x7BFF</code>, and going below that <code>0x0500</code> address would overwrite
+the BIOS Data Area (BDA). See the <a href="https://wiki.osdev.org/Memory_Map_(x86)">OSDev wiki</a> for more information.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This address is meant to
 illustrate the difference between the two main possible values set by the BIOS,

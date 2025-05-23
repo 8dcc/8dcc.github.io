@@ -96,20 +96,20 @@ bootloader, right after the EBPB.
 :END:
 
 The very first thing that the bootloader does is setting up the Data Segment
-(=DS=), Extra Segment (=ES=) and Stack Segment (=SS=) registers to ~0x0000~. Since we
-can't =MOV= immediate values, we need to first clear =AX=, and then use that to set
-these segment registers.
+(=DS=), Extra Segment (=ES=) and Stack Segment (=SS=) registers to ~0x0000~. Since the
+=MOV= instruction doesn't support assigning immediate values to segment registers,
+the =AX= register is first cleared and then used to set those segment registers.
 
 Next, the Stack Pointer (=SP=) is set to ~0x7C00~, the physical address where the
-BIOS loaded us; since the stack grows downwards, we will use the memory region
-adjacent to us for the stack[fn::Keep in mind that the free memory region before
-the Stage 1 binary usually goes from physical address ~0x0500~ to ~0x7BFF~, and
-going below that ~0x0500~ address would overwrite the BIOS Data Area (BDA). See
-the [[https://wiki.osdev.org/Memory_Map_(x86)][OSDev wiki]] for more information.]. At first glance, this address might seem
-incorrect, since the first =PUSH= would overwrite the first 2 bytes of our Stage 1
-binary; this is incorrect, because the =PUSH= instruction decreases the Stack
-Pointer /before/ writing the pushed value to the address at =SS:SP= (see
-{{{isdm-page(1, 1235)}}}).
+BIOS loaded the Stage 1 binary; since the stack grows downwards, the memory
+region right below this address can be used for the stack[fn::Keep in mind that
+the free memory region before the Stage 1 binary usually goes from physical
+address ~0x0500~ to ~0x7BFF~, and going below that ~0x0500~ address would overwrite
+the BIOS Data Area (BDA). See the [[https://wiki.osdev.org/Memory_Map_(x86)][OSDev wiki]] for more information.]. At first
+glance, this address might seem incorrect, since the first =PUSH= would overwrite
+the first 2 bytes of our Stage 1 binary; this is incorrect, because the =PUSH=
+instruction decreases the Stack Pointer /before/ writing the pushed value to the
+address at =SS:SP= (see {{{isdm-page(1, 1235)}}}).
 
 Next, a far jump is performed to ensure that the Code Segment (=CS=) and
 Instruction Pointer (=IP=) are set to ~0000:7C00~[fn::This address is meant to
@@ -295,8 +295,8 @@ possible. Without getting into much detail, these are the methods used in the
 bootloader, starting with the most likely to work:
 
 1. Check if the A20 line was already enabled. This is done by comparing a known
-   value at some address with the value located 1 MiB higher; if they match, we
-   assume that it wrapped around, so the A20 line is disabled.
+   value at some address with the value located 1 MiB higher; if they match,
+   it's safe to assume that it wrapped around, so the A20 line is disabled.
 2. Try to enable it through the BIOS. This is done through BIOS interrupt ~0x15~.
 3. Try to enable it through the original keyboard method.
 
@@ -308,8 +308,8 @@ stops.
 :CUSTOM_ID: loading-the-gdt
 :END:
 
-Before switching to protected mode, we have to load a Global Descriptor Table
-(GDT).
+Before switching to protected mode, the Global Descriptor Table (GDT) has to be
+loaded.
 
 #+begin_comment org
 TODO: About why we have to subtract one from the size of the GDT, when defining its
@@ -329,7 +329,8 @@ limit value of 0 results in exactly one valid byte.
 :CUSTOM_ID: switching-to-protected-mode
 :END:
 
-Before transferring access to the kernel, we have to switch to protected mode.
+Before transferring access to the kernel, the bootloader has to switch to
+protected mode.
 
 #+begin_comment org
 TODO: Link sections:
