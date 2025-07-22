@@ -1,0 +1,24 @@
+#+TITLE: Understanding Monads
+#+AUTHOR: 8dcc
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+This article is about [[https://en.wikipedia.org/wiki/Monad_(functional_programming)][monads]] in the context of programming, specifically about a
+design pattern that is often used in purely functional languages, such as
+[[https://www.haskell.org/][Haskell]]. This concept originates from [[https://en.wikipedia.org/wiki/Category_theory][category theory]], but this article won't be
+focusing on that.
+
+Although I haven't personally used Haskell a lot, I have known about monads for
+a long time, probably since I heard about the [[https://en.wikipedia.org/wiki/Xmonad][xmonad]] window manager. After
+researching on this topic for a few days, I decided to write a small article
+about what I learned, since it might be useful for some people. This article
+won't focus specifically on Haskell, so most concepts can be applied to many
+languages, and not a lot of programming background is required from the reader.
