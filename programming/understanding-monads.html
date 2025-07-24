@@ -206,6 +206,7 @@
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
 <li><a href="#introduction">1. Introduction</a></li>
+<li><a href="#pure-functions">2. Pure functions</a></li>
 </ul>
 </div>
 </div>
@@ -230,6 +231,116 @@ languages, and not a lot of programming background is required from the reader.
 </p>
 </div>
 </div>
+
+<div id="outline-container-pure-functions" class="outline-2">
+<h2 id="pure-functions"><span class="section-number-2">2.</span> Pure functions</h2>
+<div class="outline-text-2" id="text-pure-functions">
+<p>
+Before trying to understand Monads and their use cases, it&rsquo;s important to know
+about <a href="https://en.wikipedia.org/wiki/Pure_function">pure functions</a>, and why they are desirable. Pure functions are a kind of
+function that satisfy 2 properties:
+</p>
+
+<ol class="org-ol">
+<li>The value returned by the function depends only on its inputs, so identical
+values are returned across multiple calls with identical inputs.</li>
+<li>The function must not have <a href="https://en.wikipedia.org/wiki/Side_effect_(computer_science)">side effects</a>, such as modifying global variables,
+input/output streams, etc.</li>
+</ol>
+
+<p>
+For example, the following C functions are conceptually pure<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>, since they don&rsquo;t
+break any of the rules above.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">long</span> <span style="color: #4ae2ff;">double_sum</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">b</span>) {
+    <span style="color: #ff6f9f;">return</span> (a + b) * <span style="color: #88ca9f;">2</span>;
+}
+
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">strlen</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">str</span>) {
+    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">result</span> = <span style="color: #88ca9f;">0</span>;
+    <span style="color: #ff6f9f;">while</span> (str[result] != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>)
+        result++;
+    <span style="color: #ff6f9f;">return</span> result;
+}
+</pre>
 </div>
+
+<p>
+However, the following are not pure, because they are either influenced by the
+external program state, or because they alter it.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">my_global</span> = <span style="color: #88ca9f;">0</span>;
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Accesses external state</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">global_sum</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">n</span>) {
+    <span style="color: #ff6f9f;">return</span> my_global + n;
+}
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Modifies external state (global variable)</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">impure_sum</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">b</span>) {
+    my_global = <span style="color: #88ca9f;">123</span>;
+    <span style="color: #ff6f9f;">return</span> a + b;
+}
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Modifies external state (static variable)</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">static_sum</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">n</span>) {
+    <span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">my_static_global</span> = <span style="color: #88ca9f;">0</span>;
+    my_static_global += n;
+    <span style="color: #ff6f9f;">return</span> my_static_global;
+}
+
+<span style="color: #989898;">/* </span><span style="color: #989898;">Modifies external state (I/O stream)</span><span style="color: #989898;"> */</span>
+<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">print_sum</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">b</span>) {
+    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">result</span> = a + b;
+    printf(<span style="color: #00d3d0;">"Result: </span><span style="color: #ff6f9f;">%d</span><span style="color: #00d3d0;">"</span>, result);
+    <span style="color: #ff6f9f;">return</span> result;
+}
+</pre>
+</div>
+
+<p>
+Pure functions offer many advantages over impure functions, for both the machine
+(compiler, interpreter) and the human (designing the architecture, programming,
+testing, documenting). Some of these advantages include:
+</p>
+
+<ul class="org-ul">
+<li><b>Result caching</b> (<a href="https://en.wikipedia.org/wiki/Memoization">Memoization</a>): If a pure function is repeatedly called with
+the same arguments, since it&rsquo;s guaranteed to return the same result given the
+same inputs, it could be stored in a look-up table, for better performance
+when called multiple times.</li>
+<li><b>Better optimizations</b>: If the compiler/interpreter knows that a function is
+pure, it can safely do many more optimizations, including result caching, or
+skipping calls altogether<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>.</li>
+<li><b>Predictability and security</b>: From the programmer&rsquo;s point of view, it&rsquo;s much
+easier to test a pure function than an impure one, since it doesn&rsquo;t depend on
+an external environment that might make the tests more unreliable or complex.</li>
+</ul>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">One might argue
+that the <code>strlen</code> function is not actually pure, since it receives a pointer whose
+value might change across calls. Since the pointer is constant, this function
+shouldn&rsquo;t be able to modify the value that <code>str</code> points to directly, but that
+doesn&rsquo;t mean that the value itself is constant outside the scope of this
+function, therefore it could be modified between calls. I decided to still
+categorize this function as pure from a higher-level perspective, since it
+produces the same results when given the same <i>string</i> inputs.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">For example, if the length of the same string is
+calculated multiple times, and the string doesn&rsquo;t change, the
+compiler/interpreter could perform a single call and reuse that value</p></div></div>
+
+
+</div>
+</div></div>
 </body>
 </html>

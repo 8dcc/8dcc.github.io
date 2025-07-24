@@ -22,3 +22,89 @@ researching on this topic for a few days, I decided to write a small article
 about what I learned, since it might be useful for some people. This article
 won't focus specifically on Haskell, so most concepts can be applied to many
 languages, and not a lot of programming background is required from the reader.
+
+* Pure functions
+:PROPERTIES:
+:CUSTOM_ID: pure-functions
+:END:
+
+Before trying to understand Monads and their use cases, it's important to know
+about [[https://en.wikipedia.org/wiki/Pure_function][pure functions]], and why they are desirable. Pure functions are a kind of
+function that satisfy 2 properties:
+
+1. The value returned by the function depends only on its inputs, so identical
+   values are returned across multiple calls with identical inputs.
+2. The function must not have [[https://en.wikipedia.org/wiki/Side_effect_(computer_science)][side effects]], such as modifying global variables,
+   input/output streams, etc.
+
+For example, the following C functions are conceptually pure[fn::One might argue
+that the =strlen= function is not actually pure, since it receives a pointer whose
+value might change across calls. Since the pointer is constant, this function
+shouldn't be able to modify the value that =str= points to directly, but that
+doesn't mean that the value itself is constant outside the scope of this
+function, therefore it could be modified between calls. I decided to still
+categorize this function as pure from a higher-level perspective, since it
+produces the same results when given the same /string/ inputs.], since they don't
+break any of the rules above.
+
+#+begin_src C
+long double_sum(int a, int b) {
+    return (a + b) * 2;
+}
+
+int strlen(const char* str) {
+    int result = 0;
+    while (str[result] != '\0')
+        result++;
+    return result;
+}
+#+end_src
+
+However, the following are not pure, because they are either influenced by the
+external program state, or because they alter it.
+
+#+begin_src C
+int my_global = 0;
+
+/* Accesses external state */
+int global_sum(int n) {
+    return my_global + n;
+}
+
+/* Modifies external state (global variable) */
+int impure_sum(int a, int b) {
+    my_global = 123;
+    return a + b;
+}
+
+/* Modifies external state (static variable) */
+int static_sum(int n) {
+    static int my_static_global = 0;
+    my_static_global += n;
+    return my_static_global;
+}
+
+/* Modifies external state (I/O stream) */
+int print_sum(int a, int b) {
+    const int result = a + b;
+    printf("Result: %d", result);
+    return result;
+}
+#+end_src
+
+Pure functions offer many advantages over impure functions, for both the machine
+(compiler, interpreter) and the human (designing the architecture, programming,
+testing, documenting). Some of these advantages include:
+
+- *Result caching* ([[https://en.wikipedia.org/wiki/Memoization][Memoization]]): If a pure function is repeatedly called with
+  the same arguments, since it's guaranteed to return the same result given the
+  same inputs, it could be stored in a look-up table, for better performance
+  when called multiple times.
+- *Better optimizations*: If the compiler/interpreter knows that a function is
+  pure, it can safely do many more optimizations, including result caching, or
+  skipping calls altogether[fn::For example, if the length of the same string is
+  calculated multiple times, and the string doesn't change, the
+  compiler/interpreter could perform a single call and reuse that value].
+- *Predictability and security*: From the programmer's point of view, it's much
+  easier to test a pure function than an impure one, since it doesn't depend on
+  an external environment that might make the tests more unreliable or complex.
