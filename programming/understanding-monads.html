@@ -211,6 +211,7 @@
 <ul>
 <li><a href="#a-simple-writer">3.1. A simple writer</a></li>
 <li><a href="#making-the-writer-pure">3.2. Making the writer pure</a></li>
+<li><a href="#extracting-the-binding-logic">3.3. Extracting the binding logic</a></li>
 </ul>
 </li>
 </ul>
@@ -507,9 +508,105 @@ receive a <code>LoggedInt</code> as their first argument, the first input intege
 
 <p>
 With this simple change, the functions are now pure. At this point, however,
-this design pattern isn&rsquo;t exactly a monad, and some of the common logic can be
+this design pattern isn&rsquo;t exactly a monad, and some of the shared logic can be
 extracted into separate functions.
 </p>
+</div>
+</div>
+
+<div id="outline-container-extracting-the-binding-logic" class="outline-3">
+<h3 id="extracting-the-binding-logic"><span class="section-number-3">3.3.</span> Extracting the binding logic</h3>
+<div class="outline-text-3" id="text-extracting-the-binding-logic">
+<p>
+The previous code can be further abstracted by moving the &ldquo;combination logic&rdquo;
+into a separate <i>binding function</i>. Before defining this <code>bind</code> function, the
+arithmetic functions should be modified so they return a <code>LoggedInt</code> while still
+receiving unwrapped integers.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">add</span>(a, b):
+    <span style="color: #ff6f9f;">return</span> LoggedInt(
+        a + b,  <span style="color: #989898;"># </span><span style="color: #989898;">New value</span>
+        [f<span style="color: #00d3d0;">"Added </span>{a}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>]  <span style="color: #989898;"># </span><span style="color: #989898;">Written log line</span>
+    )
+
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">sub</span>(a, b):
+    <span style="color: #ff6f9f;">return</span> LoggedInt(
+        a - b,
+        [f<span style="color: #00d3d0;">"Subtracted </span>{a}<span style="color: #00d3d0;"> from </span>{b}<span style="color: #00d3d0;">"</span>]
+    )
+
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">mul</span>(a, b):
+    <span style="color: #ff6f9f;">return</span> LoggedInt(
+        a * b,
+        [f<span style="color: #00d3d0;">"Multiplied </span>{a}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>]
+    )
+
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">div</span>(a, b):
+    <span style="color: #ff6f9f;">return</span> LoggedInt(
+        a / b,
+        [f<span style="color: #00d3d0;">"Divided </span>{a}<span style="color: #00d3d0;"> by </span>{b}<span style="color: #00d3d0;">"</span>]
+    )
+</pre>
+</div>
+
+<p>
+The functions now receive two simple integers, and return a new <code>LoggedInt</code> that
+contains the result value and the log line written by that specific
+function. Note how the log line needs to be wrapped in a one-element list, since
+the <code>LoggedInt</code> type expects a log <i>list</i>, not a string.
+</p>
+
+<p>
+Now that the combination logic has been removed from the arithmetic functions,
+the <code>bind</code> function can be implemented, which receives a <code>LoggedInt</code> value (<code>a</code>), one of
+the arithmetic functions, and a simple integer (<code>b</code>). It performs the following steps:
+</p>
+
+<ol class="org-ol">
+<li>Unwrap/extract the original integer value from <code>a</code>, the received <code>LoggedInt</code>.</li>
+<li>Call the transformation function with the unwrapped value and <code>b</code>, the received
+simple integer.</li>
+<li>Combine the logs of the received <code>LoggedInt</code> with the logs of the <code>LoggedInt</code>
+that was returned by transformation function.</li>
+</ol>
+
+<p>
+Through this process, it applies the received function to the other two values,
+and combines that result with the original <code>LoggedInt</code> value.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">bind</span>(old_logged_int, function, b):
+    <span style="color: #6ae4b9;">unwrapped_val</span> = old_logged_int.val
+    <span style="color: #6ae4b9;">new_logged_int</span> = function(unwrapped_val, b)
+    <span style="color: #ff6f9f;">return</span> LoggedInt(
+        new_logged_int.val,
+        old_logged_int.logs + new_logged_int.logs
+    )
+</pre>
+</div>
+
+<p>
+Instead of calling the arithmetic functions directly, they are now passed as
+arguments to <code>bind</code>, which will call the function and combine the logs, returning
+a new <code>LoggedInt</code> result.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6ae4b9;">logged_result</span> = LoggedInt(<span style="color: #88ca9f;">6</span>, [])
+<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, add, <span style="color: #88ca9f;">5</span>)
+<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, sub, <span style="color: #88ca9f;">4</span>)
+<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, mul, <span style="color: #88ca9f;">3</span>)
+<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, div, <span style="color: #88ca9f;">2</span>)
+
+<span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"Final result: </span>{logged_result.val}<span style="color: #00d3d0;">"</span>)
+<span style="color: #feacd0;">print</span>(<span style="color: #00d3d0;">"Logs:"</span>)
+<span style="color: #ff6f9f;">for</span> line <span style="color: #ff6f9f;">in</span> logged_result.logs:
+    <span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"  * </span>{line}<span style="color: #00d3d0;">"</span>)
+</pre>
+</div>
 </div>
 </div>
 </div>

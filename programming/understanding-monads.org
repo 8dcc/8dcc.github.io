@@ -269,5 +269,86 @@ for line in logged_result.logs:
 #+end_src
 
 With this simple change, the functions are now pure. At this point, however,
-this design pattern isn't exactly a monad, and some of the common logic can be
+this design pattern isn't exactly a monad, and some of the shared logic can be
 extracted into separate functions.
+
+** Extracting the binding logic
+:PROPERTIES:
+:CUSTOM_ID: extracting-the-binding-logic
+:END:
+
+The previous code can be further abstracted by moving the "combination logic"
+into a separate /binding function/. Before defining this =bind= function, the
+arithmetic functions should be modified so they return a =LoggedInt= while still
+receiving unwrapped integers.
+
+#+begin_src python
+def add(a, b):
+    return LoggedInt(
+        a + b,  # New value
+        [f"Added {a} to {b}"]  # Written log line
+    )
+
+def sub(a, b):
+    return LoggedInt(
+        a - b,
+        [f"Subtracted {a} from {b}"]
+    )
+
+def mul(a, b):
+    return LoggedInt(
+        a * b,
+        [f"Multiplied {a} to {b}"]
+    )
+
+def div(a, b):
+    return LoggedInt(
+        a / b,
+        [f"Divided {a} by {b}"]
+    )
+#+end_src
+
+The functions now receive two simple integers, and return a new =LoggedInt= that
+contains the result value and the log line written by that specific
+function. Note how the log line needs to be wrapped in a one-element list, since
+the =LoggedInt= type expects a log /list/, not a string.
+
+Now that the combination logic has been removed from the arithmetic functions,
+the =bind= function can be implemented, which receives a =LoggedInt= value (=a=), one of
+the arithmetic functions, and a simple integer (=b=). It performs the following steps:
+
+1. Unwrap/extract the original integer value from =a=, the received =LoggedInt=.
+2. Call the transformation function with the unwrapped value and =b=, the received
+   simple integer.
+3. Combine the logs of the received =LoggedInt= with the logs of the =LoggedInt=
+   that was returned by transformation function.
+
+Through this process, it applies the received function to the other two values,
+and combines that result with the original =LoggedInt= value.
+
+#+begin_src python
+def bind(old_logged_int, function, b):
+    unwrapped_val = old_logged_int.val
+    new_logged_int = function(unwrapped_val, b)
+    return LoggedInt(
+        new_logged_int.val,
+        old_logged_int.logs + new_logged_int.logs
+    )
+#+end_src
+
+Instead of calling the arithmetic functions directly, they are now passed as
+arguments to =bind=, which will call the function and combine the logs, returning
+a new =LoggedInt= result.
+
+#+begin_src python
+logged_result = LoggedInt(6, [])
+logged_result = bind(logged_result, add, 5)
+logged_result = bind(logged_result, sub, 4)
+logged_result = bind(logged_result, mul, 3)
+logged_result = bind(logged_result, div, 2)
+
+print(f"Final result: {logged_result.val}")
+print("Logs:")
+for line in logged_result.logs:
+    print(f"  * {line}")
+#+end_src
