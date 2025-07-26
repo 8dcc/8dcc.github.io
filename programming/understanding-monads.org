@@ -117,9 +117,9 @@ testing, documenting). Some of these advantages include:
   easier to test a pure function than an impure one, since it doesn't depend on
   an external environment that might make the tests more unreliable or complex.
 
-* The problem
+* From impure to monadic
 :PROPERTIES:
-:CUSTOM_ID: the-problem
+:CUSTOM_ID: from-impure-to-monadic
 :END:
 
 Before diving into what monads are, it's important to understand the problem
