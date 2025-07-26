@@ -352,3 +352,159 @@ print("Logs:")
 for line in logged_result.logs:
     print(f"  * {line}")
 #+end_src
+
+Furthermore, the first input doesn't need to be promoted into a =LoggedInt=
+explicitly anymore, since the transformation functions now receive simple
+integers.
+
+#+begin_src python
+logged_result = add(6, 5)  # No explicit call to 'LoggedInt'
+logged_result = bind(logged_result, sub, 4)
+logged_result = bind(logged_result, mul, 3)
+# ...
+#+end_src
+
+** Making the writer a monad
+:PROPERTIES:
+:CUSTOM_ID: making-the-writer-a-monad
+:END:
+
+In order to turn the writer code into a monad, there is one last change that
+needs to be made. The current =bind= function receives 3 arguments, the last one
+being a simple integer because it's what the arithmetic functions expect. The
+=bind= function of a proper monad should only receive 2 arguments: a value, whose
+type is /monadic/ (e.g. =LoggedInt=), and a transformation function, which receives
+a simple value (e.g. an integer) and returns a new monadic value.
+
+#+begin_src python
+def bind(old_logged_int, function): # Receives two arguments
+    unwrapped_val = old_logged_int.val
+    new_logged_int = function(unwrapped_val)  # Called with one argument
+    return LoggedInt(
+        new_logged_int.val,
+        old_logged_int.logs + new_logged_int.logs
+    )
+#+end_src
+
+After this change, how could the new =bind= function receive the arithmetic
+functions, if they receive two arguments, =a= and =b=? This problem has an easy
+solution, although it's not particularly pretty depending on the programming
+language. All functions can be converted into one-argument functions by
+returning a lambda. For example, the following two function calls are
+equivalent.
+
+#+begin_src python
+# Define a function that receives integers 'a', 'b' and 'c', and returns an
+# integer with the result.
+def foo(a, b, c):
+    return a + b * c
+
+# Define a function that receives an integer 'a', and returns an anonymous
+# function that receives an integer 'b', and returns and anonymous function that
+# receives an integer 'c' and returns an integer with the result.
+def bar(a):
+    return lambda b: lambda c: a + b * c
+
+# Example calls.
+foo(5, 6, 7)
+bar(5)(6)(7)
+#+end_src
+
+Therefore, the arithmetic functions themselves don't need to be modified, since
+the following expressions would be equivalent:
+
+#+begin_src python
+add(5, 6)
+
+# Equivalent one argument function.
+add_six = lambda a: add(a, 6)
+add_six(5)
+#+end_src
+
+This is how the bind functions would be called to match the previous example.
+
+#+begin_src python
+logged_result = add(6, 5)
+logged_result = bind(logged_result, lambda a: sub(a, 4))
+logged_result = bind(logged_result, lambda a: mul(a, 3))
+logged_result = bind(logged_result, lambda a: div(a, 2))
+#+end_src
+
+Furthermore, using an object-oriented approach, the =bind= function can be
+converted to a method of =LoggedInt=, allowing the caller to bind functions with a
+cleaner notation, since it now accesses the instance of the object.
+
+#+begin_src python
+class LoggedInt:
+    def __init__(self, val, logs):  # Unchanged
+        self.val = val
+        self.logs = logs
+
+    def bind(self, function):
+        new_logged_int = function(self.val)
+        return LoggedInt(
+            new_logged_int.val,
+            self.logs + new_logged_int.logs
+        )
+
+# Example usage.
+logged_result = (
+    add(6, 5).bind(lambda a: sub(a, 4))
+             .bind(lambda a: mul(a, 3))
+             .bind(lambda a: div(a, 2))
+)
+#+end_src
+
+** Final code
+:PROPERTIES:
+:CUSTOM_ID: final-code
+:END:
+
+This is the final python code for the /writer/ monad.
+
+#+begin_src python :results output
+# Monadic type, expands a base integer type to add logging functionality.
+class LoggedInt:
+    def __init__(self, val, logs):
+        self.val = val
+        self.logs = logs
+
+    # Applies a one-argument transformation function to the current instance,
+    # and combines the result with the existing log list.
+    def bind(self, function):
+        new_logged_int = function(self.val)
+        return LoggedInt(
+            new_logged_int.val,
+            self.logs + new_logged_int.logs
+        )
+
+# Transformation functions.
+def add(a, b):
+    return LoggedInt(a + b, [f"Added {a} to {b}"])
+def sub(a, b):
+    return LoggedInt(a - b, [f"Subtracted {a} from {b}"])
+def mul(a, b):
+    return LoggedInt(a * b, [f"Multiplied {a} to {b}"])
+def div(a, b):
+    return LoggedInt(a / b, [f"Divided {a} by {b}"])
+
+# Example usage.
+logged_result = (
+    add(6, 5).bind(lambda a: sub(a, 4))
+             .bind(lambda a: mul(a, 3))
+             .bind(lambda a: div(a, 2))
+)
+
+print(f"Final result: {logged_result.val}")
+print("Logs:")
+for line in logged_result.logs:
+    print(f"  * {line}")
+#+end_src
+
+#+RESULTS:
+: Final result: 10.5
+: Logs:
+:   * Added 6 to 5
+:   * Subtracted 11 from 4
+:   * Multiplied 7 to 3
+:   * Divided 21 by 2

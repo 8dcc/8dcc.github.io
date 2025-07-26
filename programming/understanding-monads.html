@@ -212,6 +212,8 @@
 <li><a href="#a-simple-writer">3.1. A simple writer</a></li>
 <li><a href="#making-the-writer-pure">3.2. Making the writer pure</a></li>
 <li><a href="#extracting-the-binding-logic">3.3. Extracting the binding logic</a></li>
+<li><a href="#making-the-writer-a-monad">3.4. Making the writer a monad</a></li>
+<li><a href="#final-code">3.5. Final code</a></li>
 </ul>
 </li>
 </ul>
@@ -600,6 +602,175 @@ a new <code>LoggedInt</code> result.
 <span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, sub, <span style="color: #88ca9f;">4</span>)
 <span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, mul, <span style="color: #88ca9f;">3</span>)
 <span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, div, <span style="color: #88ca9f;">2</span>)
+
+<span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"Final result: </span>{logged_result.val}<span style="color: #00d3d0;">"</span>)
+<span style="color: #feacd0;">print</span>(<span style="color: #00d3d0;">"Logs:"</span>)
+<span style="color: #ff6f9f;">for</span> line <span style="color: #ff6f9f;">in</span> logged_result.logs:
+    <span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"  * </span>{line}<span style="color: #00d3d0;">"</span>)
+</pre>
+</div>
+
+<p>
+Furthermore, the first input doesn&rsquo;t need to be promoted into a <code>LoggedInt</code>
+explicitly anymore, since the transformation functions now receive simple
+integers.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6ae4b9;">logged_result</span> = add(<span style="color: #88ca9f;">6</span>, <span style="color: #88ca9f;">5</span>)  <span style="color: #989898;"># </span><span style="color: #989898;">No explicit call to 'LoggedInt'</span>
+<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, sub, <span style="color: #88ca9f;">4</span>)
+<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, mul, <span style="color: #88ca9f;">3</span>)
+<span style="color: #989898;"># </span><span style="color: #989898;">...</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-making-the-writer-a-monad" class="outline-3">
+<h3 id="making-the-writer-a-monad"><span class="section-number-3">3.4.</span> Making the writer a monad</h3>
+<div class="outline-text-3" id="text-making-the-writer-a-monad">
+<p>
+In order to turn the writer code into a monad, there is one last change that
+needs to be made. The current <code>bind</code> function receives 3 arguments, the last one
+being a simple integer because it&rsquo;s what the arithmetic functions expect. The
+<code>bind</code> function of a proper monad should only receive 2 arguments: a value, whose
+type is <i>monadic</i> (e.g. <code>LoggedInt</code>), and a transformation function, which receives
+a simple value (e.g. an integer) and returns a new monadic value.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">bind</span>(old_logged_int, function): <span style="color: #989898;"># </span><span style="color: #989898;">Receives two arguments</span>
+    <span style="color: #6ae4b9;">unwrapped_val</span> = old_logged_int.val
+    <span style="color: #6ae4b9;">new_logged_int</span> = function(unwrapped_val)  <span style="color: #989898;"># </span><span style="color: #989898;">Called with one argument</span>
+    <span style="color: #ff6f9f;">return</span> LoggedInt(
+        new_logged_int.val,
+        old_logged_int.logs + new_logged_int.logs
+    )
+</pre>
+</div>
+
+<p>
+After this change, how could the new <code>bind</code> function receive the arithmetic
+functions, if they receive two arguments, <code>a</code> and <code>b</code>? This problem has an easy
+solution, although it&rsquo;s not particularly pretty depending on the programming
+language. All functions can be converted into one-argument functions by
+returning a lambda. For example, the following two function calls are
+equivalent.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #989898;"># </span><span style="color: #989898;">Define a function that receives integers 'a', 'b' and 'c', and returns an</span>
+<span style="color: #989898;"># </span><span style="color: #989898;">integer with the result.</span>
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">foo</span>(a, b, c):
+    <span style="color: #ff6f9f;">return</span> a + b * c
+
+<span style="color: #989898;"># </span><span style="color: #989898;">Define a function that receives an integer 'a', and returns an anonymous</span>
+<span style="color: #989898;"># </span><span style="color: #989898;">function that receives an integer 'b', and returns and anonymous function that</span>
+<span style="color: #989898;"># </span><span style="color: #989898;">receives an integer 'c' and returns an integer with the result.</span>
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">bar</span>(a):
+    <span style="color: #ff6f9f;">return</span> <span style="color: #ff6f9f;">lambda</span> b: <span style="color: #ff6f9f;">lambda</span> c: a + b * c
+
+<span style="color: #989898;"># </span><span style="color: #989898;">Example calls.</span>
+foo(<span style="color: #88ca9f;">5</span>, <span style="color: #88ca9f;">6</span>, <span style="color: #88ca9f;">7</span>)
+bar(<span style="color: #88ca9f;">5</span>)(<span style="color: #88ca9f;">6</span>)(<span style="color: #88ca9f;">7</span>)
+</pre>
+</div>
+
+<p>
+Therefore, the arithmetic functions themselves don&rsquo;t need to be modified, since
+the following expressions would be equivalent:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">add(<span style="color: #88ca9f;">5</span>, <span style="color: #88ca9f;">6</span>)
+
+<span style="color: #989898;"># </span><span style="color: #989898;">Equivalent one argument function.</span>
+<span style="color: #6ae4b9;">add_six</span> = <span style="color: #ff6f9f;">lambda</span> a: add(a, <span style="color: #88ca9f;">6</span>)
+add_six(<span style="color: #88ca9f;">5</span>)
+</pre>
+</div>
+
+<p>
+This is how the bind functions would be called to match the previous example.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #6ae4b9;">logged_result</span> = add(<span style="color: #88ca9f;">6</span>, <span style="color: #88ca9f;">5</span>)
+<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, <span style="color: #ff6f9f;">lambda</span> a: sub(a, <span style="color: #88ca9f;">4</span>))
+<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, <span style="color: #ff6f9f;">lambda</span> a: mul(a, <span style="color: #88ca9f;">3</span>))
+<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, <span style="color: #ff6f9f;">lambda</span> a: div(a, <span style="color: #88ca9f;">2</span>))
+</pre>
+</div>
+
+<p>
+Furthermore, using an object-oriented approach, the <code>bind</code> function can be
+converted to a method of <code>LoggedInt</code>, allowing the caller to bind functions with a
+cleaner notation, since it now accesses the instance of the object.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ff6f9f;">class</span> <span style="color: #79a8ff;">LoggedInt</span>:
+    <span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">__init__</span>(<span style="color: #ff6f9f;">self</span>, val, logs):  <span style="color: #989898;"># </span><span style="color: #989898;">Unchanged</span>
+        <span style="color: #ff6f9f;">self</span>.<span style="color: #6ae4b9;">val</span> = val
+        <span style="color: #ff6f9f;">self</span>.<span style="color: #6ae4b9;">logs</span> = logs
+
+    <span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">bind</span>(<span style="color: #ff6f9f;">self</span>, function):
+        <span style="color: #6ae4b9;">new_logged_int</span> = function(<span style="color: #ff6f9f;">self</span>.val)
+        <span style="color: #ff6f9f;">return</span> LoggedInt(
+            new_logged_int.val,
+            <span style="color: #ff6f9f;">self</span>.logs + new_logged_int.logs
+        )
+
+<span style="color: #989898;"># </span><span style="color: #989898;">Example usage.</span>
+<span style="color: #6ae4b9;">logged_result</span> = (
+    add(<span style="color: #88ca9f;">6</span>, <span style="color: #88ca9f;">5</span>).bind(<span style="color: #ff6f9f;">lambda</span> a: sub(a, <span style="color: #88ca9f;">4</span>))
+             .bind(<span style="color: #ff6f9f;">lambda</span> a: mul(a, <span style="color: #88ca9f;">3</span>))
+             .bind(<span style="color: #ff6f9f;">lambda</span> a: div(a, <span style="color: #88ca9f;">2</span>))
+)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-final-code" class="outline-3">
+<h3 id="final-code"><span class="section-number-3">3.5.</span> Final code</h3>
+<div class="outline-text-3" id="text-final-code">
+<p>
+This is the final python code for the <i>writer</i> monad.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #989898;"># </span><span style="color: #989898;">Monadic type, expands a base integer type to add logging functionality.</span>
+<span style="color: #ff6f9f;">class</span> <span style="color: #79a8ff;">LoggedInt</span>:
+    <span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">__init__</span>(<span style="color: #ff6f9f;">self</span>, val, logs):
+        <span style="color: #ff6f9f;">self</span>.<span style="color: #6ae4b9;">val</span> = val
+        <span style="color: #ff6f9f;">self</span>.<span style="color: #6ae4b9;">logs</span> = logs
+
+    <span style="color: #989898;"># </span><span style="color: #989898;">Applies a one-argument transformation function to the current instance,</span>
+    <span style="color: #989898;"># </span><span style="color: #989898;">and combines the result with the existing log list.</span>
+    <span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">bind</span>(<span style="color: #ff6f9f;">self</span>, function):
+        <span style="color: #6ae4b9;">new_logged_int</span> = function(<span style="color: #ff6f9f;">self</span>.val)
+        <span style="color: #ff6f9f;">return</span> LoggedInt(
+            new_logged_int.val,
+            <span style="color: #ff6f9f;">self</span>.logs + new_logged_int.logs
+        )
+
+<span style="color: #989898;"># </span><span style="color: #989898;">Transformation functions.</span>
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">add</span>(a, b):
+    <span style="color: #ff6f9f;">return</span> LoggedInt(a + b, [f<span style="color: #00d3d0;">"Added </span>{a}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>])
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">sub</span>(a, b):
+    <span style="color: #ff6f9f;">return</span> LoggedInt(a - b, [f<span style="color: #00d3d0;">"Subtracted </span>{a}<span style="color: #00d3d0;"> from </span>{b}<span style="color: #00d3d0;">"</span>])
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">mul</span>(a, b):
+    <span style="color: #ff6f9f;">return</span> LoggedInt(a * b, [f<span style="color: #00d3d0;">"Multiplied </span>{a}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>])
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">div</span>(a, b):
+    <span style="color: #ff6f9f;">return</span> LoggedInt(a / b, [f<span style="color: #00d3d0;">"Divided </span>{a}<span style="color: #00d3d0;"> by </span>{b}<span style="color: #00d3d0;">"</span>])
+
+<span style="color: #989898;"># </span><span style="color: #989898;">Example usage.</span>
+<span style="color: #6ae4b9;">logged_result</span> = (
+    add(<span style="color: #88ca9f;">6</span>, <span style="color: #88ca9f;">5</span>).bind(<span style="color: #ff6f9f;">lambda</span> a: sub(a, <span style="color: #88ca9f;">4</span>))
+             .bind(<span style="color: #ff6f9f;">lambda</span> a: mul(a, <span style="color: #88ca9f;">3</span>))
+             .bind(<span style="color: #ff6f9f;">lambda</span> a: div(a, <span style="color: #88ca9f;">2</span>))
+)
 
 <span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"Final result: </span>{logged_result.val}<span style="color: #00d3d0;">"</span>)
 <span style="color: #feacd0;">print</span>(<span style="color: #00d3d0;">"Logs:"</span>)
