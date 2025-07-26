@@ -41,63 +41,46 @@ function that satisfy 2 properties:
 2. The function must not have [[https://en.wikipedia.org/wiki/Side_effect_(computer_science)][side effects]], such as modifying global variables,
    input/output streams, etc.
 
-For example, the following C functions are conceptually pure[fn::One might argue
-that the =strlen= function is not actually pure, since it receives a pointer whose
-value might change across calls. Since the pointer is constant, this function
-shouldn't be able to modify the value that =str= points to directly, but that
-doesn't mean that the value itself is constant outside the scope of this
-function, therefore it could be modified between calls. I decided to still
-categorize this function as pure from a higher-level perspective, since it
-produces the same results when given the same /string/ inputs.], since they don't
-break any of the rules above.
+For example, the following python functions are pure[fn::On lower-level
+programming languages, like C, one might argue that string-manipulation
+functions are not actually pure, since they often receive a pointer whose value
+might change across calls. I decided to still categorize the =count_uppercase=
+function as pure, in higher-level programming languages, since it produces the
+same results when given the same /string/ inputs.], since they don't break any of
+the rules above.
 
-#+begin_comment org
-TODO: Use Python.
-#+end_comment
+#+begin_src python
+def double_sum(a, b):
+    return (a + b) * 2
 
-#+begin_src C
-long double_sum(int a, int b) {
-    return (a + b) * 2;
-}
-
-int strlen(const char* str) {
-    int result = 0;
-    while (str[result] != '\0')
-        result++;
+def count_uppercase(string):
+    result = 0
+    for character in string:
+        if character.isupper():
+            result += 1
     return result;
-}
 #+end_src
 
 However, the following are not pure, because they are either influenced by the
 external program state, or because they alter it.
 
-#+begin_src C
-int my_global = 0;
+#+begin_src python
+my_global = 0
 
-/* Accesses external state */
-int global_sum(int n) {
-    return my_global + n;
-}
+# Accesses external state.
+def global_sum(n):
+    return my_global + n
 
-/* Modifies external state (global variable) */
-int impure_sum(int a, int b) {
-    my_global = 123;
-    return a + b;
-}
+# Modifies external state (global variable).
+def impure_sum(a, b):
+    my_global = 123
+    return a + b
 
-/* Modifies external state (static variable) */
-int static_sum(int n) {
-    static int my_static_global = 0;
-    my_static_global += n;
-    return my_static_global;
-}
-
-/* Modifies external state (I/O stream) */
-int print_sum(int a, int b) {
-    const int result = a + b;
-    printf("Result: %d", result);
-    return result;
-}
+# Modifies external state (I/O stream).
+def print_sum(a, b):
+    result = a + b
+    print(f"Result: {result}")
+    return result
 #+end_src
 
 Pure functions offer many advantages over impure functions, for both the machine

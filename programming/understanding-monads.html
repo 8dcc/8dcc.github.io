@@ -264,21 +264,20 @@ input/output streams, etc.</li>
 </ol>
 
 <p>
-For example, the following C functions are conceptually pure<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>, since they don&rsquo;t
-break any of the rules above.
+For example, the following python functions are pure<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>, since they don&rsquo;t break any of
+the rules above.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">long</span> <span style="color: #4ae2ff;">double_sum</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">b</span>) {
-    <span style="color: #ff6f9f;">return</span> (a + b) * <span style="color: #88ca9f;">2</span>;
-}
+<pre class="src src-python"><span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">double_sum</span>(a, b):
+    <span style="color: #ff6f9f;">return</span> (a + b) * <span style="color: #88ca9f;">2</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">strlen</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">str</span>) {
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">result</span> = <span style="color: #88ca9f;">0</span>;
-    <span style="color: #ff6f9f;">while</span> (str[result] != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>)
-        result++;
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">count_uppercase</span>(string):
+    <span style="color: #6ae4b9;">result</span> = <span style="color: #88ca9f;">0</span>
+    <span style="color: #ff6f9f;">for</span> character <span style="color: #ff6f9f;">in</span> string:
+        <span style="color: #ff6f9f;">if</span> character.isupper():
+            <span style="color: #6ae4b9;">result</span> += <span style="color: #88ca9f;">1</span>
     <span style="color: #ff6f9f;">return</span> result;
-}
 </pre>
 </div>
 
@@ -288,32 +287,22 @@ external program state, or because they alter it.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">my_global</span> = <span style="color: #88ca9f;">0</span>;
+<pre class="src src-python"><span style="color: #6ae4b9;">my_global</span> = <span style="color: #88ca9f;">0</span>
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Accesses external state</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">global_sum</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">n</span>) {
-    <span style="color: #ff6f9f;">return</span> my_global + n;
-}
+<span style="color: #989898;"># </span><span style="color: #989898;">Accesses external state.</span>
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">global_sum</span>(n):
+    <span style="color: #ff6f9f;">return</span> my_global + n
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Modifies external state (global variable)</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">impure_sum</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">b</span>) {
-    my_global = <span style="color: #88ca9f;">123</span>;
-    <span style="color: #ff6f9f;">return</span> a + b;
-}
+<span style="color: #989898;"># </span><span style="color: #989898;">Modifies external state (global variable).</span>
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">impure_sum</span>(a, b):
+    <span style="color: #6ae4b9;">my_global</span> = <span style="color: #88ca9f;">123</span>
+    <span style="color: #ff6f9f;">return</span> a + b
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Modifies external state (static variable)</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">static_sum</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">n</span>) {
-    <span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">my_static_global</span> = <span style="color: #88ca9f;">0</span>;
-    my_static_global += n;
-    <span style="color: #ff6f9f;">return</span> my_static_global;
-}
-
-<span style="color: #989898;">/* </span><span style="color: #989898;">Modifies external state (I/O stream)</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">print_sum</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">b</span>) {
-    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">result</span> = a + b;
-    printf(<span style="color: #00d3d0;">"Result: </span><span style="color: #ff6f9f;">%d</span><span style="color: #00d3d0;">"</span>, result);
-    <span style="color: #ff6f9f;">return</span> result;
-}
+<span style="color: #989898;"># </span><span style="color: #989898;">Modifies external state (I/O stream).</span>
+<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">print_sum</span>(a, b):
+    <span style="color: #6ae4b9;">result</span> = a + b
+    <span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"Result: </span>{result}<span style="color: #00d3d0;">"</span>)
+    <span style="color: #ff6f9f;">return</span> result
 </pre>
 </div>
 
@@ -785,14 +774,12 @@ This is the final python code for the <i>writer</i> monad.
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">One might argue
-that the <code>strlen</code> function is not actually pure, since it receives a pointer whose
-value might change across calls. Since the pointer is constant, this function
-shouldn&rsquo;t be able to modify the value that <code>str</code> points to directly, but that
-doesn&rsquo;t mean that the value itself is constant outside the scope of this
-function, therefore it could be modified between calls. I decided to still
-categorize this function as pure from a higher-level perspective, since it
-produces the same results when given the same <i>string</i> inputs.</p></div></div>
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">On lower-level
+programming languages, like C, one might argue that string-manipulation
+functions are not actually pure, since they often receive a pointer whose value
+might change across calls. I decided to still categorize the <code>count_uppercase</code>
+function as pure, in higher-level programming languages, since it produces the
+same results when given the same <i>string</i> inputs.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">For example, if the length of the same string is
 calculated multiple times, and the string doesn&rsquo;t change, the
