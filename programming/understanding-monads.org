@@ -51,6 +51,10 @@ categorize this function as pure from a higher-level perspective, since it
 produces the same results when given the same /string/ inputs.], since they don't
 break any of the rules above.
 
+#+begin_comment org
+TODO: Use Python.
+#+end_comment
+
 #+begin_src C
 long double_sum(int a, int b) {
     return (a + b) * 2;
@@ -126,6 +130,11 @@ example, the programmer might want to combine or link a series of functions
 whose arguments are integers, but whose returned data type is a more complex
 structure that extends the received integer type.
 
+** A simple writer
+:PROPERTIES:
+:CUSTOM_ID: a-simple-writer
+:END:
+
 To illustrate this problem, along with a possible solution, the /writer/ monad
 will be used, which allows functions to extend a base type with a series of logs
 that will be appended together into a list. Below is some Python code that
@@ -185,5 +194,80 @@ Logs:
 
 Notice how the internal structure of those functions is very similar, and since
 much behavior is shared, they could be further abstracted. Also note how the
-functions are not pure because they produce side effects, like modifying a
+functions are not pure because they produce side effects by modifying a
 global variable.
+
+** Making the writer pure
+:PROPERTIES:
+:CUSTOM_ID: making-the-writer-pure
+:END:
+
+Instead of modifying a global list, these functions could return their log line
+as part of the result, making them pure. In order to chain multiple functions,
+combining their logs, they could also receive the previous log list as part of
+their arguments.
+
+First, a new data type should be defined, which extends the integer type by
+adding the log list.
+
+#+begin_src python
+class LoggedInt:
+    def __init__(self, val, logs):
+        self.val = val
+        self.logs = logs
+
+# Example
+logged_int = LoggedInt(5, ["Some log line", "Another log line"])
+#+end_src
+
+The arithmetic functions can be modified to receive and return this new data
+type, appending the new log line to the previous log list. Note how the first
+argument of the following functions is a =LoggedInt=, but the second argument is
+still a simple integer.
+
+#+begin_src python
+def add(logged_a, b):
+    return LoggedInt(
+        logged_a.val + b,  # New value
+        logged_a.logs + [f"Added {logged_a.val} to {b}"]  # Extended log list
+    )
+
+def sub(logged_a, b):
+    return LoggedInt(
+        logged_a.val - b,
+        logged_a.logs + [f"Subtracted {logged_a.val} from {b}"]
+    )
+
+def mul(logged_a, b):
+    return LoggedInt(
+        logged_a.val * b,
+        logged_a.logs + [f"Multiplied {logged_a.val} to {b}"]
+    )
+
+def div(logged_a, b):
+    return LoggedInt(
+        logged_a.val / b,
+        logged_a.logs + [f"Divided {logged_a.val} by {b}"]
+    )
+#+end_src
+
+The usage of these functions is similar to the previous ones, but since they now
+receive a =LoggedInt= as their first argument, the first input integer needs to be
+/promoted/ to a =LoggedInt=, initially with an empty log list.
+
+#+begin_src python
+logged_result = LoggedInt(6, [])
+logged_result = add(logged_result, 5)
+logged_result = sub(logged_result, 4)
+logged_result = mul(logged_result, 3)
+logged_result = div(logged_result, 2)
+
+print(f"Final result: {logged_result.val}")
+print("Logs:")
+for line in logged_result.logs:
+    print(f"  * {line}")
+#+end_src
+
+With this simple change, the functions are now pure. At this point, however,
+this design pattern isn't exactly a monad, and some of the common logic can be
+extracted into separate functions.
