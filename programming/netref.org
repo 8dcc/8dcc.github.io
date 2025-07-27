@@ -1,4 +1,4 @@
-#+TITLE: C Network Programming Reference
+#+TITLE: Introduction to network programming in C
 #+AUTHOR: 8dcc
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
@@ -17,12 +17,11 @@ This article is meant to be a quick guide/reference for C programmers who are
 interested in network programming on Unix-like systems. The code in this article
 has been tested on Linux 6.11.6.
 
-I am somewhat new to network programming myself, so if you have any suggestions,
-please feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this page.
+At the time of writing this article, I am somewhat new to network programming,
+so if you have any suggestions, please feel free to [[https://github.com/8dcc/8dcc.github.io][contribute]] to this page.
 
-Some other interesting resources about network programming:
-
-- [[https://beej.us/guide/bgnet/][Beej's Guide to Network Programming]].
+If you are interested on reading more about network programming, I recommend
+reading [[https://beej.us/guide/bgnet/][Beej's Guide to Network Programming]].
 
 * Network-related concepts
 :PROPERTIES:
