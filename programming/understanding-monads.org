@@ -1,4 +1,4 @@
-#+TITLE: Understanding Monads
+#+TITLE: Understanding monads
 #+AUTHOR: 8dcc
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
