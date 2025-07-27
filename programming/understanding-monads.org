@@ -121,7 +121,7 @@ structure that extends the received integer type.
 To illustrate this problem, along with a possible solution, the /writer/ monad
 will be used, which allows functions to extend a base type with a series of logs
 that will be appended together into a list. Below is some Python code that
-implements this /writer/ functionality without using a monad. Each function
+implements this writer functionality without using a monad. Each function
 performs some computation (in this case, simple arithmetic operations), while
 also logging a string into a global list variable.
 
@@ -297,14 +297,15 @@ function. Note how the log line needs to be wrapped in a one-element list, since
 the =LoggedInt= type expects a log /list/, not a string.
 
 Now that the combination logic has been removed from the arithmetic functions,
-the =bind= function can be implemented, which receives a =LoggedInt= value (=a=), one of
-the arithmetic functions, and a simple integer (=b=). It performs the following steps:
+the =bind= function can be implemented, which receives a =LoggedInt= value (=a=), one
+of the arithmetic functions, and a simple integer (=b=). It performs the following
+steps:
 
 1. Unwrap/extract the original integer value from =a=, the received =LoggedInt=.
-2. Call the transformation function with the unwrapped value and =b=, the received
-   simple integer.
+2. Call the arithmetic function (received as an argument) with the unwrapped
+   value and =b=, the received simple integer.
 3. Combine the logs of the received =LoggedInt= with the logs of the =LoggedInt=
-   that was returned by transformation function.
+   that were returned by the arithmetic function.
 
 Through this process, it applies the received function to the other two values,
 and combines that result with the original =LoggedInt= value.
@@ -337,8 +338,7 @@ for line in logged_result.logs:
 #+end_src
 
 Furthermore, the first input doesn't need to be promoted into a =LoggedInt=
-explicitly anymore, since the transformation functions now receive simple
-integers.
+explicitly anymore, since the arithmetic functions now receive simple integers.
 
 #+begin_src python
 logged_result = add(6, 5)  # No explicit call to 'LoggedInt'
@@ -356,8 +356,8 @@ In order to turn the writer code into a monad, there is one last change that
 needs to be made. The current =bind= function receives 3 arguments, the last one
 being a simple integer because it's what the arithmetic functions expect. The
 =bind= function of a proper monad should only receive 2 arguments: a value, whose
-type is /monadic/ (e.g. =LoggedInt=), and a transformation function, which receives
-a simple value (e.g. an integer) and returns a new monadic value.
+type is monadic (e.g. =LoggedInt=), and a /monadic function/, which receives a
+simple value (e.g. an integer) and returns a new monadic value.
 
 #+begin_src python
 def bind(old_logged_int, function): # Receives two arguments
@@ -443,17 +443,21 @@ logged_result = (
 :CUSTOM_ID: final-code
 :END:
 
-This is the final python code for the /writer/ monad.
+Some small modifications can be made, like adding default value to the second
+argument of the constructor. There is also a new one-argument monadic function
+for squaring a number.
+
+This is the final python code for the writer monad.
 
 #+begin_src python :results output
 # Monadic type, expands a base integer type to add logging functionality.
 class LoggedInt:
-    def __init__(self, val, logs):
+    def __init__(self, val, logs=[]):
         self.val = val
         self.logs = logs
 
-    # Applies a one-argument transformation function to the current instance,
-    # and combines the result with the existing log list.
+    # Applies a one-argument monadic function to the current instance, and
+    # combines the result with the existing log list.
     def bind(self, function):
         new_logged_int = function(self.val)
         return LoggedInt(
@@ -461,7 +465,7 @@ class LoggedInt:
             self.logs + new_logged_int.logs
         )
 
-# Transformation functions.
+# Monadic functions.
 def add(a, b):
     return LoggedInt(a + b, [f"Added {a} to {b}"])
 def sub(a, b):
@@ -470,12 +474,15 @@ def mul(a, b):
     return LoggedInt(a * b, [f"Multiplied {a} to {b}"])
 def div(a, b):
     return LoggedInt(a / b, [f"Divided {a} by {b}"])
+def square(a):
+    return LoggedInt(a * a, [f"Squared {a}"])
 
 # Example usage.
 logged_result = (
     add(6, 5).bind(lambda a: sub(a, 4))
              .bind(lambda a: mul(a, 3))
              .bind(lambda a: div(a, 2))
+             .bind(lambda a: square(a))
 )
 
 print(f"Final result: {logged_result.val}")
@@ -485,9 +492,114 @@ for line in logged_result.logs:
 #+end_src
 
 #+RESULTS:
-: Final result: 10.5
+: Final result: 110.25
 : Logs:
 :   * Added 6 to 5
 :   * Subtracted 11 from 4
 :   * Multiplied 7 to 3
 :   * Divided 21 by 2
+:   * Squared 10.5
+
+* What are monads?
+:PROPERTIES:
+:CUSTOM_ID: what-are-monads
+:END:
+
+A monad is a design pattern that is often used in functional programming for
+encapsulating and combining a series of steps or computations (i.e. function
+calls) within a context, allowing them to produce side effects in that
+controlled environment, keeping the functions pure.
+
+In the previous example, the =LoggedInt= data type implements the writer monad by
+extending a base integer type, where the logs are the side effects that should
+be encapsulated within the monadic context, and the =bind= function provides the
+means for combining functions in this environment.
+
+A "monad" is not a specific data type, like =Integer= or =String=, it is a design
+pattern that certain types might implement. It is similar to an [[https://en.wikipedia.org/wiki/Interface_(object-oriented_programming)][interface]] in
+object-oriented programming.
+
+** Properties of monads
+:PROPERTIES:
+:CUSTOM_ID: properties-of-monads
+:END:
+
+A monad must implement a monadic type (=LoggedInt=), and two operations:
+
+1. A constructor or wrapper[fn::This function is called =return= or =pure= in
+   Haskell, but those names can be confusing, specially when used outside a =do=
+   block. Note that =pure= is part of the =Applicative= typeclass, which is a
+   supperclass of =Monad=.], which receives the base type (e.g. an integer) and
+   wraps it into the monadic type. In the previous example, this was the
+   =__init__= constructor of =LoggedInt=.
+2. A binding function[fn::This function is usually called =bind=, and in Haskell
+   it is available as an ~>>=~ operator.], which receives a monadic value and a
+   monadic function. It applies the monadic function to the unwrapped value, and
+   preserves the old monadic context by somehow joining or combining it with the
+   one returned by the monadic function.
+
+Note how the monad doesn't need to provide any "unwrapping" functionality that
+allows the caller to extract a simple value from a monadic one; that logic is
+part of the =bind= function, which unwraps the monadic value it receives before
+applying the monadic function to it.
+
+Furthermore, monads must satisfy 3 laws that determine the behavior of the
+constructor and the binding function:
+
+- Left identity ::
+
+  Promoting a simple value into a the monadic type through the constructor, and
+  then binding it to a monadic function is equivalent to applying the function
+  to the simple value directly.
+
+  The previous writer example, satisfies this law, because the following
+  expressions are equivalent:
+
+  #+begin_src python
+  # Call the monadic function with simple value.
+  result1 = square(6)
+
+  # Promote simple value to monadic type, and bind it to monadic function.
+  result2 = LoggedInt(6).bind(square)
+  #+end_src
+
+- Right identity ::
+
+  Binding a monadic value to the constructor doesn't affect the monadic value. This
+  ensures the constructor doesn't alter the monadic environment.
+
+  In the previous writer example, this guarantees that the monadic constructor
+  doesn't initialize the log list (i.e. the monadic context) with any
+  information. This can be checked because the following expressions are
+  equivalent:
+
+  #+begin_src python
+  # Promote a simple value to a monadic type, through the constructor.
+  result1 = LoggedInt(6)
+
+  # Promote a simple value to a monadic type, and bind that to the constructor.
+  result2 = LoggedInt(6).bind(LoggedInt)
+  #+end_src
+
+- Associativity ::
+
+  The order in which monadic values are /combined/ does not affect the
+  result. Note that the order in which monadic functions are /applied/ to monadic
+  values does matter; this property specifies that the application order should
+  not affect the combination or linking process performed by =bind=.
+
+  In the previous writer example:
+
+  #+begin_src python
+  # Define another simple one-argument monadic function.
+  def add_five(a):
+      return add(a, 5)
+
+  # Promote a simple value to a monadic type, bind that to 'square', and then
+  # bind the result to 'add_five'.
+  result1 = LoggedInt(6).bind(square).bind(add_five)
+
+  # Promote a simple value to a monadic type, and bind that to a lambda which
+  # calls 'square' on its input and binds that to 'add_five'.
+  result2 = LoggedInt(6).bind(lambda a: square(a).bind(add_five))
+  #+end_src
