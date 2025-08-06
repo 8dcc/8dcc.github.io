@@ -44,11 +44,59 @@
          url('../fonts/LM-bold-italic.woff') format('woff');
 }
 
+@font-face {
+  font-family: 'Libertinus';
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  src: url('../fonts/LibertinusSerif-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Libertinus';
+  font-style: italic;
+  font-weight: normal;
+  font-display: swap;
+  src: url('../fonts/LibertinusSerif-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Libertinus';
+  font-style: normal;
+  font-weight: bold;
+  font-display: swap;
+  src: url('../fonts/LibertinusSerif-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Libertinus';
+  font-style: italic;
+  font-weight: bold;
+  font-display: swap;
+  src: url('../fonts/LibertinusSerif-BoldItalic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Libertinus';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/LibertinusSerif-Semibold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Libertinus';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/LibertinusSerif-SemiboldItalic.woff2') format('woff2');
+}
+
 /*----------------------------------------------------------------------------*/
 
 
 body {
-    font-family: 'Latin Modern', Georgia, Cambria, 'Times New Roman', Times, serif;
+    font-family: 'Libertinus', Georgia, Cambria, 'Times New Roman', Times, serif;
     margin-bottom: 4em;
     background-color: #FFFFFF;
 }
