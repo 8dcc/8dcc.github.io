@@ -276,7 +276,8 @@ always be in the $[0..8]$ range, since the elements of $\mathcal{X}$ are
 $[0..255]$, and $\log_2(256) = 8$.
 
 If you are having trouble understanding this, it might help to look at the
-entropy formula when $N$ messages have the same $\frac{1}{N}$ probability.
+entropy formula when $N$ messages have the same $\frac{1}{N}$ probability
+(e.g. a coin or dice).
 
 \begin{equation*}
   -N \times \frac{1}{N} \times \log_2 \left( \frac{1}{N} \right) =
@@ -288,42 +289,69 @@ entropy formula when $N$ messages have the same $\frac{1}{N}$ probability.
 :CUSTOM_ID: calculating-from-code
 :END:
 
-This C function shows how to calculate the entropy of an array of bytes.
+Naturally, the calculations from the previous sections can be implemented as
+code, enabling us to use it in our programs.
+
+The following C function calculates the entropy of an array of
+bytes. Specifically, it receives a pointer to an array of bytes, along with the
+size of the array, and returns its entropy (in the $[0..8]$ range, as described
+[[#entropy-range][above]]). In order to avoid cluttering the code with comments, each step will be
+described here:
+
+1. The function declares an array of occurrences, and initializes each element
+   to zero. The array has 256 elements (i.e. counters), one for each possible
+   value in the input array.
+2. The array is iterated, and for each element, the number of occurrences of
+   that value is increased.
+3. The =occurrences= array is iterated.
+   - If the current counter is zero, there were no occurrences of that byte, so
+     it is ignored.
+   - Otherwise, it divides the number of occurrences of the current byte by the
+     total number of input bytes. In other words, it calculates the probability
+     of encountering that byte in the input array.
+   - The probability is multiplied by its base 2 logarithm to obtain the
+     "informational value" of the current byte. Since the =probability= variable
+     is in the $[0..1]$ range, and its logarithm is always $\le 0$, the result
+     is accumulated by subtracting it into the =result= variable.
+4. The final result is obtained, which contains the sum of all "informational
+   values" in the input. In other words, the entropy.
 
 #+begin_src C
-/* NOTE: Remember to link with -lm */
+/*
+ ,* NOTE: Remember to link with -lm
+ ,*/
 
 #include <stddef.h> /* size_t */
 #include <stdint.h> /* uint8_t */
 #include <math.h>   /* log2() */
 
-double entropy(uint8_t* data, size_t data_sz) {
+double entropy(const uint8_t* data, size_t data_sz) {
+    /* Step 1 */
     int occurrences[256];
     for (int i = 0; i < 256; i++)
         occurrences[i] = 0;
 
-    /* Count the occurrences of each byte in the input */
+    /* Step 2 */
     for (size_t i = 0; i < data_sz; i++) {
         const uint8_t byte = data[i];
         occurrences[byte]++;
     }
 
+    /* Step 3 */
     double result = 0.0;
-
-    /* Iterate each possible value in the [00..FF] range */
     for (int byte = 0; byte < 256; byte++) {
-        /* Ignore this byte if there were no occurrences */
+        /* Step 3.1 */
         if (occurrences[byte] == 0)
             continue;
 
-        /* Probablity of encountering this byte on the input */
+        /* Step 3.2 */
         const double probability = (double)occurrences[byte] / data_sz;
 
-        /* Since the log2 of [0..1] is always negative, we subtract from the
-         ,* total to increase its value. */
+        /* Step 3.3 */
         result -= probability * log2(probability);
     }
 
+    /* Step 4 */
     return result;
 }
 #+end_src

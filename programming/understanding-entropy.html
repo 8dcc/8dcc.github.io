@@ -650,7 +650,8 @@ always be in the \([0..8]\) range, since the elements of \(\mathcal{X}\) are
 
 <p>
 If you are having trouble understanding this, it might help to look at the
-entropy formula when \(N\) messages have the same \(\frac{1}{N}\) probability.
+entropy formula when \(N\) messages have the same \(\frac{1}{N}\) probability
+(e.g. a coin or dice).
 </p>
 
 \begin{equation*}
@@ -664,43 +665,76 @@ entropy formula when \(N\) messages have the same \(\frac{1}{N}\) probability.
 <h2 id="calculating-from-code"><span class="section-number-2">5.</span> Calculating from code</h2>
 <div class="outline-text-2" id="text-calculating-from-code">
 <p>
-This C function shows how to calculate the entropy of an array of bytes.
+Naturally, the calculations from the previous sections can be implemented as
+code, enabling us to use it in our programs.
 </p>
 
+<p>
+The following C function calculates the entropy of an array of
+bytes. Specifically, it receives a pointer to an array of bytes, along with the
+size of the array, and returns its entropy (in the \([0..8]\) range, as described
+<a href="#entropy-range">above</a>). In order to avoid cluttering the code with comments, each step will be
+described here:
+</p>
+
+<ol class="org-ol">
+<li>The function declares an array of occurrences, and initializes each element
+to zero. The array has 256 elements (i.e. counters), one for each possible
+value in the input array.</li>
+<li>The array is iterated, and for each element, the number of occurrences of
+that value is increased.</li>
+<li>The <code>occurrences</code> array is iterated.
+<ul class="org-ul">
+<li>If the current counter is zero, there were no occurrences of that byte, so
+it is ignored.</li>
+<li>Otherwise, it divides the number of occurrences of the current byte by the
+total number of input bytes. In other words, it calculates the probability
+of encountering that byte in the input array.</li>
+<li>The probability is multiplied by its base 2 logarithm to obtain the
+&ldquo;informational value&rdquo; of the current byte. Since the <code>probability</code> variable
+is in the \([0..1]\) range, and its logarithm is always \(\le 0\), the result
+is accumulated by subtracting it into the <code>result</code> variable.</li>
+</ul></li>
+<li>The final result is obtained, which contains the sum of all &ldquo;informational
+values&rdquo; in the input. In other words, the entropy.</li>
+</ol>
+
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #595959;">/* </span><span style="color: #006800; font-weight: bold;">NOTE:</span><span style="color: #595959;"> Remember to link with -lm</span><span style="color: #595959;"> */</span>
+<pre class="src src-C"><span style="color: #595959;">/*</span>
+<span style="color: #595959;"> * </span><span style="color: #006800; font-weight: bold;">NOTE:</span><span style="color: #595959;"> Remember to link with -lm</span>
+<span style="color: #595959;"> */</span>
 
 <span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stddef.h&gt;</span> <span style="color: #595959;">/* </span><span style="color: #595959;">size_t</span><span style="color: #595959;"> */</span>
 <span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span> <span style="color: #595959;">/* </span><span style="color: #595959;">uint8_t</span><span style="color: #595959;"> */</span>
 <span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;math.h&gt;</span>   <span style="color: #595959;">/* </span><span style="color: #595959;">log2()</span><span style="color: #595959;"> */</span>
 
-<span style="color: #0031a9;">double</span> <span style="color: #3f578f;">entropy</span>(<span style="color: #0031a9;">uint8_t</span>* <span style="color: #005f5f;">data</span>, <span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">data_sz</span>) {
+<span style="color: #0031a9;">double</span> <span style="color: #3f578f;">entropy</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">uint8_t</span>* <span style="color: #005f5f;">data</span>, <span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">data_sz</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Step 1</span><span style="color: #595959;"> */</span>
     <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">occurrences</span>[<span style="color: #2a5045;">256</span>];
     <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">i</span> = <span style="color: #2a5045;">0</span>; i &lt; <span style="color: #2a5045;">256</span>; i++)
         occurrences[i] = <span style="color: #2a5045;">0</span>;
 
-    <span style="color: #595959;">/* </span><span style="color: #595959;">Count the occurrences of each byte in the input</span><span style="color: #595959;"> */</span>
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Step 2</span><span style="color: #595959;"> */</span>
     <span style="color: #972500;">for</span> (<span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">i</span> = <span style="color: #2a5045;">0</span>; i &lt; data_sz; i++) {
         <span style="color: #972500;">const</span> <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">byte</span> = data[i];
         occurrences[byte]++;
     }
 
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Step 3</span><span style="color: #595959;"> */</span>
     <span style="color: #0031a9;">double</span> <span style="color: #005f5f;">result</span> = <span style="color: #2a5045;">0.0</span>;
-
-    <span style="color: #595959;">/* </span><span style="color: #595959;">Iterate each possible value in the [00..FF] range</span><span style="color: #595959;"> */</span>
     <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">byte</span> = <span style="color: #2a5045;">0</span>; byte &lt; <span style="color: #2a5045;">256</span>; byte++) {
-        <span style="color: #595959;">/* </span><span style="color: #595959;">Ignore this byte if there were no occurrences</span><span style="color: #595959;"> */</span>
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Step 3.1</span><span style="color: #595959;"> */</span>
         <span style="color: #972500;">if</span> (occurrences[byte] == <span style="color: #2a5045;">0</span>)
             <span style="color: #972500;">continue</span>;
 
-        <span style="color: #595959;">/* </span><span style="color: #595959;">Probablity of encountering this byte on the input</span><span style="color: #595959;"> */</span>
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Step 3.2</span><span style="color: #595959;"> */</span>
         <span style="color: #972500;">const</span> <span style="color: #0031a9;">double</span> <span style="color: #005f5f;">probability</span> = (<span style="color: #0031a9;">double</span>)occurrences[byte] / data_sz;
 
-        <span style="color: #595959;">/* </span><span style="color: #595959;">Since the log2 of [0..1] is always negative, we subtract from the</span>
-<span style="color: #595959;">         * total to increase its value.</span><span style="color: #595959;"> */</span>
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Step 3.3</span><span style="color: #595959;"> */</span>
         result -= probability * log2(probability);
     }
 
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Step 4</span><span style="color: #595959;"> */</span>
     <span style="color: #972500;">return</span> result;
 }
 </pre>
