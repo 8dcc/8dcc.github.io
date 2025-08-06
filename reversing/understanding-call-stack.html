@@ -357,12 +357,12 @@ following.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">The following:</span>
-<span style="color: #feacd0;">call</span>    <span style="color: #88ca9f;">0xDEADBEEF</span>
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">The following:</span>
+<span style="color: #721045;">call</span>    <span style="color: #2a5045;">0xDEADBEEF</span>
 
-<span style="color: #989898;">; </span><span style="color: #989898;">Internally does:</span>
-<span style="color: #feacd0;">push</span>    rip
-<span style="color: #feacd0;">jmp</span>     <span style="color: #88ca9f;">0xDEADBEEF</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">Internally does:</span>
+<span style="color: #721045;">push</span>    rip
+<span style="color: #721045;">jmp</span>     <span style="color: #2a5045;">0xDEADBEEF</span>
 </pre>
 </div>
 
@@ -373,10 +373,10 @@ itself, which is not accurate. The correct form would be:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">push</span>    next
-<span style="color: #feacd0;">jmp</span>     <span style="color: #88ca9f;">0xDEADBEEF</span>
+<pre class="src src-nasm"><span style="color: #721045;">push</span>    next
+<span style="color: #721045;">jmp</span>     <span style="color: #2a5045;">0xDEADBEEF</span>
 
-<span style="color: #4ae2ff;">next</span>: <span style="color: #feacd0;">nop</span>  <span style="color: #989898;">; </span><span style="color: #989898;">Continue execution...</span>
+<span style="color: #3f578f;">next</span>: <span style="color: #721045;">nop</span>  <span style="color: #595959;">; </span><span style="color: #595959;">Continue execution...</span>
 </pre>
 </div>
 
@@ -386,15 +386,15 @@ by the <code>ret</code> instruction.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">The following</span>
-<span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">The following</span>
+<span style="color: #721045;">ret</span>
 
-<span style="color: #989898;">; </span><span style="color: #989898;">Internally does (without actually writing to RAX)</span>
-<span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rax</span>
-<span style="color: #feacd0;">jmp</span>     <span style="color: #6ae4b9;">rax</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">Internally does (without actually writing to RAX)</span>
+<span style="color: #721045;">pop</span>     <span style="color: #005f5f;">rax</span>
+<span style="color: #721045;">jmp</span>     <span style="color: #005f5f;">rax</span>
 
-<span style="color: #989898;">; </span><span style="color: #989898;">Or simply (although we can't directly write to RIP)</span>
-<span style="color: #feacd0;">pop</span>     rip
+<span style="color: #595959;">; </span><span style="color: #595959;">Or simply (although we can't directly write to RIP)</span>
+<span style="color: #721045;">pop</span>     rip
 </pre>
 </div>
 </div>
@@ -454,15 +454,15 @@ identifying functions from assembly.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+    <span style="color: #721045;">push</span>    <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rbp</span>, <span style="color: #005f5f;">rsp</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">...</span>
+    <span style="color: #595959;">; </span><span style="color: #595959;">...</span>
 
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">ret</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rsp</span>, <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">ret</span>
 </pre>
 </div>
 </div>
@@ -509,33 +509,33 @@ creates a <b>linked list</b>, where you can follow <code>rbp</code>&rsquo;s to t
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">DrawLine</span>:
-                                <span style="color: #989898;">; </span><span style="color: #989898;">(1)</span>
-    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(2)</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>            <span style="color: #989898;">; </span><span style="color: #989898;">(3)</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">DrawLine</span>:
+                                <span style="color: #595959;">; </span><span style="color: #595959;">(1)</span>
+    <span style="color: #721045;">push</span>    <span style="color: #005f5f;">rbp</span>                 <span style="color: #595959;">; </span><span style="color: #595959;">(2)</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rbp</span>, <span style="color: #005f5f;">rsp</span>            <span style="color: #595959;">; </span><span style="color: #595959;">(3)</span>
 
-    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbx</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(4)</span>
-    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">r12</span>
+    <span style="color: #721045;">push</span>    <span style="color: #005f5f;">rbx</span>                 <span style="color: #595959;">; </span><span style="color: #595959;">(4)</span>
+    <span style="color: #721045;">push</span>    <span style="color: #005f5f;">r12</span>
 
-    <span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x20</span>           <span style="color: #989898;">; </span><span style="color: #989898;">(5)</span>
+    <span style="color: #721045;">sub</span>     <span style="color: #005f5f;">rsp</span>, <span style="color: #2a5045;">0x20</span>           <span style="color: #595959;">; </span><span style="color: #595959;">(5)</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">The real body of the procedure starts... (6)</span>
-    <span style="color: #989898;">;</span><span style="color: #989898;">---------------------------------------------------------------------------</span>
+    <span style="color: #595959;">; </span><span style="color: #595959;">The real body of the procedure starts... (6)</span>
+    <span style="color: #595959;">;</span><span style="color: #595959;">---------------------------------------------------------------------------</span>
 
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r12</span>, [<span style="color: #6ae4b9;">rbp</span> + <span style="color: #88ca9f;">0x16</span>]   <span style="color: #989898;">; </span><span style="color: #989898;">(7)</span>
-    <span style="color: #feacd0;">mov</span>     [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x8</span>], <span style="color: #6ae4b9;">r12</span>    <span style="color: #989898;">; </span><span style="color: #989898;">(8)</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">r12</span>, [<span style="color: #005f5f;">rbp</span> + <span style="color: #2a5045;">0x16</span>]   <span style="color: #595959;">; </span><span style="color: #595959;">(7)</span>
+    <span style="color: #721045;">mov</span>     [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x8</span>], <span style="color: #005f5f;">r12</span>    <span style="color: #595959;">; </span><span style="color: #595959;">(8)</span>
 
-    <span style="color: #989898;">;</span><span style="color: #989898;">---------------------------------------------------------------------------</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">The body of the procedure ends...</span>
+    <span style="color: #595959;">;</span><span style="color: #595959;">---------------------------------------------------------------------------</span>
+    <span style="color: #595959;">; </span><span style="color: #595959;">The body of the procedure ends...</span>
 
-    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x20</span>           <span style="color: #989898;">; </span><span style="color: #989898;">(9)</span>
+    <span style="color: #721045;">add</span>     <span style="color: #005f5f;">rsp</span>, <span style="color: #2a5045;">0x20</span>           <span style="color: #595959;">; </span><span style="color: #595959;">(9)</span>
 
-    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">r12</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(10)</span>
-    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbx</span>
+    <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">r12</span>                 <span style="color: #595959;">; </span><span style="color: #595959;">(10)</span>
+    <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">rbx</span>
 
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #6ae4b9;">rbp</span>            <span style="color: #989898;">; </span><span style="color: #989898;">(11)</span>
-    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbp</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">(12)</span>
-    <span style="color: #feacd0;">ret</span>                         <span style="color: #989898;">; </span><span style="color: #989898;">(13)</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rsp</span>, <span style="color: #005f5f;">rbp</span>            <span style="color: #595959;">; </span><span style="color: #595959;">(11)</span>
+    <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">rbp</span>                 <span style="color: #595959;">; </span><span style="color: #595959;">(12)</span>
+    <span style="color: #721045;">ret</span>                         <span style="color: #595959;">; </span><span style="color: #595959;">(13)</span>
 </pre>
 </div>
 
@@ -582,26 +582,26 @@ Let&rsquo;s look at some example C code.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>
 
-<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">DrawPoint</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span>) {
-    printf(<span style="color: #00d3d0;">"Drawing point: </span><span style="color: #ff6f9f;">%d</span><span style="color: #00d3d0;">, </span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, x, y);
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">DrawPoint</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">x</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">y</span>) {
+    printf(<span style="color: #005e8b;">"Drawing point: </span><span style="color: #972500;">%d</span><span style="color: #005e8b;">, </span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, x, y);
 }
 
-<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">DrawLine</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x0</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y0</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x1</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y1</span>) {
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span> = y0; y &lt;= y1; y++)
-        <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span> = x0; x &lt;= x1; x++)
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">DrawLine</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">x0</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">y0</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">x1</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">y1</span>) {
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">y</span> = y0; y &lt;= y1; y++)
+        <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">x</span> = x0; x &lt;= x1; x++)
             DrawPoint(x, y);
 }
 
-<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">DrawSquare</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">w</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">h</span>) {
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x1</span> = x + w;
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y1</span> = y + h;
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">DrawSquare</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">x</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">y</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">w</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">h</span>) {
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">x1</span> = x + w;
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">y1</span> = y + h;
 
-    DrawLine(x, y, x1, y);   <span style="color: #989898;">/* </span><span style="color: #989898;">Up</span><span style="color: #989898;"> */</span>
-    DrawLine(x, y, x, y1);   <span style="color: #989898;">/* </span><span style="color: #989898;">Left</span><span style="color: #989898;"> */</span>
-    DrawLine(x, y1, x1, y1); <span style="color: #989898;">/* </span><span style="color: #989898;">Down</span><span style="color: #989898;"> */</span>
-    DrawLine(x1, y, x1, y1); <span style="color: #989898;">/* </span><span style="color: #989898;">Right</span><span style="color: #989898;"> */</span>
+    DrawLine(x, y, x1, y);   <span style="color: #595959;">/* </span><span style="color: #595959;">Up</span><span style="color: #595959;"> */</span>
+    DrawLine(x, y, x, y1);   <span style="color: #595959;">/* </span><span style="color: #595959;">Left</span><span style="color: #595959;"> */</span>
+    DrawLine(x, y1, x1, y1); <span style="color: #595959;">/* </span><span style="color: #595959;">Down</span><span style="color: #595959;"> */</span>
+    DrawLine(x1, y, x1, y1); <span style="color: #595959;">/* </span><span style="color: #595959;">Right</span><span style="color: #595959;"> */</span>
 }
 </pre>
 </div>
@@ -624,51 +624,51 @@ code that prints the backtrace of where we were called.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #ff6f9f;">default</span> <span style="color: #79a8ff;">rel</span>
-<span style="color: #ff6f9f;">extern</span> printf
+<pre class="src src-nasm"><span style="color: #972500;">default</span> <span style="color: #0031a9;">rel</span>
+<span style="color: #972500;">extern</span> printf
 
-<span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.data</span>
-    <span style="color: #4ae2ff;">fmt</span>: <span style="color: #feacd0;">db</span> <span style="color: #00d3d0;">"%d: %p"</span>, <span style="color: #88ca9f;">0xA</span>, <span style="color: #88ca9f;">0x0</span>
+<span style="color: #972500;">section</span> <span style="color: #0031a9;">.data</span>
+    <span style="color: #3f578f;">fmt</span>: <span style="color: #721045;">db</span> <span style="color: #005e8b;">"%d: %p"</span>, <span style="color: #2a5045;">0xA</span>, <span style="color: #2a5045;">0x0</span>
 
-<span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.text</span>
+<span style="color: #972500;">section</span> <span style="color: #0031a9;">.text</span>
 
-<span style="color: #989898;">; </span><span style="color: #989898;">void AsmPrintCallStack(int depth);</span>
-<span style="color: #ff6f9f;">global</span> AsmPrintCallStack
-<span style="color: #4ae2ff;">AsmPrintCallStack</span>:
-    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>
-    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">r12</span>
-    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">r13</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">void AsmPrintCallStack(int depth);</span>
+<span style="color: #972500;">global</span> AsmPrintCallStack
+<span style="color: #3f578f;">AsmPrintCallStack</span>:
+    <span style="color: #721045;">push</span>    <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rbp</span>, <span style="color: #005f5f;">rsp</span>
+    <span style="color: #721045;">push</span>    <span style="color: #005f5f;">r12</span>
+    <span style="color: #721045;">push</span>    <span style="color: #005f5f;">r13</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">Initialize counter to the first "depth" argument</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r13</span>, <span style="color: #6ae4b9;">rdi</span>
+    <span style="color: #595959;">; </span><span style="color: #595959;">Initialize counter to the first "depth" argument</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">r13</span>, <span style="color: #005f5f;">rdi</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">Get address of old RBP, skip ours</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r12</span>, [<span style="color: #6ae4b9;">rbp</span>]
+    <span style="color: #595959;">; </span><span style="color: #595959;">Get address of old RBP, skip ours</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">r12</span>, [<span style="color: #005f5f;">rbp</span>]
 
-<span style="color: #4ae2ff;">.loop</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">If RBP is NULL, we are done.</span>
-    <span style="color: #feacd0;">test</span>    <span style="color: #6ae4b9;">r13</span>, <span style="color: #6ae4b9;">r13</span>
-    <span style="color: #feacd0;">jz</span>      .done
+<span style="color: #3f578f;">.loop</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">If RBP is NULL, we are done.</span>
+    <span style="color: #721045;">test</span>    <span style="color: #005f5f;">r13</span>, <span style="color: #005f5f;">r13</span>
+    <span style="color: #721045;">jz</span>      .done
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">Otherwise, we can print it.</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">We add 8 to the current RBP to get the current return address.</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rdx</span>, [<span style="color: #6ae4b9;">r12</span> + <span style="color: #88ca9f;">0x8</span>]
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsi</span>, <span style="color: #6ae4b9;">r13</span>
-    <span style="color: #feacd0;">lea</span>     <span style="color: #6ae4b9;">rdi</span>, [<span style="color: #79a8ff;">rel</span> fmt]
-    <span style="color: #feacd0;">call</span>    printf <span style="color: #79a8ff;">wrt</span> ..plt
+    <span style="color: #595959;">; </span><span style="color: #595959;">Otherwise, we can print it.</span>
+    <span style="color: #595959;">; </span><span style="color: #595959;">We add 8 to the current RBP to get the current return address.</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rdx</span>, [<span style="color: #005f5f;">r12</span> + <span style="color: #2a5045;">0x8</span>]
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rsi</span>, <span style="color: #005f5f;">r13</span>
+    <span style="color: #721045;">lea</span>     <span style="color: #005f5f;">rdi</span>, [<span style="color: #0031a9;">rel</span> fmt]
+    <span style="color: #721045;">call</span>    printf <span style="color: #0031a9;">wrt</span> ..plt
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">And jump to the next one</span>
-    <span style="color: #feacd0;">dec</span>     <span style="color: #6ae4b9;">r13</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">r12</span>, [<span style="color: #6ae4b9;">r12</span>]
-    <span style="color: #feacd0;">jmp</span>     .loop
+    <span style="color: #595959;">; </span><span style="color: #595959;">And jump to the next one</span>
+    <span style="color: #721045;">dec</span>     <span style="color: #005f5f;">r13</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">r12</span>, [<span style="color: #005f5f;">r12</span>]
+    <span style="color: #721045;">jmp</span>     .loop
 
-<span style="color: #4ae2ff;">.done</span>:
-    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">r13</span>
-    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">r12</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">ret</span>
+<span style="color: #3f578f;">.done</span>:
+    <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">r13</span>
+    <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">r12</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rsp</span>, <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">ret</span>
 </pre>
 </div>
 
@@ -716,9 +716,9 @@ The rough C translation of the loop would be the following:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">while</span> (i != <span style="color: #88ca9f;">0</span>) {
-    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">ret_addr</span> = *(cur_base_ptr + <span style="color: #88ca9f;">0x8</span>);
-    printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d</span><span style="color: #00d3d0;">: </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, i, ret_addr);
+<pre class="src src-C"><span style="color: #972500;">while</span> (i != <span style="color: #2a5045;">0</span>) {
+    <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">ret_addr</span> = *(cur_base_ptr + <span style="color: #2a5045;">0x8</span>);
+    printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%d</span><span style="color: #005e8b;">: </span><span style="color: #972500;">%p\n</span><span style="color: #005e8b;">"</span>, i, ret_addr);
 
     i--;
     cur_base_ptr = *cur_base_ptr;
@@ -780,18 +780,18 @@ following assembly.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">Assemble with:</span>
-<span style="color: #989898;">;   </span><span style="color: #989898;">nasm -f elf64 -o file.o file.asm</span>
-<span style="color: #989898;">; </span><span style="color: #989898;">Look at the generated bytes with a RE tool like rizin.</span>
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">Assemble with:</span>
+<span style="color: #595959;">;   </span><span style="color: #595959;">nasm -f elf64 -o file.o file.asm</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">Look at the generated bytes with a RE tool like rizin.</span>
 
-<span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.bss</span>
-<span style="color: #4ae2ff;">addr</span>: <span style="color: #feacd0;">resb</span> <span style="color: #88ca9f;">1</span>
+<span style="color: #972500;">section</span> <span style="color: #0031a9;">.bss</span>
+<span style="color: #3f578f;">addr</span>: <span style="color: #721045;">resb</span> <span style="color: #2a5045;">1</span>
 
-<span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.text</span>
-<span style="color: #4ae2ff;">_start</span>:
-    <span style="color: #feacd0;">mov</span> <span style="color: #6ae4b9;">rax</span>, addr
-    <span style="color: #feacd0;">lea</span> <span style="color: #6ae4b9;">rax</span>, [addr]
-    <span style="color: #feacd0;">lea</span> <span style="color: #6ae4b9;">rax</span>, [<span style="color: #79a8ff;">rel</span> addr]
+<span style="color: #972500;">section</span> <span style="color: #0031a9;">.text</span>
+<span style="color: #3f578f;">_start</span>:
+    <span style="color: #721045;">mov</span> <span style="color: #005f5f;">rax</span>, addr
+    <span style="color: #721045;">lea</span> <span style="color: #005f5f;">rax</span>, [addr]
+    <span style="color: #721045;">lea</span> <span style="color: #005f5f;">rax</span>, [<span style="color: #0031a9;">rel</span> addr]
 </pre>
 </div>
 
@@ -804,9 +804,9 @@ assemble it, and <a href="https://defuse.ca/online-x86-assembler.htm">look</a> a
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #88ca9f;">48</span> b8 <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">02</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">08</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>  movabs <span style="color: #6ae4b9;">rax</span>, <span style="color: #88ca9f;">0x8000200</span>
-<span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">04</span> <span style="color: #88ca9f;">25</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">02</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">08</span>        <span style="color: #feacd0;">lea</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">ds</span>:<span style="color: #88ca9f;">0x8000200</span>
-<span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> e7 ff ff ff           <span style="color: #feacd0;">lea</span>    <span style="color: #6ae4b9;">rax</span>, [rip + <span style="color: #88ca9f;">0xffffffffffffffe7</span>] <span style="color: #989898;">; </span><span style="color: #989898;">[rip - 0x19]</span>
+<pre class="src src-nasm"><span style="color: #2a5045;">48</span> b8 <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">02</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">08</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>  movabs <span style="color: #005f5f;">rax</span>, <span style="color: #2a5045;">0x8000200</span>
+<span style="color: #2a5045;">48</span> <span style="color: #2a5045;">8d</span> <span style="color: #2a5045;">04</span> <span style="color: #2a5045;">25</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">02</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">08</span>        <span style="color: #721045;">lea</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #005f5f;">ds</span>:<span style="color: #2a5045;">0x8000200</span>
+<span style="color: #2a5045;">48</span> <span style="color: #2a5045;">8d</span> <span style="color: #2a5045;">05</span> e7 ff ff ff           <span style="color: #721045;">lea</span>    <span style="color: #005f5f;">rax</span>, [rip + <span style="color: #2a5045;">0xffffffffffffffe7</span>] <span style="color: #595959;">; </span><span style="color: #595959;">[rip - 0x19]</span>
 </pre>
 </div>
 
@@ -839,12 +839,12 @@ to call it from <code>DrawPoint</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">AsmPrintCallStack</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">depth</span>);
+<pre class="src src-C"><span style="color: #972500;">extern</span> <span style="color: #0031a9;">void</span> <span style="color: #3f578f;">AsmPrintCallStack</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">depth</span>);
 
-<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">DrawPoint</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span>) {
-    printf(<span style="color: #00d3d0;">"Drawing point: </span><span style="color: #ff6f9f;">%d</span><span style="color: #00d3d0;">, </span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, x, y);
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">DrawPoint</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">x</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">y</span>) {
+    printf(<span style="color: #005e8b;">"Drawing point: </span><span style="color: #972500;">%d</span><span style="color: #005e8b;">, </span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, x, y);
 
-    AsmPrintCallStack(<span style="color: #88ca9f;">3</span>);
+    AsmPrintCallStack(<span style="color: #2a5045;">3</span>);
 }
 </pre>
 </div>
@@ -869,16 +869,16 @@ the addresses from <code>AsmPrintCallStack</code> are correct.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
-    printf(<span style="color: #00d3d0;">"(main) Address of DrawPoint:  </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, DrawPoint);
-    printf(<span style="color: #00d3d0;">"(main) Address of DrawLine:   </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, DrawLine);
-    printf(<span style="color: #00d3d0;">"(main) Address of DrawSquare: </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, DrawSquare);
-    printf(<span style="color: #00d3d0;">"(main) Address of main:       </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, main);
+<pre class="src src-C"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">main</span>(<span style="color: #0031a9;">void</span>) {
+    printf(<span style="color: #005e8b;">"(main) Address of DrawPoint:  </span><span style="color: #972500;">%p\n</span><span style="color: #005e8b;">"</span>, DrawPoint);
+    printf(<span style="color: #005e8b;">"(main) Address of DrawLine:   </span><span style="color: #972500;">%p\n</span><span style="color: #005e8b;">"</span>, DrawLine);
+    printf(<span style="color: #005e8b;">"(main) Address of DrawSquare: </span><span style="color: #972500;">%p\n</span><span style="color: #005e8b;">"</span>, DrawSquare);
+    printf(<span style="color: #005e8b;">"(main) Address of main:       </span><span style="color: #972500;">%p\n</span><span style="color: #005e8b;">"</span>, main);
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">DrawPoint only gets called once</span><span style="color: #989898;"> */</span>
-    DrawSquare(<span style="color: #88ca9f;">5</span>, <span style="color: #88ca9f;">5</span>, <span style="color: #88ca9f;">0</span>, <span style="color: #88ca9f;">0</span>);
+    <span style="color: #595959;">/* </span><span style="color: #595959;">DrawPoint only gets called once</span><span style="color: #595959;"> */</span>
+    DrawSquare(<span style="color: #2a5045;">5</span>, <span style="color: #2a5045;">5</span>, <span style="color: #2a5045;">0</span>, <span style="color: #2a5045;">0</span>);
 
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
 }
 </pre>
 </div>
@@ -894,31 +894,31 @@ what I mentioned in <a href="#note-about-position-independent-executables">Note 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-makefile"><span style="color: #6ae4b9;">CC</span>=gcc
-<span style="color: #6ae4b9;">CFLAGS</span>=-Wall -Wextra
-<span style="color: #6ae4b9;">LDFLAGS</span>=-fPIE
+<pre class="src src-makefile"><span style="color: #005f5f;">CC</span>=gcc
+<span style="color: #005f5f;">CFLAGS</span>=-Wall -Wextra
+<span style="color: #005f5f;">LDFLAGS</span>=-fPIE
 
-<span style="color: #6ae4b9;">AS</span>=nasm
-<span style="color: #6ae4b9;">ASFLAGS</span>=-f elf64
+<span style="color: #005f5f;">AS</span>=nasm
+<span style="color: #005f5f;">ASFLAGS</span>=-f elf64
 
-<span style="color: #6ae4b9;">OBJ</span>=obj/main.c.o obj/callstack.asm.o
-<span style="color: #6ae4b9;">BIN</span>=callstack-test.out
+<span style="color: #005f5f;">OBJ</span>=obj/main.c.o obj/callstack.asm.o
+<span style="color: #005f5f;">BIN</span>=callstack-test.out
 
-<span style="color: #4ae2ff;">.PHONY</span>: all clean
-<span style="color: #4ae2ff;">all</span>: $(<span style="color: #6ae4b9;">BIN</span>)
-<span style="color: #4ae2ff;">clean</span>:
-    rm -f $(<span style="color: #6ae4b9;">BIN</span>) $(<span style="color: #6ae4b9;">OBJ</span>)
+<span style="color: #3f578f;">.PHONY</span>: all clean
+<span style="color: #3f578f;">all</span>: $(<span style="color: #005f5f;">BIN</span>)
+<span style="color: #3f578f;">clean</span>:
+    rm -f $(<span style="color: #005f5f;">BIN</span>) $(<span style="color: #005f5f;">OBJ</span>)
 
-<span style="color: #4ae2ff;">$(</span><span style="color: #4ae2ff;">BIN</span><span style="color: #4ae2ff;">)</span>: $(<span style="color: #6ae4b9;">OBJ</span>)
-    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) $(<span style="color: #6ae4b9;">LDFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">^</span>
+<span style="color: #3f578f;">$(</span><span style="color: #3f578f;">BIN</span><span style="color: #3f578f;">)</span>: $(<span style="color: #005f5f;">OBJ</span>)
+    $(<span style="color: #005f5f;">CC</span>) $(<span style="color: #005f5f;">CFLAGS</span>) $(<span style="color: #005f5f;">LDFLAGS</span>) -o <span style="color: #3f578f;">$</span><span style="color: #2a5045;">@</span> $<span style="color: #2a5045;">^</span>
 
-<span style="color: #4ae2ff;">obj/main.c.o</span>: main.c
-    @mkdir -p $(<span style="color: #6ae4b9;">dir</span> <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span>)
-    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> -c $<span style="color: #88ca9f;">&lt;</span>
+<span style="color: #3f578f;">obj/main.c.o</span>: main.c
+    @mkdir -p $(<span style="color: #005f5f;">dir</span> <span style="color: #3f578f;">$</span><span style="color: #2a5045;">@</span>)
+    $(<span style="color: #005f5f;">CC</span>) $(<span style="color: #005f5f;">CFLAGS</span>) -o <span style="color: #3f578f;">$</span><span style="color: #2a5045;">@</span> -c $<span style="color: #2a5045;">&lt;</span>
 
-<span style="color: #4ae2ff;">obj/callstack.asm.o</span>: callstack.asm
-    @mkdir -p $(<span style="color: #6ae4b9;">dir</span> <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span>)
-    $(<span style="color: #6ae4b9;">AS</span>) $(<span style="color: #6ae4b9;">ASFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span>
+<span style="color: #3f578f;">obj/callstack.asm.o</span>: callstack.asm
+    @mkdir -p $(<span style="color: #005f5f;">dir</span> <span style="color: #3f578f;">$</span><span style="color: #2a5045;">@</span>)
+    $(<span style="color: #005f5f;">AS</span>) $(<span style="color: #005f5f;">ASFLAGS</span>) -o <span style="color: #3f578f;">$</span><span style="color: #2a5045;">@</span> $<span style="color: #2a5045;">&lt;</span>
 </pre>
 </div>
 </div>

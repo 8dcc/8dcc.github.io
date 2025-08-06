@@ -736,22 +736,22 @@ pointer.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #ff6740;">%define</span> SENDPACKET_STACK_OFFSET <span style="color: #88ca9f;">0xF8</span>
+<pre class="src src-nasm"><span style="color: #a0132f;">%define</span> SENDPACKET_STACK_OFFSET <span style="color: #2a5045;">0xF8</span>
 
-<span style="color: #ff6f9f;">default</span> <span style="color: #79a8ff;">REL</span>
+<span style="color: #972500;">default</span> <span style="color: #0031a9;">REL</span>
 
-<span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.data</span>
-    <span style="color: #ff6f9f;">global</span> bSendPacket
-    <span style="color: #4ae2ff;">bSendPacket</span>: <span style="color: #feacd0;">dq</span> <span style="color: #88ca9f;">1</span>               <span style="color: #989898;">; </span><span style="color: #989898;">Bool pointer to bSendPacket on the stack</span>
+<span style="color: #972500;">section</span> <span style="color: #0031a9;">.data</span>
+    <span style="color: #972500;">global</span> bSendPacket
+    <span style="color: #3f578f;">bSendPacket</span>: <span style="color: #721045;">dq</span> <span style="color: #2a5045;">1</span>               <span style="color: #595959;">; </span><span style="color: #595959;">Bool pointer to bSendPacket on the stack</span>
 
-<span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.text</span>
-    <span style="color: #ff6f9f;">extern</span> h_CreateMove:function    <span style="color: #989898;">; </span><span style="color: #989898;">hooks.c (func)</span>
+<span style="color: #972500;">section</span> <span style="color: #0031a9;">.text</span>
+    <span style="color: #972500;">extern</span> h_CreateMove:function    <span style="color: #595959;">; </span><span style="color: #595959;">hooks.c (func)</span>
 
-<span style="color: #ff6f9f;">global</span> h_CreateMoveProxy
-<span style="color: #4ae2ff;">h_CreateMoveProxy</span>:
-    <span style="color: #feacd0;">lea</span>     <span style="color: #6ae4b9;">rax</span>, [<span style="color: #6ae4b9;">rsp</span> + SENDPACKET_STACK_OFFSET]
-    <span style="color: #feacd0;">mov</span>     [bSendPacket], <span style="color: #6ae4b9;">rax</span>
-    <span style="color: #feacd0;">jmp</span>     h_CreateMove <span style="color: #79a8ff;">wrt</span> ..plt
+<span style="color: #972500;">global</span> h_CreateMoveProxy
+<span style="color: #3f578f;">h_CreateMoveProxy</span>:
+    <span style="color: #721045;">lea</span>     <span style="color: #005f5f;">rax</span>, [<span style="color: #005f5f;">rsp</span> + SENDPACKET_STACK_OFFSET]
+    <span style="color: #721045;">mov</span>     [bSendPacket], <span style="color: #005f5f;">rax</span>
+    <span style="color: #721045;">jmp</span>     h_CreateMove <span style="color: #0031a9;">wrt</span> ..plt
 </pre>
 </div>
 
@@ -795,21 +795,21 @@ and we are ready to go.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#if</span> <span style="color: #ff6740; font-weight: bold;">!</span><span style="color: #ff6740;">defined</span>(__has_builtin) || <span style="color: #ff6740; font-weight: bold;">!</span>__has_builtin(__builtin_frame_address)
-<span style="color: #ff6740;">#error</span> <span style="color: #00d3d0;">"This version of GCC doesn't support __builtin_frame_address()"</span>
-<span style="color: #ff6740;">#endif</span>
+<pre class="src src-C"><span style="color: #a0132f;">#if</span> <span style="color: #972500; font-weight: bold;">!</span><span style="color: #a0132f;">defined</span>(__has_builtin) || <span style="color: #972500; font-weight: bold;">!</span>__has_builtin(__builtin_frame_address)
+<span style="color: #a0132f;">#error</span> <span style="color: #005e8b;">"This version of GCC doesn't support __builtin_frame_address()"</span>
+<span style="color: #a0132f;">#endif</span>
 
-<span style="color: #79a8ff;">bool</span>* <span style="color: #6ae4b9;">bSendPacket</span> = <span style="color: #88ca9f;">NULL</span>;
+<span style="color: #0031a9;">bool</span>* <span style="color: #005f5f;">bSendPacket</span> = <span style="color: #2a5045;">NULL</span>;
 
-<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">h_CreateMove</span>(<span style="color: #79a8ff;">ClientMode</span>* <span style="color: #6ae4b9;">thisptr</span>, <span style="color: #79a8ff;">float</span> <span style="color: #6ae4b9;">flInputSampleTime</span>,
-                  <span style="color: #79a8ff;">usercmd_t</span>* <span style="color: #6ae4b9;">cmd</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Get current frame address, skip over pushed RBP, get pointer to bool by</span>
-<span style="color: #989898;">     * adding offset to that.</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">current_frame_address</span> = __builtin_frame_address(<span style="color: #88ca9f;">0</span>);
-    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">current_stack_address</span> = current_frame_address + <span style="color: #88ca9f;">0x8</span>;
-    bSendPacket = (<span style="color: #79a8ff;">bool</span>*)(current_stack_address + SENDPACKET_STACK_OFFSET);
+<span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">h_CreateMove</span>(<span style="color: #0031a9;">ClientMode</span>* <span style="color: #005f5f;">thisptr</span>, <span style="color: #0031a9;">float</span> <span style="color: #005f5f;">flInputSampleTime</span>,
+                  <span style="color: #0031a9;">usercmd_t</span>* <span style="color: #005f5f;">cmd</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Get current frame address, skip over pushed RBP, get pointer to bool by</span>
+<span style="color: #595959;">     * adding offset to that.</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">current_frame_address</span> = __builtin_frame_address(<span style="color: #2a5045;">0</span>);
+    <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">current_stack_address</span> = current_frame_address + <span style="color: #2a5045;">0x8</span>;
+    bSendPacket = (<span style="color: #0031a9;">bool</span>*)(current_stack_address + SENDPACKET_STACK_OFFSET);
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 }
 </pre>
 </div>

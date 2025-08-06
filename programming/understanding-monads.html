@@ -274,15 +274,15 @@ the rules above.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">double_sum</span>(a, b):
-    <span style="color: #ff6f9f;">return</span> (a + b) * <span style="color: #88ca9f;">2</span>
+<pre class="src src-python"><span style="color: #972500;">def</span> <span style="color: #3f578f;">double_sum</span>(a, b):
+    <span style="color: #972500;">return</span> (a + b) * <span style="color: #2a5045;">2</span>
 
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">count_uppercase</span>(string):
-    <span style="color: #6ae4b9;">result</span> = <span style="color: #88ca9f;">0</span>
-    <span style="color: #ff6f9f;">for</span> character <span style="color: #ff6f9f;">in</span> string:
-        <span style="color: #ff6f9f;">if</span> character.isupper():
-            <span style="color: #6ae4b9;">result</span> += <span style="color: #88ca9f;">1</span>
-    <span style="color: #ff6f9f;">return</span> result;
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">count_uppercase</span>(string):
+    <span style="color: #005f5f;">result</span> = <span style="color: #2a5045;">0</span>
+    <span style="color: #972500;">for</span> character <span style="color: #972500;">in</span> string:
+        <span style="color: #972500;">if</span> character.isupper():
+            <span style="color: #005f5f;">result</span> += <span style="color: #2a5045;">1</span>
+    <span style="color: #972500;">return</span> result;
 </pre>
 </div>
 
@@ -292,22 +292,22 @@ external program state, or because they alter it.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #6ae4b9;">my_global</span> = <span style="color: #88ca9f;">0</span>
+<pre class="src src-python"><span style="color: #005f5f;">my_global</span> = <span style="color: #2a5045;">0</span>
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Accesses external state.</span>
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">global_sum</span>(n):
-    <span style="color: #ff6f9f;">return</span> my_global + n
+<span style="color: #595959;"># </span><span style="color: #595959;">Accesses external state.</span>
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">global_sum</span>(n):
+    <span style="color: #972500;">return</span> my_global + n
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Modifies external state (global variable).</span>
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">impure_sum</span>(a, b):
-    <span style="color: #6ae4b9;">my_global</span> = <span style="color: #88ca9f;">123</span>
-    <span style="color: #ff6f9f;">return</span> a + b
+<span style="color: #595959;"># </span><span style="color: #595959;">Modifies external state (global variable).</span>
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">impure_sum</span>(a, b):
+    <span style="color: #005f5f;">my_global</span> = <span style="color: #2a5045;">123</span>
+    <span style="color: #972500;">return</span> a + b
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Modifies external state (I/O stream).</span>
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">print_sum</span>(a, b):
-    <span style="color: #6ae4b9;">result</span> = a + b
-    <span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"Result: </span>{result}<span style="color: #00d3d0;">"</span>)
-    <span style="color: #ff6f9f;">return</span> result
+<span style="color: #595959;"># </span><span style="color: #595959;">Modifies external state (I/O stream).</span>
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">print_sum</span>(a, b):
+    <span style="color: #005f5f;">result</span> = a + b
+    <span style="color: #721045;">print</span>(f<span style="color: #005e8b;">"Result: </span>{result}<span style="color: #005e8b;">"</span>)
+    <span style="color: #972500;">return</span> result
 </pre>
 </div>
 
@@ -359,23 +359,23 @@ also logging a string into a global list variable.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #6ae4b9;">global_log_list</span> = []
+<pre class="src src-python"><span style="color: #005f5f;">global_log_list</span> = []
 
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">add</span>(a, b):
-    global_log_list.append(f<span style="color: #00d3d0;">"Added </span>{a}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>)
-    <span style="color: #ff6f9f;">return</span> a + b
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">add</span>(a, b):
+    global_log_list.append(f<span style="color: #005e8b;">"Added </span>{a}<span style="color: #005e8b;"> to </span>{b}<span style="color: #005e8b;">"</span>)
+    <span style="color: #972500;">return</span> a + b
 
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">sub</span>(a, b):
-    global_log_list.append(f<span style="color: #00d3d0;">"Subtracted </span>{a}<span style="color: #00d3d0;"> from </span>{b}<span style="color: #00d3d0;">"</span>)
-    <span style="color: #ff6f9f;">return</span> a - b
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">sub</span>(a, b):
+    global_log_list.append(f<span style="color: #005e8b;">"Subtracted </span>{a}<span style="color: #005e8b;"> from </span>{b}<span style="color: #005e8b;">"</span>)
+    <span style="color: #972500;">return</span> a - b
 
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">mul</span>(a, b):
-    global_log_list.append(f<span style="color: #00d3d0;">"Multiplied </span>{a}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>)
-    <span style="color: #ff6f9f;">return</span> a * b
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">mul</span>(a, b):
+    global_log_list.append(f<span style="color: #005e8b;">"Multiplied </span>{a}<span style="color: #005e8b;"> to </span>{b}<span style="color: #005e8b;">"</span>)
+    <span style="color: #972500;">return</span> a * b
 
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">div</span>(a, b):
-    global_log_list.append(f<span style="color: #00d3d0;">"Divided </span>{a}<span style="color: #00d3d0;"> by </span>{b}<span style="color: #00d3d0;">"</span>)
-    <span style="color: #ff6f9f;">return</span> a / b
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">div</span>(a, b):
+    global_log_list.append(f<span style="color: #005e8b;">"Divided </span>{a}<span style="color: #005e8b;"> by </span>{b}<span style="color: #005e8b;">"</span>)
+    <span style="color: #972500;">return</span> a / b
 </pre>
 </div>
 
@@ -388,15 +388,15 @@ that were generated by the functions.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #6ae4b9;">result</span> = add(<span style="color: #88ca9f;">6</span>, <span style="color: #88ca9f;">5</span>)
-<span style="color: #6ae4b9;">result</span> = sub(result, <span style="color: #88ca9f;">4</span>)
-<span style="color: #6ae4b9;">result</span> = mul(result, <span style="color: #88ca9f;">3</span>)
-<span style="color: #6ae4b9;">result</span> = div(result, <span style="color: #88ca9f;">2</span>)
+<pre class="src src-python"><span style="color: #005f5f;">result</span> = add(<span style="color: #2a5045;">6</span>, <span style="color: #2a5045;">5</span>)
+<span style="color: #005f5f;">result</span> = sub(result, <span style="color: #2a5045;">4</span>)
+<span style="color: #005f5f;">result</span> = mul(result, <span style="color: #2a5045;">3</span>)
+<span style="color: #005f5f;">result</span> = div(result, <span style="color: #2a5045;">2</span>)
 
-<span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"Final result: </span>{result}<span style="color: #00d3d0;">"</span>)
-<span style="color: #feacd0;">print</span>(<span style="color: #00d3d0;">"Logs:"</span>)
-<span style="color: #ff6f9f;">for</span> line <span style="color: #ff6f9f;">in</span> global_log_list:
-    <span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"  * </span>{line}<span style="color: #00d3d0;">"</span>)
+<span style="color: #721045;">print</span>(f<span style="color: #005e8b;">"Final result: </span>{result}<span style="color: #005e8b;">"</span>)
+<span style="color: #721045;">print</span>(<span style="color: #005e8b;">"Logs:"</span>)
+<span style="color: #972500;">for</span> line <span style="color: #972500;">in</span> global_log_list:
+    <span style="color: #721045;">print</span>(f<span style="color: #005e8b;">"  * </span>{line}<span style="color: #005e8b;">"</span>)
 </pre>
 </div>
 
@@ -438,13 +438,13 @@ adding the log list.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #ff6f9f;">class</span> <span style="color: #79a8ff;">LoggedInt</span>:
-    <span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">__init__</span>(<span style="color: #ff6f9f;">self</span>, val, logs):
-        <span style="color: #ff6f9f;">self</span>.<span style="color: #6ae4b9;">val</span> = val
-        <span style="color: #ff6f9f;">self</span>.<span style="color: #6ae4b9;">logs</span> = logs
+<pre class="src src-python"><span style="color: #972500;">class</span> <span style="color: #0031a9;">LoggedInt</span>:
+    <span style="color: #972500;">def</span> <span style="color: #3f578f;">__init__</span>(<span style="color: #972500;">self</span>, val, logs):
+        <span style="color: #972500;">self</span>.<span style="color: #005f5f;">val</span> = val
+        <span style="color: #972500;">self</span>.<span style="color: #005f5f;">logs</span> = logs
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Example</span>
-<span style="color: #6ae4b9;">logged_int</span> = LoggedInt(<span style="color: #88ca9f;">5</span>, [<span style="color: #00d3d0;">"Some log line"</span>, <span style="color: #00d3d0;">"Another log line"</span>])
+<span style="color: #595959;"># </span><span style="color: #595959;">Example</span>
+<span style="color: #005f5f;">logged_int</span> = LoggedInt(<span style="color: #2a5045;">5</span>, [<span style="color: #005e8b;">"Some log line"</span>, <span style="color: #005e8b;">"Another log line"</span>])
 </pre>
 </div>
 
@@ -456,28 +456,28 @@ still a simple integer.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">add</span>(logged_a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(
-        logged_a.val + b,  <span style="color: #989898;"># </span><span style="color: #989898;">New value</span>
-        logged_a.logs + [f<span style="color: #00d3d0;">"Added </span>{logged_a.val}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>]  <span style="color: #989898;"># </span><span style="color: #989898;">Extended log list</span>
+<pre class="src src-python"><span style="color: #972500;">def</span> <span style="color: #3f578f;">add</span>(logged_a, b):
+    <span style="color: #972500;">return</span> LoggedInt(
+        logged_a.val + b,  <span style="color: #595959;"># </span><span style="color: #595959;">New value</span>
+        logged_a.logs + [f<span style="color: #005e8b;">"Added </span>{logged_a.val}<span style="color: #005e8b;"> to </span>{b}<span style="color: #005e8b;">"</span>]  <span style="color: #595959;"># </span><span style="color: #595959;">Extended log list</span>
     )
 
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">sub</span>(logged_a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">sub</span>(logged_a, b):
+    <span style="color: #972500;">return</span> LoggedInt(
         logged_a.val - b,
-        logged_a.logs + [f<span style="color: #00d3d0;">"Subtracted </span>{logged_a.val}<span style="color: #00d3d0;"> from </span>{b}<span style="color: #00d3d0;">"</span>]
+        logged_a.logs + [f<span style="color: #005e8b;">"Subtracted </span>{logged_a.val}<span style="color: #005e8b;"> from </span>{b}<span style="color: #005e8b;">"</span>]
     )
 
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">mul</span>(logged_a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">mul</span>(logged_a, b):
+    <span style="color: #972500;">return</span> LoggedInt(
         logged_a.val * b,
-        logged_a.logs + [f<span style="color: #00d3d0;">"Multiplied </span>{logged_a.val}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>]
+        logged_a.logs + [f<span style="color: #005e8b;">"Multiplied </span>{logged_a.val}<span style="color: #005e8b;"> to </span>{b}<span style="color: #005e8b;">"</span>]
     )
 
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">div</span>(logged_a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">div</span>(logged_a, b):
+    <span style="color: #972500;">return</span> LoggedInt(
         logged_a.val / b,
-        logged_a.logs + [f<span style="color: #00d3d0;">"Divided </span>{logged_a.val}<span style="color: #00d3d0;"> by </span>{b}<span style="color: #00d3d0;">"</span>]
+        logged_a.logs + [f<span style="color: #005e8b;">"Divided </span>{logged_a.val}<span style="color: #005e8b;"> by </span>{b}<span style="color: #005e8b;">"</span>]
     )
 </pre>
 </div>
@@ -489,16 +489,16 @@ receive a <code>LoggedInt</code> as their first argument, the first input intege
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #6ae4b9;">logged_result</span> = LoggedInt(<span style="color: #88ca9f;">6</span>, [])
-<span style="color: #6ae4b9;">logged_result</span> = add(logged_result, <span style="color: #88ca9f;">5</span>)
-<span style="color: #6ae4b9;">logged_result</span> = sub(logged_result, <span style="color: #88ca9f;">4</span>)
-<span style="color: #6ae4b9;">logged_result</span> = mul(logged_result, <span style="color: #88ca9f;">3</span>)
-<span style="color: #6ae4b9;">logged_result</span> = div(logged_result, <span style="color: #88ca9f;">2</span>)
+<pre class="src src-python"><span style="color: #005f5f;">logged_result</span> = LoggedInt(<span style="color: #2a5045;">6</span>, [])
+<span style="color: #005f5f;">logged_result</span> = add(logged_result, <span style="color: #2a5045;">5</span>)
+<span style="color: #005f5f;">logged_result</span> = sub(logged_result, <span style="color: #2a5045;">4</span>)
+<span style="color: #005f5f;">logged_result</span> = mul(logged_result, <span style="color: #2a5045;">3</span>)
+<span style="color: #005f5f;">logged_result</span> = div(logged_result, <span style="color: #2a5045;">2</span>)
 
-<span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"Final result: </span>{logged_result.val}<span style="color: #00d3d0;">"</span>)
-<span style="color: #feacd0;">print</span>(<span style="color: #00d3d0;">"Logs:"</span>)
-<span style="color: #ff6f9f;">for</span> line <span style="color: #ff6f9f;">in</span> logged_result.logs:
-    <span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"  * </span>{line}<span style="color: #00d3d0;">"</span>)
+<span style="color: #721045;">print</span>(f<span style="color: #005e8b;">"Final result: </span>{logged_result.val}<span style="color: #005e8b;">"</span>)
+<span style="color: #721045;">print</span>(<span style="color: #005e8b;">"Logs:"</span>)
+<span style="color: #972500;">for</span> line <span style="color: #972500;">in</span> logged_result.logs:
+    <span style="color: #721045;">print</span>(f<span style="color: #005e8b;">"  * </span>{line}<span style="color: #005e8b;">"</span>)
 </pre>
 </div>
 
@@ -521,28 +521,28 @@ receiving unwrapped integers.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">add</span>(a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(
-        a + b,  <span style="color: #989898;"># </span><span style="color: #989898;">New value</span>
-        [f<span style="color: #00d3d0;">"Added </span>{a}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>]  <span style="color: #989898;"># </span><span style="color: #989898;">Written log line</span>
+<pre class="src src-python"><span style="color: #972500;">def</span> <span style="color: #3f578f;">add</span>(a, b):
+    <span style="color: #972500;">return</span> LoggedInt(
+        a + b,  <span style="color: #595959;"># </span><span style="color: #595959;">New value</span>
+        [f<span style="color: #005e8b;">"Added </span>{a}<span style="color: #005e8b;"> to </span>{b}<span style="color: #005e8b;">"</span>]  <span style="color: #595959;"># </span><span style="color: #595959;">Written log line</span>
     )
 
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">sub</span>(a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">sub</span>(a, b):
+    <span style="color: #972500;">return</span> LoggedInt(
         a - b,
-        [f<span style="color: #00d3d0;">"Subtracted </span>{a}<span style="color: #00d3d0;"> from </span>{b}<span style="color: #00d3d0;">"</span>]
+        [f<span style="color: #005e8b;">"Subtracted </span>{a}<span style="color: #005e8b;"> from </span>{b}<span style="color: #005e8b;">"</span>]
     )
 
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">mul</span>(a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">mul</span>(a, b):
+    <span style="color: #972500;">return</span> LoggedInt(
         a * b,
-        [f<span style="color: #00d3d0;">"Multiplied </span>{a}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>]
+        [f<span style="color: #005e8b;">"Multiplied </span>{a}<span style="color: #005e8b;"> to </span>{b}<span style="color: #005e8b;">"</span>]
     )
 
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">div</span>(a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">div</span>(a, b):
+    <span style="color: #972500;">return</span> LoggedInt(
         a / b,
-        [f<span style="color: #00d3d0;">"Divided </span>{a}<span style="color: #00d3d0;"> by </span>{b}<span style="color: #00d3d0;">"</span>]
+        [f<span style="color: #005e8b;">"Divided </span>{a}<span style="color: #005e8b;"> by </span>{b}<span style="color: #005e8b;">"</span>]
     )
 </pre>
 </div>
@@ -575,10 +575,10 @@ and combines that result with the original <code>LoggedInt</code> value.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">bind</span>(old_logged_int, function, b):
-    <span style="color: #6ae4b9;">unwrapped_val</span> = old_logged_int.val
-    <span style="color: #6ae4b9;">new_logged_int</span> = function(unwrapped_val, b)
-    <span style="color: #ff6f9f;">return</span> LoggedInt(
+<pre class="src src-python"><span style="color: #972500;">def</span> <span style="color: #3f578f;">bind</span>(old_logged_int, function, b):
+    <span style="color: #005f5f;">unwrapped_val</span> = old_logged_int.val
+    <span style="color: #005f5f;">new_logged_int</span> = function(unwrapped_val, b)
+    <span style="color: #972500;">return</span> LoggedInt(
         new_logged_int.val,
         old_logged_int.logs + new_logged_int.logs
     )
@@ -592,16 +592,16 @@ a new <code>LoggedInt</code> result.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #6ae4b9;">logged_result</span> = LoggedInt(<span style="color: #88ca9f;">6</span>, [])
-<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, add, <span style="color: #88ca9f;">5</span>)
-<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, sub, <span style="color: #88ca9f;">4</span>)
-<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, mul, <span style="color: #88ca9f;">3</span>)
-<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, div, <span style="color: #88ca9f;">2</span>)
+<pre class="src src-python"><span style="color: #005f5f;">logged_result</span> = LoggedInt(<span style="color: #2a5045;">6</span>, [])
+<span style="color: #005f5f;">logged_result</span> = bind(logged_result, add, <span style="color: #2a5045;">5</span>)
+<span style="color: #005f5f;">logged_result</span> = bind(logged_result, sub, <span style="color: #2a5045;">4</span>)
+<span style="color: #005f5f;">logged_result</span> = bind(logged_result, mul, <span style="color: #2a5045;">3</span>)
+<span style="color: #005f5f;">logged_result</span> = bind(logged_result, div, <span style="color: #2a5045;">2</span>)
 
-<span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"Final result: </span>{logged_result.val}<span style="color: #00d3d0;">"</span>)
-<span style="color: #feacd0;">print</span>(<span style="color: #00d3d0;">"Logs:"</span>)
-<span style="color: #ff6f9f;">for</span> line <span style="color: #ff6f9f;">in</span> logged_result.logs:
-    <span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"  * </span>{line}<span style="color: #00d3d0;">"</span>)
+<span style="color: #721045;">print</span>(f<span style="color: #005e8b;">"Final result: </span>{logged_result.val}<span style="color: #005e8b;">"</span>)
+<span style="color: #721045;">print</span>(<span style="color: #005e8b;">"Logs:"</span>)
+<span style="color: #972500;">for</span> line <span style="color: #972500;">in</span> logged_result.logs:
+    <span style="color: #721045;">print</span>(f<span style="color: #005e8b;">"  * </span>{line}<span style="color: #005e8b;">"</span>)
 </pre>
 </div>
 
@@ -611,10 +611,10 @@ explicitly anymore, since the arithmetic functions now receive simple integers.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #6ae4b9;">logged_result</span> = add(<span style="color: #88ca9f;">6</span>, <span style="color: #88ca9f;">5</span>)  <span style="color: #989898;"># </span><span style="color: #989898;">No explicit call to 'LoggedInt'</span>
-<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, sub, <span style="color: #88ca9f;">4</span>)
-<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, mul, <span style="color: #88ca9f;">3</span>)
-<span style="color: #989898;"># </span><span style="color: #989898;">...</span>
+<pre class="src src-python"><span style="color: #005f5f;">logged_result</span> = add(<span style="color: #2a5045;">6</span>, <span style="color: #2a5045;">5</span>)  <span style="color: #595959;"># </span><span style="color: #595959;">No explicit call to 'LoggedInt'</span>
+<span style="color: #005f5f;">logged_result</span> = bind(logged_result, sub, <span style="color: #2a5045;">4</span>)
+<span style="color: #005f5f;">logged_result</span> = bind(logged_result, mul, <span style="color: #2a5045;">3</span>)
+<span style="color: #595959;"># </span><span style="color: #595959;">...</span>
 </pre>
 </div>
 </div>
@@ -633,10 +633,10 @@ simple value (e.g. an integer) and returns a new monadic value.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">bind</span>(old_logged_int, function): <span style="color: #989898;"># </span><span style="color: #989898;">Receives two arguments</span>
-    <span style="color: #6ae4b9;">unwrapped_val</span> = old_logged_int.val
-    <span style="color: #6ae4b9;">new_logged_int</span> = function(unwrapped_val)  <span style="color: #989898;"># </span><span style="color: #989898;">Called with one argument</span>
-    <span style="color: #ff6f9f;">return</span> LoggedInt(
+<pre class="src src-python"><span style="color: #972500;">def</span> <span style="color: #3f578f;">bind</span>(old_logged_int, function): <span style="color: #595959;"># </span><span style="color: #595959;">Receives two arguments</span>
+    <span style="color: #005f5f;">unwrapped_val</span> = old_logged_int.val
+    <span style="color: #005f5f;">new_logged_int</span> = function(unwrapped_val)  <span style="color: #595959;"># </span><span style="color: #595959;">Called with one argument</span>
+    <span style="color: #972500;">return</span> LoggedInt(
         new_logged_int.val,
         old_logged_int.logs + new_logged_int.logs
     )
@@ -653,20 +653,20 @@ equivalent.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #989898;"># </span><span style="color: #989898;">Define a function that receives integers 'a', 'b' and 'c', and returns an</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">integer with the result.</span>
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">foo</span>(a, b, c):
-    <span style="color: #ff6f9f;">return</span> a + b * c
+<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">Define a function that receives integers 'a', 'b' and 'c', and returns an</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">integer with the result.</span>
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">foo</span>(a, b, c):
+    <span style="color: #972500;">return</span> a + b * c
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Define a function that receives an integer 'a', and returns an anonymous</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">function that receives an integer 'b', and returns and anonymous function that</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">receives an integer 'c' and returns an integer with the result.</span>
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">bar</span>(a):
-    <span style="color: #ff6f9f;">return</span> <span style="color: #ff6f9f;">lambda</span> b: <span style="color: #ff6f9f;">lambda</span> c: a + b * c
+<span style="color: #595959;"># </span><span style="color: #595959;">Define a function that receives an integer 'a', and returns an anonymous</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">function that receives an integer 'b', and returns and anonymous function that</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">receives an integer 'c' and returns an integer with the result.</span>
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">bar</span>(a):
+    <span style="color: #972500;">return</span> <span style="color: #972500;">lambda</span> b: <span style="color: #972500;">lambda</span> c: a + b * c
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Example calls.</span>
-foo(<span style="color: #88ca9f;">5</span>, <span style="color: #88ca9f;">6</span>, <span style="color: #88ca9f;">7</span>)
-bar(<span style="color: #88ca9f;">5</span>)(<span style="color: #88ca9f;">6</span>)(<span style="color: #88ca9f;">7</span>)
+<span style="color: #595959;"># </span><span style="color: #595959;">Example calls.</span>
+foo(<span style="color: #2a5045;">5</span>, <span style="color: #2a5045;">6</span>, <span style="color: #2a5045;">7</span>)
+bar(<span style="color: #2a5045;">5</span>)(<span style="color: #2a5045;">6</span>)(<span style="color: #2a5045;">7</span>)
 </pre>
 </div>
 
@@ -676,11 +676,11 @@ the following expressions would be equivalent:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python">add(<span style="color: #88ca9f;">5</span>, <span style="color: #88ca9f;">6</span>)
+<pre class="src src-python">add(<span style="color: #2a5045;">5</span>, <span style="color: #2a5045;">6</span>)
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Equivalent one argument function.</span>
-<span style="color: #6ae4b9;">add_six</span> = <span style="color: #ff6f9f;">lambda</span> a: add(a, <span style="color: #88ca9f;">6</span>)
-add_six(<span style="color: #88ca9f;">5</span>)
+<span style="color: #595959;"># </span><span style="color: #595959;">Equivalent one argument function.</span>
+<span style="color: #005f5f;">add_six</span> = <span style="color: #972500;">lambda</span> a: add(a, <span style="color: #2a5045;">6</span>)
+add_six(<span style="color: #2a5045;">5</span>)
 </pre>
 </div>
 
@@ -689,10 +689,10 @@ This is how the bind functions would be called to match the previous example.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #6ae4b9;">logged_result</span> = add(<span style="color: #88ca9f;">6</span>, <span style="color: #88ca9f;">5</span>)
-<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, <span style="color: #ff6f9f;">lambda</span> a: sub(a, <span style="color: #88ca9f;">4</span>))
-<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, <span style="color: #ff6f9f;">lambda</span> a: mul(a, <span style="color: #88ca9f;">3</span>))
-<span style="color: #6ae4b9;">logged_result</span> = bind(logged_result, <span style="color: #ff6f9f;">lambda</span> a: div(a, <span style="color: #88ca9f;">2</span>))
+<pre class="src src-python"><span style="color: #005f5f;">logged_result</span> = add(<span style="color: #2a5045;">6</span>, <span style="color: #2a5045;">5</span>)
+<span style="color: #005f5f;">logged_result</span> = bind(logged_result, <span style="color: #972500;">lambda</span> a: sub(a, <span style="color: #2a5045;">4</span>))
+<span style="color: #005f5f;">logged_result</span> = bind(logged_result, <span style="color: #972500;">lambda</span> a: mul(a, <span style="color: #2a5045;">3</span>))
+<span style="color: #005f5f;">logged_result</span> = bind(logged_result, <span style="color: #972500;">lambda</span> a: div(a, <span style="color: #2a5045;">2</span>))
 </pre>
 </div>
 
@@ -703,23 +703,23 @@ cleaner notation, since it now accesses the instance of the object.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #ff6f9f;">class</span> <span style="color: #79a8ff;">LoggedInt</span>:
-    <span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">__init__</span>(<span style="color: #ff6f9f;">self</span>, val, logs):  <span style="color: #989898;"># </span><span style="color: #989898;">Unchanged</span>
-        <span style="color: #ff6f9f;">self</span>.<span style="color: #6ae4b9;">val</span> = val
-        <span style="color: #ff6f9f;">self</span>.<span style="color: #6ae4b9;">logs</span> = logs
+<pre class="src src-python"><span style="color: #972500;">class</span> <span style="color: #0031a9;">LoggedInt</span>:
+    <span style="color: #972500;">def</span> <span style="color: #3f578f;">__init__</span>(<span style="color: #972500;">self</span>, val, logs):  <span style="color: #595959;"># </span><span style="color: #595959;">Unchanged</span>
+        <span style="color: #972500;">self</span>.<span style="color: #005f5f;">val</span> = val
+        <span style="color: #972500;">self</span>.<span style="color: #005f5f;">logs</span> = logs
 
-    <span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">bind</span>(<span style="color: #ff6f9f;">self</span>, function):
-        <span style="color: #6ae4b9;">new_logged_int</span> = function(<span style="color: #ff6f9f;">self</span>.val)
-        <span style="color: #ff6f9f;">return</span> LoggedInt(
+    <span style="color: #972500;">def</span> <span style="color: #3f578f;">bind</span>(<span style="color: #972500;">self</span>, function):
+        <span style="color: #005f5f;">new_logged_int</span> = function(<span style="color: #972500;">self</span>.val)
+        <span style="color: #972500;">return</span> LoggedInt(
             new_logged_int.val,
-            <span style="color: #ff6f9f;">self</span>.logs + new_logged_int.logs
+            <span style="color: #972500;">self</span>.logs + new_logged_int.logs
         )
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Example usage.</span>
-<span style="color: #6ae4b9;">logged_result</span> = (
-    add(<span style="color: #88ca9f;">6</span>, <span style="color: #88ca9f;">5</span>).bind(<span style="color: #ff6f9f;">lambda</span> a: sub(a, <span style="color: #88ca9f;">4</span>))
-             .bind(<span style="color: #ff6f9f;">lambda</span> a: mul(a, <span style="color: #88ca9f;">3</span>))
-             .bind(<span style="color: #ff6f9f;">lambda</span> a: div(a, <span style="color: #88ca9f;">2</span>))
+<span style="color: #595959;"># </span><span style="color: #595959;">Example usage.</span>
+<span style="color: #005f5f;">logged_result</span> = (
+    add(<span style="color: #2a5045;">6</span>, <span style="color: #2a5045;">5</span>).bind(<span style="color: #972500;">lambda</span> a: sub(a, <span style="color: #2a5045;">4</span>))
+             .bind(<span style="color: #972500;">lambda</span> a: mul(a, <span style="color: #2a5045;">3</span>))
+             .bind(<span style="color: #972500;">lambda</span> a: div(a, <span style="color: #2a5045;">2</span>))
 )
 </pre>
 </div>
@@ -740,45 +740,45 @@ This is the final python code for the writer monad.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #989898;"># </span><span style="color: #989898;">Monadic type, expands a base integer type to add logging functionality.</span>
-<span style="color: #ff6f9f;">class</span> <span style="color: #79a8ff;">LoggedInt</span>:
-    <span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">__init__</span>(<span style="color: #ff6f9f;">self</span>, val, logs=[]):
-        <span style="color: #ff6f9f;">self</span>.<span style="color: #6ae4b9;">val</span> = val
-        <span style="color: #ff6f9f;">self</span>.<span style="color: #6ae4b9;">logs</span> = logs
+<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">Monadic type, expands a base integer type to add logging functionality.</span>
+<span style="color: #972500;">class</span> <span style="color: #0031a9;">LoggedInt</span>:
+    <span style="color: #972500;">def</span> <span style="color: #3f578f;">__init__</span>(<span style="color: #972500;">self</span>, val, logs=[]):
+        <span style="color: #972500;">self</span>.<span style="color: #005f5f;">val</span> = val
+        <span style="color: #972500;">self</span>.<span style="color: #005f5f;">logs</span> = logs
 
-    <span style="color: #989898;"># </span><span style="color: #989898;">Applies a one-argument monadic function to the current instance, and</span>
-    <span style="color: #989898;"># </span><span style="color: #989898;">combines the result with the existing log list.</span>
-    <span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">bind</span>(<span style="color: #ff6f9f;">self</span>, function):
-        <span style="color: #6ae4b9;">new_logged_int</span> = function(<span style="color: #ff6f9f;">self</span>.val)
-        <span style="color: #ff6f9f;">return</span> LoggedInt(
+    <span style="color: #595959;"># </span><span style="color: #595959;">Applies a one-argument monadic function to the current instance, and</span>
+    <span style="color: #595959;"># </span><span style="color: #595959;">combines the result with the existing log list.</span>
+    <span style="color: #972500;">def</span> <span style="color: #3f578f;">bind</span>(<span style="color: #972500;">self</span>, function):
+        <span style="color: #005f5f;">new_logged_int</span> = function(<span style="color: #972500;">self</span>.val)
+        <span style="color: #972500;">return</span> LoggedInt(
             new_logged_int.val,
-            <span style="color: #ff6f9f;">self</span>.logs + new_logged_int.logs
+            <span style="color: #972500;">self</span>.logs + new_logged_int.logs
         )
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Monadic functions.</span>
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">add</span>(a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(a + b, [f<span style="color: #00d3d0;">"Added </span>{a}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>])
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">sub</span>(a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(a - b, [f<span style="color: #00d3d0;">"Subtracted </span>{a}<span style="color: #00d3d0;"> from </span>{b}<span style="color: #00d3d0;">"</span>])
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">mul</span>(a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(a * b, [f<span style="color: #00d3d0;">"Multiplied </span>{a}<span style="color: #00d3d0;"> to </span>{b}<span style="color: #00d3d0;">"</span>])
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">div</span>(a, b):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(a / b, [f<span style="color: #00d3d0;">"Divided </span>{a}<span style="color: #00d3d0;"> by </span>{b}<span style="color: #00d3d0;">"</span>])
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">square</span>(a):
-    <span style="color: #ff6f9f;">return</span> LoggedInt(a * a, [f<span style="color: #00d3d0;">"Squared </span>{a}<span style="color: #00d3d0;">"</span>])
+<span style="color: #595959;"># </span><span style="color: #595959;">Monadic functions.</span>
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">add</span>(a, b):
+    <span style="color: #972500;">return</span> LoggedInt(a + b, [f<span style="color: #005e8b;">"Added </span>{a}<span style="color: #005e8b;"> to </span>{b}<span style="color: #005e8b;">"</span>])
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">sub</span>(a, b):
+    <span style="color: #972500;">return</span> LoggedInt(a - b, [f<span style="color: #005e8b;">"Subtracted </span>{a}<span style="color: #005e8b;"> from </span>{b}<span style="color: #005e8b;">"</span>])
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">mul</span>(a, b):
+    <span style="color: #972500;">return</span> LoggedInt(a * b, [f<span style="color: #005e8b;">"Multiplied </span>{a}<span style="color: #005e8b;"> to </span>{b}<span style="color: #005e8b;">"</span>])
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">div</span>(a, b):
+    <span style="color: #972500;">return</span> LoggedInt(a / b, [f<span style="color: #005e8b;">"Divided </span>{a}<span style="color: #005e8b;"> by </span>{b}<span style="color: #005e8b;">"</span>])
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">square</span>(a):
+    <span style="color: #972500;">return</span> LoggedInt(a * a, [f<span style="color: #005e8b;">"Squared </span>{a}<span style="color: #005e8b;">"</span>])
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Example usage.</span>
-<span style="color: #6ae4b9;">logged_result</span> = (
-    add(<span style="color: #88ca9f;">6</span>, <span style="color: #88ca9f;">5</span>).bind(<span style="color: #ff6f9f;">lambda</span> a: sub(a, <span style="color: #88ca9f;">4</span>))
-             .bind(<span style="color: #ff6f9f;">lambda</span> a: mul(a, <span style="color: #88ca9f;">3</span>))
-             .bind(<span style="color: #ff6f9f;">lambda</span> a: div(a, <span style="color: #88ca9f;">2</span>))
-             .bind(<span style="color: #ff6f9f;">lambda</span> a: square(a))
+<span style="color: #595959;"># </span><span style="color: #595959;">Example usage.</span>
+<span style="color: #005f5f;">logged_result</span> = (
+    add(<span style="color: #2a5045;">6</span>, <span style="color: #2a5045;">5</span>).bind(<span style="color: #972500;">lambda</span> a: sub(a, <span style="color: #2a5045;">4</span>))
+             .bind(<span style="color: #972500;">lambda</span> a: mul(a, <span style="color: #2a5045;">3</span>))
+             .bind(<span style="color: #972500;">lambda</span> a: div(a, <span style="color: #2a5045;">2</span>))
+             .bind(<span style="color: #972500;">lambda</span> a: square(a))
 )
 
-<span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"Final result: </span>{logged_result.val}<span style="color: #00d3d0;">"</span>)
-<span style="color: #feacd0;">print</span>(<span style="color: #00d3d0;">"Logs:"</span>)
-<span style="color: #ff6f9f;">for</span> line <span style="color: #ff6f9f;">in</span> logged_result.logs:
-    <span style="color: #feacd0;">print</span>(f<span style="color: #00d3d0;">"  * </span>{line}<span style="color: #00d3d0;">"</span>)
+<span style="color: #721045;">print</span>(f<span style="color: #005e8b;">"Final result: </span>{logged_result.val}<span style="color: #005e8b;">"</span>)
+<span style="color: #721045;">print</span>(<span style="color: #005e8b;">"Logs:"</span>)
+<span style="color: #972500;">for</span> line <span style="color: #972500;">in</span> logged_result.logs:
+    <span style="color: #721045;">print</span>(f<span style="color: #005e8b;">"  * </span>{line}<span style="color: #005e8b;">"</span>)
 </pre>
 </div>
 </div>
@@ -851,11 +851,11 @@ expressions are equivalent:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #989898;"># </span><span style="color: #989898;">Call the monadic function with simple value.</span>
-<span style="color: #6ae4b9;">result1</span> = square(<span style="color: #88ca9f;">6</span>)
+<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">Call the monadic function with simple value.</span>
+<span style="color: #005f5f;">result1</span> = square(<span style="color: #2a5045;">6</span>)
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Promote simple value to monadic type, and bind it to monadic function.</span>
-<span style="color: #6ae4b9;">result2</span> = LoggedInt(<span style="color: #88ca9f;">6</span>).bind(square)
+<span style="color: #595959;"># </span><span style="color: #595959;">Promote simple value to monadic type, and bind it to monadic function.</span>
+<span style="color: #005f5f;">result2</span> = LoggedInt(<span style="color: #2a5045;">6</span>).bind(square)
 </pre>
 </div></dd>
 
@@ -872,11 +872,11 @@ equivalent:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #989898;"># </span><span style="color: #989898;">Promote a simple value to a monadic type, through the constructor.</span>
-<span style="color: #6ae4b9;">result1</span> = LoggedInt(<span style="color: #88ca9f;">6</span>)
+<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">Promote a simple value to a monadic type, through the constructor.</span>
+<span style="color: #005f5f;">result1</span> = LoggedInt(<span style="color: #2a5045;">6</span>)
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Promote a simple value to a monadic type, and bind that to the constructor.</span>
-<span style="color: #6ae4b9;">result2</span> = LoggedInt(<span style="color: #88ca9f;">6</span>).bind(LoggedInt)
+<span style="color: #595959;"># </span><span style="color: #595959;">Promote a simple value to a monadic type, and bind that to the constructor.</span>
+<span style="color: #005f5f;">result2</span> = LoggedInt(<span style="color: #2a5045;">6</span>).bind(LoggedInt)
 </pre>
 </div></dd>
 
@@ -892,17 +892,17 @@ In the previous writer example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #989898;"># </span><span style="color: #989898;">Define another simple one-argument monadic function.</span>
-<span style="color: #ff6f9f;">def</span> <span style="color: #4ae2ff;">add_five</span>(a):
-    <span style="color: #ff6f9f;">return</span> add(a, <span style="color: #88ca9f;">5</span>)
+<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">Define another simple one-argument monadic function.</span>
+<span style="color: #972500;">def</span> <span style="color: #3f578f;">add_five</span>(a):
+    <span style="color: #972500;">return</span> add(a, <span style="color: #2a5045;">5</span>)
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Promote a simple value to a monadic type, bind that to 'square', and then</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">bind the result to 'add_five'.</span>
-<span style="color: #6ae4b9;">result1</span> = LoggedInt(<span style="color: #88ca9f;">6</span>).bind(square).bind(add_five)
+<span style="color: #595959;"># </span><span style="color: #595959;">Promote a simple value to a monadic type, bind that to 'square', and then</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">bind the result to 'add_five'.</span>
+<span style="color: #005f5f;">result1</span> = LoggedInt(<span style="color: #2a5045;">6</span>).bind(square).bind(add_five)
 
-<span style="color: #989898;"># </span><span style="color: #989898;">Promote a simple value to a monadic type, and bind that to a lambda which</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">calls 'square' on its input and binds that to 'add_five'.</span>
-<span style="color: #6ae4b9;">result2</span> = LoggedInt(<span style="color: #88ca9f;">6</span>).bind(<span style="color: #ff6f9f;">lambda</span> a: square(a).bind(add_five))
+<span style="color: #595959;"># </span><span style="color: #595959;">Promote a simple value to a monadic type, and bind that to a lambda which</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">calls 'square' on its input and binds that to 'add_five'.</span>
+<span style="color: #005f5f;">result2</span> = LoggedInt(<span style="color: #2a5045;">6</span>).bind(<span style="color: #972500;">lambda</span> a: square(a).bind(add_five))
 </pre>
 </div></dd>
 </dl>

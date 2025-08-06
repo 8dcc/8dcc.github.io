@@ -226,45 +226,45 @@ Original challenge link: <a href="https://challenges.re/8/">Click me</a>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-   <span style="color: #88ca9f;">0</span>:       <span style="color: #feacd0;">push</span>   <span style="color: #6ae4b9;">r12</span>
-   <span style="color: #88ca9f;">2</span>:       <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">rsi</span>, <span style="color: #6ae4b9;">rsi</span>
-   <span style="color: #88ca9f;">5</span>:       <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">r12</span>, <span style="color: #6ae4b9;">rdi</span>
-   <span style="color: #88ca9f;">8</span>:       <span style="color: #feacd0;">push</span>   <span style="color: #6ae4b9;">rbp</span>
-   <span style="color: #88ca9f;">9</span>:       <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rdx</span>
-   <span style="color: #4ae2ff;">c</span>:       <span style="color: #feacd0;">push</span>   <span style="color: #6ae4b9;">rbx</span>
-   <span style="color: #4ae2ff;">d</span>:       <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rbx</span>, <span style="color: #6ae4b9;">rsi</span>
-  <span style="color: #88ca9f;">10</span>:       <span style="color: #feacd0;">je</span>     <span style="color: #88ca9f;">32</span>
-  <span style="color: #88ca9f;">12</span>:       <span style="color: #feacd0;">nop</span>    <span style="color: #79a8ff;">WORD</span> [<span style="color: #6ae4b9;">rax</span> + <span style="color: #6ae4b9;">rax</span> * <span style="color: #88ca9f;">1</span> + <span style="color: #88ca9f;">0x0</span>]
-  <span style="color: #88ca9f;">18</span>:       <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rsi</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbx</span>]
-  <span style="color: #88ca9f;">1b</span>:       <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rbp</span>
-  <span style="color: #88ca9f;">1e</span>:       <span style="color: #feacd0;">call</span>   <span style="color: #6ae4b9;">r12</span>
-  <span style="color: #88ca9f;">21</span>:       <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-  <span style="color: #88ca9f;">23</span>:       <span style="color: #feacd0;">je</span>     <span style="color: #88ca9f;">56</span>
-  <span style="color: #88ca9f;">25</span>:       <span style="color: #feacd0;">js</span>     <span style="color: #88ca9f;">40</span>
-  <span style="color: #88ca9f;">27</span>:       <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rbx</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbx</span> + <span style="color: #88ca9f;">0x18</span>]
-  <span style="color: #88ca9f;">2b</span>:       <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">rbx</span>, <span style="color: #6ae4b9;">rbx</span>
-  <span style="color: #88ca9f;">2e</span>:       <span style="color: #feacd0;">xchg</span>   <span style="color: #6ae4b9;">ax</span>, <span style="color: #6ae4b9;">ax</span>
-  <span style="color: #88ca9f;">30</span>:       <span style="color: #feacd0;">jne</span>    <span style="color: #88ca9f;">18</span>
-  <span style="color: #88ca9f;">32</span>:       <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">rbx</span>
-  <span style="color: #88ca9f;">33</span>:       <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">rbp</span>
-  <span style="color: #88ca9f;">34</span>:       <span style="color: #feacd0;">xor</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-  <span style="color: #88ca9f;">36</span>:       <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">r12</span>
-  <span style="color: #88ca9f;">38</span>:       <span style="color: #feacd0;">ret</span>
-  <span style="color: #88ca9f;">39</span>:       <span style="color: #feacd0;">nop</span>    <span style="color: #79a8ff;">DWORD</span> [<span style="color: #6ae4b9;">rax</span> + <span style="color: #88ca9f;">0x0</span>]
-  <span style="color: #88ca9f;">40</span>:       <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rbx</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbx</span> + <span style="color: #88ca9f;">0x10</span>]
-  <span style="color: #88ca9f;">44</span>:       <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">rbx</span>, <span style="color: #6ae4b9;">rbx</span>
-  <span style="color: #88ca9f;">47</span>:       <span style="color: #feacd0;">je</span>     <span style="color: #88ca9f;">32</span>
-  <span style="color: #88ca9f;">49</span>:       <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rsi</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbx</span>]
-  <span style="color: #88ca9f;">4c</span>:       <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rbp</span>
-  <span style="color: #88ca9f;">4f</span>:       <span style="color: #feacd0;">call</span>   <span style="color: #6ae4b9;">r12</span>
-  <span style="color: #88ca9f;">52</span>:       <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-  <span style="color: #88ca9f;">54</span>:       <span style="color: #feacd0;">jne</span>    <span style="color: #88ca9f;">25</span>
-  <span style="color: #88ca9f;">56</span>:       <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rbx</span>
-  <span style="color: #88ca9f;">59</span>:       <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">rbx</span>
-  <span style="color: #88ca9f;">5a</span>:       <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">rbp</span>
-  <span style="color: #88ca9f;">5b</span>:       <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">r12</span>
-  <span style="color: #88ca9f;">5d</span>:       <span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+   <span style="color: #2a5045;">0</span>:       <span style="color: #721045;">push</span>   <span style="color: #005f5f;">r12</span>
+   <span style="color: #2a5045;">2</span>:       <span style="color: #721045;">test</span>   <span style="color: #005f5f;">rsi</span>, <span style="color: #005f5f;">rsi</span>
+   <span style="color: #2a5045;">5</span>:       <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">r12</span>, <span style="color: #005f5f;">rdi</span>
+   <span style="color: #2a5045;">8</span>:       <span style="color: #721045;">push</span>   <span style="color: #005f5f;">rbp</span>
+   <span style="color: #2a5045;">9</span>:       <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rbp</span>, <span style="color: #005f5f;">rdx</span>
+   <span style="color: #3f578f;">c</span>:       <span style="color: #721045;">push</span>   <span style="color: #005f5f;">rbx</span>
+   <span style="color: #3f578f;">d</span>:       <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rbx</span>, <span style="color: #005f5f;">rsi</span>
+  <span style="color: #2a5045;">10</span>:       <span style="color: #721045;">je</span>     <span style="color: #2a5045;">32</span>
+  <span style="color: #2a5045;">12</span>:       <span style="color: #721045;">nop</span>    <span style="color: #0031a9;">WORD</span> [<span style="color: #005f5f;">rax</span> + <span style="color: #005f5f;">rax</span> * <span style="color: #2a5045;">1</span> + <span style="color: #2a5045;">0x0</span>]
+  <span style="color: #2a5045;">18</span>:       <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rsi</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbx</span>]
+  <span style="color: #2a5045;">1b</span>:       <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rdi</span>, <span style="color: #005f5f;">rbp</span>
+  <span style="color: #2a5045;">1e</span>:       <span style="color: #721045;">call</span>   <span style="color: #005f5f;">r12</span>
+  <span style="color: #2a5045;">21</span>:       <span style="color: #721045;">test</span>   <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+  <span style="color: #2a5045;">23</span>:       <span style="color: #721045;">je</span>     <span style="color: #2a5045;">56</span>
+  <span style="color: #2a5045;">25</span>:       <span style="color: #721045;">js</span>     <span style="color: #2a5045;">40</span>
+  <span style="color: #2a5045;">27</span>:       <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rbx</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbx</span> + <span style="color: #2a5045;">0x18</span>]
+  <span style="color: #2a5045;">2b</span>:       <span style="color: #721045;">test</span>   <span style="color: #005f5f;">rbx</span>, <span style="color: #005f5f;">rbx</span>
+  <span style="color: #2a5045;">2e</span>:       <span style="color: #721045;">xchg</span>   <span style="color: #005f5f;">ax</span>, <span style="color: #005f5f;">ax</span>
+  <span style="color: #2a5045;">30</span>:       <span style="color: #721045;">jne</span>    <span style="color: #2a5045;">18</span>
+  <span style="color: #2a5045;">32</span>:       <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">rbx</span>
+  <span style="color: #2a5045;">33</span>:       <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">rbp</span>
+  <span style="color: #2a5045;">34</span>:       <span style="color: #721045;">xor</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+  <span style="color: #2a5045;">36</span>:       <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">r12</span>
+  <span style="color: #2a5045;">38</span>:       <span style="color: #721045;">ret</span>
+  <span style="color: #2a5045;">39</span>:       <span style="color: #721045;">nop</span>    <span style="color: #0031a9;">DWORD</span> [<span style="color: #005f5f;">rax</span> + <span style="color: #2a5045;">0x0</span>]
+  <span style="color: #2a5045;">40</span>:       <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rbx</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbx</span> + <span style="color: #2a5045;">0x10</span>]
+  <span style="color: #2a5045;">44</span>:       <span style="color: #721045;">test</span>   <span style="color: #005f5f;">rbx</span>, <span style="color: #005f5f;">rbx</span>
+  <span style="color: #2a5045;">47</span>:       <span style="color: #721045;">je</span>     <span style="color: #2a5045;">32</span>
+  <span style="color: #2a5045;">49</span>:       <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rsi</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbx</span>]
+  <span style="color: #2a5045;">4c</span>:       <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rdi</span>, <span style="color: #005f5f;">rbp</span>
+  <span style="color: #2a5045;">4f</span>:       <span style="color: #721045;">call</span>   <span style="color: #005f5f;">r12</span>
+  <span style="color: #2a5045;">52</span>:       <span style="color: #721045;">test</span>   <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+  <span style="color: #2a5045;">54</span>:       <span style="color: #721045;">jne</span>    <span style="color: #2a5045;">25</span>
+  <span style="color: #2a5045;">56</span>:       <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #005f5f;">rbx</span>
+  <span style="color: #2a5045;">59</span>:       <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">rbx</span>
+  <span style="color: #2a5045;">5a</span>:       <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">rbp</span>
+  <span style="color: #2a5045;">5b</span>:       <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">r12</span>
+  <span style="color: #2a5045;">5d</span>:       <span style="color: #721045;">ret</span>
 </pre>
 </div>
 
@@ -273,50 +273,50 @@ After removing the unused labels, and renaming the used ones.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-    <span style="color: #feacd0;">push</span>   <span style="color: #6ae4b9;">r12</span>
-    <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">rsi</span>, <span style="color: #6ae4b9;">rsi</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">r12</span>, <span style="color: #6ae4b9;">rdi</span>
-    <span style="color: #feacd0;">push</span>   <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rdx</span>
-    <span style="color: #feacd0;">push</span>   <span style="color: #6ae4b9;">rbx</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rbx</span>, <span style="color: #6ae4b9;">rsi</span>
-    <span style="color: #feacd0;">je</span>     .return_zero
-    <span style="color: #feacd0;">nop</span>
-<span style="color: #4ae2ff;">.unk0</span>:
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rsi</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbx</span>]
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">call</span>   <span style="color: #6ae4b9;">r12</span>
-    <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">je</span>     .return_rbx
-<span style="color: #4ae2ff;">.unk1</span>:
-    <span style="color: #feacd0;">js</span>     .unk2
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rbx</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbx</span> + <span style="color: #88ca9f;">0x18</span>]
-    <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">rbx</span>, <span style="color: #6ae4b9;">rbx</span>
-    <span style="color: #feacd0;">xchg</span>   <span style="color: #6ae4b9;">ax</span>, <span style="color: #6ae4b9;">ax</span>  <span style="color: #989898;">; </span><span style="color: #989898;">(nop)</span>
-    <span style="color: #feacd0;">jne</span>    .unk0
-<span style="color: #4ae2ff;">.return_zero</span>:
-    <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">rbx</span>
-    <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">xor</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">r12</span>
-    <span style="color: #feacd0;">ret</span>
-    <span style="color: #feacd0;">nop</span>
-<span style="color: #4ae2ff;">.unk2</span>:
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rbx</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbx</span> + <span style="color: #88ca9f;">0x10</span>]
-    <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">rbx</span>, <span style="color: #6ae4b9;">rbx</span>
-    <span style="color: #feacd0;">je</span>     .return_zero
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rsi</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbx</span>]
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">call</span>   <span style="color: #6ae4b9;">r12</span>
-    <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">jne</span>    .unk1
-<span style="color: #4ae2ff;">.return_rbx</span>:
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rbx</span>
-    <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">rbx</span>
-    <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">r12</span>
-    <span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+    <span style="color: #721045;">push</span>   <span style="color: #005f5f;">r12</span>
+    <span style="color: #721045;">test</span>   <span style="color: #005f5f;">rsi</span>, <span style="color: #005f5f;">rsi</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">r12</span>, <span style="color: #005f5f;">rdi</span>
+    <span style="color: #721045;">push</span>   <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rbp</span>, <span style="color: #005f5f;">rdx</span>
+    <span style="color: #721045;">push</span>   <span style="color: #005f5f;">rbx</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rbx</span>, <span style="color: #005f5f;">rsi</span>
+    <span style="color: #721045;">je</span>     .return_zero
+    <span style="color: #721045;">nop</span>
+<span style="color: #3f578f;">.unk0</span>:
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rsi</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbx</span>]
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rdi</span>, <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">call</span>   <span style="color: #005f5f;">r12</span>
+    <span style="color: #721045;">test</span>   <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">je</span>     .return_rbx
+<span style="color: #3f578f;">.unk1</span>:
+    <span style="color: #721045;">js</span>     .unk2
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rbx</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbx</span> + <span style="color: #2a5045;">0x18</span>]
+    <span style="color: #721045;">test</span>   <span style="color: #005f5f;">rbx</span>, <span style="color: #005f5f;">rbx</span>
+    <span style="color: #721045;">xchg</span>   <span style="color: #005f5f;">ax</span>, <span style="color: #005f5f;">ax</span>  <span style="color: #595959;">; </span><span style="color: #595959;">(nop)</span>
+    <span style="color: #721045;">jne</span>    .unk0
+<span style="color: #3f578f;">.return_zero</span>:
+    <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">rbx</span>
+    <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">xor</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">r12</span>
+    <span style="color: #721045;">ret</span>
+    <span style="color: #721045;">nop</span>
+<span style="color: #3f578f;">.unk2</span>:
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rbx</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbx</span> + <span style="color: #2a5045;">0x10</span>]
+    <span style="color: #721045;">test</span>   <span style="color: #005f5f;">rbx</span>, <span style="color: #005f5f;">rbx</span>
+    <span style="color: #721045;">je</span>     .return_zero
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rsi</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbx</span>]
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rdi</span>, <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">call</span>   <span style="color: #005f5f;">r12</span>
+    <span style="color: #721045;">test</span>   <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">jne</span>    .unk1
+<span style="color: #3f578f;">.return_rbx</span>:
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #005f5f;">rbx</span>
+    <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">rbx</span>
+    <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">r12</span>
+    <span style="color: #721045;">ret</span>
 </pre>
 </div>
 </div>
@@ -399,36 +399,36 @@ check.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">int</span> (*<span style="color: #79a8ff;">callback_t</span>)(<span style="color: #79a8ff;">uint64_t</span>, <span style="color: #79a8ff;">uint64_t</span>*);
+<pre class="src src-C"><span style="color: #972500;">typedef</span> <span style="color: #0031a9;">int</span> (*<span style="color: #0031a9;">callback_t</span>)(<span style="color: #0031a9;">uint64_t</span>, <span style="color: #0031a9;">uint64_t</span>*);
 
-<span style="color: #79a8ff;">uint64_t</span>* <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">callback_t</span> <span style="color: #6ae4b9;">r12</span>, <span style="color: #79a8ff;">uint64_t</span>* <span style="color: #6ae4b9;">rbx</span>, <span style="color: #79a8ff;">uint64_t</span> <span style="color: #6ae4b9;">rbp</span>) {
-    <span style="color: #ff6f9f;">if</span> (rbx == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+<span style="color: #0031a9;">uint64_t</span>* <span style="color: #3f578f;">func</span>(<span style="color: #0031a9;">callback_t</span> <span style="color: #005f5f;">r12</span>, <span style="color: #0031a9;">uint64_t</span>* <span style="color: #005f5f;">rbx</span>, <span style="color: #0031a9;">uint64_t</span> <span style="color: #005f5f;">rbp</span>) {
+    <span style="color: #972500;">if</span> (rbx == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
 
-    <span style="color: #ff6f9f;">for</span> (;;) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">unk0</span><span style="color: #989898;"> */</span>
-        <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">eax</span> = r12(rbp, rbx[<span style="color: #88ca9f;">0</span>]);
-        <span style="color: #ff6f9f;">if</span> (eax == <span style="color: #88ca9f;">0</span>)
-            <span style="color: #ff6f9f;">return</span> rbx;
+    <span style="color: #972500;">for</span> (;;) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">unk0</span><span style="color: #595959;"> */</span>
+        <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">eax</span> = r12(rbp, rbx[<span style="color: #2a5045;">0</span>]);
+        <span style="color: #972500;">if</span> (eax == <span style="color: #2a5045;">0</span>)
+            <span style="color: #972500;">return</span> rbx;
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">unk1</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">if</span> (eax &gt;= <span style="color: #88ca9f;">0</span>) {
-            rbx = rbx[<span style="color: #88ca9f;">3</span>];
-            <span style="color: #ff6f9f;">if</span> (rbx == <span style="color: #88ca9f;">NULL</span>)
-                <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+        <span style="color: #595959;">/* </span><span style="color: #595959;">unk1</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">if</span> (eax &gt;= <span style="color: #2a5045;">0</span>) {
+            rbx = rbx[<span style="color: #2a5045;">3</span>];
+            <span style="color: #972500;">if</span> (rbx == <span style="color: #2a5045;">NULL</span>)
+                <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
 
-            <span style="color: #ff6f9f;">continue</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">goto unk0</span><span style="color: #989898;"> */</span>
-        } <span style="color: #ff6f9f;">else</span> {
-            <span style="color: #989898;">/* </span><span style="color: #989898;">unk2</span><span style="color: #989898;"> */</span>
-            rbx = rbx[<span style="color: #88ca9f;">2</span>];
-            <span style="color: #ff6f9f;">if</span> (rbx == <span style="color: #88ca9f;">NULL</span>)
-                <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+            <span style="color: #972500;">continue</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">goto unk0</span><span style="color: #595959;"> */</span>
+        } <span style="color: #972500;">else</span> {
+            <span style="color: #595959;">/* </span><span style="color: #595959;">unk2</span><span style="color: #595959;"> */</span>
+            rbx = rbx[<span style="color: #2a5045;">2</span>];
+            <span style="color: #972500;">if</span> (rbx == <span style="color: #2a5045;">NULL</span>)
+                <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
 
-            <span style="color: #ff6f9f;">continue</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">goto unk0</span><span style="color: #989898;"> */</span>
+            <span style="color: #972500;">continue</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">goto unk0</span><span style="color: #595959;"> */</span>
         }
     }
 
-    <span style="color: #ff6f9f;">return</span> rbx;
+    <span style="color: #972500;">return</span> rbx;
 }
 </pre>
 </div>
@@ -440,39 +440,39 @@ of zero, since it normally returns <code>rbx</code> which is a pointer to a node
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">MyNode</span> {
-    <span style="color: #79a8ff;">uint64_t</span> <span style="color: #6ae4b9;">data0</span>;
-    <span style="color: #79a8ff;">uint64_t</span> <span style="color: #6ae4b9;">data1</span>;
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">MyNode</span>* <span style="color: #6ae4b9;">prev</span>;
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">MyNode</span>* <span style="color: #6ae4b9;">next</span>;
-} <span style="color: #79a8ff;">MyNode</span>;
+<pre class="src src-C"><span style="color: #972500;">typedef</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">MyNode</span> {
+    <span style="color: #0031a9;">uint64_t</span> <span style="color: #005f5f;">data0</span>;
+    <span style="color: #0031a9;">uint64_t</span> <span style="color: #005f5f;">data1</span>;
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">MyNode</span>* <span style="color: #005f5f;">prev</span>;
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">MyNode</span>* <span style="color: #005f5f;">next</span>;
+} <span style="color: #0031a9;">MyNode</span>;
 
-<span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">int</span> (*<span style="color: #79a8ff;">callback_t</span>)(<span style="color: #79a8ff;">uint64_t</span>, <span style="color: #79a8ff;">uint64_t</span>);
+<span style="color: #972500;">typedef</span> <span style="color: #0031a9;">int</span> (*<span style="color: #0031a9;">callback_t</span>)(<span style="color: #0031a9;">uint64_t</span>, <span style="color: #0031a9;">uint64_t</span>);
 
-<span style="color: #79a8ff;">MyNode</span>* <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">callback_t</span> <span style="color: #6ae4b9;">callback</span>, <span style="color: #79a8ff;">MyNode</span>* <span style="color: #6ae4b9;">node</span>, <span style="color: #79a8ff;">uint64_t</span> <span style="color: #6ae4b9;">data</span>) {
-    <span style="color: #ff6f9f;">if</span> (node == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+<span style="color: #0031a9;">MyNode</span>* <span style="color: #3f578f;">func</span>(<span style="color: #0031a9;">callback_t</span> <span style="color: #005f5f;">callback</span>, <span style="color: #0031a9;">MyNode</span>* <span style="color: #005f5f;">node</span>, <span style="color: #0031a9;">uint64_t</span> <span style="color: #005f5f;">data</span>) {
+    <span style="color: #972500;">if</span> (node == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
 
-    <span style="color: #ff6f9f;">for</span> (;;) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">unk0</span><span style="color: #989898;"> */</span>
-        <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">result</span> = callback(data, node-&gt;data0);
-        <span style="color: #ff6f9f;">if</span> (result == <span style="color: #88ca9f;">0</span>)
-            <span style="color: #ff6f9f;">return</span> node;
+    <span style="color: #972500;">for</span> (;;) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">unk0</span><span style="color: #595959;"> */</span>
+        <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">result</span> = callback(data, node-&gt;data0);
+        <span style="color: #972500;">if</span> (result == <span style="color: #2a5045;">0</span>)
+            <span style="color: #972500;">return</span> node;
 
-        <span style="color: #ff6f9f;">if</span> (result &gt;= <span style="color: #88ca9f;">0</span>) {
-            <span style="color: #989898;">/* </span><span style="color: #989898;">unk1</span><span style="color: #989898;"> */</span>
+        <span style="color: #972500;">if</span> (result &gt;= <span style="color: #2a5045;">0</span>) {
+            <span style="color: #595959;">/* </span><span style="color: #595959;">unk1</span><span style="color: #595959;"> */</span>
             node = node-&gt;next;
-        } <span style="color: #ff6f9f;">else</span> {
-            <span style="color: #989898;">/* </span><span style="color: #989898;">unk2</span><span style="color: #989898;"> */</span>
+        } <span style="color: #972500;">else</span> {
+            <span style="color: #595959;">/* </span><span style="color: #595959;">unk2</span><span style="color: #595959;"> */</span>
             node = node-&gt;prev;
         }
 
-        <span style="color: #ff6f9f;">if</span> (node == <span style="color: #88ca9f;">NULL</span>)
-            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+        <span style="color: #972500;">if</span> (node == <span style="color: #2a5045;">NULL</span>)
+            <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
     }
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Not reached</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">return</span> node;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Not reached</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">return</span> node;
 }
 </pre>
 </div>
@@ -533,32 +533,32 @@ also renamed some symbols to match my last example.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">MyNode</span> {
-    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">key</span>;
-    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">value</span>;
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">MyNode</span>* <span style="color: #6ae4b9;">left</span>;
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">MyNode</span>* <span style="color: #6ae4b9;">right</span>;
-} <span style="color: #79a8ff;">MyNode</span>;
+<pre class="src src-C"><span style="color: #972500;">typedef</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">MyNode</span> {
+    <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">key</span>;
+    <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">value</span>;
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">MyNode</span>* <span style="color: #005f5f;">left</span>;
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">MyNode</span>* <span style="color: #005f5f;">right</span>;
+} <span style="color: #0031a9;">MyNode</span>;
 
-<span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">int</span> (*<span style="color: #79a8ff;">cmp_func_t</span>)(<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">key1</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">key2</span>);
+<span style="color: #972500;">typedef</span> <span style="color: #0031a9;">int</span> (*<span style="color: #0031a9;">cmp_func_t</span>)(<span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">key1</span>, <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">key2</span>);
 
-<span style="color: #79a8ff;">MyNode</span>* <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">cmp_func_t</span> <span style="color: #6ae4b9;">cmp_func</span>, <span style="color: #79a8ff;">MyNode</span>* <span style="color: #6ae4b9;">node</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">key</span>) {
-    <span style="color: #ff6f9f;">if</span> (node == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+<span style="color: #0031a9;">MyNode</span>* <span style="color: #3f578f;">func</span>(<span style="color: #0031a9;">cmp_func_t</span> <span style="color: #005f5f;">cmp_func</span>, <span style="color: #0031a9;">MyNode</span>* <span style="color: #005f5f;">node</span>, <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">key</span>) {
+    <span style="color: #972500;">if</span> (node == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
 
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">cmp_result</span> = cmp_func(key, node-&gt;key);
-    <span style="color: #ff6f9f;">if</span> (cmp_result == <span style="color: #88ca9f;">0</span>) {
-        <span style="color: #ff6f9f;">return</span> node; <span style="color: #989898;">/* </span><span style="color: #989898;">Key found</span><span style="color: #989898;"> */</span>
-    } <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (cmp_result &lt; <span style="color: #88ca9f;">0</span>) {
-        <span style="color: #ff6f9f;">if</span> (node-&gt;left != <span style="color: #88ca9f;">NULL</span>)
-            <span style="color: #ff6f9f;">return</span> func(cmp_func, node-&gt;left, key);
-        <span style="color: #ff6f9f;">else</span>
-            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">Leftmost node</span><span style="color: #989898;"> */</span>
-    } <span style="color: #ff6f9f;">else</span> {
-        <span style="color: #ff6f9f;">if</span> (node-&gt;right != <span style="color: #88ca9f;">NULL</span>)
-            <span style="color: #ff6f9f;">return</span> func(cmp_func, node-&gt;right, key);
-        <span style="color: #ff6f9f;">else</span>
-            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">Rightmost node</span><span style="color: #989898;"> */</span>
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">cmp_result</span> = cmp_func(key, node-&gt;key);
+    <span style="color: #972500;">if</span> (cmp_result == <span style="color: #2a5045;">0</span>) {
+        <span style="color: #972500;">return</span> node; <span style="color: #595959;">/* </span><span style="color: #595959;">Key found</span><span style="color: #595959;"> */</span>
+    } <span style="color: #972500;">else</span> <span style="color: #972500;">if</span> (cmp_result &lt; <span style="color: #2a5045;">0</span>) {
+        <span style="color: #972500;">if</span> (node-&gt;left != <span style="color: #2a5045;">NULL</span>)
+            <span style="color: #972500;">return</span> func(cmp_func, node-&gt;left, key);
+        <span style="color: #972500;">else</span>
+            <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">Leftmost node</span><span style="color: #595959;"> */</span>
+    } <span style="color: #972500;">else</span> {
+        <span style="color: #972500;">if</span> (node-&gt;right != <span style="color: #2a5045;">NULL</span>)
+            <span style="color: #972500;">return</span> func(cmp_func, node-&gt;right, key);
+        <span style="color: #972500;">else</span>
+            <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">Rightmost node</span><span style="color: #595959;"> */</span>
     }
 }
 </pre>

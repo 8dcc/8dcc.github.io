@@ -557,9 +557,9 @@ Unreal Engine code.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C++"><span style="color: #ff6f9f;">if</span> (GUObjectArray.OpenForDisregardForGC())
+<pre class="src src-C++"><span style="color: #972500;">if</span> (GUObjectArray.OpenForDisregardForGC())
 {
-    SCOPED_BOOT_TIMING(<span style="color: #00d3d0;">"CloseDisregardForGC"</span>);
+    SCOPED_BOOT_TIMING(<span style="color: #005e8b;">"CloseDisregardForGC"</span>);
     GUObjectArray.CloseDisregardForGC();
 }
 </pre>
@@ -605,24 +605,24 @@ function might look something like this:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C">  <span style="color: #989898;">// </span><span style="color: #989898;">...</span>
-  <span style="color: #989898;">// </span><span style="color: #989898;">Label mess, qword gets assigned somewhere over here</span>
+<pre class="src src-C">  <span style="color: #595959;">// </span><span style="color: #595959;">...</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">Label mess, qword gets assigned somewhere over here</span>
 
-<span style="color: #88ca9f;">LABEL_123</span>:
-  sub_1822B30(&amp;PerformanceCount, L<span style="color: #00d3d0;">"Failed to load package '</span><span style="color: #ff6f9f;">%s</span><span style="color: #00d3d0;">' into a new game world."</span>, v124);
-  <span style="color: #ff6f9f;">if</span> ( v6 == &amp;PerformanceCount )
+<span style="color: #2a5045;">LABEL_123</span>:
+  sub_1822B30(&amp;PerformanceCount, L<span style="color: #005e8b;">"Failed to load package '</span><span style="color: #972500;">%s</span><span style="color: #005e8b;">' into a new game world."</span>, v124);
+  <span style="color: #972500;">if</span> ( v6 == &amp;PerformanceCount )
   {
       v7 = PerformanceCount;
   }
-  <span style="color: #ff6f9f;">else</span>
+  <span style="color: #972500;">else</span>
   {
-      <span style="color: #989898;">// </span><span style="color: #989898;">...</span>
+      <span style="color: #595959;">// </span><span style="color: #595959;">...</span>
   }
 
-  <span style="color: #989898;">// </span><span style="color: #989898;">...</span>
-  <span style="color: #989898;">// </span><span style="color: #989898;">Subroutine returns, qword assigment is not here</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">...</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">Subroutine returns, qword assigment is not here</span>
 
-  <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+  <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
 }
 </pre>
 </div>
@@ -650,16 +650,16 @@ should be the following.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C++"><span style="color: #ff6f9f;">inline</span> <span style="color: #88ca9f;">std</span>::<span style="color: #79a8ff;">vector</span>&lt;Offset&gt; <span style="color: #4ae2ff;">setOffsets</span>()
+<pre class="src src-C++"><span style="color: #972500;">inline</span> <span style="color: #2a5045;">std</span>::<span style="color: #0031a9;">vector</span>&lt;Offset&gt; <span style="color: #3f578f;">setOffsets</span>()
 {
-    <span style="color: #88ca9f;">std</span>::<span style="color: #79a8ff;">vector</span>&lt;Offset&gt; <span style="color: #6ae4b9;">offsets</span>;
+    <span style="color: #2a5045;">std</span>::<span style="color: #0031a9;">vector</span>&lt;Offset&gt; <span style="color: #005f5f;">offsets</span>;
 
-    <span style="color: #989898;">// </span><span style="color: #989898;">Mordhau-Win64-Shipping.exe</span>
-    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS, <span style="color: #00d3d0;">"OFFSET_GNAMES"</span>, <span style="color: #88ca9f;">0x57ABCD</span> });
-    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS, <span style="color: #00d3d0;">"OFFSET_GOBJECTS"</span>, <span style="color: #88ca9f;">0x57CDEF0</span> });
-    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS | OFFSET_LIVE_EDITOR, <span style="color: #00d3d0;">"OFFSET_UWORLD"</span>, <span style="color: #88ca9f;">0x58FEDCB</span> });
+    <span style="color: #595959;">// </span><span style="color: #595959;">Mordhau-Win64-Shipping.exe</span>
+    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS, <span style="color: #005e8b;">"OFFSET_GNAMES"</span>, <span style="color: #2a5045;">0x57ABCD</span> });
+    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS, <span style="color: #005e8b;">"OFFSET_GOBJECTS"</span>, <span style="color: #2a5045;">0x57CDEF0</span> });
+    offsets.push_back({ OFFSET_ADDRESS | OFFSET_DS | OFFSET_LIVE_EDITOR, <span style="color: #005e8b;">"OFFSET_UWORLD"</span>, <span style="color: #2a5045;">0x58FEDCB</span> });
 
-    <span style="color: #ff6f9f;">return</span> offsets;
+    <span style="color: #972500;">return</span> offsets;
 }
 </pre>
 </div>
@@ -736,101 +736,101 @@ until now, you might realize what these numbers mean, and what to do with them.
 <div class="org-src-container">
 <pre class="src src-C">&lt;UWorld&gt;
  |
- |- <span style="color: #88ca9f;">0x120</span>
+ |- <span style="color: #2a5045;">0x120</span>
  |  |
- |  |- <span style="color: #88ca9f;">0x689</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
- |  |- <span style="color: #88ca9f;">0x697</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 1</span>
+ |  |- <span style="color: #2a5045;">0x689</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try 0</span>
+ |  |- <span style="color: #2a5045;">0x697</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try 1</span>
  |
- |- <span style="color: #88ca9f;">0x180</span>, <span style="color: #88ca9f;">0x38</span>, <span style="color: #88ca9f;">0x0</span>, <span style="color: #88ca9f;">0x30</span>
+ |- <span style="color: #2a5045;">0x180</span>, <span style="color: #2a5045;">0x38</span>, <span style="color: #2a5045;">0x0</span>, <span style="color: #2a5045;">0x30</span>
     |
-    |- <span style="color: #88ca9f;">0x2B8</span>, <span style="color: #88ca9f;">0x23C</span>
-    |- <span style="color: #88ca9f;">0x28C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
-    |- <span style="color: #88ca9f;">0xA28</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try fixing</span>
-    |- <span style="color: #88ca9f;">0xDB1</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 1</span>
-    |- <span style="color: #88ca9f;">0x260</span>
+    |- <span style="color: #2a5045;">0x2B8</span>, <span style="color: #2a5045;">0x23C</span>
+    |- <span style="color: #2a5045;">0x28C</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Not useful</span>
+    |- <span style="color: #2a5045;">0xA28</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try fixing</span>
+    |- <span style="color: #2a5045;">0xDB1</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try 1</span>
+    |- <span style="color: #2a5045;">0x260</span>
     |  |
-    |  |- <span style="color: #88ca9f;">0x8A0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Next 2 are client-sided, unfortunately</span>
-    |  |- <span style="color: #88ca9f;">0x8A4</span>
-    |  |- <span style="color: #88ca9f;">0x8A8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Vehicle. Others can use, carefuly</span>
-    |  |- <span style="color: #88ca9f;">0x8C4</span>
-    |  |- <span style="color: #88ca9f;">0x8CC</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Vehicle too</span>
-    |  |- <span style="color: #88ca9f;">0xDE8</span>
-    |  |- <span style="color: #88ca9f;">0x6A0</span>
-    |     |- <span style="color: #88ca9f;">0xC8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try fixing, with next one</span>
-    |     |- <span style="color: #88ca9f;">0xEC</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 9999, not client-sided</span>
+    |  |- <span style="color: #2a5045;">0x8A0</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Next 2 are client-sided, unfortunately</span>
+    |  |- <span style="color: #2a5045;">0x8A4</span>
+    |  |- <span style="color: #2a5045;">0x8A8</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Vehicle. Others can use, carefuly</span>
+    |  |- <span style="color: #2a5045;">0x8C4</span>
+    |  |- <span style="color: #2a5045;">0x8CC</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Vehicle too</span>
+    |  |- <span style="color: #2a5045;">0xDE8</span>
+    |  |- <span style="color: #2a5045;">0x6A0</span>
+    |     |- <span style="color: #2a5045;">0xC8</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try fixing, with next one</span>
+    |     |- <span style="color: #2a5045;">0xEC</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try 9999, not client-sided</span>
     |
-    |- <span style="color: #88ca9f;">0x2A0</span>
+    |- <span style="color: #2a5045;">0x2A0</span>
        |
-       |- <span style="color: #88ca9f;">0xB80</span>, <span style="color: #88ca9f;">0x128</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
-       |- <span style="color: #88ca9f;">0xF09</span>         <span style="color: #989898;">// </span><span style="color: #989898;">Try 2, new gameplay</span>
-       |- <span style="color: #88ca9f;">0xB78</span>, <span style="color: #88ca9f;">0x830</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Careful</span>
-       |- <span style="color: #88ca9f;">0x6A0</span>, <span style="color: #88ca9f;">0xF8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Client-sided, unfortunately</span>
-       |- <span style="color: #88ca9f;">0xB08</span>
+       |- <span style="color: #2a5045;">0xB80</span>, <span style="color: #2a5045;">0x128</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Not useful</span>
+       |- <span style="color: #2a5045;">0xF09</span>         <span style="color: #595959;">// </span><span style="color: #595959;">Try 2, new gameplay</span>
+       |- <span style="color: #2a5045;">0xB78</span>, <span style="color: #2a5045;">0x830</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Careful</span>
+       |- <span style="color: #2a5045;">0x6A0</span>, <span style="color: #2a5045;">0xF8</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Client-sided, unfortunately</span>
+       |- <span style="color: #2a5045;">0xB08</span>
        |  |
-       |  |- <span style="color: #88ca9f;">0x61</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try kick, etc.</span>
-       |  |- <span style="color: #88ca9f;">0x6C</span>
-       |  |- <span style="color: #88ca9f;">0x6D</span>
-       |  |- <span style="color: #88ca9f;">0x6E</span>
+       |  |- <span style="color: #2a5045;">0x61</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try kick, etc.</span>
+       |  |- <span style="color: #2a5045;">0x6C</span>
+       |  |- <span style="color: #2a5045;">0x6D</span>
+       |  |- <span style="color: #2a5045;">0x6E</span>
        |
-       |- <span style="color: #88ca9f;">0x288</span>
+       |- <span style="color: #2a5045;">0x288</span>
        |  |
-       |  |- <span style="color: #88ca9f;">0xC49</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
-       |  |- <span style="color: #88ca9f;">0xD1C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 1, very OP</span>
+       |  |- <span style="color: #2a5045;">0xC49</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Not useful</span>
+       |  |- <span style="color: #2a5045;">0xD1C</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try 1, very OP</span>
        |
-       |- <span style="color: #88ca9f;">0xE66</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 1</span>
-       |- <span style="color: #88ca9f;">0xEA4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try increasing</span>
-       |- <span style="color: #88ca9f;">0xEA8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
-       |- <span style="color: #88ca9f;">0xE94</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Not sure if it does anything</span>
-       |- <span style="color: #88ca9f;">0x1029</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Needs another option to be useful</span>
-       |- <span style="color: #88ca9f;">0x8C4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
-       |- <span style="color: #88ca9f;">0x8CC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try -1</span>
+       |- <span style="color: #2a5045;">0xE66</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try 1</span>
+       |- <span style="color: #2a5045;">0xEA4</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try increasing</span>
+       |- <span style="color: #2a5045;">0xEA8</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try -1</span>
+       |- <span style="color: #2a5045;">0xE94</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Not sure if it does anything</span>
+       |- <span style="color: #2a5045;">0x1029</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Needs another option to be useful</span>
+       |- <span style="color: #2a5045;">0x8C4</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try -1</span>
+       |- <span style="color: #2a5045;">0x8CC</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try -1</span>
        |
-       |- <span style="color: #88ca9f;">0x1200</span>
+       |- <span style="color: #2a5045;">0x1200</span>
        |  |
-       |  |- <span style="color: #88ca9f;">0xCEC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Next 3 will feel weird</span>
-       |  |- <span style="color: #88ca9f;">0xCF4</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try... non ranged?</span>
-       |  |- <span style="color: #88ca9f;">0xD00</span>
-       |  |- <span style="color: #88ca9f;">0xD1F</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Not useful</span>
-       |  |- <span style="color: #88ca9f;">0xCC8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try ranged</span>
-       |  |- <span style="color: #88ca9f;">0xEF8</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Useful in very few weapons</span>
-       |  |- <span style="color: #88ca9f;">0xCBC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try throw</span>
-       |  |- <span style="color: #88ca9f;">0xD23</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Extremelly goofy one, personal favorite</span>
-       |  |- <span style="color: #88ca9f;">0x1A0C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Needed for a previous option</span>
-       |  |- <span style="color: #88ca9f;">0xCB9</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try pavise</span>
-       |  |- <span style="color: #88ca9f;">0x1C98</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Very goofy, pavise again</span>
+       |  |- <span style="color: #2a5045;">0xCEC</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Next 3 will feel weird</span>
+       |  |- <span style="color: #2a5045;">0xCF4</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try... non ranged?</span>
+       |  |- <span style="color: #2a5045;">0xD00</span>
+       |  |- <span style="color: #2a5045;">0xD1F</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Not useful</span>
+       |  |- <span style="color: #2a5045;">0xCC8</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try ranged</span>
+       |  |- <span style="color: #2a5045;">0xEF8</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Useful in very few weapons</span>
+       |  |- <span style="color: #2a5045;">0xCBC</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try throw</span>
+       |  |- <span style="color: #2a5045;">0xD23</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Extremelly goofy one, personal favorite</span>
+       |  |- <span style="color: #2a5045;">0x1A0C</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Needed for a previous option</span>
+       |  |- <span style="color: #2a5045;">0xCB9</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try pavise</span>
+       |  |- <span style="color: #2a5045;">0x1C98</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Very goofy, pavise again</span>
        |
-       |- <span style="color: #88ca9f;">0x11F8</span>
+       |- <span style="color: #2a5045;">0x11F8</span>
           |
-          |- <span style="color: #88ca9f;">0xCEC</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Most are shared with 0x1200</span>
-          |- <span style="color: #88ca9f;">0xCF4</span>
-          |- <span style="color: #88ca9f;">0xD00</span>
-          |- <span style="color: #88ca9f;">0xD1F</span>
-          |- <span style="color: #88ca9f;">0xD40</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try heal, unfortunately not shared</span>
-          |- <span style="color: #88ca9f;">0xCC8</span>
-          |- <span style="color: #88ca9f;">0xEF8</span>
-          |- <span style="color: #88ca9f;">0xCBC</span>
-          |- <span style="color: #88ca9f;">0xD23</span>
-          |- <span style="color: #88ca9f;">0x1A0C</span>
-          |- <span style="color: #88ca9f;">0xCB9</span>
-          |- <span style="color: #88ca9f;">0x1C98</span>
-          |- <span style="color: #88ca9f;">0xF40</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try polehammer, for example</span>
-          |- <span style="color: #88ca9f;">0xF41</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Should be always 1</span>
-          |- <span style="color: #88ca9f;">0xF54</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
-          |- <span style="color: #88ca9f;">0xF58</span>   <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
-          |- <span style="color: #88ca9f;">0x13E0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try maul, for example</span>
-          |- <span style="color: #88ca9f;">0x13E1</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Should be always 1</span>
-          |- <span style="color: #88ca9f;">0x13F0</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try lowering a bit, combine with next 2</span>
-          |- <span style="color: #88ca9f;">0x13F4</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
-          |- <span style="color: #88ca9f;">0x13F8</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0</span>
-          |- <span style="color: #88ca9f;">0xD40</span>, <span style="color: #88ca9f;">0xB0</span>
+          |- <span style="color: #2a5045;">0xCEC</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Most are shared with 0x1200</span>
+          |- <span style="color: #2a5045;">0xCF4</span>
+          |- <span style="color: #2a5045;">0xD00</span>
+          |- <span style="color: #2a5045;">0xD1F</span>
+          |- <span style="color: #2a5045;">0xD40</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try heal, unfortunately not shared</span>
+          |- <span style="color: #2a5045;">0xCC8</span>
+          |- <span style="color: #2a5045;">0xEF8</span>
+          |- <span style="color: #2a5045;">0xCBC</span>
+          |- <span style="color: #2a5045;">0xD23</span>
+          |- <span style="color: #2a5045;">0x1A0C</span>
+          |- <span style="color: #2a5045;">0xCB9</span>
+          |- <span style="color: #2a5045;">0x1C98</span>
+          |- <span style="color: #2a5045;">0xF40</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try polehammer, for example</span>
+          |- <span style="color: #2a5045;">0xF41</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Should be always 1</span>
+          |- <span style="color: #2a5045;">0xF54</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try 0</span>
+          |- <span style="color: #2a5045;">0xF58</span>   <span style="color: #595959;">// </span><span style="color: #595959;">Try 0</span>
+          |- <span style="color: #2a5045;">0x13E0</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try maul, for example</span>
+          |- <span style="color: #2a5045;">0x13E1</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Should be always 1</span>
+          |- <span style="color: #2a5045;">0x13F0</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try lowering a bit, combine with next 2</span>
+          |- <span style="color: #2a5045;">0x13F4</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try 0</span>
+          |- <span style="color: #2a5045;">0x13F8</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try 0</span>
+          |- <span style="color: #2a5045;">0xD40</span>, <span style="color: #2a5045;">0xB0</span>
              |
-             |- <span style="color: #88ca9f;">0x14</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Be creative</span>
-             |- <span style="color: #88ca9f;">0x18</span>
-             |- <span style="color: #88ca9f;">0x1C</span>
-             |- <span style="color: #88ca9f;">0x7C</span>  <span style="color: #989898;">// </span><span style="color: #989898;">Try 0 for next 3</span>
-             |- <span style="color: #88ca9f;">0x80</span>
-             |- <span style="color: #88ca9f;">0x84</span>
-             |- ...   <span style="color: #989898;">// </span><span style="color: #989898;">Groups of 6 repeat</span>
+             |- <span style="color: #2a5045;">0x14</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Be creative</span>
+             |- <span style="color: #2a5045;">0x18</span>
+             |- <span style="color: #2a5045;">0x1C</span>
+             |- <span style="color: #2a5045;">0x7C</span>  <span style="color: #595959;">// </span><span style="color: #595959;">Try 0 for next 3</span>
+             |- <span style="color: #2a5045;">0x80</span>
+             |- <span style="color: #2a5045;">0x84</span>
+             |- ...   <span style="color: #595959;">// </span><span style="color: #595959;">Groups of 6 repeat</span>
 </pre>
 </div>
 

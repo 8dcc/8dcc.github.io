@@ -307,11 +307,11 @@ the <code>car</code> of the <code>cdr</code> of the <code>cdr</code> of <code>x<
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>car <span style="color: #cabf00;">(</span>cons <span style="color: #88ca9f;">10</span> <span style="color: #88ca9f;">20</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
-  &#8658; <span style="color: #88ca9f;">10</span>
+<pre class="src src-lisp"><span style="color: #a60000;">(</span>car <span style="color: #695500;">(</span>cons <span style="color: #2a5045;">10</span> <span style="color: #2a5045;">20</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+  &#8658; <span style="color: #2a5045;">10</span>
 
-<span style="color: #ff5f59;">(</span>cdr <span style="color: #cabf00;">(</span>cons <span style="color: #88ca9f;">10</span> <span style="color: #88ca9f;">20</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
-  &#8658; <span style="color: #88ca9f;">20</span>
+<span style="color: #a60000;">(</span>cdr <span style="color: #695500;">(</span>cons <span style="color: #2a5045;">10</span> <span style="color: #2a5045;">20</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+  &#8658; <span style="color: #2a5045;">20</span>
 </pre>
 </div>
 
@@ -323,11 +323,11 @@ after the dot is the CDR.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>car '<span style="color: #cabf00;">(</span><span style="color: #88ca9f;">10</span> . <span style="color: #88ca9f;">20</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
-  &#8658; <span style="color: #88ca9f;">10</span>
+<pre class="src src-lisp"><span style="color: #a60000;">(</span>car '<span style="color: #695500;">(</span><span style="color: #2a5045;">10</span> . <span style="color: #2a5045;">20</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+  &#8658; <span style="color: #2a5045;">10</span>
 
-<span style="color: #ff5f59;">(</span>cdr '<span style="color: #cabf00;">(</span><span style="color: #88ca9f;">10</span> . <span style="color: #88ca9f;">20</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
-  &#8658; <span style="color: #88ca9f;">20</span>
+<span style="color: #a60000;">(</span>cdr '<span style="color: #695500;">(</span><span style="color: #2a5045;">10</span> . <span style="color: #2a5045;">20</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+  &#8658; <span style="color: #2a5045;">20</span>
 </pre>
 </div>
 </div>
@@ -342,7 +342,7 @@ something that looks like:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>a b <span style="color: #88ca9f;">1</span> <span style="color: #88ca9f;">2</span><span style="color: #ff5f59;">)</span>
+<pre class="src src-lisp"><span style="color: #a60000;">(</span>a b <span style="color: #2a5045;">1</span> <span style="color: #2a5045;">2</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -353,7 +353,7 @@ notation is just syntactic sugar for:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>a . <span style="color: #cabf00;">(</span>b . <span style="color: #44bc44;">(</span><span style="color: #88ca9f;">1</span> . <span style="color: #00eff0;">(</span><span style="color: #88ca9f;">2</span> . nil<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+<pre class="src src-lisp"><span style="color: #a60000;">(</span>a . <span style="color: #695500;">(</span>b . <span style="color: #006800;">(</span><span style="color: #2a5045;">1</span> . <span style="color: #008899;">(</span><span style="color: #2a5045;">2</span> . nil<span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -407,21 +407,21 @@ from C, using a <i>tagged union</i>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> {
-    <span style="color: #6ae4b9;">EXPR_INTEGER</span>,
-    <span style="color: #6ae4b9;">EXPR_FLOAT</span>,
-    <span style="color: #6ae4b9;">EXPR_SYMBOL</span>,
+<pre class="src src-C"><span style="color: #972500;">enum</span> <span style="color: #0031a9;">EExprType</span> {
+    <span style="color: #005f5f;">EXPR_INTEGER</span>,
+    <span style="color: #005f5f;">EXPR_FLOAT</span>,
+    <span style="color: #005f5f;">EXPR_SYMBOL</span>,
 };
 
-<span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span> {
-    <span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> <span style="color: #6ae4b9;">type</span>;
+<span style="color: #972500;">typedef</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">Expr</span> {
+    <span style="color: #972500;">enum</span> <span style="color: #0031a9;">EExprType</span> <span style="color: #005f5f;">type</span>;
 
-    <span style="color: #ff6f9f;">union</span> {
-        <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">n</span>;
-        <span style="color: #79a8ff;">float</span> <span style="color: #6ae4b9;">f</span>;
-        <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">s</span>;
-    } <span style="color: #6ae4b9;">val</span>;
-} <span style="color: #79a8ff;">Expr</span>;
+    <span style="color: #972500;">union</span> {
+        <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">n</span>;
+        <span style="color: #0031a9;">float</span> <span style="color: #005f5f;">f</span>;
+        <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">s</span>;
+    } <span style="color: #005f5f;">val</span>;
+} <span style="color: #0031a9;">Expr</span>;
 </pre>
 </div>
 
@@ -433,12 +433,12 @@ access the appropriate value of an expression by first checking its <code>type</
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">f</span>(<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">expr</span>) {
-    <span style="color: #ff6f9f;">switch</span> (expr-&gt;type) {
-        <span style="color: #ff6f9f;">case</span> EXPR_INTEGER: <span style="color: #ff6f9f;">return</span> expr-&gt;val.n;
-        <span style="color: #ff6f9f;">case</span> EXPR_FLOAT:   <span style="color: #ff6f9f;">return</span> (<span style="color: #79a8ff;">int</span>)expr-&gt;val.f;
-        <span style="color: #ff6f9f;">case</span> EXPR_SYMBOL:  <span style="color: #ff6f9f;">return</span> strlen(expr-&gt;val.s);
-        <span style="color: #ff6f9f;">default</span>:           abort(); <span style="color: #989898;">/* </span><span style="color: #989898;">???</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">f</span>(<span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">expr</span>) {
+    <span style="color: #972500;">switch</span> (expr-&gt;type) {
+        <span style="color: #972500;">case</span> EXPR_INTEGER: <span style="color: #972500;">return</span> expr-&gt;val.n;
+        <span style="color: #972500;">case</span> EXPR_FLOAT:   <span style="color: #972500;">return</span> (<span style="color: #0031a9;">int</span>)expr-&gt;val.f;
+        <span style="color: #972500;">case</span> EXPR_SYMBOL:  <span style="color: #972500;">return</span> strlen(expr-&gt;val.s);
+        <span style="color: #972500;">default</span>:           abort(); <span style="color: #595959;">/* </span><span style="color: #595959;">???</span><span style="color: #595959;"> */</span>
     }
 }
 </pre>
@@ -474,21 +474,21 @@ after adding the necessary members.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
-    <span style="color: #6ae4b9;">EXPR_LIST</span>,
+<pre class="src src-C"><span style="color: #972500;">enum</span> <span style="color: #0031a9;">EExprType</span> {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+    <span style="color: #005f5f;">EXPR_LIST</span>,
 };
 
-<span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span> {
-    <span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> <span style="color: #6ae4b9;">type</span>;
+<span style="color: #972500;">typedef</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">Expr</span> {
+    <span style="color: #972500;">enum</span> <span style="color: #0031a9;">EExprType</span> <span style="color: #005f5f;">type</span>;
 
-    <span style="color: #ff6f9f;">union</span> {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">children</span>;
-    } <span style="color: #6ae4b9;">val</span>;
+    <span style="color: #972500;">union</span> {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">struct</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">children</span>;
+    } <span style="color: #005f5f;">val</span>;
 
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">next</span>;
-} <span style="color: #79a8ff;">Expr</span>;
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">next</span>;
+} <span style="color: #0031a9;">Expr</span>;
 </pre>
 </div>
 
@@ -506,34 +506,34 @@ store string literals in our expressions<sup><a id="fnr.3" class="footref" href=
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">expr_new</span>(<span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> <span style="color: #6ae4b9;">type</span>);
+<pre class="src src-C"><span style="color: #972500;">extern</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #3f578f;">expr_new</span>(<span style="color: #972500;">enum</span> <span style="color: #0031a9;">EExprType</span> <span style="color: #005f5f;">type</span>);
 
-<span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">get_list</span>(<span style="color: #79a8ff;">void</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Create the list itself</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">list</span> = expr_new(EXPR_LIST);
-    list-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+<span style="color: #0031a9;">Expr</span>* <span style="color: #3f578f;">get_list</span>(<span style="color: #0031a9;">void</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Create the list itself</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">list</span> = expr_new(EXPR_LIST);
+    list-&gt;next = <span style="color: #2a5045;">NULL</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Write each element</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">elt</span>          = expr_new(EXPR_SYMBOL);
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Write each element</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">elt</span>          = expr_new(EXPR_SYMBOL);
     list-&gt;val.children = elt;
-    elt-&gt;val.s         = <span style="color: #00d3d0;">"a"</span>;
+    elt-&gt;val.s         = <span style="color: #005e8b;">"a"</span>;
 
     elt-&gt;next  = expr_new(EXPR_SYMBOL);
     elt        = elt-&gt;next;
-    elt-&gt;val.s = <span style="color: #00d3d0;">"b"</span>;
+    elt-&gt;val.s = <span style="color: #005e8b;">"b"</span>;
 
     elt-&gt;next  = expr_new(EXPR_INTEGER);
     elt        = elt-&gt;next;
-    elt-&gt;val.n = <span style="color: #88ca9f;">1</span>;
+    elt-&gt;val.n = <span style="color: #2a5045;">1</span>;
 
     elt-&gt;next  = expr_new(EXPR_INTEGER);
     elt        = elt-&gt;next;
-    elt-&gt;val.n = <span style="color: #88ca9f;">2</span>;
+    elt-&gt;val.n = <span style="color: #2a5045;">2</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Terminate the linked list</span><span style="color: #989898;"> */</span>
-    elt-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Terminate the linked list</span><span style="color: #595959;"> */</span>
+    elt-&gt;next = <span style="color: #2a5045;">NULL</span>;
 
-    <span style="color: #ff6f9f;">return</span> list;
+    <span style="color: #972500;">return</span> list;
 }
 </pre>
 </div>
@@ -562,15 +562,15 @@ case for adding some integers together.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">sum</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">list</span>) {
+<pre class="src src-C"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">sum</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">list</span>) {
     assert(list-&gt;type == EXPR_LIST);
 
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">total</span> = <span style="color: #88ca9f;">0</span>;
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">e</span> = list-&gt;val.children; e != <span style="color: #88ca9f;">NULL</span>; e = e-&gt;next)
-        <span style="color: #ff6f9f;">if</span> (e-&gt;type == EXPR_INTEGER)
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">total</span> = <span style="color: #2a5045;">0</span>;
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">e</span> = list-&gt;val.children; e != <span style="color: #2a5045;">NULL</span>; e = e-&gt;next)
+        <span style="color: #972500;">if</span> (e-&gt;type == EXPR_INTEGER)
             total += e-&gt;val.n;
 
-    <span style="color: #ff6f9f;">return</span> total;
+    <span style="color: #972500;">return</span> total;
 }
 </pre>
 </div>
@@ -607,24 +607,24 @@ to include pairs.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
-    <span style="color: #6ae4b9;">EXPR_PAIR</span>,
+<pre class="src src-C"><span style="color: #972500;">enum</span> <span style="color: #0031a9;">EExprType</span> {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+    <span style="color: #005f5f;">EXPR_PAIR</span>,
 };
 
-<span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">ExprPair</span> {
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">car</span>;
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">cdr</span>;
-} <span style="color: #79a8ff;">ExprPair</span>;
+<span style="color: #972500;">typedef</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">ExprPair</span> {
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">car</span>;
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">cdr</span>;
+} <span style="color: #0031a9;">ExprPair</span>;
 
-<span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Expr</span> {
-    <span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> <span style="color: #6ae4b9;">type</span>;
+<span style="color: #972500;">typedef</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">Expr</span> {
+    <span style="color: #972500;">enum</span> <span style="color: #0031a9;">EExprType</span> <span style="color: #005f5f;">type</span>;
 
-    <span style="color: #ff6f9f;">union</span> {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">ExprPair</span> <span style="color: #6ae4b9;">pair</span>;
-    } <span style="color: #6ae4b9;">val</span>;
-} <span style="color: #79a8ff;">Expr</span>;
+    <span style="color: #972500;">union</span> {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">struct</span> <span style="color: #0031a9;">ExprPair</span> <span style="color: #005f5f;">pair</span>;
+    } <span style="color: #005f5f;">val</span>;
+} <span style="color: #0031a9;">Expr</span>;
 </pre>
 </div>
 
@@ -651,34 +651,34 @@ pointer to <code>NULL</code> instead.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">expr_new</span>(<span style="color: #ff6f9f;">enum</span> <span style="color: #79a8ff;">EExprType</span> <span style="color: #6ae4b9;">type</span>);
-<span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">NIL</span>;
+<pre class="src src-C"><span style="color: #972500;">extern</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #3f578f;">expr_new</span>(<span style="color: #972500;">enum</span> <span style="color: #0031a9;">EExprType</span> <span style="color: #005f5f;">type</span>);
+<span style="color: #972500;">extern</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">NIL</span>;
 
-<span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">get_list</span>(<span style="color: #79a8ff;">void</span>) {
-    <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">first</span>              = expr_new(EXPR_PAIR);
-    <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">cur</span>                = first;
-    cur-&gt;val.pair.car        = expr_new(EXPR_SYMBOL); <span style="color: #989898;">/* </span><span style="color: #989898;">CADR</span><span style="color: #989898;"> */</span>
-    cur-&gt;val.pair.car-&gt;val.s = <span style="color: #00d3d0;">"a"</span>;
-
-    cur-&gt;val.pair.cdr        = expr_new(EXPR_PAIR);
-    cur                      = cur-&gt;val.pair.cdr;
-    cur-&gt;val.pair.car        = expr_new(EXPR_SYMBOL); <span style="color: #989898;">/* </span><span style="color: #989898;">CADR</span><span style="color: #989898;"> */</span>
-    cur-&gt;val.pair.car-&gt;val.s = <span style="color: #00d3d0;">"b"</span>;
+<span style="color: #0031a9;">Expr</span>* <span style="color: #3f578f;">get_list</span>(<span style="color: #0031a9;">void</span>) {
+    <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">first</span>              = expr_new(EXPR_PAIR);
+    <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">cur</span>                = first;
+    cur-&gt;val.pair.car        = expr_new(EXPR_SYMBOL); <span style="color: #595959;">/* </span><span style="color: #595959;">CADR</span><span style="color: #595959;"> */</span>
+    cur-&gt;val.pair.car-&gt;val.s = <span style="color: #005e8b;">"a"</span>;
 
     cur-&gt;val.pair.cdr        = expr_new(EXPR_PAIR);
     cur                      = cur-&gt;val.pair.cdr;
-    cur-&gt;val.pair.car        = expr_new(EXPR_INTEGER); <span style="color: #989898;">/* </span><span style="color: #989898;">CADDR</span><span style="color: #989898;"> */</span>
-    cur-&gt;val.pair.car-&gt;val.n = <span style="color: #88ca9f;">1</span>;
+    cur-&gt;val.pair.car        = expr_new(EXPR_SYMBOL); <span style="color: #595959;">/* </span><span style="color: #595959;">CADR</span><span style="color: #595959;"> */</span>
+    cur-&gt;val.pair.car-&gt;val.s = <span style="color: #005e8b;">"b"</span>;
 
     cur-&gt;val.pair.cdr        = expr_new(EXPR_PAIR);
     cur                      = cur-&gt;val.pair.cdr;
-    cur-&gt;val.pair.car        = expr_new(EXPR_INTEGER); <span style="color: #989898;">/* </span><span style="color: #989898;">CADDDR</span><span style="color: #989898;"> */</span>
-    cur-&gt;val.pair.car-&gt;val.n = <span style="color: #88ca9f;">2</span>;
+    cur-&gt;val.pair.car        = expr_new(EXPR_INTEGER); <span style="color: #595959;">/* </span><span style="color: #595959;">CADDR</span><span style="color: #595959;"> */</span>
+    cur-&gt;val.pair.car-&gt;val.n = <span style="color: #2a5045;">1</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Terminate the chain of cons cells</span><span style="color: #989898;"> */</span>
+    cur-&gt;val.pair.cdr        = expr_new(EXPR_PAIR);
+    cur                      = cur-&gt;val.pair.cdr;
+    cur-&gt;val.pair.car        = expr_new(EXPR_INTEGER); <span style="color: #595959;">/* </span><span style="color: #595959;">CADDDR</span><span style="color: #595959;"> */</span>
+    cur-&gt;val.pair.car-&gt;val.n = <span style="color: #2a5045;">2</span>;
+
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Terminate the chain of cons cells</span><span style="color: #595959;"> */</span>
     cur-&gt;val.pair.cdr = NIL;
 
-    <span style="color: #ff6f9f;">return</span> first;
+    <span style="color: #972500;">return</span> first;
 }
 </pre>
 </div>
@@ -702,21 +702,21 @@ code a bit cleaner.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">CAR</span>(<span style="color: #6ae4b9;">EXPR_PTR</span>) ((EXPR_PTR)-&gt;val.pair.car)
-<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">CDR</span>(<span style="color: #6ae4b9;">EXPR_PTR</span>) ((EXPR_PTR)-&gt;val.pair.cdr)
+<pre class="src src-C"><span style="color: #a0132f;">#define</span> <span style="color: #3f578f;">CAR</span>(<span style="color: #005f5f;">EXPR_PTR</span>) ((EXPR_PTR)-&gt;val.pair.car)
+<span style="color: #a0132f;">#define</span> <span style="color: #3f578f;">CDR</span>(<span style="color: #005f5f;">EXPR_PTR</span>) ((EXPR_PTR)-&gt;val.pair.cdr)
 
-<span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">is_proper_list</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">expr</span>);
-<span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">is_nil</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">expr</span>);
+<span style="color: #972500;">extern</span> <span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">is_proper_list</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">expr</span>);
+<span style="color: #972500;">extern</span> <span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">is_nil</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">expr</span>);
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">sum</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">list</span>) {
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">sum</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">list</span>) {
     assert(is_proper_list(list));
 
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">total</span> = <span style="color: #88ca9f;">0</span>;
-    <span style="color: #ff6f9f;">for</span> (; <span style="color: #ff6740; font-weight: bold;">!</span>is_nil(list); list = CDR(list))
-        <span style="color: #ff6f9f;">if</span> (CAR(list) == EXPR_INTEGER)
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">total</span> = <span style="color: #2a5045;">0</span>;
+    <span style="color: #972500;">for</span> (; <span style="color: #972500; font-weight: bold;">!</span>is_nil(list); list = CDR(list))
+        <span style="color: #972500;">if</span> (CAR(list) == EXPR_INTEGER)
             total += CAR(list)-&gt;val.n;
 
-    <span style="color: #ff6f9f;">return</span> total;
+    <span style="color: #972500;">return</span> total;
 }
 </pre>
 </div>
@@ -780,17 +780,17 @@ the dotted pair notation described <a href="#cons-cells">above</a>, or by using 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp"><span style="color: #ff5f59;">(</span>cdr '<span style="color: #cabf00;">(</span>a b . c<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
-  &#8658; <span style="color: #ff5f59;">(</span>b . c<span style="color: #ff5f59;">)</span>
+<pre class="src src-lisp"><span style="color: #a60000;">(</span>cdr '<span style="color: #695500;">(</span>a b . c<span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+  &#8658; <span style="color: #a60000;">(</span>b . c<span style="color: #a60000;">)</span>
 
-<span style="color: #ff5f59;">(</span>cadr '<span style="color: #cabf00;">(</span>a b . c<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; (car (cdr ...))</span>
+<span style="color: #a60000;">(</span>cadr '<span style="color: #695500;">(</span>a b . c<span style="color: #695500;">)</span><span style="color: #a60000;">)</span>  <span style="color: #595959;">; (car (cdr ...))</span>
   &#8658; b
 
-<span style="color: #ff5f59;">(</span>cddr '<span style="color: #cabf00;">(</span>a b . c<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>  <span style="color: #989898;">; (cdr (cdr ...))</span>
+<span style="color: #a60000;">(</span>cddr '<span style="color: #695500;">(</span>a b . c<span style="color: #695500;">)</span><span style="color: #a60000;">)</span>  <span style="color: #595959;">; (cdr (cdr ...))</span>
   &#8658; c
 
-<span style="color: #ff5f59;">(</span>cons 'a <span style="color: #cabf00;">(</span>cons 'b <span style="color: #44bc44;">(</span>cons <span style="color: #88ca9f;">3</span> <span style="color: #88ca9f;">4</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
-  &#8658; <span style="color: #ff5f59;">(</span>a b <span style="color: #88ca9f;">3</span> . <span style="color: #88ca9f;">4</span><span style="color: #ff5f59;">)</span>
+<span style="color: #a60000;">(</span>cons 'a <span style="color: #695500;">(</span>cons 'b <span style="color: #006800;">(</span>cons <span style="color: #2a5045;">3</span> <span style="color: #2a5045;">4</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+  &#8658; <span style="color: #a60000;">(</span>a b <span style="color: #2a5045;">3</span> . <span style="color: #2a5045;">4</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -841,19 +841,19 @@ is supposed to return its first element.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">expr_clone</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">e</span>) {
-    <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">result</span> = expr_new(e-&gt;type);
+<pre class="src src-C"><span style="color: #0031a9;">Expr</span>* <span style="color: #3f578f;">expr_clone</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">e</span>) {
+    <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">result</span> = expr_new(e-&gt;type);
     result-&gt;val  = e-&gt;val;
-    result-&gt;next = <span style="color: #88ca9f;">NULL</span>;
-    <span style="color: #ff6f9f;">return</span> result;
+    result-&gt;next = <span style="color: #2a5045;">NULL</span>;
+    <span style="color: #972500;">return</span> result;
 }
 
-<span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">car</span>(<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">list</span>) {
-    <span style="color: #ff6f9f;">if</span> (is_nil(list))
-        <span style="color: #ff6f9f;">return</span> NIL;
+<span style="color: #0031a9;">Expr</span>* <span style="color: #3f578f;">car</span>(<span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">list</span>) {
+    <span style="color: #972500;">if</span> (is_nil(list))
+        <span style="color: #972500;">return</span> NIL;
 
     assert(list-&gt;type == EXPR_LIST);
-    <span style="color: #ff6f9f;">return</span> expr_clone(list-&gt;val.children);
+    <span style="color: #972500;">return</span> expr_clone(list-&gt;val.children);
 }
 </pre>
 </div>
@@ -875,12 +875,12 @@ completely independent of their context.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">car</span>(<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">expr</span>) {
-    <span style="color: #ff6f9f;">if</span> (is_nil(expr))
-        <span style="color: #ff6f9f;">return</span> NIL;
+<pre class="src src-C"><span style="color: #0031a9;">Expr</span>* <span style="color: #3f578f;">car</span>(<span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">expr</span>) {
+    <span style="color: #972500;">if</span> (is_nil(expr))
+        <span style="color: #972500;">return</span> NIL;
 
     assert(expr-&gt;type == EXPR_PAIR);
-    <span style="color: #ff6f9f;">return</span> expr-&gt;val.pair.car;
+    <span style="color: #972500;">return</span> expr-&gt;val.pair.car;
 }
 </pre>
 </div>
@@ -925,13 +925,13 @@ symbol <code>nil</code> and the empty list <code>()</code> were two completely d
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Symbol: nil</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">sym</span>  = expr_new(EXPR_SYMBOL);
-sym-&gt;val.s = <span style="color: #00d3d0;">"nil"</span>;
+<pre class="src src-C"><span style="color: #595959;">/* </span><span style="color: #595959;">Symbol: nil</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">sym</span>  = expr_new(EXPR_SYMBOL);
+sym-&gt;val.s = <span style="color: #005e8b;">"nil"</span>;
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Empty list: ()</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">list</span>         = expr_new(EXPR_LIST);
-list-&gt;val.children = <span style="color: #88ca9f;">NULL</span>;
+<span style="color: #595959;">/* </span><span style="color: #595959;">Empty list: ()</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">list</span>         = expr_new(EXPR_LIST);
+list-&gt;val.children = <span style="color: #2a5045;">NULL</span>;
 </pre>
 </div>
 
@@ -948,10 +948,10 @@ equivalent:
 'nil
   &#8658; nil
 
-<span style="color: #ff5f59;">()</span>
+<span style="color: #a60000;">()</span>
   &#8658; nil
 
-'<span style="color: #ff5f59;">()</span>
+'<span style="color: #a60000;">()</span>
   &#8658; nil
 </pre>
 </div>
@@ -964,11 +964,11 @@ multiple expression types.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Old, inconsistent</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">is_nil</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">e</span>) {
-    <span style="color: #ff6f9f;">return</span> (e-&gt;type == EXPR_LIST &amp;&amp; e-&gt;val.children == <span style="color: #88ca9f;">NULL</span>) ||
-           (e-&gt;type == EXPR_SYMBOL &amp;&amp; e-&gt;val.s != <span style="color: #88ca9f;">NULL</span> &amp;&amp;
-            <span style="color: #ff6740; font-weight: bold;">!</span>strcmp(e-&gt;val.s, <span style="color: #00d3d0;">"nil"</span>));
+<pre class="src src-C"><span style="color: #595959;">/* </span><span style="color: #595959;">Old, inconsistent</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">is_nil</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">e</span>) {
+    <span style="color: #972500;">return</span> (e-&gt;type == EXPR_LIST &amp;&amp; e-&gt;val.children == <span style="color: #2a5045;">NULL</span>) ||
+           (e-&gt;type == EXPR_SYMBOL &amp;&amp; e-&gt;val.s != <span style="color: #2a5045;">NULL</span> &amp;&amp;
+            <span style="color: #972500; font-weight: bold;">!</span>strcmp(e-&gt;val.s, <span style="color: #005e8b;">"nil"</span>));
 }
 </pre>
 </div>
@@ -996,28 +996,28 @@ to compare each element recursively, ideally using an <code>expr_list_equal</cod
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">expr_equal</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">a</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">b</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">expr_equal</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">a</span>, <span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">b</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 
-    <span style="color: #ff6f9f;">switch</span> (a-&gt;type) {
-        <span style="color: #ff6f9f;">case</span> EXPR_LIST:
-            <span style="color: #ff6f9f;">return</span> expr_list_equal(a, b);
+    <span style="color: #972500;">switch</span> (a-&gt;type) {
+        <span style="color: #972500;">case</span> EXPR_LIST:
+            <span style="color: #972500;">return</span> expr_list_equal(a, b);
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
     }
 }
 
-<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">expr_list_equal</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">a</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">b</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Similar to strcmp(3)</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">while</span> (expr_equal(a, b)) {
-        <span style="color: #ff6f9f;">if</span> (a == <span style="color: #88ca9f;">NULL</span>)
-            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+<span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">expr_list_equal</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">a</span>, <span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">b</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Similar to strcmp(3)</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">while</span> (expr_equal(a, b)) {
+        <span style="color: #972500;">if</span> (a == <span style="color: #2a5045;">NULL</span>)
+            <span style="color: #972500;">return</span> <span style="color: #2a5045;">true</span>;
 
         a = a-&gt;next;
         b = b-&gt;next;
     }
 
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
 }
 </pre>
 </div>
@@ -1035,15 +1035,15 @@ applied without depending on their context.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">expr_equal</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">a</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">b</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">expr_equal</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">a</span>, <span style="color: #972500;">const</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">b</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 
-    <span style="color: #ff6f9f;">switch</span> (a-&gt;type) {
-        <span style="color: #ff6f9f;">case</span> EXPR_PAIR:
-            <span style="color: #ff6f9f;">return</span> expr_equal(CAR(a), CAR(b))
+    <span style="color: #972500;">switch</span> (a-&gt;type) {
+        <span style="color: #972500;">case</span> EXPR_PAIR:
+            <span style="color: #972500;">return</span> expr_equal(CAR(a), CAR(b))
                 &amp;&amp; expr_equal(CDR(a), CDR(b));
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
     }
 }
 </pre>
@@ -1069,11 +1069,11 @@ call</a>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp"><span style="color: #989898;">;; </span><span style="color: #989898;">Does the function F return non-nil for all elements of LST?</span>
-<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">defun</span> <span style="color: #4ae2ff;">every</span> <span style="color: #cabf00;">(</span>f lst<span style="color: #cabf00;">)</span>
-  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">cond</span> <span style="color: #44bc44;">(</span><span style="color: #00eff0;">(</span>null? lst<span style="color: #00eff0;">)</span> tru<span style="color: #44bc44;">)</span>
-        <span style="color: #44bc44;">(</span><span style="color: #00eff0;">(</span>not <span style="color: #338fff;">(</span>f <span style="color: #ef7fff;">(</span>car lst<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span> nil<span style="color: #44bc44;">)</span>
-        <span style="color: #44bc44;">(</span>tru <span style="color: #00eff0;">(</span>every f <span style="color: #338fff;">(</span>cdr lst<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+<pre class="src src-lisp"><span style="color: #595959;">;; </span><span style="color: #595959;">Does the function F return non-nil for all elements of LST?</span>
+<span style="color: #a60000;">(</span><span style="color: #972500;">defun</span> <span style="color: #3f578f;">every</span> <span style="color: #695500;">(</span>f lst<span style="color: #695500;">)</span>
+  <span style="color: #695500;">(</span><span style="color: #972500;">cond</span> <span style="color: #006800;">(</span><span style="color: #008899;">(</span>null? lst<span style="color: #008899;">)</span> tru<span style="color: #006800;">)</span>
+        <span style="color: #006800;">(</span><span style="color: #008899;">(</span>not <span style="color: #0000ff;">(</span>f <span style="color: #dd22dd;">(</span>car lst<span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span> nil<span style="color: #006800;">)</span>
+        <span style="color: #006800;">(</span>tru <span style="color: #008899;">(</span>every f <span style="color: #0000ff;">(</span>cdr lst<span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -1082,14 +1082,14 @@ Now compare it to the following iterative implementation as a C primitive.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">extern</span> <span style="color: #79a8ff;">Expr</span>* <span style="color: #4ae2ff;">funcall</span>(<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">func</span>, <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">arg</span>);
+<pre class="src src-C"><span style="color: #972500;">extern</span> <span style="color: #0031a9;">Expr</span>* <span style="color: #3f578f;">funcall</span>(<span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">func</span>, <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">arg</span>);
 
-<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">every</span>(<span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">f</span>, <span style="color: #79a8ff;">Expr</span>* <span style="color: #6ae4b9;">lst</span>) {
-    <span style="color: #ff6f9f;">for</span> (; <span style="color: #ff6740; font-weight: bold;">!</span>is_nil(lst); lst = CDR(lst))
-        <span style="color: #ff6f9f;">if</span> (is_nil(funcall(f, CAR(lst))))
-            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+<span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">every</span>(<span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">f</span>, <span style="color: #0031a9;">Expr</span>* <span style="color: #005f5f;">lst</span>) {
+    <span style="color: #972500;">for</span> (; <span style="color: #972500; font-weight: bold;">!</span>is_nil(lst); lst = CDR(lst))
+        <span style="color: #972500;">if</span> (is_nil(funcall(f, CAR(lst))))
+            <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
 
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">true</span>;
 }
 </pre>
 </div>

@@ -334,7 +334,7 @@ To get the real symbol name, we can either search for &ldquo;<code>take_hit</cod
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">readelf --wide --syms devildaggers | grep <span style="color: #00d3d0;">"hero.*take_hit"</span>
+<pre class="src src-bash">readelf --wide --syms devildaggers | grep <span style="color: #005e8b;">"hero.*take_hit"</span>
 </pre>
 </div>
 
@@ -386,20 +386,20 @@ The final code for finding <code>verse2::hero::take_hit()</code> looks like this
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">SYM_HERO_TAKE_HIT</span> <span style="color: #00d3d0;">"_ZN6verse24hero8take_hitEbN5verse10death_typeEb"</span>
+<pre class="src src-C"><span style="color: #a0132f;">#define</span> <span style="color: #005f5f;">SYM_HERO_TAKE_HIT</span> <span style="color: #005e8b;">"_ZN6verse24hero8take_hitEbN5verse10death_typeEb"</span>
 
-<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">globals_init</span>(<span style="color: #79a8ff;">void</span>) {
-    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">handle_self</span> = dlopen(<span style="color: #88ca9f;">NULL</span>, RTLD_LAZY | RTLD_NOLOAD);
-    <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>handle_self) {
-        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"dlopen() returned NULL</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">"</span>);
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+<span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">globals_init</span>(<span style="color: #0031a9;">void</span>) {
+    <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">handle_self</span> = dlopen(<span style="color: #2a5045;">NULL</span>, RTLD_LAZY | RTLD_NOLOAD);
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>handle_self) {
+        fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"dlopen() returned NULL</span><span style="color: #972500;">\n</span><span style="color: #005e8b;">"</span>);
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
     }
 
-    <span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">void</span> (*<span style="color: #79a8ff;">hero_take_hit_t</span>)(<span style="color: #79a8ff;">Hero</span>*, <span style="color: #79a8ff;">bool</span>, <span style="color: #79a8ff;">int</span>, <span style="color: #79a8ff;">bool</span>);
-    <span style="color: #79a8ff;">hero_take_hit_t</span> <span style="color: #6ae4b9;">hero_take_hit</span> = dlsym(handle_self, SYM_HERO_TAKE_HIT);
-    <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>hero_take_hit) {
-        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"dlsym() returned NULL</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">"</span>);
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+    <span style="color: #972500;">typedef</span> <span style="color: #0031a9;">void</span> (*<span style="color: #0031a9;">hero_take_hit_t</span>)(<span style="color: #0031a9;">Hero</span>*, <span style="color: #0031a9;">bool</span>, <span style="color: #0031a9;">int</span>, <span style="color: #0031a9;">bool</span>);
+    <span style="color: #0031a9;">hero_take_hit_t</span> <span style="color: #005f5f;">hero_take_hit</span> = dlsym(handle_self, SYM_HERO_TAKE_HIT);
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>hero_take_hit) {
+        fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"dlsym() returned NULL</span><span style="color: #972500;">\n</span><span style="color: #005e8b;">"</span>);
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
     }
 }
 </pre>
@@ -423,24 +423,24 @@ hook.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">"detour.h"</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">"detour.h"</span>
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Make sure these are accesible by the hook and the init function</span><span style="color: #989898;"> */</span>
-<span style="color: #4ae2ff;">DETOUR_DECL_TYPE</span>(<span style="color: #79a8ff;">bool</span>, hero_take_hit, <span style="color: #79a8ff;">Hero</span>*, <span style="color: #79a8ff;">bool</span>, <span style="color: #79a8ff;">int</span>, <span style="color: #79a8ff;">bool</span>);
-<span style="color: #79a8ff;">detour_ctx_t</span> <span style="color: #6ae4b9;">ctx_hero_take_hit</span>;
+<span style="color: #595959;">/* </span><span style="color: #595959;">Make sure these are accesible by the hook and the init function</span><span style="color: #595959;"> */</span>
+<span style="color: #3f578f;">DETOUR_DECL_TYPE</span>(<span style="color: #0031a9;">bool</span>, hero_take_hit, <span style="color: #0031a9;">Hero</span>*, <span style="color: #0031a9;">bool</span>, <span style="color: #0031a9;">int</span>, <span style="color: #0031a9;">bool</span>);
+<span style="color: #0031a9;">detour_ctx_t</span> <span style="color: #005f5f;">ctx_hero_take_hit</span>;
 
-<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">hook_hero_take_hit</span>(<span style="color: #79a8ff;">Hero</span>* <span style="color: #6ae4b9;">thisptr</span>, <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">rsi</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">death_type</span>, <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">rcx</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Implement our hook</span><span style="color: #989898;"> */</span>
+<span style="color: #972500;">static</span> <span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">hook_hero_take_hit</span>(<span style="color: #0031a9;">Hero</span>* <span style="color: #005f5f;">thisptr</span>, <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">rsi</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">death_type</span>, <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">rcx</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #808000; font-weight: bold;">TODO:</span><span style="color: #595959;"> Implement our hook</span><span style="color: #595959;"> */</span>
 }
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Call when our shared object is injected</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">hooks_init</span>(<span style="color: #79a8ff;">void</span>) {
+<span style="color: #595959;">/* </span><span style="color: #595959;">Call when our shared object is injected</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">hooks_init</span>(<span style="color: #0031a9;">void</span>) {
     detour_init(&amp;ctx_hero_take_hit, hero_take_hit, hook_hero_take_hit);
     detour_add(&amp;ctx_hero_take_hit);
 }
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Call when unloading our shared object</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">hooks_restore</span>(<span style="color: #79a8ff;">void</span>) {
+<span style="color: #595959;">/* </span><span style="color: #595959;">Call when unloading our shared object</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">hooks_restore</span>(<span style="color: #0031a9;">void</span>) {
     detour_del(&amp;ctx_hero_take_hit);
 }
 </pre>
@@ -454,19 +454,19 @@ the godmode, we can simply call the original function and return its value:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Toggle this setting from some kind of menu</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">godmode</span> = <span style="color: #88ca9f;">true</span>;
+<pre class="src src-C"><span style="color: #595959;">/* </span><span style="color: #808000; font-weight: bold;">TODO:</span><span style="color: #595959;"> Toggle this setting from some kind of menu</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">godmode</span> = <span style="color: #2a5045;">true</span>;
 
-<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">hook_hero_take_hit</span>(<span style="color: #79a8ff;">Hero</span>* <span style="color: #6ae4b9;">thisptr</span>, <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">rsi</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">death_type</span>, <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">rcx</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Return false without calling the original</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">if</span> (godmode)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+<span style="color: #972500;">static</span> <span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">hook_hero_take_hit</span>(<span style="color: #0031a9;">Hero</span>* <span style="color: #005f5f;">thisptr</span>, <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">rsi</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">death_type</span>, <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">rcx</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Return false without calling the original</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">if</span> (godmode)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Call original hero::take_hit(), save the result and return it</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">ret</span>;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Call original hero::take_hit(), save the result and return it</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">ret</span>;
     DETOUR_ORIG_GET(&amp;ctx_hero_take_hit, ret, hero_take_hit, thisptr, rsi,
                     death_type, rcx);
-    <span style="color: #ff6f9f;">return</span> ret;
+    <span style="color: #972500;">return</span> ret;
 }
 </pre>
 </div>
@@ -476,23 +476,23 @@ The only thing left is creating our constructor and destructor functions:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">__attribute__</span>((constructor)) <span style="color: #989898;">/* </span><span style="color: #989898;">Entry point when injected</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">load</span>(<span style="color: #79a8ff;">void</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Find function address</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #972500;">__attribute__</span>((constructor)) <span style="color: #595959;">/* </span><span style="color: #595959;">Entry point when injected</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">load</span>(<span style="color: #0031a9;">void</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Find function address</span><span style="color: #595959;"> */</span>
     globals_init();
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Hook it</span><span style="color: #989898;"> */</span>
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Hook it</span><span style="color: #595959;"> */</span>
     hooks_init();
 
-    loaded = <span style="color: #88ca9f;">true</span>;
+    loaded = <span style="color: #2a5045;">true</span>;
 }
 
-<span style="color: #ff6f9f;">__attribute__</span>((destructor)) <span style="color: #989898;">/* </span><span style="color: #989898;">Entry point when unloaded</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">unload</span>() {
-    <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>loaded)
-        <span style="color: #ff6f9f;">return</span>;
+<span style="color: #972500;">__attribute__</span>((destructor)) <span style="color: #595959;">/* </span><span style="color: #595959;">Entry point when unloaded</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">unload</span>() {
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>loaded)
+        <span style="color: #972500;">return</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Unhook it</span><span style="color: #989898;"> */</span>
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Unhook it</span><span style="color: #595959;"> */</span>
     hooks_restore();
 }
 </pre>
@@ -602,23 +602,23 @@ From the code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Add 0x41 to the function start. Point to 0x003A7BE3</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">uint32_t</span>* <span style="color: #6ae4b9;">relative_offset_address</span> = (<span style="color: #79a8ff;">uintptr_t</span>)hero_step + <span style="color: #88ca9f;">0x41</span>;
+<pre class="src src-C"><span style="color: #595959;">/* </span><span style="color: #595959;">Add 0x41 to the function start. Point to 0x003A7BE3</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">uint32_t</span>* <span style="color: #005f5f;">relative_offset_address</span> = (<span style="color: #0031a9;">uintptr_t</span>)hero_step + <span style="color: #2a5045;">0x41</span>;
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Dereference to get 0x003A7BE3</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">verse_globals_relative</span> = *offset_address;
+<span style="color: #595959;">/* </span><span style="color: #595959;">Dereference to get 0x003A7BE3</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">verse_globals_relative</span> = *offset_address;
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Store address of the next instruction (func_start+0x45)</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">next_instruction</span> = (<span style="color: #79a8ff;">void</span>*)offset_address + <span style="color: #ff6f9f;">sizeof</span>(uint32_t);
+<span style="color: #595959;">/* </span><span style="color: #595959;">Store address of the next instruction (func_start+0x45)</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">next_instruction</span> = (<span style="color: #0031a9;">void</span>*)offset_address + <span style="color: #972500;">sizeof</span>(uint32_t);
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Calculate pointer TO verse2::globals</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">verse_globals_absolute</span> = next_instruction + verse_globals_relative;
+<span style="color: #595959;">/* </span><span style="color: #595959;">Calculate pointer TO verse2::globals</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">verse_globals_absolute</span> = next_instruction + verse_globals_relative;
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Dereference once to get the value stored in verse2::globals</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">verse_globals</span> = *(<span style="color: #79a8ff;">void</span>**)verse_globals_absolute;
+<span style="color: #595959;">/* </span><span style="color: #595959;">Dereference once to get the value stored in verse2::globals</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">verse_globals</span> = *(<span style="color: #0031a9;">void</span>**)verse_globals_absolute;
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Now we can access the members</span><span style="color: #989898;"> */</span>
-verse_globals-&gt;my_member = <span style="color: #88ca9f;">true</span>;
+<span style="color: #595959;">/* </span><span style="color: #595959;">Now we can access the members</span><span style="color: #595959;"> */</span>
+verse_globals-&gt;my_member = <span style="color: #2a5045;">true</span>;
 </pre>
 </div>
 
@@ -627,10 +627,10 @@ Or in a more compact way using a <code>RELATIVE2ABSOLUTE()</code> macro:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Location of address + Size of offset + Offset</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">RELATIVE2ABSOLUTE</span>(<span style="color: #6ae4b9;">ADDR</span>) (<span style="color: #79a8ff;">void</span>*)((<span style="color: #79a8ff;">void</span>*)(ADDR) + <span style="color: #88ca9f;">4</span> + *(<span style="color: #79a8ff;">uint32_t</span>*)(ADDR))
+<pre class="src src-C"><span style="color: #595959;">/* </span><span style="color: #595959;">Location of address + Size of offset + Offset</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #3f578f;">RELATIVE2ABSOLUTE</span>(<span style="color: #005f5f;">ADDR</span>) (<span style="color: #0031a9;">void</span>*)((<span style="color: #0031a9;">void</span>*)(ADDR) + <span style="color: #2a5045;">4</span> + *(<span style="color: #0031a9;">uint32_t</span>*)(ADDR))
 
-<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">verse_globals</span> = *(<span style="color: #79a8ff;">void</span>**)<span style="color: #4ae2ff;">RELATIVE2ABSOLUTE</span>((<span style="color: #79a8ff;">uintptr_t</span>)hero_step + <span style="color: #88ca9f;">0x41</span>);
+<span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">verse_globals</span> = *(<span style="color: #0031a9;">void</span>**)<span style="color: #3f578f;">RELATIVE2ABSOLUTE</span>((<span style="color: #0031a9;">uintptr_t</span>)hero_step + <span style="color: #2a5045;">0x41</span>);
 </pre>
 </div>
 </div>
@@ -646,12 +646,12 @@ should declare our own <code>verse_globals_t</code> structure with the offsets w
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">verse_globals_t</span> <span style="color: #79a8ff;">verse_globals_t</span>;
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">verse_globals_t</span> {
-    <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">pad</span>[<span style="color: #88ca9f;">0x488</span>];
-    <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">particle_editor</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">0x488</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">level_editor</span>;    <span style="color: #989898;">/* </span><span style="color: #989898;">0x489</span><span style="color: #989898;"> */</span>
-} <span style="color: #ff6f9f;">__attribute__</span>((packed));
+<pre class="src src-C"><span style="color: #972500;">typedef</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">verse_globals_t</span> <span style="color: #0031a9;">verse_globals_t</span>;
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">verse_globals_t</span> {
+    <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">pad</span>[<span style="color: #2a5045;">0x488</span>];
+    <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">particle_editor</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">0x488</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">level_editor</span>;    <span style="color: #595959;">/* </span><span style="color: #595959;">0x489</span><span style="color: #595959;"> */</span>
+} <span style="color: #972500;">__attribute__</span>((packed));
 </pre>
 </div>
 
@@ -667,7 +667,7 @@ structure:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">verse_globals_t</span>* <span style="color: #6ae4b9;">verse_globals</span>;
+<pre class="src src-C"><span style="color: #0031a9;">verse_globals_t</span>* <span style="color: #005f5f;">verse_globals</span>;
 </pre>
 </div>
 </div>
@@ -682,13 +682,13 @@ the editors. I set them inside my <code>verse2::hero::step()</code> hook:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">hook_hero_step</span>(<span style="color: #79a8ff;">Hero</span>* <span style="color: #6ae4b9;">thisptr</span>, <span style="color: #79a8ff;">float</span> <span style="color: #6ae4b9;">rsi</span>) {
-    <span style="color: #ff6f9f;">if</span> (LEVEL_EDITOR)
-        verse_globals-&gt;level_editor = <span style="color: #88ca9f;">true</span>;
-    <span style="color: #ff6f9f;">if</span> (PARTICLE_EDITOR)
-        verse_globals-&gt;particle_editor = <span style="color: #88ca9f;">true</span>;
+<pre class="src src-C"><span style="color: #972500;">static</span> <span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">hook_hero_step</span>(<span style="color: #0031a9;">Hero</span>* <span style="color: #005f5f;">thisptr</span>, <span style="color: #0031a9;">float</span> <span style="color: #005f5f;">rsi</span>) {
+    <span style="color: #972500;">if</span> (LEVEL_EDITOR)
+        verse_globals-&gt;level_editor = <span style="color: #2a5045;">true</span>;
+    <span style="color: #972500;">if</span> (PARTICLE_EDITOR)
+        verse_globals-&gt;particle_editor = <span style="color: #2a5045;">true</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 }
 </pre>
 </div>
@@ -741,14 +741,14 @@ The final offset was <code>0x2BC</code>, so I simply updated my <code>verse_glob
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">verse_globals_t</span> <span style="color: #79a8ff;">verse_globals_t</span>;
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">verse_globals_t</span> {
-    <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">pad0</span>[<span style="color: #88ca9f;">0x2BC</span>];
-    <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">top_down_cam</span>;    <span style="color: #989898;">/* </span><span style="color: #989898;">0x2BC</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">pad1</span>[<span style="color: #88ca9f;">0x1CB</span>];
-    <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">particle_editor</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">0x488</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">level_editor</span>;    <span style="color: #989898;">/* </span><span style="color: #989898;">0x489</span><span style="color: #989898;"> */</span>
-} <span style="color: #ff6f9f;">__attribute__</span>((packed));
+<pre class="src src-C"><span style="color: #972500;">typedef</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">verse_globals_t</span> <span style="color: #0031a9;">verse_globals_t</span>;
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">verse_globals_t</span> {
+    <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">pad0</span>[<span style="color: #2a5045;">0x2BC</span>];
+    <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">top_down_cam</span>;    <span style="color: #595959;">/* </span><span style="color: #595959;">0x2BC</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">pad1</span>[<span style="color: #2a5045;">0x1CB</span>];
+    <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">particle_editor</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">0x488</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">level_editor</span>;    <span style="color: #595959;">/* </span><span style="color: #595959;">0x489</span><span style="color: #595959;"> */</span>
+} <span style="color: #972500;">__attribute__</span>((packed));
 </pre>
 </div>
 

@@ -369,17 +369,17 @@ First, some auxiliary functions for adding and scaling RGB colors.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #cabf00;">(</span><span style="color: #4ae2ff;">rgb-add</span> a b<span style="color: #cabf00;">)</span>
-  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span>null? b<span style="color: #44bc44;">)</span>
+<pre class="src src-scheme"><span style="color: #a60000;">(</span><span style="color: #972500;">define</span> <span style="color: #695500;">(</span><span style="color: #3f578f;">rgb-add</span> a b<span style="color: #695500;">)</span>
+  <span style="color: #695500;">(</span><span style="color: #972500;">if</span> <span style="color: #006800;">(</span>null? b<span style="color: #006800;">)</span>
       a
-      <span style="color: #44bc44;">(</span>list <span style="color: #00eff0;">(</span>+ <span style="color: #338fff;">(</span>car   a<span style="color: #338fff;">)</span> <span style="color: #338fff;">(</span>car   b<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
-            <span style="color: #00eff0;">(</span>+ <span style="color: #338fff;">(</span>cadr  a<span style="color: #338fff;">)</span> <span style="color: #338fff;">(</span>cadr  b<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
-            <span style="color: #00eff0;">(</span>+ <span style="color: #338fff;">(</span>caddr a<span style="color: #338fff;">)</span> <span style="color: #338fff;">(</span>caddr b<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+      <span style="color: #006800;">(</span>list <span style="color: #008899;">(</span>+ <span style="color: #0000ff;">(</span>car   a<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>car   b<span style="color: #0000ff;">)</span><span style="color: #008899;">)</span>
+            <span style="color: #008899;">(</span>+ <span style="color: #0000ff;">(</span>cadr  a<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>cadr  b<span style="color: #0000ff;">)</span><span style="color: #008899;">)</span>
+            <span style="color: #008899;">(</span>+ <span style="color: #0000ff;">(</span>caddr a<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>caddr b<span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 
-<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #cabf00;">(</span><span style="color: #4ae2ff;">rgb-scale</span> rgb scale<span style="color: #cabf00;">)</span>
-  <span style="color: #cabf00;">(</span>list <span style="color: #44bc44;">(</span>* scale <span style="color: #00eff0;">(</span>car   rgb<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span>
-        <span style="color: #44bc44;">(</span>* scale <span style="color: #00eff0;">(</span>cadr  rgb<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span>
-        <span style="color: #44bc44;">(</span>* scale <span style="color: #00eff0;">(</span>caddr rgb<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+<span style="color: #a60000;">(</span><span style="color: #972500;">define</span> <span style="color: #695500;">(</span><span style="color: #3f578f;">rgb-scale</span> rgb scale<span style="color: #695500;">)</span>
+  <span style="color: #695500;">(</span>list <span style="color: #006800;">(</span>* scale <span style="color: #008899;">(</span>car   rgb<span style="color: #008899;">)</span><span style="color: #006800;">)</span>
+        <span style="color: #006800;">(</span>* scale <span style="color: #008899;">(</span>cadr  rgb<span style="color: #008899;">)</span><span style="color: #006800;">)</span>
+        <span style="color: #006800;">(</span>* scale <span style="color: #008899;">(</span>caddr rgb<span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -400,12 +400,12 @@ transparencies is assumed to be 1.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #cabf00;">(</span><span style="color: #4ae2ff;">transparencies-absolute</span> colors transparencies<span style="color: #cabf00;">)</span>
-  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">or</span> <span style="color: #00eff0;">(</span>null? colors<span style="color: #00eff0;">)</span>
-          <span style="color: #00eff0;">(</span>null? transparencies<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span>
-      '<span style="color: #44bc44;">()</span>
-      <span style="color: #44bc44;">(</span>rgb-add <span style="color: #00eff0;">(</span>rgb-scale <span style="color: #338fff;">(</span>car colors<span style="color: #338fff;">)</span> <span style="color: #338fff;">(</span>car transparencies<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
-               <span style="color: #00eff0;">(</span>transparencies-absolute <span style="color: #338fff;">(</span>cdr colors<span style="color: #338fff;">)</span> <span style="color: #338fff;">(</span>cdr transparencies<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+<pre class="src src-scheme"><span style="color: #a60000;">(</span><span style="color: #972500;">define</span> <span style="color: #695500;">(</span><span style="color: #3f578f;">transparencies-absolute</span> colors transparencies<span style="color: #695500;">)</span>
+  <span style="color: #695500;">(</span><span style="color: #972500;">if</span> <span style="color: #006800;">(</span><span style="color: #972500;">or</span> <span style="color: #008899;">(</span>null? colors<span style="color: #008899;">)</span>
+          <span style="color: #008899;">(</span>null? transparencies<span style="color: #008899;">)</span><span style="color: #006800;">)</span>
+      '<span style="color: #006800;">()</span>
+      <span style="color: #006800;">(</span>rgb-add <span style="color: #008899;">(</span>rgb-scale <span style="color: #0000ff;">(</span>car colors<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>car transparencies<span style="color: #0000ff;">)</span><span style="color: #008899;">)</span>
+               <span style="color: #008899;">(</span>transparencies-absolute <span style="color: #0000ff;">(</span>cdr colors<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>cdr transparencies<span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -414,9 +414,9 @@ The following example uses the previous function with 3 transparent colors.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">(196 170 99)</span>
-<span style="color: #ff5f59;">(</span>transparencies-absolute '<span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span><span style="color: #88ca9f;">255</span> <span style="color: #88ca9f;">110</span> <span style="color: #88ca9f;">66</span><span style="color: #44bc44;">)</span> <span style="color: #44bc44;">(</span><span style="color: #88ca9f;">232</span> <span style="color: #88ca9f;">218</span> <span style="color: #88ca9f;">178</span><span style="color: #44bc44;">)</span> <span style="color: #44bc44;">(</span><span style="color: #88ca9f;">75</span> <span style="color: #88ca9f;">238</span> <span style="color: #88ca9f;">104</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
-                         '<span style="color: #cabf00;">(</span><span style="color: #88ca9f;">0.5</span> <span style="color: #88ca9f;">0.2</span> <span style="color: #88ca9f;">0.3</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">(196 170 99)</span>
+<span style="color: #a60000;">(</span>transparencies-absolute '<span style="color: #695500;">(</span><span style="color: #006800;">(</span><span style="color: #2a5045;">255</span> <span style="color: #2a5045;">110</span> <span style="color: #2a5045;">66</span><span style="color: #006800;">)</span> <span style="color: #006800;">(</span><span style="color: #2a5045;">232</span> <span style="color: #2a5045;">218</span> <span style="color: #2a5045;">178</span><span style="color: #006800;">)</span> <span style="color: #006800;">(</span><span style="color: #2a5045;">75</span> <span style="color: #2a5045;">238</span> <span style="color: #2a5045;">104</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span>
+                         '<span style="color: #695500;">(</span><span style="color: #2a5045;">0.5</span> <span style="color: #2a5045;">0.2</span> <span style="color: #2a5045;">0.3</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 </div>
@@ -432,22 +432,22 @@ ignored, and is assumed to be one.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #cabf00;">(</span><span style="color: #4ae2ff;">transparencies-relative</span> colors transparencies<span style="color: #cabf00;">)</span>
-  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #44bc44;">(</span><span style="color: #4ae2ff;">apply-transparency</span> c1 c2 t2<span style="color: #44bc44;">)</span>
-    <span style="color: #44bc44;">(</span>rgb-add <span style="color: #00eff0;">(</span>rgb-scale c1 <span style="color: #338fff;">(</span>- <span style="color: #88ca9f;">1</span> t2<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
-             <span style="color: #00eff0;">(</span>rgb-scale c2 t2<span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+<pre class="src src-scheme"><span style="color: #a60000;">(</span><span style="color: #972500;">define</span> <span style="color: #695500;">(</span><span style="color: #3f578f;">transparencies-relative</span> colors transparencies<span style="color: #695500;">)</span>
+  <span style="color: #695500;">(</span><span style="color: #972500;">define</span> <span style="color: #006800;">(</span><span style="color: #3f578f;">apply-transparency</span> c1 c2 t2<span style="color: #006800;">)</span>
+    <span style="color: #006800;">(</span>rgb-add <span style="color: #008899;">(</span>rgb-scale c1 <span style="color: #0000ff;">(</span>- <span style="color: #2a5045;">1</span> t2<span style="color: #0000ff;">)</span><span style="color: #008899;">)</span>
+             <span style="color: #008899;">(</span>rgb-scale c2 t2<span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span>
 
-  <span style="color: #cabf00;">(</span><span style="color: #ff6f9f;">define</span> <span style="color: #44bc44;">(</span><span style="color: #4ae2ff;">transparencies-relative-reversed</span> colors transparencies<span style="color: #44bc44;">)</span>
-    <span style="color: #44bc44;">(</span><span style="color: #ff6f9f;">if</span> <span style="color: #00eff0;">(</span>null? <span style="color: #338fff;">(</span>cdr colors<span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span>
-        <span style="color: #00eff0;">(</span>car colors<span style="color: #00eff0;">)</span>
-        <span style="color: #00eff0;">(</span><span style="color: #ff6f9f;">let</span> <span style="color: #338fff;">(</span><span style="color: #ef7fff;">(</span>cur-transparency <span style="color: #ff5f59;">(</span>car transparencies<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
-          <span style="color: #338fff;">(</span>rgb-add <span style="color: #ef7fff;">(</span>rgb-scale <span style="color: #ff5f59;">(</span>car colors<span style="color: #ff5f59;">)</span>
-                              cur-transparency<span style="color: #ef7fff;">)</span>
-                   <span style="color: #ef7fff;">(</span>rgb-scale <span style="color: #ff5f59;">(</span>transparencies-relative-reversed <span style="color: #cabf00;">(</span>cdr colors<span style="color: #cabf00;">)</span> <span style="color: #cabf00;">(</span>cdr transparencies<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
-                              <span style="color: #ff5f59;">(</span>- <span style="color: #88ca9f;">1</span> cur-transparency<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
+  <span style="color: #695500;">(</span><span style="color: #972500;">define</span> <span style="color: #006800;">(</span><span style="color: #3f578f;">transparencies-relative-reversed</span> colors transparencies<span style="color: #006800;">)</span>
+    <span style="color: #006800;">(</span><span style="color: #972500;">if</span> <span style="color: #008899;">(</span>null? <span style="color: #0000ff;">(</span>cdr colors<span style="color: #0000ff;">)</span><span style="color: #008899;">)</span>
+        <span style="color: #008899;">(</span>car colors<span style="color: #008899;">)</span>
+        <span style="color: #008899;">(</span><span style="color: #972500;">let</span> <span style="color: #0000ff;">(</span><span style="color: #dd22dd;">(</span>cur-transparency <span style="color: #a60000;">(</span>car transparencies<span style="color: #a60000;">)</span><span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span>
+          <span style="color: #0000ff;">(</span>rgb-add <span style="color: #dd22dd;">(</span>rgb-scale <span style="color: #a60000;">(</span>car colors<span style="color: #a60000;">)</span>
+                              cur-transparency<span style="color: #dd22dd;">)</span>
+                   <span style="color: #dd22dd;">(</span>rgb-scale <span style="color: #a60000;">(</span>transparencies-relative-reversed <span style="color: #695500;">(</span>cdr colors<span style="color: #695500;">)</span> <span style="color: #695500;">(</span>cdr transparencies<span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+                              <span style="color: #a60000;">(</span>- <span style="color: #2a5045;">1</span> cur-transparency<span style="color: #a60000;">)</span><span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span>
 
-  <span style="color: #cabf00;">(</span>transparencies-relative-reversed <span style="color: #44bc44;">(</span>reverse colors<span style="color: #44bc44;">)</span>
-                                    <span style="color: #44bc44;">(</span>reverse transparencies<span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #695500;">(</span>transparencies-relative-reversed <span style="color: #006800;">(</span>reverse colors<span style="color: #006800;">)</span>
+                                    <span style="color: #006800;">(</span>reverse transparencies<span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -465,9 +465,9 @@ transparencies no longer has to be 1.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #989898;">;; </span><span style="color: #989898;">(161 190 101)</span>
-<span style="color: #ff5f59;">(</span>transparencies-relative '<span style="color: #cabf00;">(</span><span style="color: #44bc44;">(</span><span style="color: #88ca9f;">255</span> <span style="color: #88ca9f;">110</span> <span style="color: #88ca9f;">66</span><span style="color: #44bc44;">)</span> <span style="color: #44bc44;">(</span><span style="color: #88ca9f;">232</span> <span style="color: #88ca9f;">218</span> <span style="color: #88ca9f;">178</span><span style="color: #44bc44;">)</span> <span style="color: #44bc44;">(</span><span style="color: #88ca9f;">75</span> <span style="color: #88ca9f;">238</span> <span style="color: #88ca9f;">104</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span>
-                         '<span style="color: #cabf00;">(</span><span style="color: #88ca9f;">1</span> <span style="color: #88ca9f;">0.3</span> <span style="color: #88ca9f;">0.5</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+<pre class="src src-scheme"><span style="color: #595959;">;; </span><span style="color: #595959;">(161 190 101)</span>
+<span style="color: #a60000;">(</span>transparencies-relative '<span style="color: #695500;">(</span><span style="color: #006800;">(</span><span style="color: #2a5045;">255</span> <span style="color: #2a5045;">110</span> <span style="color: #2a5045;">66</span><span style="color: #006800;">)</span> <span style="color: #006800;">(</span><span style="color: #2a5045;">232</span> <span style="color: #2a5045;">218</span> <span style="color: #2a5045;">178</span><span style="color: #006800;">)</span> <span style="color: #006800;">(</span><span style="color: #2a5045;">75</span> <span style="color: #2a5045;">238</span> <span style="color: #2a5045;">104</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span>
+                         '<span style="color: #695500;">(</span><span style="color: #2a5045;">1</span> <span style="color: #2a5045;">0.3</span> <span style="color: #2a5045;">0.5</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 </div>

@@ -227,26 +227,26 @@ This is the original function, adapted to fit the <a href="https://www.nasm.us/"
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">edi</span>
-    <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
-    <span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0x55555555</span>         <span style="color: #989898;">; </span><span style="color: #989898;">0b01010101010101010101010101010101</span>
-    <span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #6ae4b9;">edx</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #005f5f;">edi</span>
+    <span style="color: #721045;">shr</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">1</span>
+    <span style="color: #721045;">and</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0x55555555</span>         <span style="color: #595959;">; </span><span style="color: #595959;">0b01010101010101010101010101010101</span>
+    <span style="color: #721045;">sub</span>     <span style="color: #005f5f;">edi</span>, <span style="color: #005f5f;">edx</span>
 
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edi</span>
-    <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #88ca9f;">2</span>
-    <span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span>         <span style="color: #989898;">; </span><span style="color: #989898;">0b00110011001100110011001100110011</span>
-    <span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #88ca9f;">0x33333333</span>         <span style="color: #989898;">; </span><span style="color: #989898;">0b00110011001100110011001100110011</span>
-    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #6ae4b9;">eax</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edi</span>
+    <span style="color: #721045;">shr</span>     <span style="color: #005f5f;">edi</span>, <span style="color: #2a5045;">2</span>
+    <span style="color: #721045;">and</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x33333333</span>         <span style="color: #595959;">; </span><span style="color: #595959;">0b00110011001100110011001100110011</span>
+    <span style="color: #721045;">and</span>     <span style="color: #005f5f;">edi</span>, <span style="color: #2a5045;">0x33333333</span>         <span style="color: #595959;">; </span><span style="color: #595959;">0b00110011001100110011001100110011</span>
+    <span style="color: #721045;">add</span>     <span style="color: #005f5f;">edi</span>, <span style="color: #005f5f;">eax</span>
 
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edi</span>
-    <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">4</span>
-    <span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edi</span>
-    <span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0f0f0f0f</span>         <span style="color: #989898;">; </span><span style="color: #989898;">0b00001111000011110000111100001111</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edi</span>
+    <span style="color: #721045;">shr</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">4</span>
+    <span style="color: #721045;">add</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edi</span>
+    <span style="color: #721045;">and</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x0f0f0f0f</span>         <span style="color: #595959;">; </span><span style="color: #595959;">0b00001111000011110000111100001111</span>
 
-    <span style="color: #feacd0;">imul</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x01010101</span>    <span style="color: #989898;">; </span><span style="color: #989898;">0b00000001000000010000000100000001</span>
-    <span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">24</span>
-    <span style="color: #feacd0;">ret</span>
+    <span style="color: #721045;">imul</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x01010101</span>    <span style="color: #595959;">; </span><span style="color: #595959;">0b00000001000000010000000100000001</span>
+    <span style="color: #721045;">shr</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">24</span>
+    <span style="color: #721045;">ret</span>
 </pre>
 </div>
 </div>
@@ -268,10 +268,10 @@ argument in <code>edi</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">edi</span>
-<span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0x55555555</span> <span style="color: #989898;">; </span><span style="color: #989898;">0b01010101010101010101010101010101</span>
-<span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #6ae4b9;">edx</span>
+<pre class="src src-nasm"><span style="color: #721045;">mov</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #005f5f;">edi</span>
+<span style="color: #721045;">shr</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">1</span>
+<span style="color: #721045;">and</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0x55555555</span> <span style="color: #595959;">; </span><span style="color: #595959;">0b01010101010101010101010101010101</span>
+<span style="color: #721045;">sub</span>     <span style="color: #005f5f;">edi</span>, <span style="color: #005f5f;">edx</span>
 </pre>
 </div>
 
@@ -280,11 +280,11 @@ It then adds the even pairs of bits (<code>eax</code>) to the odd pairs of bits 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edi</span>
-<span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #88ca9f;">2</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span> <span style="color: #989898;">; </span><span style="color: #989898;">0b00110011001100110011001100110011</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #88ca9f;">0x33333333</span> <span style="color: #989898;">; </span><span style="color: #989898;">0b00110011001100110011001100110011</span>
-<span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">edi</span>, <span style="color: #6ae4b9;">eax</span>
+<pre class="src src-nasm"><span style="color: #721045;">mov</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edi</span>
+<span style="color: #721045;">shr</span>     <span style="color: #005f5f;">edi</span>, <span style="color: #2a5045;">2</span>
+<span style="color: #721045;">and</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x33333333</span> <span style="color: #595959;">; </span><span style="color: #595959;">0b00110011001100110011001100110011</span>
+<span style="color: #721045;">and</span>     <span style="color: #005f5f;">edi</span>, <span style="color: #2a5045;">0x33333333</span> <span style="color: #595959;">; </span><span style="color: #595959;">0b00110011001100110011001100110011</span>
+<span style="color: #721045;">add</span>     <span style="color: #005f5f;">edi</span>, <span style="color: #005f5f;">eax</span>
 </pre>
 </div>
 
@@ -294,9 +294,9 @@ adds the original value stored in <code>edi</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edi</span>
-<span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">4</span>
-<span style="color: #feacd0;">add</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edi</span>
+<pre class="src src-nasm"><span style="color: #721045;">mov</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edi</span>
+<span style="color: #721045;">shr</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">4</span>
+<span style="color: #721045;">add</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edi</span>
 </pre>
 </div>
 
@@ -307,8 +307,8 @@ register, it will truncate the value and keep the lower 32 bits.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0f0f0f0f</span>      <span style="color: #989898;">; </span><span style="color: #989898;">0b00001111000011110000111100001111</span>
-<span style="color: #feacd0;">imul</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x01010101</span> <span style="color: #989898;">; </span><span style="color: #989898;">0b00000001000000010000000100000001</span>
+<pre class="src src-nasm"><span style="color: #721045;">and</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x0f0f0f0f</span>      <span style="color: #595959;">; </span><span style="color: #595959;">0b00001111000011110000111100001111</span>
+<span style="color: #721045;">imul</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x01010101</span> <span style="color: #595959;">; </span><span style="color: #595959;">0b00000001000000010000000100000001</span>
 </pre>
 </div>
 
@@ -317,8 +317,8 @@ It then shifts the result 24 bits to the right, before returning it.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">24</span>
-<span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #721045;">shr</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">24</span>
+<span style="color: #721045;">ret</span>
 </pre>
 </div>
 
@@ -409,27 +409,27 @@ The assembly function is the simplified version of this one:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">count_bits</span>(<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">x</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Put count of each 2 bits into those 2 bits</span><span style="color: #989898;"> */</span>
-    x = (x &amp; <span style="color: #88ca9f;">0x55555555</span>) + ((x &gt;&gt; <span style="color: #88ca9f;">1</span>) &amp; <span style="color: #88ca9f;">0x55555555</span>);
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">count_bits</span>(<span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">x</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Put count of each 2 bits into those 2 bits</span><span style="color: #595959;"> */</span>
+    x = (x &amp; <span style="color: #2a5045;">0x55555555</span>) + ((x &gt;&gt; <span style="color: #2a5045;">1</span>) &amp; <span style="color: #2a5045;">0x55555555</span>);
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Put count of each 4 bits into those 4 bits</span><span style="color: #989898;"> */</span>
-    x = (x &amp; <span style="color: #88ca9f;">0x33333333</span>) + ((x &gt;&gt; <span style="color: #88ca9f;">2</span>) &amp; <span style="color: #88ca9f;">0x33333333</span>);
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Put count of each 4 bits into those 4 bits</span><span style="color: #595959;"> */</span>
+    x = (x &amp; <span style="color: #2a5045;">0x33333333</span>) + ((x &gt;&gt; <span style="color: #2a5045;">2</span>) &amp; <span style="color: #2a5045;">0x33333333</span>);
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Put count of each 8 bits into those 8 bits</span><span style="color: #989898;"> */</span>
-    x = (x &amp; <span style="color: #88ca9f;">0x0f0f0f0f</span>) + ((x &gt;&gt; <span style="color: #88ca9f;">4</span>) &amp; <span style="color: #88ca9f;">0x0f0f0f0f</span>);
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Put count of each 8 bits into those 8 bits</span><span style="color: #595959;"> */</span>
+    x = (x &amp; <span style="color: #2a5045;">0x0f0f0f0f</span>) + ((x &gt;&gt; <span style="color: #2a5045;">4</span>) &amp; <span style="color: #2a5045;">0x0f0f0f0f</span>);
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">If (x &lt;= 0xFF), propagates lower byte to the upper ones. I am not sure</span>
-<span style="color: #989898;">     * why this works for bigger values.</span><span style="color: #989898;"> */</span>
-    x *= <span style="color: #88ca9f;">0x01010101</span>;
-    <span style="color: #ff6f9f;">return</span> x &gt;&gt; <span style="color: #88ca9f;">24</span>;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">If (x &lt;= 0xFF), propagates lower byte to the upper ones. I am not sure</span>
+<span style="color: #595959;">     * why this works for bigger values.</span><span style="color: #595959;"> */</span>
+    x *= <span style="color: #2a5045;">0x01010101</span>;
+    <span style="color: #972500;">return</span> x &gt;&gt; <span style="color: #2a5045;">24</span>;
 }
 
-printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
-printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, count_bits(<span style="color: #2a5045;">0x000000AB</span>)); <span style="color: #595959;">/* </span><span style="color: #595959;">5</span><span style="color: #595959;"> */</span>
+printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, count_bits(<span style="color: #2a5045;">0xDEADBEEF</span>)); <span style="color: #595959;">/* </span><span style="color: #595959;">24</span><span style="color: #595959;"> */</span>
 </pre>
 </div>
 
@@ -474,8 +474,8 @@ The last multiplication and shifting step is used to skip the following lines:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C">x = (x &amp; <span style="color: #88ca9f;">0x00ff00ff</span>) + ((x &gt;&gt;  <span style="color: #88ca9f;">8</span>) &amp; <span style="color: #88ca9f;">0x00ff00ff</span>);
-x = (x &amp; <span style="color: #88ca9f;">0x0000ffff</span>) + ((x &gt;&gt; <span style="color: #88ca9f;">16</span>) &amp; <span style="color: #88ca9f;">0x0000ffff</span>);
+<pre class="src src-C">x = (x &amp; <span style="color: #2a5045;">0x00ff00ff</span>) + ((x &gt;&gt;  <span style="color: #2a5045;">8</span>) &amp; <span style="color: #2a5045;">0x00ff00ff</span>);
+x = (x &amp; <span style="color: #2a5045;">0x0000ffff</span>) + ((x &gt;&gt; <span style="color: #2a5045;">16</span>) &amp; <span style="color: #2a5045;">0x0000ffff</span>);
 </pre>
 </div>
 
@@ -494,7 +494,7 @@ shifting and returning.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">imul</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x01010101</span>
+<pre class="src src-nasm"><span style="color: #721045;">imul</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x01010101</span>
 </pre>
 </div>
 
@@ -516,8 +516,8 @@ Right after this, it shifts the value 24 bits to the right, discarding the lower
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">24</span>
-<span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #721045;">shr</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">24</span>
+<span style="color: #721045;">ret</span>
 </pre>
 </div>
 
@@ -528,10 +528,10 @@ constant:
 
 <div class="org-src-container">
 <pre class="src src-asm">...
-<span style="color: #4ae2ff;">ADD</span>     <span style="color: #ff6f9f;">r0</span>, r0, r0, LSL #<span style="color: #88ca9f;">16</span>
-<span style="color: #4ae2ff;">ADD</span>     <span style="color: #ff6f9f;">r0</span>, r0, r0, LSL #<span style="color: #88ca9f;">8</span>
-<span style="color: #4ae2ff;">LSR</span>     <span style="color: #ff6f9f;">r0</span>, r0, #<span style="color: #88ca9f;">24</span>
-<span style="color: #4ae2ff;">BX</span>      <span style="color: #ff6f9f;">lr</span>
+<span style="color: #3f578f;">ADD</span>     <span style="color: #972500;">r0</span>, r0, r0, LSL #<span style="color: #2a5045;">16</span>
+<span style="color: #3f578f;">ADD</span>     <span style="color: #972500;">r0</span>, r0, r0, LSL #<span style="color: #2a5045;">8</span>
+<span style="color: #3f578f;">LSR</span>     <span style="color: #972500;">r0</span>, r0, #<span style="color: #2a5045;">24</span>
+<span style="color: #3f578f;">BX</span>      <span style="color: #972500;">lr</span>
 </pre>
 </div>
 
@@ -571,10 +571,10 @@ Translated to C code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C">r0 = r0 + (r0 &lt;&lt; <span style="color: #88ca9f;">16</span>);
-r0 = r0 + (r0 &lt;&lt; <span style="color: #88ca9f;">8</span>);
-r0 = r0 &gt;&gt; <span style="color: #88ca9f;">24</span>;
-<span style="color: #ff6f9f;">return</span> r0;
+<pre class="src src-C">r0 = r0 + (r0 &lt;&lt; <span style="color: #2a5045;">16</span>);
+r0 = r0 + (r0 &lt;&lt; <span style="color: #2a5045;">8</span>);
+r0 = r0 &gt;&gt; <span style="color: #2a5045;">24</span>;
+<span style="color: #972500;">return</span> r0;
 </pre>
 </div>
 
@@ -615,35 +615,35 @@ for the last step, while the other uses shifting.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>
 
-<span style="color: #79a8ff;">uint32_t</span> <span style="color: #4ae2ff;">count_bits</span>(<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">num</span>) {
-    num -= (num &gt;&gt; <span style="color: #88ca9f;">1</span>) &amp; <span style="color: #88ca9f;">0x55555555</span>;                       <span style="color: #989898;">/* </span><span style="color: #989898;">First 4 instructions</span><span style="color: #989898;"> */</span>
-    num = ((num &gt;&gt; <span style="color: #88ca9f;">2</span>) &amp; <span style="color: #88ca9f;">0x33333333</span>) + (num &amp; <span style="color: #88ca9f;">0x33333333</span>); <span style="color: #989898;">/* </span><span style="color: #989898;">Next 5 instructions</span><span style="color: #989898;"> */</span>
-    num += (num &gt;&gt; <span style="color: #88ca9f;">4</span>);                                    <span style="color: #989898;">/* </span><span style="color: #989898;">Next 3 instructions</span><span style="color: #989898;"> */</span>
-    num &amp;= <span style="color: #88ca9f;">0x0f0f0f0f</span>;                                    <span style="color: #989898;">/* </span><span style="color: #989898;">Next instruction</span><span style="color: #989898;"> */</span>
-    num = (num * <span style="color: #88ca9f;">0x01010101</span>) &gt;&gt; <span style="color: #88ca9f;">24</span>;                       <span style="color: #989898;">/* </span><span style="color: #989898;">Next 2 instructions</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">return</span> num;                                           <span style="color: #989898;">/* </span><span style="color: #989898;">Last instruction</span><span style="color: #989898;"> */</span>
+<span style="color: #0031a9;">uint32_t</span> <span style="color: #3f578f;">count_bits</span>(<span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">num</span>) {
+    num -= (num &gt;&gt; <span style="color: #2a5045;">1</span>) &amp; <span style="color: #2a5045;">0x55555555</span>;                       <span style="color: #595959;">/* </span><span style="color: #595959;">First 4 instructions</span><span style="color: #595959;"> */</span>
+    num = ((num &gt;&gt; <span style="color: #2a5045;">2</span>) &amp; <span style="color: #2a5045;">0x33333333</span>) + (num &amp; <span style="color: #2a5045;">0x33333333</span>); <span style="color: #595959;">/* </span><span style="color: #595959;">Next 5 instructions</span><span style="color: #595959;"> */</span>
+    num += (num &gt;&gt; <span style="color: #2a5045;">4</span>);                                    <span style="color: #595959;">/* </span><span style="color: #595959;">Next 3 instructions</span><span style="color: #595959;"> */</span>
+    num &amp;= <span style="color: #2a5045;">0x0f0f0f0f</span>;                                    <span style="color: #595959;">/* </span><span style="color: #595959;">Next instruction</span><span style="color: #595959;"> */</span>
+    num = (num * <span style="color: #2a5045;">0x01010101</span>) &gt;&gt; <span style="color: #2a5045;">24</span>;                       <span style="color: #595959;">/* </span><span style="color: #595959;">Next 2 instructions</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">return</span> num;                                           <span style="color: #595959;">/* </span><span style="color: #595959;">Last instruction</span><span style="color: #595959;"> */</span>
 }
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Without the 0x01010101 constant</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">uint32_t</span> <span style="color: #4ae2ff;">count_bits_shifting</span>(<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">num</span>) {
-    num -= (num &gt;&gt; <span style="color: #88ca9f;">1</span>) &amp; <span style="color: #88ca9f;">0x55555555</span>;
-    num = ((num &gt;&gt; <span style="color: #88ca9f;">2</span>) &amp; <span style="color: #88ca9f;">0x33333333</span>) + (num &amp; <span style="color: #88ca9f;">0x33333333</span>);
-    num += (num &gt;&gt; <span style="color: #88ca9f;">4</span>);
-    num &amp;= <span style="color: #88ca9f;">0x0f0f0f0f</span>;
+<span style="color: #595959;">/* </span><span style="color: #595959;">Without the 0x01010101 constant</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">uint32_t</span> <span style="color: #3f578f;">count_bits_shifting</span>(<span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">num</span>) {
+    num -= (num &gt;&gt; <span style="color: #2a5045;">1</span>) &amp; <span style="color: #2a5045;">0x55555555</span>;
+    num = ((num &gt;&gt; <span style="color: #2a5045;">2</span>) &amp; <span style="color: #2a5045;">0x33333333</span>) + (num &amp; <span style="color: #2a5045;">0x33333333</span>);
+    num += (num &gt;&gt; <span style="color: #2a5045;">4</span>);
+    num &amp;= <span style="color: #2a5045;">0x0f0f0f0f</span>;
 
-    num += (num &lt;&lt; <span style="color: #88ca9f;">16</span>);
-    num += (num &lt;&lt; <span style="color: #88ca9f;">8</span>);
-    num &gt;&gt;= <span style="color: #88ca9f;">24</span>;
-    <span style="color: #ff6f9f;">return</span> num;
+    num += (num &lt;&lt; <span style="color: #2a5045;">16</span>);
+    num += (num &lt;&lt; <span style="color: #2a5045;">8</span>);
+    num &gt;&gt;= <span style="color: #2a5045;">24</span>;
+    <span style="color: #972500;">return</span> num;
 }
 
-printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>));          <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
-printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>));          <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
-printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits_shifting(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
-printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits_shifting(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, count_bits(<span style="color: #2a5045;">0x000000AB</span>));          <span style="color: #595959;">/* </span><span style="color: #595959;">5</span><span style="color: #595959;"> */</span>
+printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, count_bits(<span style="color: #2a5045;">0xDEADBEEF</span>));          <span style="color: #595959;">/* </span><span style="color: #595959;">24</span><span style="color: #595959;"> */</span>
+printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, count_bits_shifting(<span style="color: #2a5045;">0x000000AB</span>)); <span style="color: #595959;">/* </span><span style="color: #595959;">5</span><span style="color: #595959;"> */</span>
+printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, count_bits_shifting(<span style="color: #2a5045;">0xDEADBEEF</span>)); <span style="color: #595959;">/* </span><span style="color: #595959;">24</span><span style="color: #595959;"> */</span>
 </pre>
 </div>
 </div>
@@ -657,21 +657,21 @@ A simpler (but probably slower) way of doing it with a <code>for</code> loop:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">count_bits</span>(<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">x</span>) {
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ret</span> = <span style="color: #88ca9f;">0</span>;
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">count_bits</span>(<span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">x</span>) {
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">ret</span> = <span style="color: #2a5045;">0</span>;
 
-    <span style="color: #ff6f9f;">for</span> (; x &gt; <span style="color: #88ca9f;">0</span>; x &gt;&gt;= <span style="color: #88ca9f;">1</span>)
-        <span style="color: #ff6f9f;">if</span> (x &amp; <span style="color: #88ca9f;">1</span>)
+    <span style="color: #972500;">for</span> (; x &gt; <span style="color: #2a5045;">0</span>; x &gt;&gt;= <span style="color: #2a5045;">1</span>)
+        <span style="color: #972500;">if</span> (x &amp; <span style="color: #2a5045;">1</span>)
             ret++;
 
-    <span style="color: #ff6f9f;">return</span> ret;
+    <span style="color: #972500;">return</span> ret;
 }
 
-printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0x000000AB</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">5</span><span style="color: #989898;"> */</span>
-printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, count_bits(<span style="color: #88ca9f;">0xDEADBEEF</span>)); <span style="color: #989898;">/* </span><span style="color: #989898;">24</span><span style="color: #989898;"> */</span>
+printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, count_bits(<span style="color: #2a5045;">0x000000AB</span>)); <span style="color: #595959;">/* </span><span style="color: #595959;">5</span><span style="color: #595959;"> */</span>
+printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, count_bits(<span style="color: #2a5045;">0xDEADBEEF</span>)); <span style="color: #595959;">/* </span><span style="color: #595959;">24</span><span style="color: #595959;"> */</span>
 </pre>
 </div>
 </div>

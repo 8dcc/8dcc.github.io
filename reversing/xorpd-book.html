@@ -261,14 +261,14 @@ Different ways of setting a register to zero.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">xor</span>      <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-<span style="color: #feacd0;">lea</span>      <span style="color: #6ae4b9;">rbx</span>, [<span style="color: #88ca9f;">0</span>]
-<span style="color: #feacd0;">loop</span>     $
-<span style="color: #feacd0;">mov</span>      <span style="color: #6ae4b9;">rdx</span>, <span style="color: #88ca9f;">0</span>
-<span style="color: #feacd0;">and</span>      <span style="color: #6ae4b9;">esi</span>, <span style="color: #88ca9f;">0</span>
-<span style="color: #feacd0;">sub</span>      <span style="color: #6ae4b9;">edi</span>, <span style="color: #6ae4b9;">edi</span>
-<span style="color: #feacd0;">push</span>     <span style="color: #88ca9f;">0</span>
-<span style="color: #feacd0;">pop</span>      <span style="color: #6ae4b9;">rbp</span>
+<pre class="src src-nasm"><span style="color: #721045;">xor</span>      <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+<span style="color: #721045;">lea</span>      <span style="color: #005f5f;">rbx</span>, [<span style="color: #2a5045;">0</span>]
+<span style="color: #721045;">loop</span>     $
+<span style="color: #721045;">mov</span>      <span style="color: #005f5f;">rdx</span>, <span style="color: #2a5045;">0</span>
+<span style="color: #721045;">and</span>      <span style="color: #005f5f;">esi</span>, <span style="color: #2a5045;">0</span>
+<span style="color: #721045;">sub</span>      <span style="color: #005f5f;">edi</span>, <span style="color: #005f5f;">edi</span>
+<span style="color: #721045;">push</span>     <span style="color: #2a5045;">0</span>
+<span style="color: #721045;">pop</span>      <span style="color: #005f5f;">rbp</span>
 </pre>
 </div>
 
@@ -297,9 +297,9 @@ Calculate <a href="https://en.wikipedia.org/wiki/Fibonacci_sequence">Fibonacci</
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">.loop</span>:
-    <span style="color: #feacd0;">xadd</span>     <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rdx</span>
-    <span style="color: #feacd0;">loop</span>     .loop
+<pre class="src src-nasm"><span style="color: #3f578f;">.loop</span>:
+    <span style="color: #721045;">xadd</span>     <span style="color: #005f5f;">rax</span>, <span style="color: #005f5f;">rdx</span>
+    <span style="color: #721045;">loop</span>     .loop
 </pre>
 </div>
 
@@ -417,9 +417,9 @@ The following code converts non-zero numbers to one.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">neg</span>      <span style="color: #6ae4b9;">rax</span>
-<span style="color: #feacd0;">sbb</span>      <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rax</span>
-<span style="color: #feacd0;">neg</span>      <span style="color: #6ae4b9;">rax</span>
+<pre class="src src-nasm"><span style="color: #721045;">neg</span>      <span style="color: #005f5f;">rax</span>
+<span style="color: #721045;">sbb</span>      <span style="color: #005f5f;">rax</span>, <span style="color: #005f5f;">rax</span>
+<span style="color: #721045;">neg</span>      <span style="color: #005f5f;">rax</span>
 </pre>
 </div>
 
@@ -428,8 +428,8 @@ This is equivalent to the following C code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">val</span> = <span style="color: #88ca9f;">123</span>;
-<span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">is_non_zero</span> = <span style="color: #ff6740; font-weight: bold;">!</span>!val; <span style="color: #989898;">/* </span><span style="color: #989898;">1 or 0</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #0031a9;">int</span> <span style="color: #005f5f;">val</span> = <span style="color: #2a5045;">123</span>;
+<span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">is_non_zero</span> = <span style="color: #972500; font-weight: bold;">!</span>!val; <span style="color: #595959;">/* </span><span style="color: #595959;">1 or 0</span><span style="color: #595959;"> */</span>
 </pre>
 </div>
 

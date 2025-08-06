@@ -226,28 +226,28 @@ bit to fit the <a href="https://www.nasm.us/">nasm</a> syntax.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">eax</span>, [<span style="color: #6ae4b9;">esp</span> + <span style="color: #88ca9f;">0x4</span>]
-    <span style="color: #feacd0;">bswap</span>  <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0F0F0F0F</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xF0F0F0F0</span>
-    <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">4</span>
-    <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">4</span>
-    <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xCCCCCCCC</span>
-    <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">2</span>
-    <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">2</span>
-    <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x55555555</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xAAAAAAAA</span>
-    <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
-    <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
-    <span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">eax</span>, [<span style="color: #005f5f;">esp</span> + <span style="color: #2a5045;">0x4</span>]
+    <span style="color: #721045;">bswap</span>  <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x0F0F0F0F</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0xF0F0F0F0</span>
+    <span style="color: #721045;">shr</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">4</span>
+    <span style="color: #721045;">shl</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">4</span>
+    <span style="color: #721045;">or</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edx</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x33333333</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0xCCCCCCCC</span>
+    <span style="color: #721045;">shr</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">2</span>
+    <span style="color: #721045;">shl</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">2</span>
+    <span style="color: #721045;">or</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edx</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x55555555</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0xAAAAAAAA</span>
+    <span style="color: #721045;">add</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">shr</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">1</span>
+    <span style="color: #721045;">or</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edx</span>
+    <span style="color: #721045;">ret</span>
 </pre>
 </div>
 </div>
@@ -285,7 +285,7 @@ to the <code>esp</code> register to skip over the return address and get the par
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, [<span style="color: #6ae4b9;">esp</span> + <span style="color: #88ca9f;">0x4</span>]
+<pre class="src src-nasm"><span style="color: #721045;">mov</span>     <span style="color: #005f5f;">eax</span>, [<span style="color: #005f5f;">esp</span> + <span style="color: #2a5045;">0x4</span>]
 </pre>
 </div>
 
@@ -296,14 +296,14 @@ access the parameters:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-    <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">ebp</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">Preserve caller's stack frame (pushing another 4 bytes)</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">ebp</span>, <span style="color: #6ae4b9;">esp</span>            <span style="color: #989898;">; </span><span style="color: #989898;">Store current stack frame</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, [<span style="color: #6ae4b9;">esp</span> + <span style="color: #88ca9f;">0x8</span>]    <span style="color: #989898;">; </span><span style="color: #989898;">Skip over pushed EBP and the return address (4 + 4)</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+    <span style="color: #721045;">push</span>    <span style="color: #005f5f;">ebp</span>                 <span style="color: #595959;">; </span><span style="color: #595959;">Preserve caller's stack frame (pushing another 4 bytes)</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">ebp</span>, <span style="color: #005f5f;">esp</span>            <span style="color: #595959;">; </span><span style="color: #595959;">Store current stack frame</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">eax</span>, [<span style="color: #005f5f;">esp</span> + <span style="color: #2a5045;">0x8</span>]    <span style="color: #595959;">; </span><span style="color: #595959;">Skip over pushed EBP and the return address (4 + 4)</span>
     ...
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">esp</span>, <span style="color: #6ae4b9;">ebp</span>            <span style="color: #989898;">; </span><span style="color: #989898;">Restore stack frame</span>
-    <span style="color: #feacd0;">pop</span>     <span style="color: #6ae4b9;">ebp</span>                 <span style="color: #989898;">; </span><span style="color: #989898;">Pop caller's stack frame</span>
-    <span style="color: #feacd0;">ret</span>                         <span style="color: #989898;">; </span><span style="color: #989898;">Next value on the stack is the return address, popped by `ret`</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">esp</span>, <span style="color: #005f5f;">ebp</span>            <span style="color: #595959;">; </span><span style="color: #595959;">Restore stack frame</span>
+    <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">ebp</span>                 <span style="color: #595959;">; </span><span style="color: #595959;">Pop caller's stack frame</span>
+    <span style="color: #721045;">ret</span>                         <span style="color: #595959;">; </span><span style="color: #595959;">Next value on the stack is the return address, popped by `ret`</span>
 </pre>
 </div>
 
@@ -328,7 +328,7 @@ So it will convert <code>0x11223344</code> to <code>0x44332211</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">bswap</span>   <span style="color: #6ae4b9;">eax</span>
+<pre class="src src-nasm"><span style="color: #721045;">bswap</span>   <span style="color: #005f5f;">eax</span>
 </pre>
 </div>
 
@@ -339,9 +339,9 @@ lower part in <code>edx</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0F0F0F0F</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xF0F0F0F0</span>
+<pre class="src src-nasm"><span style="color: #721045;">mov</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #005f5f;">eax</span>
+<span style="color: #721045;">and</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x0F0F0F0F</span>
+<span style="color: #721045;">and</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0xF0F0F0F0</span>
 </pre>
 </div>
 
@@ -351,9 +351,9 @@ them back together.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">4</span>
-<span style="color: #feacd0;">shl</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">4</span>
-<span style="color: #feacd0;">or</span>      <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+<pre class="src src-nasm"><span style="color: #721045;">shr</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">4</span>
+<span style="color: #721045;">shl</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">4</span>
+<span style="color: #721045;">or</span>      <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edx</span>
 </pre>
 </div>
 
@@ -385,12 +385,12 @@ nibbles:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b00110011001100110011001100110011</span>
-<span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xCCCCCCCC</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b11001100110011001100110011001100</span>
-<span style="color: #feacd0;">shr</span>     <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">2</span>
-<span style="color: #feacd0;">shl</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">2</span>
-<span style="color: #feacd0;">or</span>      <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+<pre class="src src-nasm"><span style="color: #721045;">mov</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #005f5f;">eax</span>
+<span style="color: #721045;">and</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x33333333</span>   <span style="color: #595959;">; </span><span style="color: #595959;">0b00110011001100110011001100110011</span>
+<span style="color: #721045;">and</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0xCCCCCCCC</span>   <span style="color: #595959;">; </span><span style="color: #595959;">0b11001100110011001100110011001100</span>
+<span style="color: #721045;">shr</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">2</span>
+<span style="color: #721045;">shl</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">2</span>
+<span style="color: #721045;">or</span>      <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edx</span>
 </pre>
 </div>
 
@@ -404,13 +404,13 @@ And finally, it does a similar operation with <b>every bit</b>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x55555555</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b01010101010101010101010101010101</span>
-<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xAAAAAAAA</span>   <span style="color: #989898;">; </span><span style="color: #989898;">0b10101010101010101010101010101010</span>
-<span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-<span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
-<span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
-<span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #721045;">mov</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #005f5f;">eax</span>
+<span style="color: #721045;">and</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x55555555</span>   <span style="color: #595959;">; </span><span style="color: #595959;">0b01010101010101010101010101010101</span>
+<span style="color: #721045;">and</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0xAAAAAAAA</span>   <span style="color: #595959;">; </span><span style="color: #595959;">0b10101010101010101010101010101010</span>
+<span style="color: #721045;">add</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+<span style="color: #721045;">shr</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">1</span>
+<span style="color: #721045;">or</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edx</span>
+<span style="color: #721045;">ret</span>
 </pre>
 </div>
 
@@ -421,10 +421,10 @@ to the left. The previous code could have been written as:
 
 <div class="org-src-container">
 <pre class="src src-nasm">...
-<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x55555555</span>
-<span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xAAAAAAAA</span>
-<span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">1</span>
-<span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
+<span style="color: #721045;">and</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x55555555</span>
+<span style="color: #721045;">and</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0xAAAAAAAA</span>
+<span style="color: #721045;">shl</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">1</span>
+<span style="color: #721045;">shr</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">1</span>
 ...
 </pre>
 </div>
@@ -447,24 +447,24 @@ This is a simple C translation of the assembly:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;byteswap.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;byteswap.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>
 
-<span style="color: #79a8ff;">uint32_t</span> <span style="color: #4ae2ff;">swap</span>(<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">num</span>) {
+<span style="color: #0031a9;">uint32_t</span> <span style="color: #3f578f;">swap</span>(<span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">num</span>) {
     num = bswap_32(num);
-    num = ((num &amp; <span style="color: #88ca9f;">0x0F0F0F0F</span>) &lt;&lt; <span style="color: #88ca9f;">4</span>) | ((num &amp; <span style="color: #88ca9f;">0xF0F0F0F0</span>) &gt;&gt; <span style="color: #88ca9f;">4</span>);
-    num = ((num &amp; <span style="color: #88ca9f;">0x33333333</span>) &lt;&lt; <span style="color: #88ca9f;">2</span>) | ((num &amp; <span style="color: #88ca9f;">0xCCCCCCCC</span>) &gt;&gt; <span style="color: #88ca9f;">2</span>);
-    num = ((num &amp; <span style="color: #88ca9f;">0x55555555</span>) &lt;&lt; <span style="color: #88ca9f;">1</span>) | ((num &amp; <span style="color: #88ca9f;">0xAAAAAAAA</span>) &gt;&gt; <span style="color: #88ca9f;">1</span>);
-    <span style="color: #ff6f9f;">return</span> num;
+    num = ((num &amp; <span style="color: #2a5045;">0x0F0F0F0F</span>) &lt;&lt; <span style="color: #2a5045;">4</span>) | ((num &amp; <span style="color: #2a5045;">0xF0F0F0F0</span>) &gt;&gt; <span style="color: #2a5045;">4</span>);
+    num = ((num &amp; <span style="color: #2a5045;">0x33333333</span>) &lt;&lt; <span style="color: #2a5045;">2</span>) | ((num &amp; <span style="color: #2a5045;">0xCCCCCCCC</span>) &gt;&gt; <span style="color: #2a5045;">2</span>);
+    num = ((num &amp; <span style="color: #2a5045;">0x55555555</span>) &lt;&lt; <span style="color: #2a5045;">1</span>) | ((num &amp; <span style="color: #2a5045;">0xAAAAAAAA</span>) &gt;&gt; <span style="color: #2a5045;">1</span>);
+    <span style="color: #972500;">return</span> num;
 }
 
-<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">PRINT_EXPR</span>(<span style="color: #6ae4b9;">E</span>) printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%s</span><span style="color: #00d3d0;"> 0x</span><span style="color: #ff6f9f;">%X\n</span><span style="color: #00d3d0;">"</span>, #E, E)
+<span style="color: #a0132f;">#define</span> <span style="color: #3f578f;">PRINT_EXPR</span>(<span style="color: #005f5f;">E</span>) printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%s</span><span style="color: #005e8b;"> 0x</span><span style="color: #972500;">%X\n</span><span style="color: #005e8b;">"</span>, #E, E)
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
-    PRINT_EXPR(swap(<span style="color: #88ca9f;">0xDEADBEEF</span>));       <span style="color: #989898;">/* </span><span style="color: #989898;">0xF77DB57B</span><span style="color: #989898;"> */</span>
-    PRINT_EXPR(swap(swap(<span style="color: #88ca9f;">0xDEADBEEF</span>))); <span style="color: #989898;">/* </span><span style="color: #989898;">0xDEADBEEF</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">main</span>(<span style="color: #0031a9;">void</span>) {
+    PRINT_EXPR(swap(<span style="color: #2a5045;">0xDEADBEEF</span>));       <span style="color: #595959;">/* </span><span style="color: #595959;">0xF77DB57B</span><span style="color: #595959;"> */</span>
+    PRINT_EXPR(swap(swap(<span style="color: #2a5045;">0xDEADBEEF</span>))); <span style="color: #595959;">/* </span><span style="color: #595959;">0xDEADBEEF</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
 }
 </pre>
 </div>
@@ -485,32 +485,32 @@ The bit swapping sections are the same, just in a different order.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">inverse</span>:
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">eax</span>, [<span style="color: #6ae4b9;">esp</span> + <span style="color: #88ca9f;">0x4</span>]
+<pre class="src src-nasm"><span style="color: #3f578f;">inverse</span>:
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">eax</span>, [<span style="color: #005f5f;">esp</span> + <span style="color: #2a5045;">0x4</span>]
 
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x55555555</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xAAAAAAAA</span>
-    <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">1</span>
-    <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">1</span>
-    <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x55555555</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0xAAAAAAAA</span>
+    <span style="color: #721045;">shl</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">1</span>
+    <span style="color: #721045;">shr</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">1</span>
+    <span style="color: #721045;">or</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edx</span>
 
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x33333333</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xCCCCCCCC</span>
-    <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">2</span>
-    <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">2</span>
-    <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x33333333</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0xCCCCCCCC</span>
+    <span style="color: #721045;">shl</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">2</span>
+    <span style="color: #721045;">shr</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">2</span>
+    <span style="color: #721045;">or</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edx</span>
 
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x0F0F0F0F</span>
-    <span style="color: #feacd0;">and</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0xF0F0F0F0</span>
-    <span style="color: #feacd0;">shl</span>    <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">4</span>
-    <span style="color: #feacd0;">shr</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">4</span>
-    <span style="color: #feacd0;">or</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edx</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x0F0F0F0F</span>
+    <span style="color: #721045;">and</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0xF0F0F0F0</span>
+    <span style="color: #721045;">shl</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">4</span>
+    <span style="color: #721045;">shr</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">4</span>
+    <span style="color: #721045;">or</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edx</span>
 
-    <span style="color: #feacd0;">bswap</span>  <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">ret</span>
+    <span style="color: #721045;">bswap</span>  <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">ret</span>
 </pre>
 </div>
 </div>

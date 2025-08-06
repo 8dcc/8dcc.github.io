@@ -256,8 +256,8 @@ The compiler will sometimes optimize the following pretested loop:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">while</span> (a != b) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #972500;">while</span> (a != b) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 }
 </pre>
 </div>
@@ -267,10 +267,10 @@ Into this posttested loop inside a conditional.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">if</span> (a != b) {
-    <span style="color: #ff6f9f;">do</span> {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
-    } <span style="color: #ff6f9f;">while</span> (a != b);
+<pre class="src src-C"><span style="color: #972500;">if</span> (a != b) {
+    <span style="color: #972500;">do</span> {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+    } <span style="color: #972500;">while</span> (a != b);
 }
 </pre>
 </div>
@@ -280,12 +280,12 @@ The assembly for the first loop would be something like:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">.loop</span>:
-    <span style="color: #feacd0;">cmp</span> A, B
-    <span style="color: #feacd0;">je</span> .done
-    <span style="color: #989898;">; </span><span style="color: #989898;">...</span>
-    <span style="color: #feacd0;">jmp</span> .loop
-<span style="color: #4ae2ff;">.done</span>:
+<pre class="src src-nasm"><span style="color: #3f578f;">.loop</span>:
+    <span style="color: #721045;">cmp</span> A, B
+    <span style="color: #721045;">je</span> .done
+    <span style="color: #595959;">; </span><span style="color: #595959;">...</span>
+    <span style="color: #721045;">jmp</span> .loop
+<span style="color: #3f578f;">.done</span>:
 </pre>
 </div>
 
@@ -295,13 +295,13 @@ like:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm">    <span style="color: #feacd0;">cmp</span> A, B
-    <span style="color: #feacd0;">je</span> .done
-<span style="color: #4ae2ff;">.loop</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">...</span>
-    <span style="color: #feacd0;">cmp</span> A, B
-    <span style="color: #feacd0;">jne</span> .loop
-<span style="color: #4ae2ff;">.done</span>:
+<pre class="src src-nasm">    <span style="color: #721045;">cmp</span> A, B
+    <span style="color: #721045;">je</span> .done
+<span style="color: #3f578f;">.loop</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">...</span>
+    <span style="color: #721045;">cmp</span> A, B
+    <span style="color: #721045;">jne</span> .loop
+<span style="color: #3f578f;">.done</span>:
 </pre>
 </div>
 
@@ -331,12 +331,12 @@ When the program encounters a loop start, the following assembly is generated:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm">    <span style="color: #feacd0;">jmp</span> .check_N
-<span style="color: #4ae2ff;">.loop_N</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">...</span>
-<span style="color: #4ae2ff;">.check_N</span>:
-    <span style="color: #feacd0;">cmp</span> <span style="color: #79a8ff;">byte</span> [<span style="color: #6ae4b9;">rcx</span>], <span style="color: #88ca9f;">0</span>
-    <span style="color: #feacd0;">jnz</span> .loop_N
+<pre class="src src-nasm">    <span style="color: #721045;">jmp</span> .check_N
+<span style="color: #3f578f;">.loop_N</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">...</span>
+<span style="color: #3f578f;">.check_N</span>:
+    <span style="color: #721045;">cmp</span> <span style="color: #0031a9;">byte</span> [<span style="color: #005f5f;">rcx</span>], <span style="color: #2a5045;">0</span>
+    <span style="color: #721045;">jnz</span> .loop_N
 </pre>
 </div>
 

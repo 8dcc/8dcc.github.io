@@ -229,23 +229,23 @@ Original challenge link: <a href="https://challenges.re/7/">Click me</a>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-   <span style="color: #88ca9f;">0</span>:                <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rdi</span>]
-   <span style="color: #88ca9f;">3</span>:                <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rdi</span>
-   <span style="color: #88ca9f;">6</span>:                <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #6ae4b9;">rdi</span>
-   <span style="color: #88ca9f;">9</span>:                <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">dl</span>, <span style="color: #6ae4b9;">dl</span>
-   <span style="color: #4ae2ff;">b</span>:                <span style="color: #feacd0;">je</span>     <span style="color: #88ca9f;">29</span>
-   <span style="color: #4ae2ff;">d</span>:                <span style="color: #feacd0;">nop</span>    <span style="color: #79a8ff;">DWORD</span> [<span style="color: #6ae4b9;">rax</span>]
-  <span style="color: #88ca9f;">10</span>:                <span style="color: #feacd0;">lea</span>    <span style="color: #6ae4b9;">esi</span>, [<span style="color: #6ae4b9;">rdx</span> - <span style="color: #88ca9f;">0x41</span>]
-  <span style="color: #88ca9f;">13</span>:                <span style="color: #feacd0;">cmp</span>    <span style="color: #6ae4b9;">sil</span>, <span style="color: #88ca9f;">0x19</span>
-  <span style="color: #88ca9f;">17</span>:                <span style="color: #feacd0;">ja</span>     <span style="color: #88ca9f;">1e</span>
-  <span style="color: #88ca9f;">19</span>:                <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0x20</span>
-  <span style="color: #88ca9f;">1c</span>:                <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rcx</span>], <span style="color: #6ae4b9;">dl</span>
-  <span style="color: #88ca9f;">1e</span>:                <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #88ca9f;">0x1</span>
-  <span style="color: #88ca9f;">22</span>:                <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rcx</span>]
-  <span style="color: #88ca9f;">25</span>:                <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">dl</span>, <span style="color: #6ae4b9;">dl</span>
-  <span style="color: #88ca9f;">27</span>:                <span style="color: #feacd0;">jne</span>    <span style="color: #88ca9f;">10</span>
-  <span style="color: #88ca9f;">29</span>:                <span style="color: #feacd0;">repz</span> <span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+   <span style="color: #2a5045;">0</span>:                <span style="color: #721045;">movzx</span>  <span style="color: #005f5f;">edx</span>, <span style="color: #0031a9;">BYTE</span> [<span style="color: #005f5f;">rdi</span>]
+   <span style="color: #2a5045;">3</span>:                <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #005f5f;">rdi</span>
+   <span style="color: #2a5045;">6</span>:                <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rcx</span>, <span style="color: #005f5f;">rdi</span>
+   <span style="color: #2a5045;">9</span>:                <span style="color: #721045;">test</span>   <span style="color: #005f5f;">dl</span>, <span style="color: #005f5f;">dl</span>
+   <span style="color: #3f578f;">b</span>:                <span style="color: #721045;">je</span>     <span style="color: #2a5045;">29</span>
+   <span style="color: #3f578f;">d</span>:                <span style="color: #721045;">nop</span>    <span style="color: #0031a9;">DWORD</span> [<span style="color: #005f5f;">rax</span>]
+  <span style="color: #2a5045;">10</span>:                <span style="color: #721045;">lea</span>    <span style="color: #005f5f;">esi</span>, [<span style="color: #005f5f;">rdx</span> - <span style="color: #2a5045;">0x41</span>]
+  <span style="color: #2a5045;">13</span>:                <span style="color: #721045;">cmp</span>    <span style="color: #005f5f;">sil</span>, <span style="color: #2a5045;">0x19</span>
+  <span style="color: #2a5045;">17</span>:                <span style="color: #721045;">ja</span>     <span style="color: #2a5045;">1e</span>
+  <span style="color: #2a5045;">19</span>:                <span style="color: #721045;">add</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0x20</span>
+  <span style="color: #2a5045;">1c</span>:                <span style="color: #721045;">mov</span>    <span style="color: #0031a9;">BYTE</span> [<span style="color: #005f5f;">rcx</span>], <span style="color: #005f5f;">dl</span>
+  <span style="color: #2a5045;">1e</span>:                <span style="color: #721045;">add</span>    <span style="color: #005f5f;">rcx</span>, <span style="color: #2a5045;">0x1</span>
+  <span style="color: #2a5045;">22</span>:                <span style="color: #721045;">movzx</span>  <span style="color: #005f5f;">edx</span>, <span style="color: #0031a9;">BYTE</span> [<span style="color: #005f5f;">rcx</span>]
+  <span style="color: #2a5045;">25</span>:                <span style="color: #721045;">test</span>   <span style="color: #005f5f;">dl</span>, <span style="color: #005f5f;">dl</span>
+  <span style="color: #2a5045;">27</span>:                <span style="color: #721045;">jne</span>    <span style="color: #2a5045;">10</span>
+  <span style="color: #2a5045;">29</span>:                <span style="color: #721045;">repz</span> <span style="color: #721045;">ret</span>
 </pre>
 </div>
 
@@ -254,26 +254,26 @@ After removing the unused labels, and renaming the used ones.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-    <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rdi</span>]
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rdi</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #6ae4b9;">rdi</span>
-    <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">dl</span>, <span style="color: #6ae4b9;">dl</span>
-    <span style="color: #feacd0;">je</span>     .done
-    <span style="color: #feacd0;">nop</span>    <span style="color: #79a8ff;">DWORD</span> [<span style="color: #6ae4b9;">rax</span>]
-<span style="color: #4ae2ff;">.loop</span>:
-    <span style="color: #feacd0;">lea</span>    <span style="color: #6ae4b9;">esi</span>, [<span style="color: #6ae4b9;">rdx</span> - <span style="color: #88ca9f;">0x41</span>]
-    <span style="color: #feacd0;">cmp</span>    <span style="color: #6ae4b9;">sil</span>, <span style="color: #88ca9f;">0x19</span>
-    <span style="color: #feacd0;">ja</span>     .bigger_val
-    <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">edx</span>, <span style="color: #88ca9f;">0x20</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rcx</span>], <span style="color: #6ae4b9;">dl</span>
-<span style="color: #4ae2ff;">.bigger_val</span>:
-    <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">rcx</span>, <span style="color: #88ca9f;">0x1</span>
-    <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">edx</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rcx</span>]
-    <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">dl</span>, <span style="color: #6ae4b9;">dl</span>
-    <span style="color: #feacd0;">jne</span>    .loop
-<span style="color: #4ae2ff;">.done</span>:
-    <span style="color: #feacd0;">repz</span> <span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+    <span style="color: #721045;">movzx</span>  <span style="color: #005f5f;">edx</span>, <span style="color: #0031a9;">BYTE</span> [<span style="color: #005f5f;">rdi</span>]
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #005f5f;">rdi</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rcx</span>, <span style="color: #005f5f;">rdi</span>
+    <span style="color: #721045;">test</span>   <span style="color: #005f5f;">dl</span>, <span style="color: #005f5f;">dl</span>
+    <span style="color: #721045;">je</span>     .done
+    <span style="color: #721045;">nop</span>    <span style="color: #0031a9;">DWORD</span> [<span style="color: #005f5f;">rax</span>]
+<span style="color: #3f578f;">.loop</span>:
+    <span style="color: #721045;">lea</span>    <span style="color: #005f5f;">esi</span>, [<span style="color: #005f5f;">rdx</span> - <span style="color: #2a5045;">0x41</span>]
+    <span style="color: #721045;">cmp</span>    <span style="color: #005f5f;">sil</span>, <span style="color: #2a5045;">0x19</span>
+    <span style="color: #721045;">ja</span>     .bigger_val
+    <span style="color: #721045;">add</span>    <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0x20</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #0031a9;">BYTE</span> [<span style="color: #005f5f;">rcx</span>], <span style="color: #005f5f;">dl</span>
+<span style="color: #3f578f;">.bigger_val</span>:
+    <span style="color: #721045;">add</span>    <span style="color: #005f5f;">rcx</span>, <span style="color: #2a5045;">0x1</span>
+    <span style="color: #721045;">movzx</span>  <span style="color: #005f5f;">edx</span>, <span style="color: #0031a9;">BYTE</span> [<span style="color: #005f5f;">rcx</span>]
+    <span style="color: #721045;">test</span>   <span style="color: #005f5f;">dl</span>, <span style="color: #005f5f;">dl</span>
+    <span style="color: #721045;">jne</span>    .loop
+<span style="color: #3f578f;">.done</span>:
+    <span style="color: #721045;">repz</span> <span style="color: #721045;">ret</span>
 </pre>
 </div>
 </div>
@@ -384,19 +384,19 @@ The first version uses register names and is a more direct translation.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">rcx</span>) {
-    <span style="color: #ff6f9f;">if</span> (*rcx == <span style="color: #88ca9f;">0</span>)
-        <span style="color: #ff6f9f;">return</span>;
+<pre class="src src-C"><span style="color: #0031a9;">void</span> <span style="color: #3f578f;">func</span>(<span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">rcx</span>) {
+    <span style="color: #972500;">if</span> (*rcx == <span style="color: #2a5045;">0</span>)
+        <span style="color: #972500;">return</span>;
 
-    <span style="color: #ff6f9f;">do</span> {
-        <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">esi</span> = *rcx - <span style="color: #88ca9f;">0x41</span>;
+    <span style="color: #972500;">do</span> {
+        <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">esi</span> = *rcx - <span style="color: #2a5045;">0x41</span>;
 
-        <span style="color: #ff6f9f;">if</span> (esi &lt;= <span style="color: #88ca9f;">0x19</span>) {
-            *rcx += <span style="color: #88ca9f;">0x20</span>;
+        <span style="color: #972500;">if</span> (esi &lt;= <span style="color: #2a5045;">0x19</span>) {
+            *rcx += <span style="color: #2a5045;">0x20</span>;
         }
 
         rcx++;
-    } <span style="color: #ff6f9f;">while</span> (*rcx != <span style="color: #88ca9f;">0</span>);
+    } <span style="color: #972500;">while</span> (*rcx != <span style="color: #2a5045;">0</span>);
 }
 </pre>
 </div>
@@ -414,14 +414,14 @@ variables.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">ptr</span>) {
-    <span style="color: #ff6f9f;">while</span> (*ptr != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>) {
-        <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span> = *ptr - <span style="color: #00d3d0;">'A'</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">esi</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #0031a9;">void</span> <span style="color: #3f578f;">func</span>(<span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">ptr</span>) {
+    <span style="color: #972500;">while</span> (*ptr != <span style="color: #005e8b;">'</span><span style="color: #972500;">\0</span><span style="color: #005e8b;">'</span>) {
+        <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">c</span> = *ptr - <span style="color: #005e8b;">'A'</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">esi</span><span style="color: #595959;"> */</span>
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Between 'A' and 'Z'</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">if</span> (c &lt;= <span style="color: #88ca9f;">25</span>) {
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Convert from 'A' (0x41) to 'a' (0x61)</span><span style="color: #989898;"> */</span>
-            *ptr += <span style="color: #88ca9f;">32</span>;
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Between 'A' and 'Z'</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">if</span> (c &lt;= <span style="color: #2a5045;">25</span>) {
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Convert from 'A' (0x41) to 'a' (0x61)</span><span style="color: #595959;"> */</span>
+            *ptr += <span style="color: #2a5045;">32</span>;
         }
 
         ptr++;

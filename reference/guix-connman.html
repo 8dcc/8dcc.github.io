@@ -249,9 +249,9 @@ modules:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">use-modules</span>
- <span style="color: #989898;">;; </span><span style="color: #989898;">...</span>
- <span style="color: #cabf00;">(</span>gnu services networking<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+<pre class="src src-scheme"><span style="color: #a60000;">(</span><span style="color: #972500;">use-modules</span>
+ <span style="color: #595959;">;; </span><span style="color: #595959;">...</span>
+ <span style="color: #695500;">(</span>gnu services networking<span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -260,21 +260,21 @@ And then add the actual services to your <code>(operating-system ...)</code> dec
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #ff5f59;">(</span>operating-system
- <span style="color: #989898;">;; </span><span style="color: #989898;">Other parameters...</span>
+<pre class="src src-scheme"><span style="color: #a60000;">(</span>operating-system
+ <span style="color: #595959;">;; </span><span style="color: #595959;">Other parameters...</span>
 
- <span style="color: #cabf00;">(</span>services
-  <span style="color: #989898;">;; </span><span style="color: #989898;">Other services...</span>
+ <span style="color: #695500;">(</span>services
+  <span style="color: #595959;">;; </span><span style="color: #595959;">Other services...</span>
 
-  <span style="color: #44bc44;">(</span>service wpa-supplicant-service-type<span style="color: #44bc44;">)</span>
-  <span style="color: #44bc44;">(</span>service connman-service-type
-           <span style="color: #00eff0;">(</span>connman-configuration
-            <span style="color: #338fff;">(</span>shepherd-requirement '<span style="color: #ef7fff;">(</span>wpa-supplicant<span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span>
-            <span style="color: #338fff;">(</span>general-configuration
-             <span style="color: #ef7fff;">(</span>connman-general-configuration
-              <span style="color: #ff5f59;">(</span>allow-hostname-updates? #f<span style="color: #ff5f59;">)</span>
-              <span style="color: #ff5f59;">(</span>allow-domainname-updates? #f<span style="color: #ff5f59;">)</span>
-              <span style="color: #ff5f59;">(</span>single-connected-technology? #f<span style="color: #ff5f59;">)</span><span style="color: #ef7fff;">)</span><span style="color: #338fff;">)</span><span style="color: #00eff0;">)</span><span style="color: #44bc44;">)</span><span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+  <span style="color: #006800;">(</span>service wpa-supplicant-service-type<span style="color: #006800;">)</span>
+  <span style="color: #006800;">(</span>service connman-service-type
+           <span style="color: #008899;">(</span>connman-configuration
+            <span style="color: #0000ff;">(</span>shepherd-requirement '<span style="color: #dd22dd;">(</span>wpa-supplicant<span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span>
+            <span style="color: #0000ff;">(</span>general-configuration
+             <span style="color: #dd22dd;">(</span>connman-general-configuration
+              <span style="color: #a60000;">(</span>allow-hostname-updates? #f<span style="color: #a60000;">)</span>
+              <span style="color: #a60000;">(</span>allow-domainname-updates? #f<span style="color: #a60000;">)</span>
+              <span style="color: #a60000;">(</span>single-connected-technology? #f<span style="color: #a60000;">)</span><span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -291,7 +291,7 @@ Once our configuration is updated, we can reconfigure our system with:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #989898;"># </span><span style="color: #989898;">Change the path to match your system configuration.</span>
+<pre class="src src-bash"><span style="color: #595959;"># </span><span style="color: #595959;">Change the path to match your system configuration.</span>
 sudo -E guix system reconfigure ~/.config/guix/system.scm
 </pre>
 </div>
@@ -316,8 +316,8 @@ Started:
 
 $ sudo herd status connman
 - Status of connman:
-  It is running since <span style="color: #88ca9f;">09:04:18</span> AM (<span style="color: #88ca9f;">44</span> minutes ago)<span style="color: #feacd0;">.</span>
-  Main PID: <span style="color: #88ca9f;">309</span>
+  It is running since <span style="color: #2a5045;">09:04:18</span> AM (<span style="color: #2a5045;">44</span> minutes ago)<span style="color: #721045;">.</span>
+  Main PID: <span style="color: #2a5045;">309</span>
   Command: /gnu/store/[...]-connman-1.42/sbin/connmand --config=/gnu/store/[...]-main.conf --nodaemon --nodnsproxy --noplugin=vpn
   It is enabled.
   Provides: connman networking
@@ -327,8 +327,8 @@ $ sudo herd status connman
 
 $ sudo herd status wpa-supplicant
 - Status of wpa-supplicant:
-  It is running since <span style="color: #88ca9f;">09:04:18</span> AM (<span style="color: #88ca9f;">45</span> minutes ago)<span style="color: #feacd0;">.</span>
-  Main PID: <span style="color: #88ca9f;">288</span>
+  It is running since <span style="color: #2a5045;">09:04:18</span> AM (<span style="color: #2a5045;">45</span> minutes ago)<span style="color: #721045;">.</span>
+  Main PID: <span style="color: #2a5045;">288</span>
   Command: /gnu/store/[...]-wpa-supplicant-2.10/sbin/wpa_supplicant -P/var/run/wpa_supplicant.pid -B -s -u
   It is enabled.
   Provides: wpa-supplicant
@@ -415,7 +415,7 @@ If it&rsquo;s your first time connecting, you will need to enter the password:
 
 <div class="org-src-container">
 <pre class="src src-bash">Agent RequestInput wifi_dc85de828967_38303944616e69656c73_managed_psk
-  Passphrase = [ <span style="color: #6ae4b9;">Type</span>=psk, <span style="color: #6ae4b9;">Requirement</span>=mandatory ]
+  Passphrase = [ <span style="color: #005f5f;">Type</span>=psk, <span style="color: #005f5f;">Requirement</span>=mandatory ]
   Passphrase?
 </pre>
 </div>
@@ -441,17 +441,17 @@ can check the interface status with <a href="https://man.cx/ip-address(8)"><code
 
 <div class="org-src-container">
 <pre class="src src-bash">$ ip a
-<span style="color: #88ca9f;">1:</span> lo: &lt;LOOPBACK,MULTICAST,UP,LOWER_UP&gt; mtu <span style="color: #88ca9f;">65536</span> qdisc noqueue state UNKNOWN group default qlen <span style="color: #88ca9f;">1000</span>
-    link/loopback <span style="color: #88ca9f;">00:00:00:00:00:00</span> brd <span style="color: #88ca9f;">00:00:00:00:00:00</span>
-    inet <span style="color: #88ca9f;">127.0.0.1/8</span> scope global lo
+<span style="color: #2a5045;">1:</span> lo: &lt;LOOPBACK,MULTICAST,UP,LOWER_UP&gt; mtu <span style="color: #2a5045;">65536</span> qdisc noqueue state UNKNOWN group default qlen <span style="color: #2a5045;">1000</span>
+    link/loopback <span style="color: #2a5045;">00:00:00:00:00:00</span> brd <span style="color: #2a5045;">00:00:00:00:00:00</span>
+    inet <span style="color: #2a5045;">127.0.0.1/8</span> scope global lo
        valid_lft forever preferred_lft forever
     inet6 ::1/128 scope host proto kernel_lo
        valid_lft forever preferred_lft forever
-<span style="color: #88ca9f;">2:</span> enp0s25: &lt;NO-CARRIER,BROADCAST,MULTICAST,DYNAMIC,UP&gt; mtu <span style="color: #88ca9f;">1500</span> qdisc pfifo_fast state DOWN group default qlen <span style="color: #88ca9f;">1000</span>
-    link/ether <span style="color: #88ca9f;">11:22:33:aa:bb:cc</span> brd ff:ff:ff:ff:ff:ff
-<span style="color: #88ca9f;">3:</span> wlp3s0: &lt;BROADCAST,MULTICAST,DYNAMIC,UP,LOWER_UP&gt; mtu <span style="color: #88ca9f;">1500</span> qdisc noqueue state UP group default qlen <span style="color: #88ca9f;">1000</span>
-    link/ether <span style="color: #88ca9f;">44:55:66:aa:bb:cc</span> brd ff:ff:ff:ff:ff:ff
-    inet <span style="color: #88ca9f;">192.168.0.2/24</span> brd <span style="color: #88ca9f;">192.168.0.255</span> scope global wlp3s0
+<span style="color: #2a5045;">2:</span> enp0s25: &lt;NO-CARRIER,BROADCAST,MULTICAST,DYNAMIC,UP&gt; mtu <span style="color: #2a5045;">1500</span> qdisc pfifo_fast state DOWN group default qlen <span style="color: #2a5045;">1000</span>
+    link/ether <span style="color: #2a5045;">11:22:33:aa:bb:cc</span> brd ff:ff:ff:ff:ff:ff
+<span style="color: #2a5045;">3:</span> wlp3s0: &lt;BROADCAST,MULTICAST,DYNAMIC,UP,LOWER_UP&gt; mtu <span style="color: #2a5045;">1500</span> qdisc noqueue state UP group default qlen <span style="color: #2a5045;">1000</span>
+    link/ether <span style="color: #2a5045;">44:55:66:aa:bb:cc</span> brd ff:ff:ff:ff:ff:ff
+    inet <span style="color: #2a5045;">192.168.0.2/24</span> brd <span style="color: #2a5045;">192.168.0.255</span> scope global wlp3s0
        valid_lft forever preferred_lft forever
     inet6 aaaa::bbbb:111:2222:3333/64 scope link proto kernel_ll
        valid_lft forever preferred_lft forever

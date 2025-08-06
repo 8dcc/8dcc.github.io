@@ -108,15 +108,9 @@ p sup, li sup, p sub, li sub {
 
 /*----------------------------------------------------------------------------*/
 
-pre.src {
-    background: #111111;
-    color: white;
-    border: 1px solid #000000;
-}
-
 pre.src::before {
     background-color: inherit;
-    color: #888;
+    color: #999;
 }
 
 pre.src .linenr {

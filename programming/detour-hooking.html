@@ -227,16 +227,16 @@ Imagine the following <code>foo</code> function, called from <code>main</code>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>
 
-<span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">foo</span>(<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">b</span>) {
-    printf(<span style="color: #00d3d0;">"foo: </span><span style="color: #ff6f9f;">%.1f</span><span style="color: #00d3d0;"> + </span><span style="color: #ff6f9f;">%.1f</span><span style="color: #00d3d0;"> = </span><span style="color: #ff6f9f;">%.1f\n</span><span style="color: #00d3d0;">"</span>, a, b, a + b);
-    <span style="color: #ff6f9f;">return</span> a + b;
+<span style="color: #0031a9;">double</span> <span style="color: #3f578f;">foo</span>(<span style="color: #0031a9;">double</span> <span style="color: #005f5f;">a</span>, <span style="color: #0031a9;">double</span> <span style="color: #005f5f;">b</span>) {
+    printf(<span style="color: #005e8b;">"foo: </span><span style="color: #972500;">%.1f</span><span style="color: #005e8b;"> + </span><span style="color: #972500;">%.1f</span><span style="color: #005e8b;"> = </span><span style="color: #972500;">%.1f\n</span><span style="color: #005e8b;">"</span>, a, b, a + b);
+    <span style="color: #972500;">return</span> a + b;
 }
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
-    foo(<span style="color: #88ca9f;">5.0</span>, <span style="color: #88ca9f;">2.0</span>);
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">main</span>(<span style="color: #0031a9;">void</span>) {
+    foo(<span style="color: #2a5045;">5.0</span>, <span style="color: #2a5045;">2.0</span>);
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
 }
 </pre>
 </div>
@@ -263,35 +263,35 @@ First, let&rsquo;s have a look at the disassembly of this <code>foo</code> funct
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">CALL XREF from main @ 0x11b5</span>
-fcn.00001139 <span style="color: #989898;">; </span><span style="color: #989898;">fcn.00001139(int64_t arg7, int64_t arg8);</span>
-fcn.00001139 <span style="color: #989898;">;  </span><span style="color: #989898;">arg int64_t arg7 @ xmm0</span>
-fcn.00001139 <span style="color: #989898;">;  </span><span style="color: #989898;">arg int64_t arg8 @ xmm1</span>
-fcn.00001139 <span style="color: #989898;">;  </span><span style="color: #989898;">var int64_t var_18h @ stack - 0x18</span>
-fcn.00001139 <span style="color: #989898;">;  </span><span style="color: #989898;">var int64_t var_10h @ stack - 0x10</span>
-fcn.00001139         <span style="color: #88ca9f;">55</span>                      <span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">rbp</span>
-fcn.00001139+0x1     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> e5                <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rbp</span>, <span style="color: #6ae4b9;">rsp</span>
-fcn.00001139+0x4     <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">83</span> ec <span style="color: #88ca9f;">10</span>             <span style="color: #feacd0;">sub</span>     <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">0x10</span>
-fcn.00001139+0x8     f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">11</span> <span style="color: #88ca9f;">45</span> f8          <span style="color: #feacd0;">movsd</span>   <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">8</span>], <span style="color: #6ae4b9;">xmm0</span> <span style="color: #989898;">; </span><span style="color: #989898;">arg7</span>
-fcn.00001139+0xd     f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">11</span> <span style="color: #88ca9f;">4d</span> f0          <span style="color: #feacd0;">movsd</span>   <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>], <span style="color: #6ae4b9;">xmm1</span> <span style="color: #989898;">; </span><span style="color: #989898;">arg8</span>
-fcn.00001139+0x12    f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">10</span> <span style="color: #88ca9f;">45</span> f8          <span style="color: #feacd0;">movsd</span>   <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">8</span>]
-fcn.00001139+0x17    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">28</span> c8             <span style="color: #feacd0;">movapd</span>  <span style="color: #6ae4b9;">xmm1</span>, <span style="color: #6ae4b9;">xmm0</span>
-fcn.00001139+0x1b    f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">58</span> <span style="color: #88ca9f;">4d</span> f0          <span style="color: #feacd0;">addsd</span>   <span style="color: #6ae4b9;">xmm1</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>]
-fcn.00001139+0x20    f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">10</span> <span style="color: #88ca9f;">45</span> f0          <span style="color: #feacd0;">movsd</span>   <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>]
-fcn.00001139+0x25    <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8b</span> <span style="color: #88ca9f;">45</span> f8             <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">8</span>]
-fcn.00001139+0x29    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">28</span> d1             <span style="color: #feacd0;">movapd</span>  <span style="color: #6ae4b9;">xmm2</span>, <span style="color: #6ae4b9;">xmm1</span>
-fcn.00001139+0x2d    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">28</span> c8             <span style="color: #feacd0;">movapd</span>  <span style="color: #6ae4b9;">xmm1</span>, <span style="color: #6ae4b9;">xmm0</span>
-fcn.00001139+0x31    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">6e</span> c0          <span style="color: #feacd0;">movq</span>    <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #6ae4b9;">rax</span>
-fcn.00001139+0x36    <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">8d</span> <span style="color: #88ca9f;">05</span> <span style="color: #88ca9f;">92</span> <span style="color: #88ca9f;">0e</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>    <span style="color: #feacd0;">lea</span>     <span style="color: #6ae4b9;">rax</span>, [rip + str.foo]
-fcn.00001139+0x3d    <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">89</span> c7                <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">rdi</span>, <span style="color: #6ae4b9;">rax</span>          <span style="color: #989898;">; </span><span style="color: #989898;">const char *format</span>
-fcn.00001139+0x40    b8 <span style="color: #88ca9f;">03</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>          <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">3</span>
-fcn.00001139+0x45    e8 ad fe ff ff          <span style="color: #feacd0;">call</span>    sym.imp.printf    <span style="color: #989898;">; </span><span style="color: #989898;">sym.imp.printf ; int printf(const char *format)</span>
-fcn.00001139+0x4a    f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">10</span> <span style="color: #88ca9f;">45</span> f8          <span style="color: #feacd0;">movsd</span>   <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">8</span>]
-fcn.00001139+0x4f    f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">58</span> <span style="color: #88ca9f;">45</span> f0          <span style="color: #feacd0;">addsd</span>   <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>]
-fcn.00001139+0x54    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">7e</span> c0          <span style="color: #feacd0;">movq</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">xmm0</span>
-fcn.00001139+0x59    <span style="color: #88ca9f;">66</span> <span style="color: #88ca9f;">48</span> <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">6e</span> c0          <span style="color: #feacd0;">movq</span>    <span style="color: #6ae4b9;">xmm0</span>, <span style="color: #6ae4b9;">rax</span>
-fcn.00001139+0x5e    c9                      <span style="color: #feacd0;">leave</span>
-fcn.00001139+0x5f    c3                      <span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">CALL XREF from main @ 0x11b5</span>
+fcn.00001139 <span style="color: #595959;">; </span><span style="color: #595959;">fcn.00001139(int64_t arg7, int64_t arg8);</span>
+fcn.00001139 <span style="color: #595959;">;  </span><span style="color: #595959;">arg int64_t arg7 @ xmm0</span>
+fcn.00001139 <span style="color: #595959;">;  </span><span style="color: #595959;">arg int64_t arg8 @ xmm1</span>
+fcn.00001139 <span style="color: #595959;">;  </span><span style="color: #595959;">var int64_t var_18h @ stack - 0x18</span>
+fcn.00001139 <span style="color: #595959;">;  </span><span style="color: #595959;">var int64_t var_10h @ stack - 0x10</span>
+fcn.00001139         <span style="color: #2a5045;">55</span>                      <span style="color: #721045;">push</span>    <span style="color: #005f5f;">rbp</span>
+fcn.00001139+0x1     <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">89</span> e5                <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rbp</span>, <span style="color: #005f5f;">rsp</span>
+fcn.00001139+0x4     <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">83</span> ec <span style="color: #2a5045;">10</span>             <span style="color: #721045;">sub</span>     <span style="color: #005f5f;">rsp</span>, <span style="color: #2a5045;">0x10</span>
+fcn.00001139+0x8     f2 <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">11</span> <span style="color: #2a5045;">45</span> f8          <span style="color: #721045;">movsd</span>   <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">8</span>], <span style="color: #005f5f;">xmm0</span> <span style="color: #595959;">; </span><span style="color: #595959;">arg7</span>
+fcn.00001139+0xd     f2 <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">11</span> <span style="color: #2a5045;">4d</span> f0          <span style="color: #721045;">movsd</span>   <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>], <span style="color: #005f5f;">xmm1</span> <span style="color: #595959;">; </span><span style="color: #595959;">arg8</span>
+fcn.00001139+0x12    f2 <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">10</span> <span style="color: #2a5045;">45</span> f8          <span style="color: #721045;">movsd</span>   <span style="color: #005f5f;">xmm0</span>, <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">8</span>]
+fcn.00001139+0x17    <span style="color: #2a5045;">66</span> <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">28</span> c8             <span style="color: #721045;">movapd</span>  <span style="color: #005f5f;">xmm1</span>, <span style="color: #005f5f;">xmm0</span>
+fcn.00001139+0x1b    f2 <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">58</span> <span style="color: #2a5045;">4d</span> f0          <span style="color: #721045;">addsd</span>   <span style="color: #005f5f;">xmm1</span>, <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>]
+fcn.00001139+0x20    f2 <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">10</span> <span style="color: #2a5045;">45</span> f0          <span style="color: #721045;">movsd</span>   <span style="color: #005f5f;">xmm0</span>, <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>]
+fcn.00001139+0x25    <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">8b</span> <span style="color: #2a5045;">45</span> f8             <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rax</span>, <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">8</span>]
+fcn.00001139+0x29    <span style="color: #2a5045;">66</span> <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">28</span> d1             <span style="color: #721045;">movapd</span>  <span style="color: #005f5f;">xmm2</span>, <span style="color: #005f5f;">xmm1</span>
+fcn.00001139+0x2d    <span style="color: #2a5045;">66</span> <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">28</span> c8             <span style="color: #721045;">movapd</span>  <span style="color: #005f5f;">xmm1</span>, <span style="color: #005f5f;">xmm0</span>
+fcn.00001139+0x31    <span style="color: #2a5045;">66</span> <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">6e</span> c0          <span style="color: #721045;">movq</span>    <span style="color: #005f5f;">xmm0</span>, <span style="color: #005f5f;">rax</span>
+fcn.00001139+0x36    <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">8d</span> <span style="color: #2a5045;">05</span> <span style="color: #2a5045;">92</span> <span style="color: #2a5045;">0e</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>    <span style="color: #721045;">lea</span>     <span style="color: #005f5f;">rax</span>, [rip + str.foo]
+fcn.00001139+0x3d    <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">89</span> c7                <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rdi</span>, <span style="color: #005f5f;">rax</span>          <span style="color: #595959;">; </span><span style="color: #595959;">const char *format</span>
+fcn.00001139+0x40    b8 <span style="color: #2a5045;">03</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>          <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">3</span>
+fcn.00001139+0x45    e8 ad fe ff ff          <span style="color: #721045;">call</span>    sym.imp.printf    <span style="color: #595959;">; </span><span style="color: #595959;">sym.imp.printf ; int printf(const char *format)</span>
+fcn.00001139+0x4a    f2 <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">10</span> <span style="color: #2a5045;">45</span> f8          <span style="color: #721045;">movsd</span>   <span style="color: #005f5f;">xmm0</span>, <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">8</span>]
+fcn.00001139+0x4f    f2 <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">58</span> <span style="color: #2a5045;">45</span> f0          <span style="color: #721045;">addsd</span>   <span style="color: #005f5f;">xmm0</span>, <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>]
+fcn.00001139+0x54    <span style="color: #2a5045;">66</span> <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">7e</span> c0          <span style="color: #721045;">movq</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #005f5f;">xmm0</span>
+fcn.00001139+0x59    <span style="color: #2a5045;">66</span> <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">6e</span> c0          <span style="color: #721045;">movq</span>    <span style="color: #005f5f;">xmm0</span>, <span style="color: #005f5f;">rax</span>
+fcn.00001139+0x5e    c9                      <span style="color: #721045;">leave</span>
+fcn.00001139+0x5f    c3                      <span style="color: #721045;">ret</span>
 </pre>
 </div>
 
@@ -307,13 +307,13 @@ addresses is &ldquo;reversed&rdquo; because of <a href="https://en.wikipedia.org
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">x86</span>
-<span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">0x11223344</span>          <span style="color: #989898;">; </span><span style="color: #989898;">b8 44 33 22 11</span>
-<span style="color: #feacd0;">jmp</span>     <span style="color: #6ae4b9;">eax</span>                      <span style="color: #989898;">; </span><span style="color: #989898;">ff e0</span>
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">x86</span>
+<span style="color: #721045;">mov</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">0x11223344</span>          <span style="color: #595959;">; </span><span style="color: #595959;">b8 44 33 22 11</span>
+<span style="color: #721045;">jmp</span>     <span style="color: #005f5f;">eax</span>                      <span style="color: #595959;">; </span><span style="color: #595959;">ff e0</span>
 
-<span style="color: #989898;">; </span><span style="color: #989898;">x86_64</span>
-movabs  <span style="color: #6ae4b9;">rax</span>, <span style="color: #88ca9f;">0x1122334455667788</span>  <span style="color: #989898;">; </span><span style="color: #989898;">48 b8 88 77 66 55 44 33 22 11</span>
-<span style="color: #feacd0;">jmp</span>     <span style="color: #6ae4b9;">rax</span>                      <span style="color: #989898;">; </span><span style="color: #989898;">ff e0</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">x86_64</span>
+movabs  <span style="color: #005f5f;">rax</span>, <span style="color: #2a5045;">0x1122334455667788</span>  <span style="color: #595959;">; </span><span style="color: #595959;">48 b8 88 77 66 55 44 33 22 11</span>
+<span style="color: #721045;">jmp</span>     <span style="color: #005f5f;">rax</span>                      <span style="color: #595959;">; </span><span style="color: #595959;">ff e0</span>
 </pre>
 </div>
 
@@ -328,12 +328,12 @@ would be:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm">fcn.00001139         <span style="color: #88ca9f;">48</span> b8 ef be ad de <span style="color: #88ca9f;">00</span>    movabs  <span style="color: #6ae4b9;">rax</span>, <span style="color: #88ca9f;">0xDEADBEEF</span>
-fcn.00001139         <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span> <span style="color: #88ca9f;">00</span>
-fcn.00001139+0x1     ff e0                   <span style="color: #feacd0;">jmp</span>     <span style="color: #6ae4b9;">rax</span>
-fcn.00001139+0x4     f8                      <span style="color: #feacd0;">clc</span>
-fcn.00001139+0x8     f2 <span style="color: #88ca9f;">0f</span> <span style="color: #88ca9f;">11</span> <span style="color: #88ca9f;">4d</span> f0          <span style="color: #feacd0;">movsd</span>   <span style="color: #79a8ff;">qword</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>], <span style="color: #6ae4b9;">xmm1</span> <span style="color: #989898;">; </span><span style="color: #989898;">arg8</span>
-<span style="color: #989898;">; </span><span style="color: #989898;">...</span>
+<pre class="src src-nasm">fcn.00001139         <span style="color: #2a5045;">48</span> b8 ef be ad de <span style="color: #2a5045;">00</span>    movabs  <span style="color: #005f5f;">rax</span>, <span style="color: #2a5045;">0xDEADBEEF</span>
+fcn.00001139         <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>
+fcn.00001139+0x1     ff e0                   <span style="color: #721045;">jmp</span>     <span style="color: #005f5f;">rax</span>
+fcn.00001139+0x4     f8                      <span style="color: #721045;">clc</span>
+fcn.00001139+0x8     f2 <span style="color: #2a5045;">0f</span> <span style="color: #2a5045;">11</span> <span style="color: #2a5045;">4d</span> f0          <span style="color: #721045;">movsd</span>   <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>], <span style="color: #005f5f;">xmm1</span> <span style="color: #595959;">; </span><span style="color: #595959;">arg8</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">...</span>
 </pre>
 </div>
 </div>
@@ -361,16 +361,16 @@ declaration depending on the architecture with <code>#ifdef</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span>
 
-<span style="color: #ff6740;">#ifdef</span> __i386__
-<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">jmp_bytes</span>[] = { <span style="color: #88ca9f;">0xB8</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0xFF</span>, <span style="color: #88ca9f;">0xE0</span> };
-<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">JMP_BYTES_OFF</span> <span style="color: #88ca9f;">1</span> <span style="color: #989898;">/* </span><span style="color: #989898;">Offset inside the array where the ptr should go</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#else</span>
-<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">jmp_bytes</span>[] = { <span style="color: #88ca9f;">0x48</span>, <span style="color: #88ca9f;">0xB8</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>,
-                               <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0x00</span>, <span style="color: #88ca9f;">0xFF</span>, <span style="color: #88ca9f;">0xE0</span> };
-<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">JMP_BYTES_OFF</span> <span style="color: #88ca9f;">2</span> <span style="color: #989898;">/* </span><span style="color: #989898;">Offset inside the array where the ptr should go</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#endif</span>
+<span style="color: #a0132f;">#ifdef</span> __i386__
+<span style="color: #972500;">static</span> <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">jmp_bytes</span>[] = { <span style="color: #2a5045;">0xB8</span>, <span style="color: #2a5045;">0x00</span>, <span style="color: #2a5045;">0x00</span>, <span style="color: #2a5045;">0x00</span>, <span style="color: #2a5045;">0x00</span>, <span style="color: #2a5045;">0xFF</span>, <span style="color: #2a5045;">0xE0</span> };
+<span style="color: #a0132f;">#define</span> <span style="color: #005f5f;">JMP_BYTES_OFF</span> <span style="color: #2a5045;">1</span> <span style="color: #595959;">/* </span><span style="color: #595959;">Offset inside the array where the ptr should go</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#else</span>
+<span style="color: #972500;">static</span> <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">jmp_bytes</span>[] = { <span style="color: #2a5045;">0x48</span>, <span style="color: #2a5045;">0xB8</span>, <span style="color: #2a5045;">0x00</span>, <span style="color: #2a5045;">0x00</span>, <span style="color: #2a5045;">0x00</span>, <span style="color: #2a5045;">0x00</span>,
+                               <span style="color: #2a5045;">0x00</span>, <span style="color: #2a5045;">0x00</span>, <span style="color: #2a5045;">0x00</span>, <span style="color: #2a5045;">0x00</span>, <span style="color: #2a5045;">0xFF</span>, <span style="color: #2a5045;">0xE0</span> };
+<span style="color: #a0132f;">#define</span> <span style="color: #005f5f;">JMP_BYTES_OFF</span> <span style="color: #2a5045;">2</span> <span style="color: #595959;">/* </span><span style="color: #595959;">Offset inside the array where the ptr should go</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#endif</span>
 </pre>
 </div>
 
@@ -386,22 +386,22 @@ you are on windows you should use something like <code>VirtualProtect</code> (<a
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdbool.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;unistd.h&gt;</span>   <span style="color: #989898;">/* </span><span style="color: #989898;">getpagesize</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/mman.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">mprotect</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdbool.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;unistd.h&gt;</span>   <span style="color: #595959;">/* </span><span style="color: #595959;">getpagesize</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/mman.h&gt;</span> <span style="color: #595959;">/* </span><span style="color: #595959;">mprotect</span><span style="color: #595959;"> */</span>
 
-<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">protect_addr</span>(<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">ptr</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">new_flags</span>) {
-    <span style="color: #79a8ff;">long</span> <span style="color: #6ae4b9;">page_size</span>      = sysconf(_SC_PAGESIZE);
-    <span style="color: #79a8ff;">long</span> <span style="color: #6ae4b9;">page_mask</span>      = ~(page_size - <span style="color: #88ca9f;">1</span>);
-    <span style="color: #79a8ff;">uintptr_t</span> <span style="color: #6ae4b9;">next_page</span> = ((<span style="color: #79a8ff;">uintptr_t</span>)ptr + page_size - <span style="color: #88ca9f;">1</span>) &amp; page_mask;
-    <span style="color: #79a8ff;">uintptr_t</span> <span style="color: #6ae4b9;">prev_page</span> = next_page - page_size;
-    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">page</span>          = (<span style="color: #79a8ff;">void</span>*)prev_page;
+<span style="color: #972500;">static</span> <span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">protect_addr</span>(<span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">ptr</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">new_flags</span>) {
+    <span style="color: #0031a9;">long</span> <span style="color: #005f5f;">page_size</span>      = sysconf(_SC_PAGESIZE);
+    <span style="color: #0031a9;">long</span> <span style="color: #005f5f;">page_mask</span>      = ~(page_size - <span style="color: #2a5045;">1</span>);
+    <span style="color: #0031a9;">uintptr_t</span> <span style="color: #005f5f;">next_page</span> = ((<span style="color: #0031a9;">uintptr_t</span>)ptr + page_size - <span style="color: #2a5045;">1</span>) &amp; page_mask;
+    <span style="color: #0031a9;">uintptr_t</span> <span style="color: #005f5f;">prev_page</span> = next_page - page_size;
+    <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">page</span>          = (<span style="color: #0031a9;">void</span>*)prev_page;
 
-    <span style="color: #ff6f9f;">if</span> (mprotect(page, page_size, new_flags) == -<span style="color: #88ca9f;">1</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+    <span style="color: #972500;">if</span> (mprotect(page, page_size, new_flags) == -<span style="color: #2a5045;">1</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
 
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">true</span>;
 }
 </pre>
 </div>
@@ -429,10 +429,10 @@ Let&rsquo;s declare our sample hook.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">hook</span>(<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">b</span>) {
-    printf(<span style="color: #00d3d0;">"hook: intercepted </span><span style="color: #ff6f9f;">%.1f</span><span style="color: #00d3d0;"> and </span><span style="color: #ff6f9f;">%.1f\n</span><span style="color: #00d3d0;">"</span>, a, b);
-    printf(<span style="color: #00d3d0;">"hook: overwriting return value...</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">"</span>);
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">420</span>;
+<pre class="src src-C"><span style="color: #0031a9;">double</span> <span style="color: #3f578f;">hook</span>(<span style="color: #0031a9;">double</span> <span style="color: #005f5f;">a</span>, <span style="color: #0031a9;">double</span> <span style="color: #005f5f;">b</span>) {
+    printf(<span style="color: #005e8b;">"hook: intercepted </span><span style="color: #972500;">%.1f</span><span style="color: #005e8b;"> and </span><span style="color: #972500;">%.1f\n</span><span style="color: #005e8b;">"</span>, a, b);
+    printf(<span style="color: #005e8b;">"hook: overwriting return value...</span><span style="color: #972500;">\n</span><span style="color: #005e8b;">"</span>);
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">420</span>;
 }
 </pre>
 </div>
@@ -444,15 +444,15 @@ calling the original function from our hook.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;string.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;string.h&gt;</span>
 
-<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">orig_ptr</span> = &amp;foo;  <span style="color: #989898;">/* </span><span style="color: #989898;">foo(...)</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">hook_ptr</span> = &amp;hook; <span style="color: #989898;">/* </span><span style="color: #989898;">hook(...)</span><span style="color: #989898;"> */</span>
+<span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">orig_ptr</span> = &amp;foo;  <span style="color: #595959;">/* </span><span style="color: #595959;">foo(...)</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">hook_ptr</span> = &amp;hook; <span style="color: #595959;">/* </span><span style="color: #595959;">hook(...)</span><span style="color: #595959;"> */</span>
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Store first N bytes of `foo' into `saved_bytes'</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">N</span> <span style="color: #ff6f9f;">sizeof</span>(jmp_bytes)
-<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">saved_bytes</span>[N];
-<span style="color: #4ae2ff;">memcpy</span>(saved_bytes, orig_ptr, N);
+<span style="color: #595959;">/* </span><span style="color: #595959;">Store first N bytes of `foo' into `saved_bytes'</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #005f5f;">N</span> <span style="color: #972500;">sizeof</span>(jmp_bytes)
+<span style="color: #972500;">static</span> <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">saved_bytes</span>[N];
+<span style="color: #3f578f;">memcpy</span>(saved_bytes, orig_ptr, N);
 </pre>
 </div>
 
@@ -463,7 +463,7 @@ address, not the first 8 bytes of our hook function.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C">memcpy(&amp;jmp_bytes[JMP_BYTES_OFF], &amp;hook_ptr, <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #79a8ff;">void</span>*));
+<pre class="src src-C">memcpy(&amp;jmp_bytes[JMP_BYTES_OFF], &amp;hook_ptr, <span style="color: #972500;">sizeof</span>(<span style="color: #0031a9;">void</span>*));
 </pre>
 </div>
 
@@ -472,16 +472,16 @@ Now that we are set up, we can actually <b>hook</b> our function.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Try to add WRITE permissions to `orig_ptr'</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_WRITE | PROT_EXEC))
-    <span style="color: #ff6f9f;">return</span>;
+<pre class="src src-C"><span style="color: #595959;">/* </span><span style="color: #595959;">Try to add WRITE permissions to `orig_ptr'</span><span style="color: #595959;"> */</span>
+<span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_WRITE | PROT_EXEC))
+    <span style="color: #972500;">return</span>;
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Overwrite the first N bytes of `foo' with our jmp instruction</span><span style="color: #989898;"> */</span>
-<span style="color: #4ae2ff;">memcpy</span>(orig_ptr, jmp_bytes, <span style="color: #ff6f9f;">sizeof</span>(jmp_bytes));
+<span style="color: #595959;">/* </span><span style="color: #595959;">Overwrite the first N bytes of `foo' with our jmp instruction</span><span style="color: #595959;"> */</span>
+<span style="color: #3f578f;">memcpy</span>(orig_ptr, jmp_bytes, <span style="color: #972500;">sizeof</span>(jmp_bytes));
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Restore old protection, assuming it was r-x</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_EXEC))
-    <span style="color: #ff6f9f;">return</span>;
+<span style="color: #595959;">/* </span><span style="color: #595959;">Restore old protection, assuming it was r-x</span><span style="color: #595959;"> */</span>
+<span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_EXEC))
+    <span style="color: #972500;">return</span>;
 </pre>
 </div>
 
@@ -495,14 +495,14 @@ function will get called instead.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_WRITE | PROT_EXEC))
-    <span style="color: #ff6f9f;">return</span>;
+<pre class="src src-C"><span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_WRITE | PROT_EXEC))
+    <span style="color: #972500;">return</span>;
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Restore the first N bytes of `foo'</span><span style="color: #989898;"> */</span>
-<span style="color: #4ae2ff;">memcpy</span>(orig_ptr, saved_bytes, <span style="color: #ff6f9f;">sizeof</span>(saved_bytes));
+<span style="color: #595959;">/* </span><span style="color: #595959;">Restore the first N bytes of `foo'</span><span style="color: #595959;"> */</span>
+<span style="color: #3f578f;">memcpy</span>(orig_ptr, saved_bytes, <span style="color: #972500;">sizeof</span>(saved_bytes));
 
-<span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_EXEC))
-    <span style="color: #ff6f9f;">return</span>;
+<span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>protect_addr(orig_ptr, PROT_READ | PROT_EXEC))
+    <span style="color: #972500;">return</span>;
 </pre>
 </div>
 
@@ -512,13 +512,13 @@ with the intercepted parameters and hooking again.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">double</span> (*<span style="color: #79a8ff;">orig_t</span>)(<span style="color: #79a8ff;">double</span>, <span style="color: #79a8ff;">double</span>);
+<pre class="src src-C"><span style="color: #972500;">typedef</span> <span style="color: #0031a9;">double</span> (*<span style="color: #0031a9;">orig_t</span>)(<span style="color: #0031a9;">double</span>, <span style="color: #0031a9;">double</span>);
 
-<span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">result</span>;
+<span style="color: #0031a9;">double</span> <span style="color: #005f5f;">result</span>;
 
-<span style="color: #4ae2ff;">unhook</span>(orig_ptr, saved_bytes);
-result = (<span style="color: #79a8ff;">orig_t</span>)<span style="color: #4ae2ff;">orig_ptr</span>(a, b);
-<span style="color: #4ae2ff;">hook</span>(orig_ptr, jmp_bytes);
+<span style="color: #3f578f;">unhook</span>(orig_ptr, saved_bytes);
+result = (<span style="color: #0031a9;">orig_t</span>)<span style="color: #3f578f;">orig_ptr</span>(a, b);
+<span style="color: #3f578f;">hook</span>(orig_ptr, jmp_bytes);
 </pre>
 </div>
 </div>

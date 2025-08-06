@@ -344,9 +344,9 @@ For example, after the declaration:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Foo</span> {
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">n</span>;
-    <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">d</span>[]; <span style="color: #989898;">/* </span><span style="color: #989898;">Flexible array member</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #972500;">struct</span> <span style="color: #0031a9;">Foo</span> {
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">n</span>;
+    <span style="color: #0031a9;">double</span> <span style="color: #005f5f;">d</span>[]; <span style="color: #595959;">/* </span><span style="color: #595959;">Flexible array member</span><span style="color: #595959;"> */</span>
 };
 </pre>
 </div>
@@ -356,8 +356,8 @@ The structure <code>Foo</code> has a flexible array member <code>d</code>. A typ
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">m</span> = <span style="color: #989898;">/* </span><span style="color: #989898;">some value</span><span style="color: #989898;"> */</span>;
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Foo</span>* <span style="color: #6ae4b9;">p</span> = malloc(<span style="color: #ff6f9f;">sizeof</span>(<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Foo</span>) + <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #79a8ff;">double</span>[m]));
+<pre class="src src-C"><span style="color: #0031a9;">int</span> <span style="color: #005f5f;">m</span> = <span style="color: #595959;">/* </span><span style="color: #595959;">some value</span><span style="color: #595959;"> */</span>;
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">Foo</span>* <span style="color: #005f5f;">p</span> = malloc(<span style="color: #972500;">sizeof</span>(<span style="color: #972500;">struct</span> <span style="color: #0031a9;">Foo</span>) + <span style="color: #972500;">sizeof</span>(<span style="color: #0031a9;">double</span>[m]));
 </pre>
 </div>
 
@@ -367,10 +367,10 @@ behaves, for most purposes, as if <code>p</code> had been declared as:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> {
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">n</span>;
-    <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">d</span>[m];
-}* <span style="color: #6ae4b9;">p</span>;
+<pre class="src src-C"><span style="color: #972500;">struct</span> {
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">n</span>;
+    <span style="color: #0031a9;">double</span> <span style="color: #005f5f;">d</span>[m];
+}* <span style="color: #005f5f;">p</span>;
 </pre>
 </div>
 
@@ -409,14 +409,14 @@ low-order to high-order) is implementation-defined<sup><a id="fnr.8" class="foot
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Foo</span> {
-    <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">a</span> : <span style="color: #88ca9f;">3</span>;
-    <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">b</span> : <span style="color: #88ca9f;">11</span>;
+<pre class="src src-C"><span style="color: #972500;">struct</span> <span style="color: #0031a9;">Foo</span> {
+    <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">a</span> : <span style="color: #2a5045;">3</span>;
+    <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">b</span> : <span style="color: #2a5045;">11</span>;
 };
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Foo</span> <span style="color: #6ae4b9;">foo</span>;
-foo.a = <span style="color: #88ca9f;">0</span>;     <span style="color: #989898;">/* </span><span style="color: #989898;">Unnecessary</span><span style="color: #989898;"> */</span>
-foo.b = <span style="color: #88ca9f;">0x7FF</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">0b11111111111</span><span style="color: #989898;"> */</span>
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">Foo</span> <span style="color: #005f5f;">foo</span>;
+foo.a = <span style="color: #2a5045;">0</span>;     <span style="color: #595959;">/* </span><span style="color: #595959;">Unnecessary</span><span style="color: #595959;"> */</span>
+foo.b = <span style="color: #2a5045;">0x7FF</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">0b11111111111</span><span style="color: #595959;"> */</span>
 </pre>
 </div>
 
@@ -444,15 +444,15 @@ the following example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Foo</span> {
-    <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">a</span> : <span style="color: #88ca9f;">3</span>;
-    <span style="color: #88ca9f;">uint32_t</span>   : <span style="color: #88ca9f;">6</span>;
-    <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">b</span> : <span style="color: #88ca9f;">11</span>;
+<pre class="src src-C"><span style="color: #972500;">struct</span> <span style="color: #0031a9;">Foo</span> {
+    <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">a</span> : <span style="color: #2a5045;">3</span>;
+    <span style="color: #2a5045;">uint32_t</span>   : <span style="color: #2a5045;">6</span>;
+    <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">b</span> : <span style="color: #2a5045;">11</span>;
 };
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Foo</span> <span style="color: #6ae4b9;">foo</span>;
-foo.a = <span style="color: #88ca9f;">0x7</span>;   <span style="color: #989898;">/* </span><span style="color: #989898;">0b00000000111</span><span style="color: #989898;"> */</span>
-foo.b = <span style="color: #88ca9f;">0x7FF</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">0b11111111111</span><span style="color: #989898;"> */</span>
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">Foo</span> <span style="color: #005f5f;">foo</span>;
+foo.a = <span style="color: #2a5045;">0x7</span>;   <span style="color: #595959;">/* </span><span style="color: #595959;">0b00000000111</span><span style="color: #595959;"> */</span>
+foo.b = <span style="color: #2a5045;">0x7FF</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">0b11111111111</span><span style="color: #595959;"> */</span>
 </pre>
 </div>
 
@@ -475,17 +475,17 @@ bit-field, if any, was placed. Therefore, in the following example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Foo</span> {
-    <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">a</span> : <span style="color: #88ca9f;">3</span>;
-    <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">b</span> : <span style="color: #88ca9f;">11</span>;
-    <span style="color: #88ca9f;">uint32_t</span>   : <span style="color: #88ca9f;">0</span>;
-    <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">c</span> : <span style="color: #88ca9f;">5</span>;
+<pre class="src src-C"><span style="color: #972500;">struct</span> <span style="color: #0031a9;">Foo</span> {
+    <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">a</span> : <span style="color: #2a5045;">3</span>;
+    <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">b</span> : <span style="color: #2a5045;">11</span>;
+    <span style="color: #2a5045;">uint32_t</span>   : <span style="color: #2a5045;">0</span>;
+    <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">c</span> : <span style="color: #2a5045;">5</span>;
 };
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Foo</span> <span style="color: #6ae4b9;">foo</span>;
-foo.a = <span style="color: #88ca9f;">0x7</span>;   <span style="color: #989898;">/* </span><span style="color: #989898;">0b00000000111</span><span style="color: #989898;"> */</span>
-foo.b = <span style="color: #88ca9f;">0x7FF</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">0b11111111111</span><span style="color: #989898;"> */</span>
-foo.c = <span style="color: #88ca9f;">0x1F</span>;  <span style="color: #989898;">/* </span><span style="color: #989898;">0b00000011111</span><span style="color: #989898;"> */</span>
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">Foo</span> <span style="color: #005f5f;">foo</span>;
+foo.a = <span style="color: #2a5045;">0x7</span>;   <span style="color: #595959;">/* </span><span style="color: #595959;">0b00000000111</span><span style="color: #595959;"> */</span>
+foo.b = <span style="color: #2a5045;">0x7FF</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">0b11111111111</span><span style="color: #595959;"> */</span>
+foo.c = <span style="color: #2a5045;">0x1F</span>;  <span style="color: #595959;">/* </span><span style="color: #595959;">0b00000011111</span><span style="color: #595959;"> */</span>
 </pre>
 </div>
 

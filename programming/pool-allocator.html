@@ -284,12 +284,12 @@ First, let&rsquo;s have a look at the definition of <code>Chunk</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">CHUNK_SZ</span> <span style="color: #88ca9f;">64</span>
+<pre class="src src-C"><span style="color: #a0132f;">#define</span> <span style="color: #005f5f;">CHUNK_SZ</span> <span style="color: #2a5045;">64</span>
 
-<span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">union</span> <span style="color: #79a8ff;">Chunk</span> <span style="color: #79a8ff;">Chunk</span>;
-<span style="color: #ff6f9f;">union</span> <span style="color: #79a8ff;">Chunk</span> {
-    <span style="color: #79a8ff;">Chunk</span>* <span style="color: #6ae4b9;">next</span>;
-    <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">arr</span>[CHUNK_SZ];
+<span style="color: #972500;">typedef</span> <span style="color: #972500;">union</span> <span style="color: #0031a9;">Chunk</span> <span style="color: #0031a9;">Chunk</span>;
+<span style="color: #972500;">union</span> <span style="color: #0031a9;">Chunk</span> {
+    <span style="color: #0031a9;">Chunk</span>* <span style="color: #005f5f;">next</span>;
+    <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">arr</span>[CHUNK_SZ];
 };
 </pre>
 </div>
@@ -372,10 +372,10 @@ be used when the user <a href="#allocating-chunks">allocates a chunk</a>.</li>
 </ol>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Pool</span> <span style="color: #79a8ff;">Pool</span>;
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Pool</span> {
-    <span style="color: #79a8ff;">Chunk</span>* <span style="color: #6ae4b9;">free_chunk</span>;
-    <span style="color: #79a8ff;">Chunk</span>* <span style="color: #6ae4b9;">chunk_arr</span>;
+<pre class="src src-C"><span style="color: #972500;">typedef</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">Pool</span> <span style="color: #0031a9;">Pool</span>;
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">Pool</span> {
+    <span style="color: #0031a9;">Chunk</span>* <span style="color: #005f5f;">free_chunk</span>;
+    <span style="color: #0031a9;">Chunk</span>* <span style="color: #005f5f;">chunk_arr</span>;
 };
 </pre>
 </div>
@@ -396,22 +396,22 @@ chunks.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">Pool</span>* <span style="color: #4ae2ff;">pool_new</span>(<span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">pool_sz</span>) {
-    <span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span> = malloc(<span style="color: #ff6f9f;">sizeof</span>(Pool));
-    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+<pre class="src src-C"><span style="color: #0031a9;">Pool</span>* <span style="color: #3f578f;">pool_new</span>(<span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">pool_sz</span>) {
+    <span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span> = malloc(<span style="color: #972500;">sizeof</span>(Pool));
+    <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
 
-    pool-&gt;chunk_arr = pool-&gt;free_chunk = malloc(pool_sz * <span style="color: #ff6f9f;">sizeof</span>(Chunk));
-    <span style="color: #ff6f9f;">if</span> (pool-&gt;chunk_arr == <span style="color: #88ca9f;">NULL</span>) {
+    pool-&gt;chunk_arr = pool-&gt;free_chunk = malloc(pool_sz * <span style="color: #972500;">sizeof</span>(Chunk));
+    <span style="color: #972500;">if</span> (pool-&gt;chunk_arr == <span style="color: #2a5045;">NULL</span>) {
         free(pool);
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
     }
 
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; pool_sz - <span style="color: #88ca9f;">1</span>; i++)
-        pool-&gt;chunk_arr[i].next = &amp;pool-&gt;chunk_arr[i + <span style="color: #88ca9f;">1</span>];
-    pool-&gt;chunk_arr[pool_sz - <span style="color: #88ca9f;">1</span>].next = <span style="color: #88ca9f;">NULL</span>;
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">i</span> = <span style="color: #2a5045;">0</span>; i &lt; pool_sz - <span style="color: #2a5045;">1</span>; i++)
+        pool-&gt;chunk_arr[i].next = &amp;pool-&gt;chunk_arr[i + <span style="color: #2a5045;">1</span>];
+    pool-&gt;chunk_arr[pool_sz - <span style="color: #2a5045;">1</span>].next = <span style="color: #2a5045;">NULL</span>;
 
-    <span style="color: #ff6f9f;">return</span> pool;
+    <span style="color: #972500;">return</span> pool;
 }
 </pre>
 </div>
@@ -483,13 +483,13 @@ remove it from the list by setting the start of the list
 </ol>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">void</span>* <span style="color: #4ae2ff;">pool_alloc</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>) {
-    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span> || pool-&gt;free_chunk == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+<pre class="src src-C"><span style="color: #0031a9;">void</span>* <span style="color: #3f578f;">pool_alloc</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>) {
+    <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span> || pool-&gt;free_chunk == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
 
-    <span style="color: #79a8ff;">Chunk</span>* <span style="color: #6ae4b9;">result</span>    = pool-&gt;free_chunk;
+    <span style="color: #0031a9;">Chunk</span>* <span style="color: #005f5f;">result</span>    = pool-&gt;free_chunk;
     pool-&gt;free_chunk = pool-&gt;free_chunk-&gt;next;
-    <span style="color: #ff6f9f;">return</span> result;
+    <span style="color: #972500;">return</span> result;
 }
 </pre>
 </div>
@@ -525,11 +525,11 @@ process.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">pool_free</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">ptr</span>) {
-    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span> || ptr == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span>;
+<pre class="src src-C"><span style="color: #0031a9;">void</span> <span style="color: #3f578f;">pool_free</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>, <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">ptr</span>) {
+    <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span> || ptr == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span>;
 
-    <span style="color: #79a8ff;">Chunk</span>* <span style="color: #6ae4b9;">freed</span>     = ptr;
+    <span style="color: #0031a9;">Chunk</span>* <span style="color: #005f5f;">freed</span>     = ptr;
     freed-&gt;next      = pool-&gt;free_chunk;
     pool-&gt;free_chunk = freed;
 }
@@ -565,9 +565,9 @@ will get a bit trickier <a href="#changes-to-pool-new-and-pool-close">below</a>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">pool_close</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>) {
-    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span>;
+<pre class="src src-C"><span style="color: #0031a9;">void</span> <span style="color: #3f578f;">pool_close</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>) {
+    <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span>;
 
     free(pool-&gt;chunk_arr);
     free(pool);
@@ -687,10 +687,10 @@ to the start of each array.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">ArrayStart</span> <span style="color: #79a8ff;">ArrayStart</span>;
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">ArrayStart</span> {
-    <span style="color: #79a8ff;">Chunk</span>* <span style="color: #6ae4b9;">arr</span>;
-    <span style="color: #79a8ff;">ArrayStart</span>* <span style="color: #6ae4b9;">next</span>;
+<pre class="src src-C"><span style="color: #972500;">typedef</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">ArrayStart</span> <span style="color: #0031a9;">ArrayStart</span>;
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">ArrayStart</span> {
+    <span style="color: #0031a9;">Chunk</span>* <span style="color: #005f5f;">arr</span>;
+    <span style="color: #0031a9;">ArrayStart</span>* <span style="color: #005f5f;">next</span>;
 };
 </pre>
 </div>
@@ -701,9 +701,9 @@ pointer to the linked list of array starts.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">Pool</span> {
-    <span style="color: #79a8ff;">Chunk</span>* <span style="color: #6ae4b9;">free_chunk</span>;
-    <span style="color: #79a8ff;">ArrayStart</span>* <span style="color: #6ae4b9;">array_starts</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">Updated</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #972500;">struct</span> <span style="color: #0031a9;">Pool</span> {
+    <span style="color: #0031a9;">Chunk</span>* <span style="color: #005f5f;">free_chunk</span>;
+    <span style="color: #0031a9;">ArrayStart</span>* <span style="color: #005f5f;">array_starts</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">Updated</span><span style="color: #595959;"> */</span>
 };
 </pre>
 </div>
@@ -731,33 +731,33 @@ it there.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">Pool</span>* <span style="color: #4ae2ff;">pool_new</span>(<span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">pool_sz</span>) {
-    <span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span> = malloc(<span style="color: #ff6f9f;">sizeof</span>(Pool));
-    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+<pre class="src src-C"><span style="color: #0031a9;">Pool</span>* <span style="color: #3f578f;">pool_new</span>(<span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">pool_sz</span>) {
+    <span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span> = malloc(<span style="color: #972500;">sizeof</span>(Pool));
+    <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
 
-    <span style="color: #79a8ff;">Chunk</span>* <span style="color: #6ae4b9;">arr</span> = pool-&gt;free_chunk = malloc(pool_sz * <span style="color: #ff6f9f;">sizeof</span>(Chunk));
-    <span style="color: #ff6f9f;">if</span> (arr == <span style="color: #88ca9f;">NULL</span>) {
+    <span style="color: #0031a9;">Chunk</span>* <span style="color: #005f5f;">arr</span> = pool-&gt;free_chunk = malloc(pool_sz * <span style="color: #972500;">sizeof</span>(Chunk));
+    <span style="color: #972500;">if</span> (arr == <span style="color: #2a5045;">NULL</span>) {
         free(pool);
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
     }
 
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; pool_sz - <span style="color: #88ca9f;">1</span>; i++)
-        arr[i].next = &amp;arr[i + <span style="color: #88ca9f;">1</span>];
-    arr[pool_sz - <span style="color: #88ca9f;">1</span>].next = <span style="color: #88ca9f;">NULL</span>;
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">i</span> = <span style="color: #2a5045;">0</span>; i &lt; pool_sz - <span style="color: #2a5045;">1</span>; i++)
+        arr[i].next = &amp;arr[i + <span style="color: #2a5045;">1</span>];
+    arr[pool_sz - <span style="color: #2a5045;">1</span>].next = <span style="color: #2a5045;">NULL</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Added</span><span style="color: #989898;"> */</span>
-    pool-&gt;array_starts = malloc(<span style="color: #ff6f9f;">sizeof</span>(ArrayStart));
-    <span style="color: #ff6f9f;">if</span> (pool-&gt;array_starts == <span style="color: #88ca9f;">NULL</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Added</span><span style="color: #595959;"> */</span>
+    pool-&gt;array_starts = malloc(<span style="color: #972500;">sizeof</span>(ArrayStart));
+    <span style="color: #972500;">if</span> (pool-&gt;array_starts == <span style="color: #2a5045;">NULL</span>) {
         free(arr);
         free(pool);
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
     }
 
-    pool-&gt;array_starts-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+    pool-&gt;array_starts-&gt;next = <span style="color: #2a5045;">NULL</span>;
     pool-&gt;array_starts-&gt;arr  = arr;
 
-    <span style="color: #ff6f9f;">return</span> pool;
+    <span style="color: #972500;">return</span> pool;
 }
 </pre>
 </div>
@@ -768,13 +768,13 @@ list, freeing each chunk array and each <code>ArrayStart</code> structure in the
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">pool_close</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>) {
-    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span>;
+<pre class="src src-C"><span style="color: #0031a9;">void</span> <span style="color: #3f578f;">pool_close</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>) {
+    <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span>;
 
-    <span style="color: #79a8ff;">ArrayStart</span>* <span style="color: #6ae4b9;">array_start</span> = pool-&gt;array_starts;
-    <span style="color: #ff6f9f;">while</span> (array_start != <span style="color: #88ca9f;">NULL</span>) {
-        <span style="color: #79a8ff;">ArrayStart</span>* <span style="color: #6ae4b9;">next</span> = array_start-&gt;next;
+    <span style="color: #0031a9;">ArrayStart</span>* <span style="color: #005f5f;">array_start</span> = pool-&gt;array_starts;
+    <span style="color: #972500;">while</span> (array_start != <span style="color: #2a5045;">NULL</span>) {
+        <span style="color: #0031a9;">ArrayStart</span>* <span style="color: #005f5f;">next</span> = array_start-&gt;next;
         free(array_start-&gt;arr);
         free(array_start);
         array_start = next;
@@ -812,36 +812,36 @@ And this is the code corresponding to the previous steps.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">pool_expand</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">extra_sz</span>) {
-    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span> || extra_sz == <span style="color: #88ca9f;">0</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+<pre class="src src-C"><span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">pool_expand</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>, <span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">extra_sz</span>) {
+    <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span> || extra_sz == <span style="color: #2a5045;">0</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Step 1</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">Chunk</span>* <span style="color: #6ae4b9;">extra_arr</span> = malloc(extra_sz * <span style="color: #ff6f9f;">sizeof</span>(Chunk));
-    <span style="color: #ff6f9f;">if</span> (extra_arr == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Step 1</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">Chunk</span>* <span style="color: #005f5f;">extra_arr</span> = malloc(extra_sz * <span style="color: #972500;">sizeof</span>(Chunk));
+    <span style="color: #972500;">if</span> (extra_arr == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Step 2</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; extra_sz - <span style="color: #88ca9f;">1</span>; i++)
-        extra_arr[i].next = &amp;extra_arr[i + <span style="color: #88ca9f;">1</span>];
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Step 2</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">i</span> = <span style="color: #2a5045;">0</span>; i &lt; extra_sz - <span style="color: #2a5045;">1</span>; i++)
+        extra_arr[i].next = &amp;extra_arr[i + <span style="color: #2a5045;">1</span>];
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Step 3</span><span style="color: #989898;"> */</span>
-    extra_arr[extra_sz - <span style="color: #88ca9f;">1</span>].next = pool-&gt;free_chunk;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Step 3</span><span style="color: #595959;"> */</span>
+    extra_arr[extra_sz - <span style="color: #2a5045;">1</span>].next = pool-&gt;free_chunk;
     pool-&gt;free_chunk             = extra_arr;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Step 4</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">ArrayStart</span>* <span style="color: #6ae4b9;">array_start</span> = malloc(<span style="color: #ff6f9f;">sizeof</span>(ArrayStart));
-    <span style="color: #ff6f9f;">if</span> (array_start == <span style="color: #88ca9f;">NULL</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Step 4</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">ArrayStart</span>* <span style="color: #005f5f;">array_start</span> = malloc(<span style="color: #972500;">sizeof</span>(ArrayStart));
+    <span style="color: #972500;">if</span> (array_start == <span style="color: #2a5045;">NULL</span>) {
         free(extra_arr);
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
     }
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Step 5</span><span style="color: #989898;"> */</span>
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Step 5</span><span style="color: #595959;"> */</span>
     array_start-&gt;arr   = extra_arr;
     array_start-&gt;next  = pool-&gt;array_starts;
     pool-&gt;array_starts = array_start;
 
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">true</span>;
 }
 </pre>
 </div>
@@ -893,8 +893,8 @@ some <code>valgrind-devel</code> package, depending on your distribution.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;valgrind/valgrind.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;valgrind/memcheck.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;valgrind/valgrind.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;valgrind/memcheck.h&gt;</span>
 </pre>
 </div>
 
@@ -927,74 +927,74 @@ With all that in mind, this is how our new code would look like:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">Pool</span>* <span style="color: #4ae2ff;">pool_new</span>(<span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">pool_sz</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">chunk_sz</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #0031a9;">Pool</span>* <span style="color: #3f578f;">pool_new</span>(<span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">pool_sz</span>, <span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">chunk_sz</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 
     VALGRIND_MAKE_MEM_NOACCESS(arr, pool_sz * chunk_sz);
-    VALGRIND_MAKE_MEM_NOACCESS(pool-&gt;array_starts, <span style="color: #ff6f9f;">sizeof</span>(ArrayStart));
-    VALGRIND_MAKE_MEM_NOACCESS(pool, <span style="color: #ff6f9f;">sizeof</span>(Pool));
-    VALGRIND_CREATE_MEMPOOL(pool, <span style="color: #88ca9f;">0</span>, <span style="color: #88ca9f;">0</span>);
+    VALGRIND_MAKE_MEM_NOACCESS(pool-&gt;array_starts, <span style="color: #972500;">sizeof</span>(ArrayStart));
+    VALGRIND_MAKE_MEM_NOACCESS(pool, <span style="color: #972500;">sizeof</span>(Pool));
+    VALGRIND_CREATE_MEMPOOL(pool, <span style="color: #2a5045;">0</span>, <span style="color: #2a5045;">0</span>);
 
-    <span style="color: #ff6f9f;">return</span> pool;
+    <span style="color: #972500;">return</span> pool;
 }
 
-<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">pool_expand</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">extra_sz</span>) {
-    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span> || extra_sz == <span style="color: #88ca9f;">0</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+<span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">pool_expand</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>, <span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">extra_sz</span>) {
+    <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span> || extra_sz == <span style="color: #2a5045;">0</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
 
-    VALGRIND_MAKE_MEM_DEFINED(pool, <span style="color: #ff6f9f;">sizeof</span>(Pool));
+    VALGRIND_MAKE_MEM_DEFINED(pool, <span style="color: #972500;">sizeof</span>(Pool));
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 
     VALGRIND_MAKE_MEM_NOACCESS(extra_arr, extra_sz * pool-&gt;chunk_sz);
-    VALGRIND_MAKE_MEM_NOACCESS(array_start, <span style="color: #ff6f9f;">sizeof</span>(ArrayStart));
-    VALGRIND_MAKE_MEM_NOACCESS(pool, <span style="color: #ff6f9f;">sizeof</span>(Pool));
+    VALGRIND_MAKE_MEM_NOACCESS(array_start, <span style="color: #972500;">sizeof</span>(ArrayStart));
+    VALGRIND_MAKE_MEM_NOACCESS(pool, <span style="color: #972500;">sizeof</span>(Pool));
 
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">true</span>;
 }
 
-<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">pool_close</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>) {
-    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span>;
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">pool_close</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>) {
+    <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span>;
 
-    VALGRIND_MAKE_MEM_DEFINED(pool, <span style="color: #ff6f9f;">sizeof</span>(Pool));
+    VALGRIND_MAKE_MEM_DEFINED(pool, <span style="color: #972500;">sizeof</span>(Pool));
 
-    <span style="color: #79a8ff;">ArrayStart</span>* <span style="color: #6ae4b9;">array_start</span> = pool-&gt;array_starts;
-    <span style="color: #ff6f9f;">while</span> (array_start != <span style="color: #88ca9f;">NULL</span>) {
-        VALGRIND_MAKE_MEM_DEFINED(array_start, <span style="color: #ff6f9f;">sizeof</span>(ArrayStart));
-        <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+    <span style="color: #0031a9;">ArrayStart</span>* <span style="color: #005f5f;">array_start</span> = pool-&gt;array_starts;
+    <span style="color: #972500;">while</span> (array_start != <span style="color: #2a5045;">NULL</span>) {
+        VALGRIND_MAKE_MEM_DEFINED(array_start, <span style="color: #972500;">sizeof</span>(ArrayStart));
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
     }
 
     VALGRIND_DESTROY_MEMPOOL(pool);
     free(pool);
 }
 
-<span style="color: #79a8ff;">void</span>* <span style="color: #4ae2ff;">pool_alloc</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>) {
-    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
-    VALGRIND_MAKE_MEM_DEFINED(pool, <span style="color: #ff6f9f;">sizeof</span>(Pool));
+<span style="color: #0031a9;">void</span>* <span style="color: #3f578f;">pool_alloc</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>) {
+    <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
+    VALGRIND_MAKE_MEM_DEFINED(pool, <span style="color: #972500;">sizeof</span>(Pool));
 
-    <span style="color: #ff6f9f;">if</span> (pool-&gt;free_chunk == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
-    VALGRIND_MAKE_MEM_DEFINED(pool-&gt;free_chunk, <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #79a8ff;">void</span>**));
+    <span style="color: #972500;">if</span> (pool-&gt;free_chunk == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
+    VALGRIND_MAKE_MEM_DEFINED(pool-&gt;free_chunk, <span style="color: #972500;">sizeof</span>(<span style="color: #0031a9;">void</span>**));
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 
     VALGRIND_MEMPOOL_ALLOC(pool, result, pool-&gt;chunk_sz);
-    VALGRIND_MAKE_MEM_NOACCESS(pool-&gt;free_chunk, <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #79a8ff;">void</span>**));
-    VALGRIND_MAKE_MEM_NOACCESS(pool, <span style="color: #ff6f9f;">sizeof</span>(Pool));
-    <span style="color: #ff6f9f;">return</span> result;
+    VALGRIND_MAKE_MEM_NOACCESS(pool-&gt;free_chunk, <span style="color: #972500;">sizeof</span>(<span style="color: #0031a9;">void</span>**));
+    VALGRIND_MAKE_MEM_NOACCESS(pool, <span style="color: #972500;">sizeof</span>(Pool));
+    <span style="color: #972500;">return</span> result;
 }
 
-<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">pool_free</span>(<span style="color: #79a8ff;">Pool</span>* <span style="color: #6ae4b9;">pool</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">ptr</span>) {
-    <span style="color: #ff6f9f;">if</span> (pool == <span style="color: #88ca9f;">NULL</span> || ptr == <span style="color: #88ca9f;">NULL</span>)
-        <span style="color: #ff6f9f;">return</span>;
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">pool_free</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>, <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">ptr</span>) {
+    <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span> || ptr == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span>;
 
-    VALGRIND_MAKE_MEM_DEFINED(pool, <span style="color: #ff6f9f;">sizeof</span>(Pool));
+    VALGRIND_MAKE_MEM_DEFINED(pool, <span style="color: #972500;">sizeof</span>(Pool));
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 
-    VALGRIND_MAKE_MEM_NOACCESS(pool, <span style="color: #ff6f9f;">sizeof</span>(Pool));
+    VALGRIND_MAKE_MEM_NOACCESS(pool, <span style="color: #972500;">sizeof</span>(Pool));
     VALGRIND_MEMPOOL_FREE(pool, ptr);
 }
 </pre>

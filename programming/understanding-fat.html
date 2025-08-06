@@ -1166,11 +1166,11 @@ number of bytes per sector, and rounding up:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_bytes</span> =
-    bpb-&gt;root_dir_entry_count * <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">DirectoryEntry</span>);
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_bytes</span> =
+    bpb-&gt;root_dir_entry_count * <span style="color: #972500;">sizeof</span>(<span style="color: #972500;">struct</span> <span style="color: #0031a9;">DirectoryEntry</span>);
 
-<span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_sectors</span> = root_dir_bytes / bpb-&gt;bytes_per_sector;
-<span style="color: #ff6f9f;">if</span> (root_dir_bytes % bpb-&gt;bytes_per_sector != <span style="color: #88ca9f;">0</span>)
+<span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_sectors</span> = root_dir_bytes / bpb-&gt;bytes_per_sector;
+<span style="color: #972500;">if</span> (root_dir_bytes % bpb-&gt;bytes_per_sector != <span style="color: #2a5045;">0</span>)
     root_dir_sectors++;
 </pre>
 </div>
@@ -1182,11 +1182,11 @@ integer division:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_bytes</span> =
-    bpb-&gt;root_dir_entry_count * <span style="color: #ff6f9f;">sizeof</span>(<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">DirectoryEntry</span>);
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_bytes</span> =
+    bpb-&gt;root_dir_entry_count * <span style="color: #972500;">sizeof</span>(<span style="color: #972500;">struct</span> <span style="color: #0031a9;">DirectoryEntry</span>);
 
-<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_sectors</span> =
-  (root_dir_bytes + (bpb-&gt;bytes_per_sector - <span style="color: #88ca9f;">1</span>)) /
+<span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_sectors</span> =
+  (root_dir_bytes + (bpb-&gt;bytes_per_sector - <span style="color: #2a5045;">1</span>)) /
     bpb-&gt;bytes_per_sector;
 </pre>
 </div>
@@ -1219,15 +1219,15 @@ zero in FAT32.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">sectors_per_fat</span> = (bpb-&gt;sectors_per_fat_16 == <span style="color: #88ca9f;">0</span>)
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">sectors_per_fat</span> = (bpb-&gt;sectors_per_fat_16 == <span style="color: #2a5045;">0</span>)
                                  ? bpb-&gt;sectors_per_fat_16
                                  : ebpb-&gt;sectors_per_fat_32;
 
-<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint16_t</span> <span style="color: #6ae4b9;">reserved_sectors</span>  = bpb-&gt;reserved_sectors;
-<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">total_fat_sectors</span> = bpb-&gt;fat_count * sectors_per_fat;
-<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">root_dir_sectors</span>  = <span style="color: #989898;">/* </span><span style="color: #989898;">Shown above</span><span style="color: #989898;"> */</span>;
+<span style="color: #972500;">const</span> <span style="color: #0031a9;">uint16_t</span> <span style="color: #005f5f;">reserved_sectors</span>  = bpb-&gt;reserved_sectors;
+<span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">total_fat_sectors</span> = bpb-&gt;fat_count * sectors_per_fat;
+<span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">root_dir_sectors</span>  = <span style="color: #595959;">/* </span><span style="color: #595959;">Shown above</span><span style="color: #595959;"> */</span>;
 
-<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #6ae4b9;">first_data_sector</span> =
+<span style="color: #972500;">const</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">first_data_sector</span> =
   reserved_sectors + total_fat_sectors + root_dir_sectors;
 </pre>
 </div>

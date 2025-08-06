@@ -580,11 +580,11 @@ setting the following variables, and then running <code>M-x gdb</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #989898;">; </span><span style="color: #989898;">Launch in the Many Windows layout.</span>
-<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">setq</span> gdb-many-windows t<span style="color: #ff5f59;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #595959;">; </span><span style="color: #595959;">Launch in the Many Windows layout.</span>
+<span style="color: #a60000;">(</span><span style="color: #972500;">setq</span> gdb-many-windows t<span style="color: #a60000;">)</span>
 
-<span style="color: #989898;">; </span><span style="color: #989898;">Restore previous windows when GDB stops</span>
-<span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">setq</span> gdb-restore-window-configuration-after-quit 'if-gdb-many-windows<span style="color: #ff5f59;">)</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">Restore previous windows when GDB stops</span>
+<span style="color: #a60000;">(</span><span style="color: #972500;">setq</span> gdb-restore-window-configuration-after-quit 'if-gdb-many-windows<span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -924,15 +924,15 @@ For example, if you had this C code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdlib.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdlib.h&gt;</span>
 
-<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">MY_PATH</span> <span style="color: #00d3d0;">"file.txt"</span>
-<span style="color: #ff6740;">#define</span> <span style="color: #4ae2ff;">MY_MACRO</span>(<span style="color: #6ae4b9;">X</span>, <span style="color: #6ae4b9;">Y</span>)                          \
-    <span style="color: #ff6f9f;">do</span> {                                        \
-        func(<span style="color: #88ca9f;">0x10</span>, MY_PATH, <span style="color: #88ca9f;">NULL</span>);              \
-    } <span style="color: #ff6f9f;">while</span> (X++ &lt; Y)
+<span style="color: #a0132f;">#define</span> <span style="color: #005f5f;">MY_PATH</span> <span style="color: #005e8b;">"file.txt"</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #3f578f;">MY_MACRO</span>(<span style="color: #005f5f;">X</span>, <span style="color: #005f5f;">Y</span>)                          \
+    <span style="color: #972500;">do</span> {                                        \
+        func(<span style="color: #2a5045;">0x10</span>, MY_PATH, <span style="color: #2a5045;">NULL</span>);              \
+    } <span style="color: #972500;">while</span> (X++ &lt; Y)
 
-<span style="color: #4ae2ff;">MY_MACRO</span>(i, <span style="color: #88ca9f;">30</span>);
+<span style="color: #3f578f;">MY_MACRO</span>(i, <span style="color: #2a5045;">30</span>);
 </pre>
 </div>
 
@@ -942,9 +942,9 @@ in the region recursively (in this case <code>MY_MACRO</code>, <code>MY_PATH</co
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">do</span> {
-    func(<span style="color: #88ca9f;">0x10</span>, <span style="color: #00d3d0;">"file.txt"</span>, ((<span style="color: #79a8ff;">void</span>*)<span style="color: #88ca9f;">0</span>));
-} <span style="color: #ff6f9f;">while</span> (i++ &lt; <span style="color: #88ca9f;">30</span>);
+<pre class="src src-C"><span style="color: #972500;">do</span> {
+    func(<span style="color: #2a5045;">0x10</span>, <span style="color: #005e8b;">"file.txt"</span>, ((<span style="color: #0031a9;">void</span>*)<span style="color: #2a5045;">0</span>));
+} <span style="color: #972500;">while</span> (i++ &lt; <span style="color: #2a5045;">30</span>);
 </pre>
 </div>
 
@@ -1209,8 +1209,8 @@ disable it by setting <code>eglot-stay-out-of</code>, and replace it with <a hre
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #ff5f59;">(</span><span style="color: #ff6f9f;">with-eval-after-load</span> 'eglot
-  <span style="color: #cabf00;">(</span>add-to-list 'eglot-stay-out-of 'flymake<span style="color: #cabf00;">)</span><span style="color: #ff5f59;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #a60000;">(</span><span style="color: #972500;">with-eval-after-load</span> 'eglot
+  <span style="color: #695500;">(</span>add-to-list 'eglot-stay-out-of 'flymake<span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 

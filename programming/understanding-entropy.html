@@ -668,40 +668,40 @@ This C function shows how to calculate the entropy of an array of bytes.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #44bc44; font-weight: bold;">NOTE:</span><span style="color: #989898;"> Remember to link with -lm</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #595959;">/* </span><span style="color: #006800; font-weight: bold;">NOTE:</span><span style="color: #595959;"> Remember to link with -lm</span><span style="color: #595959;"> */</span>
 
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stddef.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">size_t</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">uint8_t</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;math.h&gt;</span>   <span style="color: #989898;">/* </span><span style="color: #989898;">log2()</span><span style="color: #989898;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stddef.h&gt;</span> <span style="color: #595959;">/* </span><span style="color: #595959;">size_t</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span> <span style="color: #595959;">/* </span><span style="color: #595959;">uint8_t</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;math.h&gt;</span>   <span style="color: #595959;">/* </span><span style="color: #595959;">log2()</span><span style="color: #595959;"> */</span>
 
-<span style="color: #79a8ff;">double</span> <span style="color: #4ae2ff;">entropy</span>(<span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">data</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">data_sz</span>) {
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">occurrences</span>[<span style="color: #88ca9f;">256</span>];
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; <span style="color: #88ca9f;">256</span>; i++)
-        occurrences[i] = <span style="color: #88ca9f;">0</span>;
+<span style="color: #0031a9;">double</span> <span style="color: #3f578f;">entropy</span>(<span style="color: #0031a9;">uint8_t</span>* <span style="color: #005f5f;">data</span>, <span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">data_sz</span>) {
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">occurrences</span>[<span style="color: #2a5045;">256</span>];
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">i</span> = <span style="color: #2a5045;">0</span>; i &lt; <span style="color: #2a5045;">256</span>; i++)
+        occurrences[i] = <span style="color: #2a5045;">0</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Count the occurrences of each byte in the input</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; data_sz; i++) {
-        <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">byte</span> = data[i];
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Count the occurrences of each byte in the input</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">i</span> = <span style="color: #2a5045;">0</span>; i &lt; data_sz; i++) {
+        <span style="color: #972500;">const</span> <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">byte</span> = data[i];
         occurrences[byte]++;
     }
 
-    <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">result</span> = <span style="color: #88ca9f;">0.0</span>;
+    <span style="color: #0031a9;">double</span> <span style="color: #005f5f;">result</span> = <span style="color: #2a5045;">0.0</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate each possible value in the [00..FF] range</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">byte</span> = <span style="color: #88ca9f;">0</span>; byte &lt; <span style="color: #88ca9f;">256</span>; byte++) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Ignore this byte if there were no occurrences</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">if</span> (occurrences[byte] == <span style="color: #88ca9f;">0</span>)
-            <span style="color: #ff6f9f;">continue</span>;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Iterate each possible value in the [00..FF] range</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">byte</span> = <span style="color: #2a5045;">0</span>; byte &lt; <span style="color: #2a5045;">256</span>; byte++) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Ignore this byte if there were no occurrences</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">if</span> (occurrences[byte] == <span style="color: #2a5045;">0</span>)
+            <span style="color: #972500;">continue</span>;
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Probablity of encountering this byte on the input</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">double</span> <span style="color: #6ae4b9;">probability</span> = (<span style="color: #79a8ff;">double</span>)occurrences[byte] / data_sz;
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Probablity of encountering this byte on the input</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">const</span> <span style="color: #0031a9;">double</span> <span style="color: #005f5f;">probability</span> = (<span style="color: #0031a9;">double</span>)occurrences[byte] / data_sz;
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Since the log2 of [0..1] is always negative, we subtract from the</span>
-<span style="color: #989898;">         * total to increase its value.</span><span style="color: #989898;"> */</span>
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Since the log2 of [0..1] is always negative, we subtract from the</span>
+<span style="color: #595959;">         * total to increase its value.</span><span style="color: #595959;"> */</span>
         result -= probability * log2(probability);
     }
 
-    <span style="color: #ff6f9f;">return</span> result;
+    <span style="color: #972500;">return</span> result;
 }
 </pre>
 </div>

@@ -432,44 +432,44 @@ the <code>out</code> pointer.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;string.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;string.h&gt;</span>
 
-<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">KEY_LEN</span> <span style="color: #88ca9f;">20</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #005f5f;">KEY_LEN</span> <span style="color: #2a5045;">20</span>
 
-<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">generate_key</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">user</span>, <span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">out</span>) {
-    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">user_len</span> = strlen(user);
+<span style="color: #972500;">static</span> <span style="color: #0031a9;">void</span> <span style="color: #3f578f;">generate_key</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">user</span>, <span style="color: #0031a9;">uint8_t</span>* <span style="color: #005f5f;">out</span>) {
+    <span style="color: #972500;">const</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">user_len</span> = strlen(user);
 
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">key_pos</span>          = <span style="color: #88ca9f;">0</span>;
-    <span style="color: #79a8ff;">unsigned</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">last_c</span> = <span style="color: #88ca9f;">0</span>;
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">key_pos</span>          = <span style="color: #2a5045;">0</span>;
+    <span style="color: #0031a9;">unsigned</span> <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">last_c</span> = <span style="color: #2a5045;">0</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate the user KEY_LEN+1 times</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">iter</span> = <span style="color: #88ca9f;">0</span>; iter &lt; KEY_LEN + <span style="color: #88ca9f;">1</span>; iter++) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate the user</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">user_pos</span> = <span style="color: #88ca9f;">0</span>; user[user_pos] != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>; user_pos++) {
-            <span style="color: #79a8ff;">unsigned</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span> = user[user_pos];
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Iterate the user KEY_LEN+1 times</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">iter</span> = <span style="color: #2a5045;">0</span>; iter &lt; KEY_LEN + <span style="color: #2a5045;">1</span>; iter++) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Iterate the user</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">user_pos</span> = <span style="color: #2a5045;">0</span>; user[user_pos] != <span style="color: #005e8b;">'</span><span style="color: #972500;">\0</span><span style="color: #005e8b;">'</span>; user_pos++) {
+            <span style="color: #0031a9;">unsigned</span> <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">c</span> = user[user_pos];
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Swap every bit pair with the adjactent pair</span><span style="color: #989898;"> */</span>
-            c = ((c &amp; <span style="color: #88ca9f;">0x33333333</span>) &lt;&lt; <span style="color: #88ca9f;">2</span>) | ((c &amp; <span style="color: #88ca9f;">0xCCCCCCCC</span>) &gt;&gt; <span style="color: #88ca9f;">2</span>);
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Swap every bit pair with the adjactent pair</span><span style="color: #595959;"> */</span>
+            c = ((c &amp; <span style="color: #2a5045;">0x33333333</span>) &lt;&lt; <span style="color: #2a5045;">2</span>) | ((c &amp; <span style="color: #2a5045;">0xCCCCCCCC</span>) &gt;&gt; <span style="color: #2a5045;">2</span>);
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Swap every bit with the adjactent one</span><span style="color: #989898;"> */</span>
-            c = ((c &amp; <span style="color: #88ca9f;">0x55555555</span>) &lt;&lt; <span style="color: #88ca9f;">1</span>) | ((c &amp; <span style="color: #88ca9f;">0xAAAAAAAA</span>) &gt;&gt; <span style="color: #88ca9f;">1</span>);
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Swap every bit with the adjactent one</span><span style="color: #595959;"> */</span>
+            c = ((c &amp; <span style="color: #2a5045;">0x55555555</span>) &lt;&lt; <span style="color: #2a5045;">1</span>) | ((c &amp; <span style="color: #2a5045;">0xAAAAAAAA</span>) &gt;&gt; <span style="color: #2a5045;">1</span>);
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Also change depending on previous char and iteration</span><span style="color: #989898;"> */</span>
-            c ^= (last_c * iter) % <span style="color: #88ca9f;">0xFF</span>;
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Also change depending on previous char and iteration</span><span style="color: #595959;"> */</span>
+            c ^= (last_c * iter) % <span style="color: #2a5045;">0xFF</span>;
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Depending on the length of the input, change the output</span><span style="color: #989898;"> */</span>
-            c ^= user_len &amp; <span style="color: #88ca9f;">0xFF</span>;
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Depending on the length of the input, change the output</span><span style="color: #595959;"> */</span>
+            c ^= user_len &amp; <span style="color: #2a5045;">0xFF</span>;
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Save current character for next iteration</span><span style="color: #989898;"> */</span>
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Save current character for next iteration</span><span style="color: #595959;"> */</span>
             last_c = c;
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Write the char to the current position</span><span style="color: #989898;"> */</span>
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Write the char to the current position</span><span style="color: #595959;"> */</span>
             out[key_pos++] = c;
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Don't overflow the key</span><span style="color: #989898;"> */</span>
-            <span style="color: #ff6f9f;">if</span> (key_pos &gt;= KEY_LEN)
-                key_pos = <span style="color: #88ca9f;">0</span>;
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Don't overflow the key</span><span style="color: #595959;"> */</span>
+            <span style="color: #972500;">if</span> (key_pos &gt;= KEY_LEN)
+                key_pos = <span style="color: #2a5045;">0</span>;
         }
     }
 }
@@ -481,25 +481,25 @@ This is an example of a simple keygen program:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">argc</span>, <span style="color: #79a8ff;">char</span>** <span style="color: #6ae4b9;">argv</span>) {
-    <span style="color: #ff6f9f;">if</span> (argc &lt; <span style="color: #88ca9f;">2</span>) {
-        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Usage: </span><span style="color: #ff6f9f;">%s</span><span style="color: #00d3d0;"> &lt;username&gt;</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">"</span>, argv[<span style="color: #88ca9f;">0</span>]);
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">1</span>;
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">main</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">argc</span>, <span style="color: #0031a9;">char</span>** <span style="color: #005f5f;">argv</span>) {
+    <span style="color: #972500;">if</span> (argc &lt; <span style="color: #2a5045;">2</span>) {
+        fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Usage: </span><span style="color: #972500;">%s</span><span style="color: #005e8b;"> &lt;username&gt;</span><span style="color: #972500;">\n</span><span style="color: #005e8b;">"</span>, argv[<span style="color: #2a5045;">0</span>]);
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">1</span>;
     }
 
-    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">username</span> = argv[<span style="color: #88ca9f;">1</span>];
-    <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">key</span>[KEY_LEN] = { <span style="color: #88ca9f;">0</span> };
+    <span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">username</span> = argv[<span style="color: #2a5045;">1</span>];
+    <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">key</span>[KEY_LEN] = { <span style="color: #2a5045;">0</span> };
 
     generate_key(username, key);
 
-    printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%s</span><span style="color: #00d3d0;"> : "</span>, username);
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; KEY_LEN; i++)
-        printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%02x</span><span style="color: #00d3d0;">"</span>, key[i]);
-    putchar(<span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">'</span>);
+    printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%s</span><span style="color: #005e8b;"> : "</span>, username);
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">i</span> = <span style="color: #2a5045;">0</span>; i &lt; KEY_LEN; i++)
+        printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%02x</span><span style="color: #005e8b;">"</span>, key[i]);
+    putchar(<span style="color: #005e8b;">'</span><span style="color: #972500;">\n</span><span style="color: #005e8b;">'</span>);
 
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
 }
 </pre>
 </div>
@@ -530,48 +530,48 @@ shifting) with the lower one.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.c&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.c&gt;</span>
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">(KEY_LEN * 2) + '\0'</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">STR_KEY_LEN</span> <span style="color: #88ca9f;">41</span>
+<span style="color: #595959;">/* </span><span style="color: #595959;">(KEY_LEN * 2) + '\0'</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #005f5f;">STR_KEY_LEN</span> <span style="color: #2a5045;">41</span>
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">'f' -&gt; 15</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6f9f;">static</span> <span style="color: #ff6f9f;">inline</span> <span style="color: #79a8ff;">int8_t</span> <span style="color: #4ae2ff;">char2nibble</span>(<span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span>) {
-    <span style="color: #ff6f9f;">if</span> (c &gt;= <span style="color: #00d3d0;">'0'</span> &amp;&amp; c &lt;= <span style="color: #00d3d0;">'9'</span>)
-        <span style="color: #ff6f9f;">return</span> c - <span style="color: #00d3d0;">'0'</span>;
-    <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (c &gt;= <span style="color: #00d3d0;">'a'</span> &amp;&amp; c &lt;= <span style="color: #00d3d0;">'f'</span>)
-        <span style="color: #ff6f9f;">return</span> c - <span style="color: #00d3d0;">'a'</span> + <span style="color: #88ca9f;">10</span>;
-    <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (c &gt;= <span style="color: #00d3d0;">'A'</span> &amp;&amp; c &lt;= <span style="color: #00d3d0;">'F'</span>)
-        <span style="color: #ff6f9f;">return</span> c - <span style="color: #00d3d0;">'A'</span> + <span style="color: #88ca9f;">10</span>;
-    <span style="color: #ff6f9f;">else</span>
-        <span style="color: #ff6f9f;">return</span> -<span style="color: #88ca9f;">1</span>;
+<span style="color: #595959;">/* </span><span style="color: #595959;">'f' -&gt; 15</span><span style="color: #595959;"> */</span>
+<span style="color: #972500;">static</span> <span style="color: #972500;">inline</span> <span style="color: #0031a9;">int8_t</span> <span style="color: #3f578f;">char2nibble</span>(<span style="color: #0031a9;">char</span> <span style="color: #005f5f;">c</span>) {
+    <span style="color: #972500;">if</span> (c &gt;= <span style="color: #005e8b;">'0'</span> &amp;&amp; c &lt;= <span style="color: #005e8b;">'9'</span>)
+        <span style="color: #972500;">return</span> c - <span style="color: #005e8b;">'0'</span>;
+    <span style="color: #972500;">else</span> <span style="color: #972500;">if</span> (c &gt;= <span style="color: #005e8b;">'a'</span> &amp;&amp; c &lt;= <span style="color: #005e8b;">'f'</span>)
+        <span style="color: #972500;">return</span> c - <span style="color: #005e8b;">'a'</span> + <span style="color: #2a5045;">10</span>;
+    <span style="color: #972500;">else</span> <span style="color: #972500;">if</span> (c &gt;= <span style="color: #005e8b;">'A'</span> &amp;&amp; c &lt;= <span style="color: #005e8b;">'F'</span>)
+        <span style="color: #972500;">return</span> c - <span style="color: #005e8b;">'A'</span> + <span style="color: #2a5045;">10</span>;
+    <span style="color: #972500;">else</span>
+        <span style="color: #972500;">return</span> -<span style="color: #2a5045;">1</span>;
 }
 
-<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">read_key</span>(<span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">out</span>) {
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">out_pos</span> = <span style="color: #88ca9f;">0</span>;
+<span style="color: #972500;">static</span> <span style="color: #0031a9;">void</span> <span style="color: #3f578f;">read_key</span>(<span style="color: #0031a9;">uint8_t</span>* <span style="color: #005f5f;">out</span>) {
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">out_pos</span> = <span style="color: #2a5045;">0</span>;
 
-    <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">key</span>[STR_KEY_LEN] = { <span style="color: #88ca9f;">0</span> };
-    scanf(<span style="color: #00d3d0;">"%41s"</span>, key);
+    <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">key</span>[STR_KEY_LEN] = { <span style="color: #2a5045;">0</span> };
+    scanf(<span style="color: #005e8b;">"%41s"</span>, key);
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">"3f5d" -&gt; { 0x3f, 0x5d }</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; key[i] != <span style="color: #00d3d0;">'\0'</span>; i++) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">First half of the byte: '3' -&gt; 3</span><span style="color: #989898;"> */</span>
-        <span style="color: #79a8ff;">int8_t</span> <span style="color: #6ae4b9;">nibble</span> = char2nibble(key[i]);
-        <span style="color: #ff6f9f;">if</span> (nibble == -<span style="color: #88ca9f;">1</span>)
-            <span style="color: #ff6f9f;">break</span>;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">"3f5d" -&gt; { 0x3f, 0x5d }</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">i</span> = <span style="color: #2a5045;">0</span>; key[i] != <span style="color: #005e8b;">'\0'</span>; i++) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">First half of the byte: '3' -&gt; 3</span><span style="color: #595959;"> */</span>
+        <span style="color: #0031a9;">int8_t</span> <span style="color: #005f5f;">nibble</span> = char2nibble(key[i]);
+        <span style="color: #972500;">if</span> (nibble == -<span style="color: #2a5045;">1</span>)
+            <span style="color: #972500;">break</span>;
         out[out_pos] = nibble;
 
         i++;
-        <span style="color: #ff6f9f;">if</span> (key[i] == <span style="color: #00d3d0;">'\0'</span>)
-            <span style="color: #ff6f9f;">break</span>;
+        <span style="color: #972500;">if</span> (key[i] == <span style="color: #005e8b;">'\0'</span>)
+            <span style="color: #972500;">break</span>;
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Move previous bits to higher half of byte</span><span style="color: #989898;"> */</span>
-        out[out_pos] &lt;&lt;= <span style="color: #88ca9f;">4</span>;
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Move previous bits to higher half of byte</span><span style="color: #595959;"> */</span>
+        out[out_pos] &lt;&lt;= <span style="color: #2a5045;">4</span>;
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Second half of the byte: 'f' -&gt; 15</span><span style="color: #989898;"> */</span>
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Second half of the byte: 'f' -&gt; 15</span><span style="color: #595959;"> */</span>
         nibble = char2nibble(key[i]);
-        <span style="color: #ff6f9f;">if</span> (nibble == -<span style="color: #88ca9f;">1</span>)
-            <span style="color: #ff6f9f;">break</span>;
+        <span style="color: #972500;">if</span> (nibble == -<span style="color: #2a5045;">1</span>)
+            <span style="color: #972500;">break</span>;
         out[out_pos] |= nibble;
 
         out_pos++;
@@ -587,31 +587,31 @@ loop, and store if they match.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdbool.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdbool.h&gt;</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
-    printf(<span style="color: #00d3d0;">"Username: "</span>);
-    <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">user</span>[<span style="color: #88ca9f;">255</span>] = { <span style="color: #88ca9f;">0</span> };
-    scanf(<span style="color: #00d3d0;">"%255s"</span>, user);
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">main</span>(<span style="color: #0031a9;">void</span>) {
+    printf(<span style="color: #005e8b;">"Username: "</span>);
+    <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">user</span>[<span style="color: #2a5045;">255</span>] = { <span style="color: #2a5045;">0</span> };
+    scanf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%255s</span><span style="color: #005e8b;">"</span>, user);
 
-    printf(<span style="color: #00d3d0;">"Key: "</span>);
-    <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">user_key</span>[KEY_LEN] = { <span style="color: #88ca9f;">0</span> };
+    printf(<span style="color: #005e8b;">"Key: "</span>);
+    <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">user_key</span>[KEY_LEN] = { <span style="color: #2a5045;">0</span> };
     read_key(user_key);
 
-    <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">real_key</span>[KEY_LEN] = { <span style="color: #88ca9f;">0</span> };
+    <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">real_key</span>[KEY_LEN] = { <span style="color: #2a5045;">0</span> };
     generate_key(user, real_key);
 
-    <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">match</span> = <span style="color: #88ca9f;">true</span>;
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; KEY_LEN; i++)
-        <span style="color: #ff6f9f;">if</span> (user_key[i] != real_key[i])
-            match = <span style="color: #88ca9f;">false</span>;
+    <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">match</span> = <span style="color: #2a5045;">true</span>;
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">i</span> = <span style="color: #2a5045;">0</span>; i &lt; KEY_LEN; i++)
+        <span style="color: #972500;">if</span> (user_key[i] != real_key[i])
+            match = <span style="color: #2a5045;">false</span>;
 
-    <span style="color: #ff6f9f;">if</span> (match)
-        puts(<span style="color: #00d3d0;">"Correct key."</span>);
-    <span style="color: #ff6f9f;">else</span>
-        puts(<span style="color: #00d3d0;">"Invalid key."</span>);
+    <span style="color: #972500;">if</span> (match)
+        puts(<span style="color: #005e8b;">"Correct key."</span>);
+    <span style="color: #972500;">else</span>
+        puts(<span style="color: #005e8b;">"Invalid key."</span>);
 
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
 }
 </pre>
 </div>

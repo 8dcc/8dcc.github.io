@@ -232,26 +232,26 @@ usually easier to reverse.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-   <span style="color: #88ca9f;">0</span>:             <span style="color: #feacd0;">push</span>   <span style="color: #6ae4b9;">rbp</span>
-   <span style="color: #88ca9f;">1</span>:             <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rbp</span>,<span style="color: #6ae4b9;">rsp</span>
-   <span style="color: #88ca9f;">4</span>:             <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x8</span>], <span style="color: #6ae4b9;">rdi</span>
-   <span style="color: #88ca9f;">8</span>:             <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>], <span style="color: #6ae4b9;">rsi</span>
-   <span style="color: #4ae2ff;">c</span>:             <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x8</span>]
-  <span style="color: #88ca9f;">10</span>:             <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rax</span>]
-  <span style="color: #88ca9f;">13</span>:             <span style="color: #feacd0;">movsx</span>  <span style="color: #6ae4b9;">dx</span>, <span style="color: #6ae4b9;">al</span>
-  <span style="color: #88ca9f;">17</span>:             <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>]
-  <span style="color: #88ca9f;">1b</span>:             <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">WORD</span> [<span style="color: #6ae4b9;">rax</span>], <span style="color: #6ae4b9;">dx</span>
-  <span style="color: #88ca9f;">1e</span>:             <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>]
-  <span style="color: #88ca9f;">22</span>:             <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">WORD</span> [<span style="color: #6ae4b9;">rax</span>]
-  <span style="color: #88ca9f;">25</span>:             <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">ax</span>, <span style="color: #6ae4b9;">ax</span>
-  <span style="color: #88ca9f;">28</span>:             <span style="color: #feacd0;">jne</span>    <span style="color: #88ca9f;">2c</span>
-  <span style="color: #88ca9f;">2a</span>:             <span style="color: #feacd0;">jmp</span>    <span style="color: #88ca9f;">38</span>
-  <span style="color: #88ca9f;">2c</span>:             <span style="color: #feacd0;">add</span>    <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x8</span>], <span style="color: #88ca9f;">1</span>
-  <span style="color: #88ca9f;">31</span>:             <span style="color: #feacd0;">add</span>    <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>], <span style="color: #88ca9f;">2</span>
-  <span style="color: #88ca9f;">36</span>:             <span style="color: #feacd0;">jmp</span>    c
-  <span style="color: #88ca9f;">38</span>:             <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">rbp</span>
-  <span style="color: #88ca9f;">39</span>:             <span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+   <span style="color: #2a5045;">0</span>:             <span style="color: #721045;">push</span>   <span style="color: #005f5f;">rbp</span>
+   <span style="color: #2a5045;">1</span>:             <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rbp</span>,<span style="color: #005f5f;">rsp</span>
+   <span style="color: #2a5045;">4</span>:             <span style="color: #721045;">mov</span>    <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x8</span>], <span style="color: #005f5f;">rdi</span>
+   <span style="color: #2a5045;">8</span>:             <span style="color: #721045;">mov</span>    <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>], <span style="color: #005f5f;">rsi</span>
+   <span style="color: #3f578f;">c</span>:             <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x8</span>]
+  <span style="color: #2a5045;">10</span>:             <span style="color: #721045;">movzx</span>  <span style="color: #005f5f;">eax</span>, <span style="color: #0031a9;">BYTE</span> [<span style="color: #005f5f;">rax</span>]
+  <span style="color: #2a5045;">13</span>:             <span style="color: #721045;">movsx</span>  <span style="color: #005f5f;">dx</span>, <span style="color: #005f5f;">al</span>
+  <span style="color: #2a5045;">17</span>:             <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>]
+  <span style="color: #2a5045;">1b</span>:             <span style="color: #721045;">mov</span>    <span style="color: #0031a9;">WORD</span> [<span style="color: #005f5f;">rax</span>], <span style="color: #005f5f;">dx</span>
+  <span style="color: #2a5045;">1e</span>:             <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>]
+  <span style="color: #2a5045;">22</span>:             <span style="color: #721045;">movzx</span>  <span style="color: #005f5f;">eax</span>, <span style="color: #0031a9;">WORD</span> [<span style="color: #005f5f;">rax</span>]
+  <span style="color: #2a5045;">25</span>:             <span style="color: #721045;">test</span>   <span style="color: #005f5f;">ax</span>, <span style="color: #005f5f;">ax</span>
+  <span style="color: #2a5045;">28</span>:             <span style="color: #721045;">jne</span>    <span style="color: #2a5045;">2c</span>
+  <span style="color: #2a5045;">2a</span>:             <span style="color: #721045;">jmp</span>    <span style="color: #2a5045;">38</span>
+  <span style="color: #2a5045;">2c</span>:             <span style="color: #721045;">add</span>    <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x8</span>], <span style="color: #2a5045;">1</span>
+  <span style="color: #2a5045;">31</span>:             <span style="color: #721045;">add</span>    <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>], <span style="color: #2a5045;">2</span>
+  <span style="color: #2a5045;">36</span>:             <span style="color: #721045;">jmp</span>    c
+  <span style="color: #2a5045;">38</span>:             <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">rbp</span>
+  <span style="color: #2a5045;">39</span>:             <span style="color: #721045;">ret</span>
 </pre>
 </div>
 
@@ -260,29 +260,29 @@ After removing the unused labels, and renaming the used ones.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-    <span style="color: #feacd0;">push</span>   <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rbp</span>,<span style="color: #6ae4b9;">rsp</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x8</span>], <span style="color: #6ae4b9;">rdi</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>], <span style="color: #6ae4b9;">rsi</span>
-<span style="color: #4ae2ff;">.loop</span>:
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x8</span>]
-    <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rax</span>]
-    <span style="color: #feacd0;">movsx</span>  <span style="color: #6ae4b9;">dx</span>, <span style="color: #6ae4b9;">al</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>]
-    <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">WORD</span> [<span style="color: #6ae4b9;">rax</span>], <span style="color: #6ae4b9;">dx</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #6ae4b9;">rax</span>, <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>]
-    <span style="color: #feacd0;">movzx</span>  <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">WORD</span> [<span style="color: #6ae4b9;">rax</span>]
-    <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">ax</span>, <span style="color: #6ae4b9;">ax</span>
-    <span style="color: #feacd0;">jne</span>    .continue
-    <span style="color: #feacd0;">jmp</span>    .done
-<span style="color: #4ae2ff;">.continue</span>:
-    <span style="color: #feacd0;">add</span>    <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x8</span>], <span style="color: #88ca9f;">1</span>
-    <span style="color: #feacd0;">add</span>    <span style="color: #79a8ff;">QWORD</span> [<span style="color: #6ae4b9;">rbp</span> - <span style="color: #88ca9f;">0x10</span>], <span style="color: #88ca9f;">2</span>
-    <span style="color: #feacd0;">jmp</span>    .loop
-<span style="color: #4ae2ff;">.done</span>:
-    <span style="color: #feacd0;">pop</span>    <span style="color: #6ae4b9;">rbp</span>
-    <span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+    <span style="color: #721045;">push</span>   <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rbp</span>,<span style="color: #005f5f;">rsp</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x8</span>], <span style="color: #005f5f;">rdi</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>], <span style="color: #005f5f;">rsi</span>
+<span style="color: #3f578f;">.loop</span>:
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x8</span>]
+    <span style="color: #721045;">movzx</span>  <span style="color: #005f5f;">eax</span>, <span style="color: #0031a9;">BYTE</span> [<span style="color: #005f5f;">rax</span>]
+    <span style="color: #721045;">movsx</span>  <span style="color: #005f5f;">dx</span>, <span style="color: #005f5f;">al</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>]
+    <span style="color: #721045;">mov</span>    <span style="color: #0031a9;">WORD</span> [<span style="color: #005f5f;">rax</span>], <span style="color: #005f5f;">dx</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #005f5f;">rax</span>, <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>]
+    <span style="color: #721045;">movzx</span>  <span style="color: #005f5f;">eax</span>, <span style="color: #0031a9;">WORD</span> [<span style="color: #005f5f;">rax</span>]
+    <span style="color: #721045;">test</span>   <span style="color: #005f5f;">ax</span>, <span style="color: #005f5f;">ax</span>
+    <span style="color: #721045;">jne</span>    .continue
+    <span style="color: #721045;">jmp</span>    .done
+<span style="color: #3f578f;">.continue</span>:
+    <span style="color: #721045;">add</span>    <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x8</span>], <span style="color: #2a5045;">1</span>
+    <span style="color: #721045;">add</span>    <span style="color: #0031a9;">QWORD</span> [<span style="color: #005f5f;">rbp</span> - <span style="color: #2a5045;">0x10</span>], <span style="color: #2a5045;">2</span>
+    <span style="color: #721045;">jmp</span>    .loop
+<span style="color: #3f578f;">.done</span>:
+    <span style="color: #721045;">pop</span>    <span style="color: #005f5f;">rbp</span>
+    <span style="color: #721045;">ret</span>
 </pre>
 </div>
 </div>
@@ -343,25 +343,25 @@ names from there.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">rdi</span>, <span style="color: #79a8ff;">int16_t</span>* <span style="color: #6ae4b9;">rsi</span>) {
-    <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">var8</span>     = rdi;
-    <span style="color: #79a8ff;">int16_t</span>* <span style="color: #6ae4b9;">var10</span> = rsi;
+<pre class="src src-C"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">func</span>(<span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">rdi</span>, <span style="color: #0031a9;">int16_t</span>* <span style="color: #005f5f;">rsi</span>) {
+    <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">var8</span>     = rdi;
+    <span style="color: #0031a9;">int16_t</span>* <span style="color: #005f5f;">var10</span> = rsi;
 
-    <span style="color: #ff6f9f;">for</span> (;;) {
-        <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">rax0</span> = var8;
-        <span style="color: #79a8ff;">int16_t</span> <span style="color: #6ae4b9;">dx</span> = *rax0;
+    <span style="color: #972500;">for</span> (;;) {
+        <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">rax0</span> = var8;
+        <span style="color: #0031a9;">int16_t</span> <span style="color: #005f5f;">dx</span> = *rax0;
 
-        <span style="color: #79a8ff;">int16_t</span>* <span style="color: #6ae4b9;">rax1</span> = var10;
+        <span style="color: #0031a9;">int16_t</span>* <span style="color: #005f5f;">rax1</span> = var10;
         *rax          = dx;
 
-        <span style="color: #79a8ff;">int16_t</span>* <span style="color: #6ae4b9;">rax2</span> = var10;
-        <span style="color: #79a8ff;">int16_t</span> <span style="color: #6ae4b9;">ax</span>    = *rax;
+        <span style="color: #0031a9;">int16_t</span>* <span style="color: #005f5f;">rax2</span> = var10;
+        <span style="color: #0031a9;">int16_t</span> <span style="color: #005f5f;">ax</span>    = *rax;
 
-        <span style="color: #ff6f9f;">if</span> (ax == <span style="color: #88ca9f;">0</span>)
-            <span style="color: #ff6f9f;">break</span>;
+        <span style="color: #972500;">if</span> (ax == <span style="color: #2a5045;">0</span>)
+            <span style="color: #972500;">break</span>;
 
         var8++;
-        var10++; <span style="color: #989898;">/* </span><span style="color: #989898;">Incrementing 2 bytes, 1 word</span><span style="color: #989898;"> */</span>
+        var10++; <span style="color: #595959;">/* </span><span style="color: #595959;">Incrementing 2 bytes, 1 word</span><span style="color: #595959;"> */</span>
     }
 }
 </pre>
@@ -372,13 +372,13 @@ After changing the symbol names, and optimizing.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">int16_t</span>* <span style="color: #6ae4b9;">b</span>) {
-    <span style="color: #ff6f9f;">for</span> (;;) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Extend byte to word</span><span style="color: #989898;"> */</span>
-        *b = (<span style="color: #79a8ff;">int16_t</span>)*a;
+<pre class="src src-C"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">func</span>(<span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">a</span>, <span style="color: #0031a9;">int16_t</span>* <span style="color: #005f5f;">b</span>) {
+    <span style="color: #972500;">for</span> (;;) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Extend byte to word</span><span style="color: #595959;"> */</span>
+        *b = (<span style="color: #0031a9;">int16_t</span>)*a;
 
-        <span style="color: #ff6f9f;">if</span> (*b == <span style="color: #88ca9f;">0</span>)
-            <span style="color: #ff6f9f;">break</span>;
+        <span style="color: #972500;">if</span> (*b == <span style="color: #2a5045;">0</span>)
+            <span style="color: #972500;">break</span>;
 
         a++;
         b++;
@@ -408,19 +408,19 @@ changed the label names again.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-    <span style="color: #feacd0;">jmp</span>    .loop
-    <span style="color: #feacd0;">nop</span>    <span style="color: #79a8ff;">WORD</span> [<span style="color: #6ae4b9;">rax</span> + <span style="color: #6ae4b9;">rax</span> * <span style="color: #88ca9f;">1</span> + <span style="color: #88ca9f;">0x0</span>]
-<span style="color: #4ae2ff;">.continue</span>:
-    <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">rdi</span>, <span style="color: #88ca9f;">1</span>
-    <span style="color: #feacd0;">add</span>    <span style="color: #6ae4b9;">rsi</span>, <span style="color: #88ca9f;">2</span>
-<span style="color: #4ae2ff;">.loop</span>:
-    <span style="color: #feacd0;">movsx</span>  <span style="color: #6ae4b9;">ax</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rdi</span>]
-    <span style="color: #feacd0;">test</span>   <span style="color: #6ae4b9;">ax</span> , <span style="color: #6ae4b9;">ax</span>
-    <span style="color: #feacd0;">mov</span>    <span style="color: #79a8ff;">WORD</span> [<span style="color: #6ae4b9;">rsi</span>], <span style="color: #6ae4b9;">ax</span>
-    <span style="color: #feacd0;">jne</span>    .continue
-    <span style="color: #feacd0;">repz</span>   <span style="color: #feacd0;">ret</span>
-    <span style="color: #feacd0;">xchg</span>   <span style="color: #6ae4b9;">ax</span>,<span style="color: #6ae4b9;">ax</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+    <span style="color: #721045;">jmp</span>    .loop
+    <span style="color: #721045;">nop</span>    <span style="color: #0031a9;">WORD</span> [<span style="color: #005f5f;">rax</span> + <span style="color: #005f5f;">rax</span> * <span style="color: #2a5045;">1</span> + <span style="color: #2a5045;">0x0</span>]
+<span style="color: #3f578f;">.continue</span>:
+    <span style="color: #721045;">add</span>    <span style="color: #005f5f;">rdi</span>, <span style="color: #2a5045;">1</span>
+    <span style="color: #721045;">add</span>    <span style="color: #005f5f;">rsi</span>, <span style="color: #2a5045;">2</span>
+<span style="color: #3f578f;">.loop</span>:
+    <span style="color: #721045;">movsx</span>  <span style="color: #005f5f;">ax</span>, <span style="color: #0031a9;">BYTE</span> [<span style="color: #005f5f;">rdi</span>]
+    <span style="color: #721045;">test</span>   <span style="color: #005f5f;">ax</span> , <span style="color: #005f5f;">ax</span>
+    <span style="color: #721045;">mov</span>    <span style="color: #0031a9;">WORD</span> [<span style="color: #005f5f;">rsi</span>], <span style="color: #005f5f;">ax</span>
+    <span style="color: #721045;">jne</span>    .continue
+    <span style="color: #721045;">repz</span>   <span style="color: #721045;">ret</span>
+    <span style="color: #721045;">xchg</span>   <span style="color: #005f5f;">ax</span>,<span style="color: #005f5f;">ax</span>
 </pre>
 </div>
 

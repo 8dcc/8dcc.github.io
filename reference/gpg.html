@@ -225,31 +225,31 @@ article</a> for more information.
 
 <div class="org-src-container">
 <pre class="src src-bash">gpg --full-generate-key
-<span style="color: #989898;"># </span><span style="color: #989898;">...</span>
-<span style="color: #989898;">#</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">Please select what kind of key you want:</span>
-<span style="color: #989898;">#    </span><span style="color: #989898;">(1) RSA and RSA</span>
-<span style="color: #989898;">#    </span><span style="color: #989898;">(2) DSA and Elgamal</span>
-<span style="color: #989898;">#    </span><span style="color: #989898;">(3) DSA (sign only)</span>
-<span style="color: #989898;">#    </span><span style="color: #989898;">(4) RSA (sign only)</span>
-<span style="color: #989898;">#    </span><span style="color: #989898;">(9) ECC (sign and encrypt) *default*</span>
-<span style="color: #989898;">#   </span><span style="color: #989898;">(10) ECC (sign only)</span>
-<span style="color: #989898;">#   </span><span style="color: #989898;">(14) Existing key from card</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">Your selection? 1</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">RSA keys may be between 1024 and 4096 bits long.</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">What keysize do you want? (3072) 4096</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">Requested keysize is 4096 bits</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">Please specify how long the key should be valid.</span>
-<span style="color: #989898;">#          </span><span style="color: #989898;">0 = key does not expire</span>
-<span style="color: #989898;">#       </span><span style="color: #989898;">&lt;n&gt;  = key expires in n days</span>
-<span style="color: #989898;">#       </span><span style="color: #989898;">&lt;n&gt;w = key expires in n weeks</span>
-<span style="color: #989898;">#       </span><span style="color: #989898;">&lt;n&gt;m = key expires in n months</span>
-<span style="color: #989898;">#       </span><span style="color: #989898;">&lt;n&gt;y = key expires in n years</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">Key is valid for? (0) 0</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">Key does not expire at all</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">Is this correct? (y/N) y</span>
-<span style="color: #989898;">#</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">...</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">...</span>
+<span style="color: #595959;">#</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">Please select what kind of key you want:</span>
+<span style="color: #595959;">#    </span><span style="color: #595959;">(1) RSA and RSA</span>
+<span style="color: #595959;">#    </span><span style="color: #595959;">(2) DSA and Elgamal</span>
+<span style="color: #595959;">#    </span><span style="color: #595959;">(3) DSA (sign only)</span>
+<span style="color: #595959;">#    </span><span style="color: #595959;">(4) RSA (sign only)</span>
+<span style="color: #595959;">#    </span><span style="color: #595959;">(9) ECC (sign and encrypt) *default*</span>
+<span style="color: #595959;">#   </span><span style="color: #595959;">(10) ECC (sign only)</span>
+<span style="color: #595959;">#   </span><span style="color: #595959;">(14) Existing key from card</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">Your selection? 1</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">RSA keys may be between 1024 and 4096 bits long.</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">What keysize do you want? (3072) 4096</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">Requested keysize is 4096 bits</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">Please specify how long the key should be valid.</span>
+<span style="color: #595959;">#          </span><span style="color: #595959;">0 = key does not expire</span>
+<span style="color: #595959;">#       </span><span style="color: #595959;">&lt;n&gt;  = key expires in n days</span>
+<span style="color: #595959;">#       </span><span style="color: #595959;">&lt;n&gt;w = key expires in n weeks</span>
+<span style="color: #595959;">#       </span><span style="color: #595959;">&lt;n&gt;m = key expires in n months</span>
+<span style="color: #595959;">#       </span><span style="color: #595959;">&lt;n&gt;y = key expires in n years</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">Key is valid for? (0) 0</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">Key does not expire at all</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">Is this correct? (y/N) y</span>
+<span style="color: #595959;">#</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">...</span>
 </pre>
 </div>
 </div>
@@ -275,12 +275,12 @@ Git (the <code>XXX</code> part will be needed in <a href="#git-integration-with-
 <div class="org-src-container">
 <pre class="src src-bash">gpg --list-secret-keys --keyid-format=long
 
-<span style="color: #989898;"># </span><span style="color: #989898;">[keyboxd]</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">---------</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">sec   ed25519/</span><span style="color: #ff6740; font-weight: bold;">XXXXXXXXXXXXXXXX</span><span style="color: #989898;"> 2024-03-29 [SC] [expires: 2027-03-29]</span>
-<span style="color: #989898;">#       </span><span style="color: #989898;">YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">uid                 [ultimate] Foo Bar <a href="mailto:foo.bar%40example.com">&lt;foo.bar@example.com&gt;</a></span>
-<span style="color: #989898;"># </span><span style="color: #989898;">ssb   cv25519/ZZZZZZZZZZZZZZZZ 2024-03-29 [E]</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">[keyboxd]</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">---------</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">sec   ed25519/</span><span style="color: #972500; font-weight: bold;">XXXXXXXXXXXXXXXX</span><span style="color: #595959;"> 2024-03-29 [SC] [expires: 2027-03-29]</span>
+<span style="color: #595959;">#       </span><span style="color: #595959;">YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">uid                 [ultimate] Foo Bar <a href="mailto:foo.bar%40example.com">&lt;foo.bar@example.com&gt;</a></span>
+<span style="color: #595959;"># </span><span style="color: #595959;">ssb   cv25519/ZZZZZZZZZZZZZZZZ 2024-03-29 [E]</span>
 </pre>
 </div>
 </div>
@@ -298,10 +298,10 @@ The following command will export an ASCII-armored version of the <i>public</i> 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">gpg --output public.pgp <span style="color: #00d3d0;">\</span>
-    --armor             <span style="color: #00d3d0;">\</span>
-    --export            <span style="color: #00d3d0;">\</span>
-    <span style="color: #00d3d0;">'foo.bar@example.com'</span>
+<pre class="src src-bash">gpg --output public.pgp <span style="color: #005e8b;">\</span>
+    --armor             <span style="color: #005e8b;">\</span>
+    --export            <span style="color: #005e8b;">\</span>
+    <span style="color: #005e8b;">'foo.bar@example.com'</span>
 </pre>
 </div>
 
@@ -311,10 +311,10 @@ The following command will export an ASCII-armored version of the <i>secret</i>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">gpg --output private.pgp <span style="color: #00d3d0;">\</span>
-    --armor              <span style="color: #00d3d0;">\</span>
-    --export-secret-key  <span style="color: #00d3d0;">\</span>
-    <span style="color: #00d3d0;">'foo.bar@example.com'</span>
+<pre class="src src-bash">gpg --output private.pgp <span style="color: #005e8b;">\</span>
+    --armor              <span style="color: #005e8b;">\</span>
+    --export-secret-key  <span style="color: #005e8b;">\</span>
+    <span style="color: #005e8b;">'foo.bar@example.com'</span>
 </pre>
 </div>
 
@@ -323,11 +323,11 @@ If it&rsquo;s a backup, the following should be used.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">gpg --output backup.pgp            <span style="color: #00d3d0;">\</span>
-    --armor                        <span style="color: #00d3d0;">\</span>
-    --export-secret-keys           <span style="color: #00d3d0;">\</span>
-    --export-options export-backup <span style="color: #00d3d0;">\</span>
-    <span style="color: #00d3d0;">'foo.bar@example.com'</span>
+<pre class="src src-bash">gpg --output backup.pgp            <span style="color: #005e8b;">\</span>
+    --armor                        <span style="color: #005e8b;">\</span>
+    --export-secret-keys           <span style="color: #005e8b;">\</span>
+    --export-options export-backup <span style="color: #005e8b;">\</span>
+    <span style="color: #005e8b;">'foo.bar@example.com'</span>
 </pre>
 </div>
 </div>
@@ -351,8 +351,8 @@ previous worked fine.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">gpg --import-options restore <span style="color: #00d3d0;">\</span>
-    --import                 <span style="color: #00d3d0;">\</span>
+<pre class="src src-bash">gpg --import-options restore <span style="color: #005e8b;">\</span>
+    --import                 <span style="color: #005e8b;">\</span>
     backup.pgp
 </pre>
 </div>
@@ -368,21 +368,21 @@ them</a>. This trust level can be changed with the following command.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">$ gpg --edit-key <span style="color: #00d3d0;">'foo.bar@example.com'</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">...</span>
+<pre class="src src-bash">$ gpg --edit-key <span style="color: #005e8b;">'foo.bar@example.com'</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">...</span>
 gpg&gt; trust
-<span style="color: #989898;"># </span><span style="color: #989898;">Please decide how far you trust this user to correctly verify other users' keys</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">(by looking at passports, checking fingerprints from different sources, etc.)</span>
-<span style="color: #989898;">#</span>
-<span style="color: #989898;">#   </span><span style="color: #989898;">1 = I don't know or won't say</span>
-<span style="color: #989898;">#   </span><span style="color: #989898;">2 = I do NOT trust</span>
-<span style="color: #989898;">#   </span><span style="color: #989898;">3 = I trust marginally</span>
-<span style="color: #989898;">#   </span><span style="color: #989898;">4 = I trust fully</span>
-<span style="color: #989898;">#   </span><span style="color: #989898;">5 = I trust ultimately</span>
-<span style="color: #989898;">#   </span><span style="color: #989898;">m = back to the main menu</span>
-<span style="color: #989898;">#</span>
-<span style="color: #989898;"># </span><span style="color: #989898;">Your decision?</span>
-gpg&gt; <span style="color: #88ca9f;">5</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">Please decide how far you trust this user to correctly verify other users' keys</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">(by looking at passports, checking fingerprints from different sources, etc.)</span>
+<span style="color: #595959;">#</span>
+<span style="color: #595959;">#   </span><span style="color: #595959;">1 = I don't know or won't say</span>
+<span style="color: #595959;">#   </span><span style="color: #595959;">2 = I do NOT trust</span>
+<span style="color: #595959;">#   </span><span style="color: #595959;">3 = I trust marginally</span>
+<span style="color: #595959;">#   </span><span style="color: #595959;">4 = I trust fully</span>
+<span style="color: #595959;">#   </span><span style="color: #595959;">5 = I trust ultimately</span>
+<span style="color: #595959;">#   </span><span style="color: #595959;">m = back to the main menu</span>
+<span style="color: #595959;">#</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">Your decision?</span>
+gpg&gt; <span style="color: #2a5045;">5</span>
 </pre>
 </div>
 </div>
@@ -402,7 +402,7 @@ The <code>XXX</code> part is supposed to be the key shown in <a href="#listing-k
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">git config --global user.signingkey <span style="color: #00d3d0;">"</span><span style="color: #ff6740; font-weight: bold;">XXXXXXXXXXXXXXXX</span><span style="color: #00d3d0;">"</span>
+<pre class="src src-bash">git config --global user.signingkey <span style="color: #005e8b;">"</span><span style="color: #972500; font-weight: bold;">XXXXXXXXXXXXXXXX</span><span style="color: #005e8b;">"</span>
 git config --global commit.gpgsign true
 </pre>
 </div>

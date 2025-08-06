@@ -261,8 +261,8 @@ has been tested on Linux 6.11.6.
 </p>
 
 <p>
-I am somewhat new to network programming myself, so if you have any suggestions,
-please feel free to <a href="https://github.com/8dcc/8dcc.github.io">contribute</a> to this page.
+At the time of writing this article, I am somewhat new to network programming,
+so if you have any suggestions, please feel free to <a href="https://github.com/8dcc/8dcc.github.io">contribute</a> to this page.
 </p>
 
 <p>
@@ -391,10 +391,10 @@ and transmitting data. Sockets are created with the <a href="https://man.cx/sock
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/types.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/socket.h&gt;</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">socket</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">domain</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">type</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">protocol</span>);
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">socket</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">domain</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">type</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">protocol</span>);
 </pre>
 </div>
 
@@ -414,14 +414,14 @@ arguments.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;netdb.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/types.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/socket.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;netdb.h&gt;</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">getaddrinfo</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">node</span>,
-                <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">service</span>,
-                <span style="color: #ff6f9f;">const</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">hints</span>,
-                <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>** <span style="color: #6ae4b9;">res</span>);
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">getaddrinfo</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">node</span>,
+                <span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">service</span>,
+                <span style="color: #972500;">const</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">addrinfo</span>* <span style="color: #005f5f;">hints</span>,
+                <span style="color: #972500;">struct</span> <span style="color: #0031a9;">addrinfo</span>** <span style="color: #005f5f;">res</span>);
 </pre>
 </div>
 
@@ -460,17 +460,17 @@ is the structure definition from <code>&lt;netdb.h&gt;</code>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/socket.h&gt;</span>
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span> {
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ai_flags</span>;             <span style="color: #989898;">/* </span><span style="color: #989898;">Input flags</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ai_family</span>;            <span style="color: #989898;">/* </span><span style="color: #989898;">Protocol family for socket</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ai_socktype</span>;          <span style="color: #989898;">/* </span><span style="color: #989898;">Socket type</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ai_protocol</span>;          <span style="color: #989898;">/* </span><span style="color: #989898;">Protocol for socket</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">socklen_t</span> <span style="color: #6ae4b9;">ai_addrlen</span>;     <span style="color: #989898;">/* </span><span style="color: #989898;">Length of socket address</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr</span>* <span style="color: #6ae4b9;">ai_addr</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">Socket address for socket</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">ai_canonname</span>;       <span style="color: #989898;">/* </span><span style="color: #989898;">Canonical name for service location</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">ai_next</span>; <span style="color: #989898;">/* </span><span style="color: #989898;">Pointer to next in list</span><span style="color: #989898;"> */</span>
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">addrinfo</span> {
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">ai_flags</span>;             <span style="color: #595959;">/* </span><span style="color: #595959;">Input flags</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">ai_family</span>;            <span style="color: #595959;">/* </span><span style="color: #595959;">Protocol family for socket</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">ai_socktype</span>;          <span style="color: #595959;">/* </span><span style="color: #595959;">Socket type</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">ai_protocol</span>;          <span style="color: #595959;">/* </span><span style="color: #595959;">Protocol for socket</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">socklen_t</span> <span style="color: #005f5f;">ai_addrlen</span>;     <span style="color: #595959;">/* </span><span style="color: #595959;">Length of socket address</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">sockaddr</span>* <span style="color: #005f5f;">ai_addr</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">Socket address for socket</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">ai_canonname</span>;       <span style="color: #595959;">/* </span><span style="color: #595959;">Canonical name for service location</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">addrinfo</span>* <span style="color: #005f5f;">ai_next</span>; <span style="color: #595959;">/* </span><span style="color: #595959;">Pointer to next in list</span><span style="color: #595959;"> */</span>
 };
 </pre>
 </div>
@@ -484,32 +484,32 @@ both defined in <code>&lt;netinet/in.h&gt;</code><sup><a id="fnr.7" class="footr
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;netinet/in.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;netinet/in.h&gt;</span>
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr_in</span> {
-    <span style="color: #79a8ff;">sa_family_t</span>     <span style="color: #6ae4b9;">sin_family</span>;     <span style="color: #989898;">/* </span><span style="color: #989898;">AF_INET</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">in_port_t</span>       <span style="color: #6ae4b9;">sin_port</span>;       <span style="color: #989898;">/* </span><span style="color: #989898;">Port number</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">in_addr</span>  <span style="color: #6ae4b9;">sin_addr</span>;       <span style="color: #989898;">/* </span><span style="color: #989898;">IPv4 address</span><span style="color: #989898;"> */</span>
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">sockaddr_in</span> {
+    <span style="color: #0031a9;">sa_family_t</span>     <span style="color: #005f5f;">sin_family</span>;     <span style="color: #595959;">/* </span><span style="color: #595959;">AF_INET</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">in_port_t</span>       <span style="color: #005f5f;">sin_port</span>;       <span style="color: #595959;">/* </span><span style="color: #595959;">Port number</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">in_addr</span>  <span style="color: #005f5f;">sin_addr</span>;       <span style="color: #595959;">/* </span><span style="color: #595959;">IPv4 address</span><span style="color: #595959;"> */</span>
 };
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr_in6</span> {
-    <span style="color: #79a8ff;">sa_family_t</span>     <span style="color: #6ae4b9;">sin6_family</span>;    <span style="color: #989898;">/* </span><span style="color: #989898;">AF_INET6</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">in_port_t</span>       <span style="color: #6ae4b9;">sin6_port</span>;      <span style="color: #989898;">/* </span><span style="color: #989898;">Port number</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">uint32_t</span>        <span style="color: #6ae4b9;">sin6_flowinfo</span>;  <span style="color: #989898;">/* </span><span style="color: #989898;">IPv6 flow info</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">in6_addr</span> <span style="color: #6ae4b9;">sin6_addr</span>;      <span style="color: #989898;">/* </span><span style="color: #989898;">IPv6 address</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">uint32_t</span>        <span style="color: #6ae4b9;">sin6_scope_id</span>;  <span style="color: #989898;">/* </span><span style="color: #989898;">Set of interfaces for a scope</span><span style="color: #989898;"> */</span>
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">sockaddr_in6</span> {
+    <span style="color: #0031a9;">sa_family_t</span>     <span style="color: #005f5f;">sin6_family</span>;    <span style="color: #595959;">/* </span><span style="color: #595959;">AF_INET6</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">in_port_t</span>       <span style="color: #005f5f;">sin6_port</span>;      <span style="color: #595959;">/* </span><span style="color: #595959;">Port number</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">uint32_t</span>        <span style="color: #005f5f;">sin6_flowinfo</span>;  <span style="color: #595959;">/* </span><span style="color: #595959;">IPv6 flow info</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">in6_addr</span> <span style="color: #005f5f;">sin6_addr</span>;      <span style="color: #595959;">/* </span><span style="color: #595959;">IPv6 address</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">uint32_t</span>        <span style="color: #005f5f;">sin6_scope_id</span>;  <span style="color: #595959;">/* </span><span style="color: #595959;">Set of interfaces for a scope</span><span style="color: #595959;"> */</span>
 };
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">in_addr</span> {
-    <span style="color: #79a8ff;">in_addr_t</span> <span style="color: #6ae4b9;">s_addr</span>;
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">in_addr</span> {
+    <span style="color: #0031a9;">in_addr_t</span> <span style="color: #005f5f;">s_addr</span>;
 };
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">in6_addr</span> {
-    <span style="color: #79a8ff;">uint8_t</span>   <span style="color: #6ae4b9;">s6_addr</span>[<span style="color: #88ca9f;">16</span>];
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">in6_addr</span> {
+    <span style="color: #0031a9;">uint8_t</span>   <span style="color: #005f5f;">s6_addr</span>[<span style="color: #2a5045;">16</span>];
 };
 
-<span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">uint32_t</span> <span style="color: #79a8ff;">in_addr_t</span>;
-<span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">uint16_t</span> <span style="color: #79a8ff;">in_port_t</span>;
+<span style="color: #972500;">typedef</span> <span style="color: #0031a9;">uint32_t</span> <span style="color: #0031a9;">in_addr_t</span>;
+<span style="color: #972500;">typedef</span> <span style="color: #0031a9;">uint16_t</span> <span style="color: #0031a9;">in_port_t</span>;
 </pre>
 </div>
 </div>
@@ -526,21 +526,21 @@ examples will be shown below. Remember to check the value returned by
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span> <span style="color: #6ae4b9;">hints</span>;
-memset(&amp;hints, <span style="color: #88ca9f;">0</span>, <span style="color: #ff6f9f;">sizeof</span>(hints));
-hints.ai_family   = AF_INET;     <span style="color: #989898;">/* </span><span style="color: #989898;">IPv4</span><span style="color: #989898;"> */</span>
-hints.ai_socktype = SOCK_STREAM; <span style="color: #989898;">/* </span><span style="color: #989898;">TCP</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #972500;">struct</span> <span style="color: #0031a9;">addrinfo</span> <span style="color: #005f5f;">hints</span>;
+memset(&amp;hints, <span style="color: #2a5045;">0</span>, <span style="color: #972500;">sizeof</span>(hints));
+hints.ai_family   = AF_INET;     <span style="color: #595959;">/* </span><span style="color: #595959;">IPv4</span><span style="color: #595959;"> */</span>
+hints.ai_socktype = SOCK_STREAM; <span style="color: #595959;">/* </span><span style="color: #595959;">TCP</span><span style="color: #595959;"> */</span>
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">server_info</span>;
-<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = getaddrinfo(ip, port, &amp;hints, &amp;server_info);
-<span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Error: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, gai_strerror(status));
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">addrinfo</span>* <span style="color: #005f5f;">server_info</span>;
+<span style="color: #972500;">const</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">status</span> = getaddrinfo(ip, port, &amp;hints, &amp;server_info);
+<span style="color: #972500;">if</span> (status != <span style="color: #2a5045;">0</span>) {
+    fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Error: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>, gai_strerror(status));
     abort();
 }
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+<span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 
-<span style="color: #4ae2ff;">freeaddrinfo</span>(server_info);
+<span style="color: #3f578f;">freeaddrinfo</span>(server_info);
 </pre>
 </div>
 
@@ -551,17 +551,17 @@ descriptor after you are done using it.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span> = socket(server_info-&gt;ai_family,
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">sockfd</span> = socket(server_info-&gt;ai_family,
                           server_info-&gt;ai_socktype,
                           server_info-&gt;ai_protocol);
-<span style="color: #ff6f9f;">if</span> (sockfd &lt; <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not create socket: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
+<span style="color: #972500;">if</span> (sockfd &lt; <span style="color: #2a5045;">0</span>) {
+    fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Could not create socket: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>, strerror(errno));
     abort();
 }
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">...</span><span style="color: #989898;"> */</span>
+<span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 
-<span style="color: #4ae2ff;">close</span>(sockfd);
+<span style="color: #3f578f;">close</span>(sockfd);
 </pre>
 </div>
 </div>
@@ -636,16 +636,16 @@ machine.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span> <span style="color: #6ae4b9;">hints</span>;
-memset(&amp;hints, <span style="color: #88ca9f;">0</span>, <span style="color: #ff6f9f;">sizeof</span>(hints));
+<pre class="src src-C"><span style="color: #972500;">struct</span> <span style="color: #0031a9;">addrinfo</span> <span style="color: #005f5f;">hints</span>;
+memset(&amp;hints, <span style="color: #2a5045;">0</span>, <span style="color: #972500;">sizeof</span>(hints));
 hints.ai_family   = AF_INET;
 hints.ai_socktype = SOCK_STREAM;
-hints.ai_flags    = AI_PASSIVE; <span style="color: #989898;">/* </span><span style="color: #989898;">New</span><span style="color: #989898;"> */</span>
+hints.ai_flags    = AI_PASSIVE; <span style="color: #595959;">/* </span><span style="color: #595959;">New</span><span style="color: #595959;"> */</span>
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">self_info</span>;
-<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = getaddrinfo(<span style="color: #88ca9f;">NULL</span>, <span style="color: #00d3d0;">"4321"</span>, &amp;hints, &amp;self_info); <span style="color: #989898;">/* </span><span style="color: #989898;">Updated</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not obtaining our address info: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>,
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">addrinfo</span>* <span style="color: #005f5f;">self_info</span>;
+<span style="color: #972500;">const</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">status</span> = getaddrinfo(<span style="color: #2a5045;">NULL</span>, <span style="color: #005e8b;">"4321"</span>, &amp;hints, &amp;self_info); <span style="color: #595959;">/* </span><span style="color: #595959;">Updated</span><span style="color: #595959;"> */</span>
+<span style="color: #972500;">if</span> (status != <span style="color: #2a5045;">0</span>) {
+    fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Could not obtaining our address info: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>,
             gai_strerror(status));
     abort();
 }
@@ -664,10 +664,10 @@ domain (e.g. IPv4 or IPv6), socket type (e.g. TCP or UDP) and protocol
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/types.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/socket.h&gt;</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">socket</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">domain</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">type</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">protocol</span>);
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">socket</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">domain</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">type</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">protocol</span>);
 </pre>
 </div>
 
@@ -682,11 +682,11 @@ Now that <code>self_info</code> contains information about the current machine, 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd_listen</span> = socket(self_info-&gt;ai_family,
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">sockfd_listen</span> = socket(self_info-&gt;ai_family,
                                  self_info-&gt;ai_socktype,
                                  self_info-&gt;ai_protocol);
-<span style="color: #ff6f9f;">if</span> (sockfd_listen &lt; <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not create socket: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
+<span style="color: #972500;">if</span> (sockfd_listen &lt; <span style="color: #2a5045;">0</span>) {
+    fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Could not create socket: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>, strerror(errno));
     abort();
 }
 </pre>
@@ -710,10 +710,10 @@ function.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/types.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/socket.h&gt;</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">bind</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr</span>* <span style="color: #6ae4b9;">addr</span>, <span style="color: #79a8ff;">socklen_t</span> <span style="color: #6ae4b9;">addrlen</span>);
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">bind</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">sockfd</span>, <span style="color: #972500;">const</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">sockaddr</span>* <span style="color: #005f5f;">addr</span>, <span style="color: #0031a9;">socklen_t</span> <span style="color: #005f5f;">addrlen</span>);
 </pre>
 </div>
 
@@ -724,11 +724,11 @@ already filled one for us, so we should use that.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = bind(sockfd_listen,
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">status</span> = bind(sockfd_listen,
                         self_info-&gt;ai_addr,
                         self_info-&gt;ai_addrlen);
-<span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not bind to socket descriptor: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>,
+<span style="color: #972500;">if</span> (status != <span style="color: #2a5045;">0</span>) {
+    fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Could not bind to socket descriptor: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>,
             strerror(errno));
     abort();
 }
@@ -746,10 +746,10 @@ this with the <a href="https://man.cx/listen(2)"><code>listen(2)</code></a> func
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/types.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/socket.h&gt;</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">listen</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">backlog</span>);
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">listen</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">sockfd</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">backlog</span>);
 </pre>
 </div>
 
@@ -761,9 +761,9 @@ on success, or -1 on error, setting <code>errno</code> appropriately.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = listen(sockfd_listen, <span style="color: #88ca9f;">10</span>);
-<span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not listen for connections: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">status</span> = listen(sockfd_listen, <span style="color: #2a5045;">10</span>);
+<span style="color: #972500;">if</span> (status != <span style="color: #2a5045;">0</span>) {
+    fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Could not listen for connections: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>, strerror(errno));
     abort();
 }
 </pre>
@@ -786,10 +786,10 @@ Once we encounter an incoming connection, we can accept it using the
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/types.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/socket.h&gt;</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">accept</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr</span>* <span style="color: #6ae4b9;">addr</span>, <span style="color: #79a8ff;">socklen_t</span>* <span style="color: #6ae4b9;">addrlen</span>);
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">accept</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">sockfd</span>, <span style="color: #972500;">struct</span> <span style="color: #0031a9;">sockaddr</span>* <span style="color: #005f5f;">addr</span>, <span style="color: #0031a9;">socklen_t</span>* <span style="color: #005f5f;">addrlen</span>);
 </pre>
 </div>
 
@@ -807,9 +807,9 @@ receiving data in the accepted connection. On error, it returns -1 and sets
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd_connection</span> = accept(sockfd_listen, <span style="color: #88ca9f;">NULL</span>, <span style="color: #88ca9f;">NULL</span>);
-<span style="color: #ff6f9f;">if</span> (sockfd_connection &lt; <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not accept incoming connection: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>,
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">sockfd_connection</span> = accept(sockfd_listen, <span style="color: #2a5045;">NULL</span>, <span style="color: #2a5045;">NULL</span>);
+<span style="color: #972500;">if</span> (sockfd_connection &lt; <span style="color: #2a5045;">0</span>) {
+    fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Could not accept incoming connection: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>,
             strerror(errno));
     abort();
 }
@@ -832,7 +832,7 @@ close it.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #4ae2ff;">close</span>(sockfd_connection);
+<pre class="src src-C"><span style="color: #3f578f;">close</span>(sockfd_connection);
 </pre>
 </div>
 
@@ -843,8 +843,8 @@ structures by calling <code>freeaddrinfo</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #4ae2ff;">close</span>(sockfd_listen);
-<span style="color: #4ae2ff;">freeaddrinfo</span>(self_info);
+<pre class="src src-C"><span style="color: #3f578f;">close</span>(sockfd_listen);
+<span style="color: #3f578f;">freeaddrinfo</span>(self_info);
 </pre>
 </div>
 </div>
@@ -874,15 +874,15 @@ specific IP address and port.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span> <span style="color: #6ae4b9;">hints</span>;
-memset(&amp;hints, <span style="color: #88ca9f;">0</span>, <span style="color: #ff6f9f;">sizeof</span>(hints));
-hints.ai_family   = AF_INET;     <span style="color: #989898;">/* </span><span style="color: #989898;">IPv4</span><span style="color: #989898;"> */</span>
-hints.ai_socktype = SOCK_STREAM; <span style="color: #989898;">/* </span><span style="color: #989898;">TCP</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #972500;">struct</span> <span style="color: #0031a9;">addrinfo</span> <span style="color: #005f5f;">hints</span>;
+memset(&amp;hints, <span style="color: #2a5045;">0</span>, <span style="color: #972500;">sizeof</span>(hints));
+hints.ai_family   = AF_INET;     <span style="color: #595959;">/* </span><span style="color: #595959;">IPv4</span><span style="color: #595959;"> */</span>
+hints.ai_socktype = SOCK_STREAM; <span style="color: #595959;">/* </span><span style="color: #595959;">TCP</span><span style="color: #595959;"> */</span>
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">addrinfo</span>* <span style="color: #6ae4b9;">server_info</span>;
-<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = getaddrinfo(<span style="color: #00d3d0;">"192.168.2.123"</span>, <span style="color: #00d3d0;">"4321"</span>, &amp;hints, &amp;server_info);
-<span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not obtain address info: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, gai_strerror(status));
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">addrinfo</span>* <span style="color: #005f5f;">server_info</span>;
+<span style="color: #972500;">const</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">status</span> = getaddrinfo(<span style="color: #005e8b;">"192.168.2.123"</span>, <span style="color: #005e8b;">"4321"</span>, &amp;hints, &amp;server_info);
+<span style="color: #972500;">if</span> (status != <span style="color: #2a5045;">0</span>) {
+    fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Could not obtain address info: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>, gai_strerror(status));
     abort();
 }
 </pre>
@@ -900,11 +900,11 @@ communicating.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span> = socket(server_info-&gt;ai_family,
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">sockfd</span> = socket(server_info-&gt;ai_family,
                           server_info-&gt;ai_socktype,
                           server_info-&gt;ai_protocol);
-<span style="color: #ff6f9f;">if</span> (sockfd &lt; <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Could not create socket: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
+<span style="color: #972500;">if</span> (sockfd &lt; <span style="color: #2a5045;">0</span>) {
+    fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Could not create socket: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>, strerror(errno));
     abort();
 }
 </pre>
@@ -927,10 +927,10 @@ connect to it. For that, we use the <a href="https://man.cx/connect(2)"><code>co
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/types.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/socket.h&gt;</span>
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">connect</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">sockaddr</span>* <span style="color: #6ae4b9;">addr</span>, <span style="color: #79a8ff;">socklen_t</span> <span style="color: #6ae4b9;">addrlen</span>);
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">connect</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">sockfd</span>, <span style="color: #972500;">const</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">sockaddr</span>* <span style="color: #005f5f;">addr</span>, <span style="color: #0031a9;">socklen_t</span> <span style="color: #005f5f;">addrlen</span>);
 </pre>
 </div>
 
@@ -942,11 +942,11 @@ function returns zero on success, or -1 on error, setting <code>errno</code> app
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">status</span> = connect(sockfd,
+<pre class="src src-C"><span style="color: #972500;">const</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">status</span> = connect(sockfd,
                            server_info-&gt;ai_addr,
                            server_info-&gt;ai_addrlen);
-<span style="color: #ff6f9f;">if</span> (status != <span style="color: #88ca9f;">0</span>) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Connection error: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
+<span style="color: #972500;">if</span> (status != <span style="color: #2a5045;">0</span>) {
+    fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Connection error: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>, strerror(errno));
     abort();
 }
 </pre>
@@ -968,8 +968,8 @@ calling <code>freeaddrinfo</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #4ae2ff;">close</span>(sockfd);
-<span style="color: #4ae2ff;">freeaddrinfo</span>(server_info);
+<pre class="src src-C"><span style="color: #3f578f;">close</span>(sockfd);
+<span style="color: #3f578f;">freeaddrinfo</span>(server_info);
 </pre>
 </div>
 </div>
@@ -988,11 +988,11 @@ it&rsquo;s better to use <a href="https://man.cx/recv(2)"><code>recv(2)</code></
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/types.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/socket.h&gt;</span>
 
-<span style="color: #79a8ff;">ssize_t</span> <span style="color: #4ae2ff;">recv</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">buf</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">len</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">flags</span>);
-<span style="color: #79a8ff;">ssize_t</span> <span style="color: #4ae2ff;">send</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">buf</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">len</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">flags</span>);
+<span style="color: #0031a9;">ssize_t</span> <span style="color: #3f578f;">recv</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">sockfd</span>, <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">buf</span>, <span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">len</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">flags</span>);
+<span style="color: #0031a9;">ssize_t</span> <span style="color: #3f578f;">send</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">sockfd</span>, <span style="color: #972500;">const</span> <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">buf</span>, <span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">len</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">flags</span>);
 </pre>
 </div>
 
@@ -1035,28 +1035,28 @@ When receiving data, we should check for errors and end-of-file indicators.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stddef.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">ssize_t</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>   <span style="color: #989898;">/* </span><span style="color: #989898;">fprintf()</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;string.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">strerror()</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdlib.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">abort()</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stddef.h&gt;</span>  <span style="color: #595959;">/* </span><span style="color: #595959;">ssize_t</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>   <span style="color: #595959;">/* </span><span style="color: #595959;">fprintf()</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;string.h&gt;</span>  <span style="color: #595959;">/* </span><span style="color: #595959;">strerror()</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdlib.h&gt;</span>  <span style="color: #595959;">/* </span><span style="color: #595959;">abort()</span><span style="color: #595959;"> */</span>
 
-<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">BUF_SZ</span> <span style="color: #88ca9f;">100</span> <span style="color: #989898;">/* </span><span style="color: #989898;">Arbitrary size</span><span style="color: #989898;"> */</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #005f5f;">BUF_SZ</span> <span style="color: #2a5045;">100</span> <span style="color: #595959;">/* </span><span style="color: #595959;">Arbitrary size</span><span style="color: #595959;"> */</span>
 
-<span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">buf</span>[BUF_SZ];
-<span style="color: #ff6f9f;">for</span> (;;) {
-    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">ssize_t</span> <span style="color: #6ae4b9;">received</span> = recv(sockfd_connection, buf, <span style="color: #ff6f9f;">sizeof</span>(buf), <span style="color: #88ca9f;">0</span>);
+<span style="color: #0031a9;">char</span> <span style="color: #005f5f;">buf</span>[BUF_SZ];
+<span style="color: #972500;">for</span> (;;) {
+    <span style="color: #972500;">const</span> <span style="color: #0031a9;">ssize_t</span> <span style="color: #005f5f;">received</span> = recv(sockfd_connection, buf, <span style="color: #972500;">sizeof</span>(buf), <span style="color: #2a5045;">0</span>);
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Error</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">if</span> (received &lt; <span style="color: #88ca9f;">0</span>) {
-        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Receive error: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Error</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">if</span> (received &lt; <span style="color: #2a5045;">0</span>) {
+        fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Receive error: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>, strerror(errno));
         abort();
     }
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">End of file</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">if</span> (received == <span style="color: #88ca9f;">0</span>)
-        <span style="color: #ff6f9f;">break</span>;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">End of file</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">if</span> (received == <span style="color: #2a5045;">0</span>)
+        <span style="color: #972500;">break</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Handle data in `buf'</span><span style="color: #989898;"> */</span>
+    <span style="color: #595959;">/* </span><span style="color: #808000; font-weight: bold;">TODO:</span><span style="color: #595959;"> Handle data in `buf'</span><span style="color: #595959;"> */</span>
 }
 </pre>
 </div>
@@ -1068,34 +1068,34 @@ until all the buffer is sent:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdbool.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">bool</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stddef.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">size_t, ssize_t</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>   <span style="color: #989898;">/* </span><span style="color: #989898;">fprintf()</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;string.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">strerror()</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdlib.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">abort()</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdbool.h&gt;</span> <span style="color: #595959;">/* </span><span style="color: #595959;">bool</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stddef.h&gt;</span>  <span style="color: #595959;">/* </span><span style="color: #595959;">size_t, ssize_t</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>   <span style="color: #595959;">/* </span><span style="color: #595959;">fprintf()</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;string.h&gt;</span>  <span style="color: #595959;">/* </span><span style="color: #595959;">strerror()</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdlib.h&gt;</span>  <span style="color: #595959;">/* </span><span style="color: #595959;">abort()</span><span style="color: #595959;"> */</span>
 
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/types.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;sys/socket.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">send()</span><span style="color: #989898;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/types.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;sys/socket.h&gt;</span> <span style="color: #595959;">/* </span><span style="color: #595959;">send()</span><span style="color: #595959;"> */</span>
 
-<span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">send_data</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">sockfd</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">data</span>, <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">data_sz</span>) {
-    <span style="color: #79a8ff;">size_t</span> <span style="color: #6ae4b9;">total_sent</span> = <span style="color: #88ca9f;">0</span>;
+<span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">send_data</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">sockfd</span>, <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">data</span>, <span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">data_sz</span>) {
+    <span style="color: #0031a9;">size_t</span> <span style="color: #005f5f;">total_sent</span> = <span style="color: #2a5045;">0</span>;
 
-    <span style="color: #ff6f9f;">while</span> (data_sz &gt; <span style="color: #88ca9f;">0</span>) {
-        <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">ssize_t</span> <span style="color: #6ae4b9;">sent</span> =
-            send(sockfd, &amp;((<span style="color: #79a8ff;">char</span>*)data)[total_sent], data_sz, <span style="color: #88ca9f;">0</span>);
-        <span style="color: #ff6f9f;">if</span> (sent &lt; <span style="color: #88ca9f;">0</span>)
-            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+    <span style="color: #972500;">while</span> (data_sz &gt; <span style="color: #2a5045;">0</span>) {
+        <span style="color: #972500;">const</span> <span style="color: #0031a9;">ssize_t</span> <span style="color: #005f5f;">sent</span> =
+            send(sockfd, &amp;((<span style="color: #0031a9;">char</span>*)data)[total_sent], data_sz, <span style="color: #2a5045;">0</span>);
+        <span style="color: #972500;">if</span> (sent &lt; <span style="color: #2a5045;">0</span>)
+            <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
 
         total_sent += sent;
         data_sz -= sent;
     }
 
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">true</span>;
 }
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Calling the function</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>send_data(sockfd, buf, buf_pos)) {
-    fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Send error: </span><span style="color: #ff6f9f;">%s\n</span><span style="color: #00d3d0;">"</span>, strerror(errno));
+<span style="color: #595959;">/* </span><span style="color: #595959;">Calling the function</span><span style="color: #595959;"> */</span>
+<span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>send_data(sockfd, buf, buf_pos)) {
+    fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Send error: </span><span style="color: #972500;">%s\n</span><span style="color: #005e8b;">"</span>, strerror(errno));
     abort();
 }
 </pre>

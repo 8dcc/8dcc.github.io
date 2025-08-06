@@ -235,27 +235,27 @@ First, let&rsquo;s have a look at a sample program:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>
 
-<span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">my_func</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span>) {
-    <span style="color: #ff6f9f;">if</span> (y &gt; x || y &lt; <span style="color: #88ca9f;">0</span> || y &gt; <span style="color: #88ca9f;">32</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+<span style="color: #972500;">static</span> <span style="color: #0031a9;">int</span> <span style="color: #3f578f;">my_func</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">x</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">y</span>) {
+    <span style="color: #972500;">if</span> (y &gt; x || y &lt; <span style="color: #2a5045;">0</span> || y &gt; <span style="color: #2a5045;">32</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
 
-    puts(<span style="color: #00d3d0;">"Hello from my_func!"</span>);
+    puts(<span style="color: #005e8b;">"Hello from my_func!"</span>);
 
-    <span style="color: #ff6f9f;">return</span> (x &gt;&gt; y) * <span style="color: #88ca9f;">3</span>;
+    <span style="color: #972500;">return</span> (x &gt;&gt; y) * <span style="color: #2a5045;">3</span>;
 }
 
-<span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">main</span>(<span style="color: #79a8ff;">void</span>) {
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">x</span> = <span style="color: #88ca9f;">0x100</span>;
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">y</span> = <span style="color: #88ca9f;">4</span>;
-    printf(<span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, my_func(x, y));
+<span style="color: #0031a9;">int</span> <span style="color: #3f578f;">main</span>(<span style="color: #0031a9;">void</span>) {
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">x</span> = <span style="color: #2a5045;">0x100</span>;
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">y</span> = <span style="color: #2a5045;">4</span>;
+    printf(<span style="color: #005e8b;">"</span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, my_func(x, y));
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Infinite loop for injecting later</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">for</span> (;;)
-        <span style="color: #cabf00;">;</span>
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Infinite loop for injecting later</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">for</span> (;;)
+        <span style="color: #808000;">;</span>
 
-    <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
 }
 </pre>
 </div>
@@ -412,39 +412,39 @@ it is:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span>
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Used for getting the bytes from IDA patterns.</span>
-<span style="color: #989898;"> * Converts: "E0" -&gt; 224</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">uint8_t</span> <span style="color: #4ae2ff;">hex_to_byte</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">hex</span>) {
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ret</span> = <span style="color: #88ca9f;">0</span>;
+<span style="color: #595959;">/* </span><span style="color: #595959;">Used for getting the bytes from IDA patterns.</span>
+<span style="color: #595959;"> * Converts: "E0" -&gt; 224</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">uint8_t</span> <span style="color: #3f578f;">hex_to_byte</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">hex</span>) {
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">ret</span> = <span style="color: #2a5045;">0</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Skip leading spaces, if any</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">while</span> (*hex == <span style="color: #00d3d0;">' '</span>)
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Skip leading spaces, if any</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">while</span> (*hex == <span style="color: #005e8b;">' '</span>)
         hex++;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Store a byte (two digits of string)</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">i</span> = <span style="color: #88ca9f;">0</span>; i &lt; <span style="color: #88ca9f;">2</span> &amp;&amp; hex[i] != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>; i++) {
-        <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">c</span> = hex[i];
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Store a byte (two digits of string)</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">i</span> = <span style="color: #2a5045;">0</span>; i &lt; <span style="color: #2a5045;">2</span> &amp;&amp; hex[i] != <span style="color: #005e8b;">'</span><span style="color: #972500;">\0</span><span style="color: #005e8b;">'</span>; i++) {
+        <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">c</span> = hex[i];
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">For example "E ", although the format should always be "0E"</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">if</span> (c == <span style="color: #00d3d0;">' '</span>)
-            <span style="color: #ff6f9f;">break</span>;
+        <span style="color: #595959;">/* </span><span style="color: #595959;">For example "E ", although the format should always be "0E"</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">if</span> (c == <span style="color: #005e8b;">' '</span>)
+            <span style="color: #972500;">break</span>;
 
-        <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">n</span> = <span style="color: #88ca9f;">0</span>;
-        <span style="color: #ff6f9f;">if</span> (c &gt;= <span style="color: #00d3d0;">'0'</span> &amp;&amp; c &lt;= <span style="color: #00d3d0;">'9'</span>)
-            n = c - <span style="color: #00d3d0;">'0'</span>;
-        <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (c &gt;= <span style="color: #00d3d0;">'a'</span> &amp;&amp; c &lt;= <span style="color: #00d3d0;">'f'</span>)
-            n = <span style="color: #88ca9f;">10</span> + c - <span style="color: #00d3d0;">'a'</span>;
-        <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (c &gt;= <span style="color: #00d3d0;">'A'</span> &amp;&amp; c &lt;= <span style="color: #00d3d0;">'F'</span>)
-            n = <span style="color: #88ca9f;">10</span> + c - <span style="color: #00d3d0;">'A'</span>;
+        <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">n</span> = <span style="color: #2a5045;">0</span>;
+        <span style="color: #972500;">if</span> (c &gt;= <span style="color: #005e8b;">'0'</span> &amp;&amp; c &lt;= <span style="color: #005e8b;">'9'</span>)
+            n = c - <span style="color: #005e8b;">'0'</span>;
+        <span style="color: #972500;">else</span> <span style="color: #972500;">if</span> (c &gt;= <span style="color: #005e8b;">'a'</span> &amp;&amp; c &lt;= <span style="color: #005e8b;">'f'</span>)
+            n = <span style="color: #2a5045;">10</span> + c - <span style="color: #005e8b;">'a'</span>;
+        <span style="color: #972500;">else</span> <span style="color: #972500;">if</span> (c &gt;= <span style="color: #005e8b;">'A'</span> &amp;&amp; c &lt;= <span style="color: #005e8b;">'F'</span>)
+            n = <span style="color: #2a5045;">10</span> + c - <span style="color: #005e8b;">'A'</span>;
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Shift size of 0xF and add the next half of byte</span><span style="color: #989898;"> */</span>
-        ret &lt;&lt;= <span style="color: #88ca9f;">4</span>;
-        ret |= n &amp; <span style="color: #88ca9f;">0xF</span>;
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Shift size of 0xF and add the next half of byte</span><span style="color: #595959;"> */</span>
+        ret &lt;&lt;= <span style="color: #2a5045;">4</span>;
+        ret |= n &amp; <span style="color: #2a5045;">0xF</span>;
     }
 
-    <span style="color: #ff6f9f;">return</span> ret &amp; <span style="color: #88ca9f;">0xFF</span>;
+    <span style="color: #972500;">return</span> ret &amp; <span style="color: #2a5045;">0xFF</span>;
 }
 </pre>
 </div>
@@ -459,67 +459,67 @@ And with that, we can make our <code>do_scan</code> function:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span>
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Search for `pattern' from `start' to `end'.</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">void</span>* <span style="color: #4ae2ff;">do_scan</span>(<span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">start</span>, <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">end</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">pattern</span>) {
-    <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>start || <span style="color: #ff6740; font-weight: bold;">!</span>end)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+<span style="color: #595959;">/* </span><span style="color: #595959;">Search for `pattern' from `start' to `end'.</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">void</span>* <span style="color: #3f578f;">do_scan</span>(<span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">start</span>, <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">end</span>, <span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">pattern</span>) {
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>start || <span style="color: #972500; font-weight: bold;">!</span>end)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Skip preceding spaces from pattern, if any</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">while</span> (*pattern == <span style="color: #00d3d0;">' '</span>)
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Skip preceding spaces from pattern, if any</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">while</span> (*pattern == <span style="color: #005e8b;">' '</span>)
         pattern++;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Current position in memory and current position in pattern</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">mem_ptr</span>    = start;
-    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">pat_ptr</span> = pattern;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Current position in memory and current position in pattern</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">uint8_t</span>* <span style="color: #005f5f;">mem_ptr</span>    = start;
+    <span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">pat_ptr</span> = pattern;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate until we reach the end of the memory or the end of the pattern</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">while</span> ((<span style="color: #79a8ff;">void</span>*)mem_ptr &lt; end &amp;&amp; *pat_ptr != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Wildcard, always match</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">if</span> (*pat_ptr == <span style="color: #00d3d0;">'?'</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Iterate until we reach the end of the memory or the end of the pattern</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">while</span> ((<span style="color: #0031a9;">void</span>*)mem_ptr &lt; end &amp;&amp; *pat_ptr != <span style="color: #005e8b;">'</span><span style="color: #972500;">\0</span><span style="color: #005e8b;">'</span>) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Wildcard, always match</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">if</span> (*pat_ptr == <span style="color: #005e8b;">'?'</span>) {
             mem_ptr++;
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">"A1 ?? ?? B2" -&gt; "A1 ? ? B2"</span><span style="color: #989898;"> */</span>
-            <span style="color: #ff6f9f;">while</span> (*pat_ptr == <span style="color: #00d3d0;">'?'</span>)
+            <span style="color: #595959;">/* </span><span style="color: #595959;">"A1 ?? ?? B2" -&gt; "A1 ? ? B2"</span><span style="color: #595959;"> */</span>
+            <span style="color: #972500;">while</span> (*pat_ptr == <span style="color: #005e8b;">'?'</span>)
                 pat_ptr++;
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Remove trailing spaces after '?'</span>
-<span style="color: #989898;">             * </span><span style="color: #44bc44; font-weight: bold;">NOTE:</span><span style="color: #989898;"> I reused this code, but you could use `goto`</span><span style="color: #989898;"> */</span>
-            <span style="color: #ff6f9f;">while</span> (*pat_ptr == <span style="color: #00d3d0;">' '</span>)
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Remove trailing spaces after '?'</span>
+<span style="color: #595959;">             * </span><span style="color: #006800; font-weight: bold;">NOTE:</span><span style="color: #595959;"> I reused this code, but you could use `goto`</span><span style="color: #595959;"> */</span>
+            <span style="color: #972500;">while</span> (*pat_ptr == <span style="color: #005e8b;">' '</span>)
                 pat_ptr++;
 
-            <span style="color: #ff6f9f;">continue</span>;
+            <span style="color: #972500;">continue</span>;
         }
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Convert "E0" into 224.</span>
-<span style="color: #989898;">         * </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Would be better to only do this once at the start of the</span>
-<span style="color: #989898;">         * function with some kind of ida2bytes function (We would need a mask</span>
-<span style="color: #989898;">         * for the '?' vs. 0x3F).</span><span style="color: #989898;"> */</span>
-        <span style="color: #79a8ff;">uint8_t</span> <span style="color: #6ae4b9;">cur_byte</span> = hex_to_byte(pat_ptr);
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Convert "E0" into 224.</span>
+<span style="color: #595959;">         * </span><span style="color: #808000; font-weight: bold;">TODO:</span><span style="color: #595959;"> Would be better to only do this once at the start of the</span>
+<span style="color: #595959;">         * function with some kind of ida2bytes function (We would need a mask</span>
+<span style="color: #595959;">         * for the '?' vs. 0x3F).</span><span style="color: #595959;"> */</span>
+        <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">cur_byte</span> = hex_to_byte(pat_ptr);
 
-        <span style="color: #ff6f9f;">if</span> (*mem_ptr == cur_byte) {
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Found exact byte match in sequence, go to next byte in memory</span><span style="color: #989898;"> */</span>
+        <span style="color: #972500;">if</span> (*mem_ptr == cur_byte) {
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Found exact byte match in sequence, go to next byte in memory</span><span style="color: #595959;"> */</span>
             mem_ptr++;
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Go to next byte separator in pattern (space)</span><span style="color: #989898;"> */</span>
-            <span style="color: #ff6f9f;">while</span> (*pat_ptr != <span style="color: #00d3d0;">' '</span> &amp;&amp; *pat_ptr != <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>)
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Go to next byte separator in pattern (space)</span><span style="color: #595959;"> */</span>
+            <span style="color: #972500;">while</span> (*pat_ptr != <span style="color: #005e8b;">' '</span> &amp;&amp; *pat_ptr != <span style="color: #005e8b;">'</span><span style="color: #972500;">\0</span><span style="color: #005e8b;">'</span>)
                 pat_ptr++;
-        } <span style="color: #ff6f9f;">else</span> {
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Byte didn't match, check pattern from the begining on the next</span>
-<span style="color: #989898;">             * position in memory</span><span style="color: #989898;"> */</span>
+        } <span style="color: #972500;">else</span> {
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Byte didn't match, check pattern from the begining on the next</span>
+<span style="color: #595959;">             * position in memory</span><span style="color: #595959;"> */</span>
             start++;
             mem_ptr = start;
             pat_ptr = pattern;
         }
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Skip trailing spaces</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">while</span> (*pat_ptr == <span style="color: #00d3d0;">' '</span>)
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Skip trailing spaces</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">while</span> (*pat_ptr == <span style="color: #005e8b;">' '</span>)
             pat_ptr++;
     }
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">If we reached end of pattern, return the match. Otherwise, NULL</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">return</span> (*pat_ptr == <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>) ? start : <span style="color: #88ca9f;">NULL</span>;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">If we reached end of pattern, return the match. Otherwise, NULL</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">return</span> (*pat_ptr == <span style="color: #005e8b;">'</span><span style="color: #972500;">\0</span><span style="color: #005e8b;">'</span>) ? start : <span style="color: #2a5045;">NULL</span>;
 }
 </pre>
 </div>
@@ -549,41 +549,41 @@ get the size of the loaded module).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdint.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;link.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;dlfcn.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdint.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;link.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;dlfcn.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>
 
-<span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">our_link_map</span> {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Base from link.h</span><span style="color: #989898;"> */</span>
-    <span style="color: #4ae2ff;">ElfW</span>(Addr) l_addr;
-    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">l_name</span>;
-    <span style="color: #4ae2ff;">ElfW</span>(Dyn) * l_ld;
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">our_link_map</span>* <span style="color: #6ae4b9;">l_next</span>;
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">our_link_map</span>* <span style="color: #6ae4b9;">l_prev</span>;
+<span style="color: #972500;">struct</span> <span style="color: #0031a9;">our_link_map</span> {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Base from link.h</span><span style="color: #595959;"> */</span>
+    <span style="color: #3f578f;">ElfW</span>(Addr) l_addr;
+    <span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">l_name</span>;
+    <span style="color: #3f578f;">ElfW</span>(Dyn) * l_ld;
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">our_link_map</span>* <span style="color: #005f5f;">l_next</span>;
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">our_link_map</span>* <span style="color: #005f5f;">l_prev</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Added</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">our_link_map</span>* <span style="color: #6ae4b9;">real</span>;
-    <span style="color: #79a8ff;">long</span> <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">ns</span>;
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">libname_list</span>* <span style="color: #6ae4b9;">moduleName</span>;
-    <span style="color: #4ae2ff;">ElfW</span>(Dyn) *
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Added</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">our_link_map</span>* <span style="color: #005f5f;">real</span>;
+    <span style="color: #0031a9;">long</span> <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">ns</span>;
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">libname_list</span>* <span style="color: #005f5f;">moduleName</span>;
+    <span style="color: #3f578f;">ElfW</span>(Dyn) *
       info[DT_NUM + DT_VERSIONTAGNUM + DT_EXTRANUM + DT_VALNUM + DT_ADDRNUM];
-    <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">ElfW</span>(<span style="color: #6ae4b9;">Phdr</span>) * phdr;
+    <span style="color: #972500;">const</span> <span style="color: #0031a9;">ElfW</span>(<span style="color: #005f5f;">Phdr</span>) * phdr;
 };
 
-<span style="color: #79a8ff;">void</span>* <span style="color: #4ae2ff;">sigscan</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">module</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">pattern</span>) {
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">our_link_map</span>* <span style="color: #6ae4b9;">link</span> = dlopen(module, RTLD_NOLOAD | RTLD_NOW);
-    <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>link) {
-        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"Can't open module </span><span style="color: #ff6f9f;">\"%s\"</span><span style="color: #00d3d0;">"</span>, module);
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+<span style="color: #0031a9;">void</span>* <span style="color: #3f578f;">sigscan</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">module</span>, <span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">pattern</span>) {
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">our_link_map</span>* <span style="color: #005f5f;">link</span> = dlopen(module, RTLD_NOLOAD | RTLD_NOW);
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>link) {
+        fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"Can't open module </span><span style="color: #972500;">\"%s\"</span><span style="color: #005e8b;">"</span>, module);
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
     }
 
-    <span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">start</span> = (<span style="color: #79a8ff;">uint8_t</span>*)link-&gt;l_addr;
-    <span style="color: #79a8ff;">uint8_t</span>* <span style="color: #6ae4b9;">end</span>   = start + link-&gt;phdr[<span style="color: #88ca9f;">0</span>].p_memsz;
+    <span style="color: #0031a9;">uint8_t</span>* <span style="color: #005f5f;">start</span> = (<span style="color: #0031a9;">uint8_t</span>*)link-&gt;l_addr;
+    <span style="color: #0031a9;">uint8_t</span>* <span style="color: #005f5f;">end</span>   = start + link-&gt;phdr[<span style="color: #2a5045;">0</span>].p_memsz;
 
     dlclose(link);
 
-    <span style="color: #ff6f9f;">return</span> do_scan(start, end, pattern);
+    <span style="color: #972500;">return</span> do_scan(start, end, pattern);
 }
 </pre>
 </div>
@@ -657,92 +657,92 @@ function but since it&rsquo;s well commented, I won&rsquo;t dive into too much d
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdbool.h&gt;</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>  <span style="color: #989898;">/* </span><span style="color: #989898;">fopen(), FILE*</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdlib.h&gt;</span> <span style="color: #989898;">/* </span><span style="color: #989898;">strtoull()</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdbool.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>  <span style="color: #595959;">/* </span><span style="color: #595959;">fopen(), FILE*</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdlib.h&gt;</span> <span style="color: #595959;">/* </span><span style="color: #595959;">strtoull()</span><span style="color: #595959;"> */</span>
 
-<span style="color: #ff6f9f;">typedef</span> <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">ModuleBounds</span> {
-    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">start</span>;
-    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">end</span>;
-    <span style="color: #ff6f9f;">struct</span> <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">next</span>;
-} <span style="color: #79a8ff;">ModuleBounds</span>;
+<span style="color: #972500;">typedef</span> <span style="color: #972500;">struct</span> <span style="color: #0031a9;">ModuleBounds</span> {
+    <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">start</span>;
+    <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">end</span>;
+    <span style="color: #972500;">struct</span> <span style="color: #0031a9;">ModuleBounds</span>* <span style="color: #005f5f;">next</span>;
+} <span style="color: #0031a9;">ModuleBounds</span>;
 
-<span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #4ae2ff;">get_module_bounds</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">module_name</span>) {
-    <span style="color: #79a8ff;">FILE</span>* <span style="color: #6ae4b9;">fd</span> = fopen(<span style="color: #00d3d0;">"/proc/self/maps"</span>, <span style="color: #00d3d0;">"r"</span>);
-    <span style="color: #ff6f9f;">if</span> (<span style="color: #ff6740; font-weight: bold;">!</span>fd)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+<span style="color: #0031a9;">ModuleBounds</span>* <span style="color: #3f578f;">get_module_bounds</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">module_name</span>) {
+    <span style="color: #0031a9;">FILE</span>* <span style="color: #005f5f;">fd</span> = fopen(<span style="color: #005e8b;">"/proc/self/maps"</span>, <span style="color: #005e8b;">"r"</span>);
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>fd)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">For the first module. Start `ret' as NULL in case no module is valid.</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">ret</span> = <span style="color: #88ca9f;">NULL</span>;
-    <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">cur</span> = ret;
+    <span style="color: #595959;">/* </span><span style="color: #595959;">For the first module. Start `ret' as NULL in case no module is valid.</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">ModuleBounds</span>* <span style="color: #005f5f;">ret</span> = <span style="color: #2a5045;">NULL</span>;
+    <span style="color: #0031a9;">ModuleBounds</span>* <span style="color: #005f5f;">cur</span> = ret;
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Buffers used in the loop by fgets() and sscanf()</span><span style="color: #989898;"> */</span>
-    <span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">line_buf</span>[<span style="color: #88ca9f;">300</span>];
-    <span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">rwxp</span>[<span style="color: #88ca9f;">5</span>];
-    <span style="color: #ff6f9f;">static</span> <span style="color: #79a8ff;">char</span> <span style="color: #6ae4b9;">pathname</span>[<span style="color: #88ca9f;">200</span>];
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Buffers used in the loop by fgets() and sscanf()</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">static</span> <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">line_buf</span>[<span style="color: #2a5045;">300</span>];
+    <span style="color: #972500;">static</span> <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">rwxp</span>[<span style="color: #2a5045;">5</span>];
+    <span style="color: #972500;">static</span> <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">pathname</span>[<span style="color: #2a5045;">200</span>];
 
-    <span style="color: #ff6f9f;">while</span> (fgets(line_buf, <span style="color: #ff6f9f;">sizeof</span>(line_buf), fd)) {
-        pathname[<span style="color: #88ca9f;">0</span>] = <span style="color: #00d3d0;">'</span><span style="color: #ff6f9f;">\0</span><span style="color: #00d3d0;">'</span>;
+    <span style="color: #972500;">while</span> (fgets(line_buf, <span style="color: #972500;">sizeof</span>(line_buf), fd)) {
+        pathname[<span style="color: #2a5045;">0</span>] = <span style="color: #005e8b;">'</span><span style="color: #972500;">\0</span><span style="color: #005e8b;">'</span>;
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Scan the current line using sscanf(). We need to change address sizes</span>
-<span style="color: #989898;">         * depending on the arch.</span><span style="color: #989898;"> */</span>
-        <span style="color: #79a8ff;">long</span> <span style="color: #79a8ff;">unsigned</span> <span style="color: #6ae4b9;">start_num</span> = <span style="color: #88ca9f;">0</span>, <span style="color: #6ae4b9;">end_num</span> = <span style="color: #88ca9f;">0</span>, <span style="color: #6ae4b9;">offset</span> = <span style="color: #88ca9f;">0</span>;
-        <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">fmt_match_num</span> =
-          sscanf(line_buf, <span style="color: #00d3d0;">"</span><span style="color: #ff6f9f;">%lx</span><span style="color: #00d3d0;">-</span><span style="color: #ff6f9f;">%lx</span><span style="color: #00d3d0;"> </span><span style="color: #ff6f9f;">%4s</span><span style="color: #00d3d0;"> </span><span style="color: #ff6f9f;">%lx</span><span style="color: #00d3d0;"> </span><span style="color: #ff6f9f;">%*x</span><span style="color: #00d3d0;">:</span><span style="color: #ff6f9f;">%*x</span><span style="color: #00d3d0;"> </span><span style="color: #ff6f9f;">%*d</span><span style="color: #00d3d0;"> %200[^</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">]</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">"</span>,
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Scan the current line using sscanf(). We need to change address sizes</span>
+<span style="color: #595959;">         * depending on the arch.</span><span style="color: #595959;"> */</span>
+        <span style="color: #0031a9;">long</span> <span style="color: #0031a9;">unsigned</span> <span style="color: #005f5f;">start_num</span> = <span style="color: #2a5045;">0</span>, <span style="color: #005f5f;">end_num</span> = <span style="color: #2a5045;">0</span>, <span style="color: #005f5f;">offset</span> = <span style="color: #2a5045;">0</span>;
+        <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">fmt_match_num</span> =
+          sscanf(line_buf, <span style="color: #005e8b;">"</span><span style="color: #972500;">%lx</span><span style="color: #005e8b;">-</span><span style="color: #972500;">%lx</span><span style="color: #005e8b;"> </span><span style="color: #972500;">%4s</span><span style="color: #005e8b;"> </span><span style="color: #972500;">%lx</span><span style="color: #005e8b;"> </span><span style="color: #972500;">%*x</span><span style="color: #005e8b;">:</span><span style="color: #972500;">%*x</span><span style="color: #005e8b;"> </span><span style="color: #972500;">%*d</span><span style="color: #005e8b;"> %200[^</span><span style="color: #972500;">\n</span><span style="color: #005e8b;">]</span><span style="color: #972500;">\n</span><span style="color: #005e8b;">"</span>,
                  &amp;start_num, &amp;end_num, rwxp, &amp;offset, pathname);
 
-        <span style="color: #ff6f9f;">if</span> (fmt_match_num &lt; <span style="color: #88ca9f;">4</span>)
-            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">NULL</span>;
+        <span style="color: #972500;">if</span> (fmt_match_num &lt; <span style="color: #2a5045;">4</span>)
+            <span style="color: #972500;">return</span> <span style="color: #2a5045;">NULL</span>;
 
-        <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">start_addr</span> = (<span style="color: #79a8ff;">void</span>*)start_num;
-        <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">end_addr</span>   = (<span style="color: #79a8ff;">void</span>*)end_num;
+        <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">start_addr</span> = (<span style="color: #0031a9;">void</span>*)start_num;
+        <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">end_addr</span>   = (<span style="color: #0031a9;">void</span>*)end_num;
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Parse "rwxp". For now we only care about read permissions.</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">is_readable</span> = rwxp[<span style="color: #88ca9f;">0</span>] == <span style="color: #00d3d0;">'r'</span>;
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Parse "rwxp". For now we only care about read permissions.</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">const</span> <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">is_readable</span> = rwxp[<span style="color: #2a5045;">0</span>] == <span style="color: #005e8b;">'r'</span>;
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">First, we make sure we got a name, and that it doesn't start with</span>
-<span style="color: #989898;">         * '\0' or '['. Then, either we don't want to filter by module name</span>
-<span style="color: #989898;">         * (module name is NULL) or we checked the module name and it matches.</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">bool</span> <span style="color: #6ae4b9;">name_matches</span> =
-          fmt_match_num == <span style="color: #88ca9f;">5</span> &amp;&amp; pathname[<span style="color: #88ca9f;">0</span>] != <span style="color: #00d3d0;">'\0'</span> &amp;&amp; pathname[<span style="color: #88ca9f;">0</span>] != <span style="color: #00d3d0;">'['</span> &amp;&amp;
-          (module_name == <span style="color: #88ca9f;">NULL</span> || <span style="color: #ff6740; font-weight: bold;">!</span>strcmp(module_name, pathname));
+        <span style="color: #595959;">/* </span><span style="color: #595959;">First, we make sure we got a name, and that it doesn't start with</span>
+<span style="color: #595959;">         * '\0' or '['. Then, either we don't want to filter by module name</span>
+<span style="color: #595959;">         * (module name is NULL) or we checked the module name and it matches.</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">const</span> <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">name_matches</span> =
+          fmt_match_num == <span style="color: #2a5045;">5</span> &amp;&amp; pathname[<span style="color: #2a5045;">0</span>] != <span style="color: #005e8b;">'\0'</span> &amp;&amp; pathname[<span style="color: #2a5045;">0</span>] != <span style="color: #005e8b;">'['</span> &amp;&amp;
+          (module_name == <span style="color: #2a5045;">NULL</span> || <span style="color: #972500; font-weight: bold;">!</span>strcmp(module_name, pathname));
 
-        <span style="color: #989898;">/* </span><span style="color: #989898;">We can read it, and it's the module we are looking for.</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">if</span> (is_readable &amp;&amp; name_matches) {
-            <span style="color: #ff6f9f;">if</span> (cur == <span style="color: #88ca9f;">NULL</span>) {
-                <span style="color: #989898;">/* </span><span style="color: #989898;">Allocate the first bounds struct</span><span style="color: #989898;"> */</span>
-                cur = (<span style="color: #79a8ff;">ModuleBounds</span>*)malloc(<span style="color: #ff6f9f;">sizeof</span>(ModuleBounds));
+        <span style="color: #595959;">/* </span><span style="color: #595959;">We can read it, and it's the module we are looking for.</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">if</span> (is_readable &amp;&amp; name_matches) {
+            <span style="color: #972500;">if</span> (cur == <span style="color: #2a5045;">NULL</span>) {
+                <span style="color: #595959;">/* </span><span style="color: #595959;">Allocate the first bounds struct</span><span style="color: #595959;"> */</span>
+                cur = (<span style="color: #0031a9;">ModuleBounds</span>*)malloc(<span style="color: #972500;">sizeof</span>(ModuleBounds));
 
-                <span style="color: #989898;">/* </span><span style="color: #989898;">This one will be returned</span><span style="color: #989898;"> */</span>
+                <span style="color: #595959;">/* </span><span style="color: #595959;">This one will be returned</span><span style="color: #595959;"> */</span>
                 ret = cur;
 
-                <span style="color: #989898;">/* </span><span style="color: #989898;">Save the addresses from this line of maps</span><span style="color: #989898;"> */</span>
+                <span style="color: #595959;">/* </span><span style="color: #595959;">Save the addresses from this line of maps</span><span style="color: #595959;"> */</span>
                 cur-&gt;start = start_addr;
                 cur-&gt;end   = end_addr;
-            } <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (cur-&gt;end == start_addr &amp;&amp; cur-&gt;end &lt; end_addr) {
-                <span style="color: #989898;">/* </span><span style="color: #989898;">If the end address of the last struct is the start of this</span>
-<span style="color: #989898;">                 * one, just merge them.</span><span style="color: #989898;"> */</span>
+            } <span style="color: #972500;">else</span> <span style="color: #972500;">if</span> (cur-&gt;end == start_addr &amp;&amp; cur-&gt;end &lt; end_addr) {
+                <span style="color: #595959;">/* </span><span style="color: #595959;">If the end address of the last struct is the start of this</span>
+<span style="color: #595959;">                 * one, just merge them.</span><span style="color: #595959;"> */</span>
                 cur-&gt;end = end_addr;
-            } <span style="color: #ff6f9f;">else</span> {
-                <span style="color: #989898;">/* </span><span style="color: #989898;">There was a gap between the end of the last block and the</span>
-<span style="color: #989898;">                 * start of this one, allocate new struct.</span><span style="color: #989898;"> */</span>
-                cur-&gt;next = (<span style="color: #79a8ff;">ModuleBounds</span>*)malloc(<span style="color: #ff6f9f;">sizeof</span>(ModuleBounds));
+            } <span style="color: #972500;">else</span> {
+                <span style="color: #595959;">/* </span><span style="color: #595959;">There was a gap between the end of the last block and the</span>
+<span style="color: #595959;">                 * start of this one, allocate new struct.</span><span style="color: #595959;"> */</span>
+                cur-&gt;next = (<span style="color: #0031a9;">ModuleBounds</span>*)malloc(<span style="color: #972500;">sizeof</span>(ModuleBounds));
 
-                <span style="color: #989898;">/* </span><span style="color: #989898;">Set as current</span><span style="color: #989898;"> */</span>
+                <span style="color: #595959;">/* </span><span style="color: #595959;">Set as current</span><span style="color: #595959;"> */</span>
                 cur = cur-&gt;next;
 
-                <span style="color: #989898;">/* </span><span style="color: #989898;">Save the addresses from this line of maps</span><span style="color: #989898;"> */</span>
+                <span style="color: #595959;">/* </span><span style="color: #595959;">Save the addresses from this line of maps</span><span style="color: #595959;"> */</span>
                 cur-&gt;start = start_addr;
                 cur-&gt;end   = end_addr;
             }
 
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Indicate the end of the linked list</span><span style="color: #989898;"> */</span>
-            cur-&gt;next = <span style="color: #88ca9f;">NULL</span>;
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Indicate the end of the linked list</span><span style="color: #595959;"> */</span>
+            cur-&gt;next = <span style="color: #2a5045;">NULL</span>;
         }
     }
 
     fclose(fd);
-    <span style="color: #ff6f9f;">return</span> ret;
+    <span style="color: #972500;">return</span> ret;
 }
 </pre>
 </div>
@@ -760,11 +760,11 @@ Of course, we would need to free the <code>ModuleBounds</code> structures alloca
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Free a linked list of ModuleBounds structures</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">free_module_bounds</span>(<span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">bounds</span>) {
-    <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">cur</span> = bounds;
-    <span style="color: #ff6f9f;">while</span> (cur != <span style="color: #88ca9f;">NULL</span>) {
-        <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">next</span> = cur-&gt;next;
+<pre class="src src-C"><span style="color: #595959;">/* </span><span style="color: #595959;">Free a linked list of ModuleBounds structures</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">free_module_bounds</span>(<span style="color: #0031a9;">ModuleBounds</span>* <span style="color: #005f5f;">bounds</span>) {
+    <span style="color: #0031a9;">ModuleBounds</span>* <span style="color: #005f5f;">cur</span> = bounds;
+    <span style="color: #972500;">while</span> (cur != <span style="color: #2a5045;">NULL</span>) {
+        <span style="color: #0031a9;">ModuleBounds</span>* <span style="color: #005f5f;">next</span> = cur-&gt;next;
         free(cur);
         cur = next;
     }
@@ -778,27 +778,27 @@ scan them using our <code>do_scan</code> function.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">Search for `ida_pattern' in the specified `module'.</span><span style="color: #989898;"> */</span>
-<span style="color: #79a8ff;">void</span>* <span style="color: #4ae2ff;">sigscan</span>(<span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">module</span>, <span style="color: #ff6f9f;">const</span> <span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">ida_pattern</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Get a linked list of ModuleBounds, containing the start and end addresses</span>
-<span style="color: #989898;">     * of all the regions that match `module'.</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">bounds</span> = get_module_bounds(module);
+<pre class="src src-C"><span style="color: #595959;">/* </span><span style="color: #595959;">Search for `ida_pattern' in the specified `module'.</span><span style="color: #595959;"> */</span>
+<span style="color: #0031a9;">void</span>* <span style="color: #3f578f;">sigscan</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">module</span>, <span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">ida_pattern</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Get a linked list of ModuleBounds, containing the start and end addresses</span>
+<span style="color: #595959;">     * of all the regions that match `module'.</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">ModuleBounds</span>* <span style="color: #005f5f;">bounds</span> = get_module_bounds(module);
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Iterate them, and scan each one until we find a match.</span><span style="color: #989898;"> */</span>
-    <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">ret</span> = <span style="color: #88ca9f;">NULL</span>;
-    <span style="color: #ff6f9f;">for</span> (<span style="color: #79a8ff;">ModuleBounds</span>* <span style="color: #6ae4b9;">cur</span> = bounds; cur != <span style="color: #88ca9f;">NULL</span>; cur = cur-&gt;next) {
-        <span style="color: #79a8ff;">void</span>* <span style="color: #6ae4b9;">cur_result</span> = do_scan(cur-&gt;start, cur-&gt;end, ida_pattern);
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Iterate them, and scan each one until we find a match.</span><span style="color: #595959;"> */</span>
+    <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">ret</span> = <span style="color: #2a5045;">NULL</span>;
+    <span style="color: #972500;">for</span> (<span style="color: #0031a9;">ModuleBounds</span>* <span style="color: #005f5f;">cur</span> = bounds; cur != <span style="color: #2a5045;">NULL</span>; cur = cur-&gt;next) {
+        <span style="color: #0031a9;">void</span>* <span style="color: #005f5f;">cur_result</span> = do_scan(cur-&gt;start, cur-&gt;end, ida_pattern);
 
-        <span style="color: #ff6f9f;">if</span> (cur_result != <span style="color: #88ca9f;">NULL</span>) {
+        <span style="color: #972500;">if</span> (cur_result != <span style="color: #2a5045;">NULL</span>) {
             ret = cur_result;
-            <span style="color: #ff6f9f;">break</span>;
+            <span style="color: #972500;">break</span>;
         }
     }
 
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Free the ModuleBounds linked list</span><span style="color: #989898;"> */</span>
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Free the ModuleBounds linked list</span><span style="color: #595959;"> */</span>
     free_module_bounds(bounds);
 
-    <span style="color: #ff6f9f;">return</span> ret;
+    <span style="color: #972500;">return</span> ret;
 }
 </pre>
 </div>
@@ -816,37 +816,37 @@ create a shared object that we can inject into a running process.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6740;">#include</span> <span style="color: #00d3d0;">&lt;stdio.h&gt;</span>
+<pre class="src src-C"><span style="color: #a0132f;">#include</span> <span style="color: #005e8b;">&lt;stdio.h&gt;</span>
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Random '?' just to show wilcards</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6740;">#define</span> <span style="color: #6ae4b9;">MY_SIG</span> <span style="color: #00d3d0;">"55 48 89 E5 48 83 EC 10 89 ? ? ? ? F8 8B 45 F8 ? ? FC 7F 0C 83"</span>
+<span style="color: #595959;">/* </span><span style="color: #595959;">Random '?' just to show wilcards</span><span style="color: #595959;"> */</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #005f5f;">MY_SIG</span> <span style="color: #005e8b;">"55 48 89 E5 48 83 EC 10 89 ? ? ? ? F8 8B 45 F8 ? ? FC 7F 0C 83"</span>
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">For readability</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6f9f;">typedef</span> <span style="color: #79a8ff;">int</span> (*<span style="color: #79a8ff;">func_ptr_t</span>)(<span style="color: #79a8ff;">int</span>, <span style="color: #79a8ff;">int</span>);
+<span style="color: #595959;">/* </span><span style="color: #595959;">For readability</span><span style="color: #595959;"> */</span>
+<span style="color: #972500;">typedef</span> <span style="color: #0031a9;">int</span> (*<span style="color: #0031a9;">func_ptr_t</span>)(<span style="color: #0031a9;">int</span>, <span style="color: #0031a9;">int</span>);
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Entry point when injected</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6f9f;">__attribute__</span>((constructor)) <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">load</span>(<span style="color: #79a8ff;">void</span>) {
-    puts(<span style="color: #00d3d0;">"Library loaded."</span>);
+<span style="color: #595959;">/* </span><span style="color: #595959;">Entry point when injected</span><span style="color: #595959;"> */</span>
+<span style="color: #972500;">__attribute__</span>((constructor)) <span style="color: #0031a9;">void</span> <span style="color: #3f578f;">load</span>(<span style="color: #0031a9;">void</span>) {
+    puts(<span style="color: #005e8b;">"Library loaded."</span>);
 
-    <span style="color: #79a8ff;">func_ptr_t</span> <span style="color: #6ae4b9;">found_func</span> = sigscan(<span style="color: #88ca9f;">NULL</span>, MY_SIG);
-    <span style="color: #ff6f9f;">if</span> (found_func == <span style="color: #88ca9f;">NULL</span>) {
-        fprintf(<span style="color: #88ca9f;">stderr</span>, <span style="color: #00d3d0;">"my_lib: Could not find function.</span><span style="color: #ff6f9f;">\n</span><span style="color: #00d3d0;">"</span>);
-        <span style="color: #ff6f9f;">return</span>;
+    <span style="color: #0031a9;">func_ptr_t</span> <span style="color: #005f5f;">found_func</span> = sigscan(<span style="color: #2a5045;">NULL</span>, MY_SIG);
+    <span style="color: #972500;">if</span> (found_func == <span style="color: #2a5045;">NULL</span>) {
+        fprintf(<span style="color: #2a5045;">stderr</span>, <span style="color: #005e8b;">"my_lib: Could not find function.</span><span style="color: #972500;">\n</span><span style="color: #005e8b;">"</span>);
+        <span style="color: #972500;">return</span>;
     }
 
-    printf(<span style="color: #00d3d0;">"my_lib: Found function at </span><span style="color: #ff6f9f;">%p\n</span><span style="color: #00d3d0;">"</span>, found_func);
+    printf(<span style="color: #005e8b;">"my_lib: Found function at </span><span style="color: #972500;">%p\n</span><span style="color: #005e8b;">"</span>, found_func);
 
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">a</span> = found_func(<span style="color: #88ca9f;">0x500</span>, <span style="color: #88ca9f;">4</span>);
-    printf(<span style="color: #00d3d0;">"my_lib: Function returned </span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, a);
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">a</span> = found_func(<span style="color: #2a5045;">0x500</span>, <span style="color: #2a5045;">4</span>);
+    printf(<span style="color: #005e8b;">"my_lib: Function returned </span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, a);
 
-    <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">b</span> = found_func(<span style="color: #88ca9f;">0x1000</span>, <span style="color: #88ca9f;">4</span>);
-    printf(<span style="color: #00d3d0;">"my_lib: Function returned </span><span style="color: #ff6f9f;">%d\n</span><span style="color: #00d3d0;">"</span>, b);
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">b</span> = found_func(<span style="color: #2a5045;">0x1000</span>, <span style="color: #2a5045;">4</span>);
+    printf(<span style="color: #005e8b;">"my_lib: Function returned </span><span style="color: #972500;">%d\n</span><span style="color: #005e8b;">"</span>, b);
 }
 
-<span style="color: #989898;">/* </span><span style="color: #989898;">Entry point when unloaded</span><span style="color: #989898;"> */</span>
-<span style="color: #ff6f9f;">__attribute__</span>((destructor)) <span style="color: #79a8ff;">void</span> <span style="color: #4ae2ff;">unload</span>() {
-    <span style="color: #989898;">/* </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Clean up stuff, if needed</span><span style="color: #989898;"> */</span>
-    puts(<span style="color: #00d3d0;">"Library unloaded."</span>);
+<span style="color: #595959;">/* </span><span style="color: #595959;">Entry point when unloaded</span><span style="color: #595959;"> */</span>
+<span style="color: #972500;">__attribute__</span>((destructor)) <span style="color: #0031a9;">void</span> <span style="color: #3f578f;">unload</span>() {
+    <span style="color: #595959;">/* </span><span style="color: #808000; font-weight: bold;">TODO:</span><span style="color: #595959;"> Clean up stuff, if needed</span><span style="color: #595959;"> */</span>
+    puts(<span style="color: #005e8b;">"Library unloaded."</span>);
 }
 </pre>
 </div>
@@ -867,22 +867,22 @@ library and the number 2, which corresponds to <code>RTLD_NOW</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #6ae4b9;">pid</span>=$(<span style="color: #feacd0;">pidof "example.out"</span>)
-<span style="color: #6ae4b9;">libpath</span>=$(<span style="color: #feacd0;">realpath "my_lib.so"</span>)
+<pre class="src src-bash"><span style="color: #005f5f;">pid</span>=$(<span style="color: #721045;">pidof "example.out"</span>)
+<span style="color: #005f5f;">libpath</span>=$(<span style="color: #721045;">realpath "my_lib.so"</span>)
 
-<span style="color: #ff6f9f;">if</span> [ <span style="color: #00d3d0;">"$pid"</span> == <span style="color: #00d3d0;">""</span> ]; <span style="color: #ff6f9f;">then</span>
-   <span style="color: #feacd0;">echo</span> <span style="color: #00d3d0;">"inject.sh: process not running."</span>
-   <span style="color: #ff6f9f;">exit</span> <span style="color: #88ca9f;">1</span>
-<span style="color: #ff6f9f;">fi</span>
+<span style="color: #972500;">if</span> [ <span style="color: #005e8b;">"$pid"</span> == <span style="color: #005e8b;">""</span> ]; <span style="color: #972500;">then</span>
+   <span style="color: #721045;">echo</span> <span style="color: #005e8b;">"inject.sh: process not running."</span>
+   <span style="color: #972500;">exit</span> <span style="color: #2a5045;">1</span>
+<span style="color: #972500;">fi</span>
 
-sudo gdb -n -q -batch                                  <span style="color: #00d3d0;">\</span>
-    -ex <span style="color: #00d3d0;">"attach $pid"</span>                                  <span style="color: #00d3d0;">\</span>
-    -ex <span style="color: #00d3d0;">"set \$dlopen = (void* (*)(char*, int))dlopen"</span> <span style="color: #00d3d0;">\</span>
-    -ex <span style="color: #00d3d0;">"set \$dlerror = (char* (*)(void))dlerror"</span>     <span style="color: #00d3d0;">\</span>
-    -ex <span style="color: #00d3d0;">"call \$dlopen(\"$libpath\", 2)"</span>               <span style="color: #00d3d0;">\</span>
-    -ex <span style="color: #00d3d0;">"call \$dlerror()"</span>                             <span style="color: #00d3d0;">\</span>
-    -ex <span style="color: #00d3d0;">"detach"</span>                                       <span style="color: #00d3d0;">\</span>
-    -ex <span style="color: #00d3d0;">"quit"</span>
+sudo gdb -n -q -batch                                  <span style="color: #005e8b;">\</span>
+    -ex <span style="color: #005e8b;">"attach $pid"</span>                                  <span style="color: #005e8b;">\</span>
+    -ex <span style="color: #005e8b;">"set \$dlopen = (void* (*)(char*, int))dlopen"</span> <span style="color: #005e8b;">\</span>
+    -ex <span style="color: #005e8b;">"set \$dlerror = (char* (*)(void))dlerror"</span>     <span style="color: #005e8b;">\</span>
+    -ex <span style="color: #005e8b;">"call \$dlopen(\"$libpath\", 2)"</span>               <span style="color: #005e8b;">\</span>
+    -ex <span style="color: #005e8b;">"call \$dlerror()"</span>                             <span style="color: #005e8b;">\</span>
+    -ex <span style="color: #005e8b;">"detach"</span>                                       <span style="color: #005e8b;">\</span>
+    -ex <span style="color: #005e8b;">"quit"</span>
 </pre>
 </div>
 
@@ -892,21 +892,21 @@ injecting:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-makefile"><span style="color: #6ae4b9;">CC</span>=gcc
-<span style="color: #6ae4b9;">CFLAGS</span>=-Wall -Wextra -O0 -fPIC
+<pre class="src src-makefile"><span style="color: #005f5f;">CC</span>=gcc
+<span style="color: #005f5f;">CFLAGS</span>=-Wall -Wextra -O0 -fPIC
 
-<span style="color: #4ae2ff;">.PHONY</span>: all inject
+<span style="color: #3f578f;">.PHONY</span>: all inject
 
-<span style="color: #4ae2ff;">all</span>: example.out my_lib.so
+<span style="color: #3f578f;">all</span>: example.out my_lib.so
 
-<span style="color: #4ae2ff;">example.out</span>: example.c
-    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span>
+<span style="color: #3f578f;">example.out</span>: example.c
+    $(<span style="color: #005f5f;">CC</span>) $(<span style="color: #005f5f;">CFLAGS</span>) -o <span style="color: #3f578f;">$</span><span style="color: #2a5045;">@</span> $<span style="color: #2a5045;">&lt;</span>
 
-<span style="color: #4ae2ff;">my_lib.so</span>: my_lib.c
-    $(<span style="color: #6ae4b9;">CC</span>) $(<span style="color: #6ae4b9;">CFLAGS</span>) -shared -o <span style="color: #4ae2ff;">$</span><span style="color: #88ca9f;">@</span> $<span style="color: #88ca9f;">&lt;</span>
+<span style="color: #3f578f;">my_lib.so</span>: my_lib.c
+    $(<span style="color: #005f5f;">CC</span>) $(<span style="color: #005f5f;">CFLAGS</span>) -shared -o <span style="color: #3f578f;">$</span><span style="color: #2a5045;">@</span> $<span style="color: #2a5045;">&lt;</span>
 
-<span style="color: #989898;"># </span><span style="color: #44bc44; font-weight: bold;">NOTE:</span><span style="color: #989898;"> Make sure example.out is running</span>
-<span style="color: #4ae2ff;">inject</span>: my_lib.so
+<span style="color: #595959;"># </span><span style="color: #006800; font-weight: bold;">NOTE:</span><span style="color: #595959;"> Make sure example.out is running</span>
+<span style="color: #3f578f;">inject</span>: my_lib.so
     bash ./inject.sh
 </pre>
 </div>

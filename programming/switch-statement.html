@@ -262,14 +262,14 @@ Let&rsquo;s first have a look at a normal if-else conditional.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">if</span> (my_var == <span style="color: #88ca9f;">11</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Block 1</span><span style="color: #989898;"> */</span>
-} <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (my_var == <span style="color: #88ca9f;">12</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Block 2</span><span style="color: #989898;"> */</span>
-} <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (my_var == <span style="color: #88ca9f;">15</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Block 3</span><span style="color: #989898;"> */</span>
-} <span style="color: #ff6f9f;">else</span> {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Block 4</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #972500;">if</span> (my_var == <span style="color: #2a5045;">11</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Block 1</span><span style="color: #595959;"> */</span>
+} <span style="color: #972500;">else</span> <span style="color: #972500;">if</span> (my_var == <span style="color: #2a5045;">12</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Block 2</span><span style="color: #595959;"> */</span>
+} <span style="color: #972500;">else</span> <span style="color: #972500;">if</span> (my_var == <span style="color: #2a5045;">15</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Block 3</span><span style="color: #595959;"> */</span>
+} <span style="color: #972500;">else</span> {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Block 4</span><span style="color: #595959;"> */</span>
 }
 </pre>
 </div>
@@ -279,16 +279,16 @@ Keep in mind that this is the same as:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">if</span> (my_var == <span style="color: #88ca9f;">11</span>) {
-    <span style="color: #989898;">/* </span><span style="color: #989898;">Block 1</span><span style="color: #989898;"> */</span>
-} <span style="color: #ff6f9f;">else</span> {
-    <span style="color: #ff6f9f;">if</span> (my_var == <span style="color: #88ca9f;">12</span>) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Block 2</span><span style="color: #989898;"> */</span>
-    } <span style="color: #ff6f9f;">else</span> {
-        <span style="color: #ff6f9f;">if</span> (my_var == <span style="color: #88ca9f;">15</span>) {
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Block 3</span><span style="color: #989898;"> */</span>
-        } <span style="color: #ff6f9f;">else</span> {
-            <span style="color: #989898;">/* </span><span style="color: #989898;">Block 4</span><span style="color: #989898;"> */</span>
+<pre class="src src-C"><span style="color: #972500;">if</span> (my_var == <span style="color: #2a5045;">11</span>) {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">Block 1</span><span style="color: #595959;"> */</span>
+} <span style="color: #972500;">else</span> {
+    <span style="color: #972500;">if</span> (my_var == <span style="color: #2a5045;">12</span>) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Block 2</span><span style="color: #595959;"> */</span>
+    } <span style="color: #972500;">else</span> {
+        <span style="color: #972500;">if</span> (my_var == <span style="color: #2a5045;">15</span>) {
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Block 3</span><span style="color: #595959;"> */</span>
+        } <span style="color: #972500;">else</span> {
+            <span style="color: #595959;">/* </span><span style="color: #595959;">Block 4</span><span style="color: #595959;"> */</span>
         }
     }
 }
@@ -301,30 +301,30 @@ generated:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm">    <span style="color: #feacd0;">mov</span> <span style="color: #6ae4b9;">eax</span>, [my_var]
+<pre class="src src-nasm">    <span style="color: #721045;">mov</span> <span style="color: #005f5f;">eax</span>, [my_var]
 
-    <span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">11</span>
-    <span style="color: #feacd0;">jne</span> else_one
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 1...</span>
-    <span style="color: #feacd0;">jmp</span> done
+    <span style="color: #721045;">cmp</span> <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">11</span>
+    <span style="color: #721045;">jne</span> else_one
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 1...</span>
+    <span style="color: #721045;">jmp</span> done
 
-<span style="color: #4ae2ff;">else_one</span>:
-    <span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">12</span>
-    <span style="color: #feacd0;">jne</span> else_two
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 2...</span>
-    <span style="color: #feacd0;">jmp</span> done
+<span style="color: #3f578f;">else_one</span>:
+    <span style="color: #721045;">cmp</span> <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">12</span>
+    <span style="color: #721045;">jne</span> else_two
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 2...</span>
+    <span style="color: #721045;">jmp</span> done
 
-<span style="color: #4ae2ff;">else_two</span>:
-    <span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">15</span>
-    <span style="color: #feacd0;">jne</span> else_three
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 3...</span>
-    <span style="color: #feacd0;">jmp</span> done
+<span style="color: #3f578f;">else_two</span>:
+    <span style="color: #721045;">cmp</span> <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">15</span>
+    <span style="color: #721045;">jne</span> else_three
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 3...</span>
+    <span style="color: #721045;">jmp</span> done
 
-<span style="color: #4ae2ff;">else_three</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 4...</span>
+<span style="color: #3f578f;">else_three</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 4...</span>
 
-<span style="color: #4ae2ff;">done</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Continue after conditionals...</span>
+<span style="color: #3f578f;">done</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Continue after conditionals...</span>
 </pre>
 </div>
 
@@ -347,19 +347,19 @@ Let&rsquo;s look at a <code>switch</code> statement equivalent to the previous i
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #ff6f9f;">switch</span> (my_var) {
-    <span style="color: #ff6f9f;">case</span> <span style="color: #88ca9f;">11</span>:
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Block 1</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">break</span>;
-    <span style="color: #ff6f9f;">case</span> <span style="color: #88ca9f;">12</span>:
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Block 2</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">break</span>;
-    <span style="color: #ff6f9f;">case</span> <span style="color: #88ca9f;">15</span>:
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Block 3</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">break</span>;
-    <span style="color: #ff6f9f;">default</span>:
-        <span style="color: #989898;">/* </span><span style="color: #989898;">Block 4</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">break</span>;
+<pre class="src src-C"><span style="color: #972500;">switch</span> (my_var) {
+    <span style="color: #972500;">case</span> <span style="color: #2a5045;">11</span>:
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Block 1</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">break</span>;
+    <span style="color: #972500;">case</span> <span style="color: #2a5045;">12</span>:
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Block 2</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">break</span>;
+    <span style="color: #972500;">case</span> <span style="color: #2a5045;">15</span>:
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Block 3</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">break</span>;
+    <span style="color: #972500;">default</span>:
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Block 4</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">break</span>;
 }
 </pre>
 </div>
@@ -370,33 +370,33 @@ produce something similar to the previous if-else example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm">    <span style="color: #feacd0;">mov</span> <span style="color: #6ae4b9;">eax</span>, [my_var]
+<pre class="src src-nasm">    <span style="color: #721045;">mov</span> <span style="color: #005f5f;">eax</span>, [my_var]
 
-    <span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">11</span>
-    <span style="color: #feacd0;">je</span>  case_11
-    <span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">12</span>
-    <span style="color: #feacd0;">je</span>  case_12
-    <span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">15</span>
-    <span style="color: #feacd0;">je</span>  case_15
-    <span style="color: #feacd0;">jmp</span> case_default
+    <span style="color: #721045;">cmp</span> <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">11</span>
+    <span style="color: #721045;">je</span>  case_11
+    <span style="color: #721045;">cmp</span> <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">12</span>
+    <span style="color: #721045;">je</span>  case_12
+    <span style="color: #721045;">cmp</span> <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">15</span>
+    <span style="color: #721045;">je</span>  case_15
+    <span style="color: #721045;">jmp</span> case_default
 
-<span style="color: #4ae2ff;">case_11</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 1...</span>
-    <span style="color: #feacd0;">jmp</span> done
+<span style="color: #3f578f;">case_11</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 1...</span>
+    <span style="color: #721045;">jmp</span> done
 
-<span style="color: #4ae2ff;">case_12</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 2...</span>
-    <span style="color: #feacd0;">jmp</span> done
+<span style="color: #3f578f;">case_12</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 2...</span>
+    <span style="color: #721045;">jmp</span> done
 
-<span style="color: #4ae2ff;">case_15</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 3...</span>
-    <span style="color: #feacd0;">jmp</span> done
+<span style="color: #3f578f;">case_15</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 3...</span>
+    <span style="color: #721045;">jmp</span> done
 
-<span style="color: #4ae2ff;">case_default</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 4...</span>
+<span style="color: #3f578f;">case_default</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 4...</span>
 
-<span style="color: #4ae2ff;">done</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Continue after conditionals...</span>
+<span style="color: #3f578f;">done</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Continue after conditionals...</span>
 </pre>
 </div>
 
@@ -437,48 +437,48 @@ For example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.data</span>
-<span style="color: #4ae2ff;">jump_table</span>:
-    <span style="color: #989898;">; </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Handle cases smaller than 11</span>
-    <span style="color: #feacd0;">dq</span> case_11
-    <span style="color: #feacd0;">dq</span> case_12
-    <span style="color: #feacd0;">dq</span> case_default <span style="color: #989898;">; </span><span style="color: #989898;">case 13, not specified</span>
-    <span style="color: #feacd0;">dq</span> case_default <span style="color: #989898;">; </span><span style="color: #989898;">case 14, not specified</span>
-    <span style="color: #feacd0;">dq</span> case_15
-    <span style="color: #989898;">; </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Handle cases greater than 15</span>
+<pre class="src src-nasm"><span style="color: #972500;">section</span> <span style="color: #0031a9;">.data</span>
+<span style="color: #3f578f;">jump_table</span>:
+    <span style="color: #595959;">; </span><span style="color: #808000; font-weight: bold;">TODO:</span><span style="color: #595959;"> Handle cases smaller than 11</span>
+    <span style="color: #721045;">dq</span> case_11
+    <span style="color: #721045;">dq</span> case_12
+    <span style="color: #721045;">dq</span> case_default <span style="color: #595959;">; </span><span style="color: #595959;">case 13, not specified</span>
+    <span style="color: #721045;">dq</span> case_default <span style="color: #595959;">; </span><span style="color: #595959;">case 14, not specified</span>
+    <span style="color: #721045;">dq</span> case_15
+    <span style="color: #595959;">; </span><span style="color: #808000; font-weight: bold;">TODO:</span><span style="color: #595959;"> Handle cases greater than 15</span>
 
-<span style="color: #989898;">; </span><span style="color: #989898;">------------------------------------------------------------------------------</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">------------------------------------------------------------------------------</span>
 
-<span style="color: #ff6f9f;">section</span> <span style="color: #79a8ff;">.text</span>
-<span style="color: #4ae2ff;">my_func</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Code before the switch...</span>
+<span style="color: #972500;">section</span> <span style="color: #0031a9;">.text</span>
+<span style="color: #3f578f;">my_func</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Code before the switch...</span>
 
-    <span style="color: #feacd0;">mov</span> <span style="color: #6ae4b9;">eax</span>, [my_var]
+    <span style="color: #721045;">mov</span> <span style="color: #005f5f;">eax</span>, [my_var]
 
-    <span style="color: #989898;">; </span><span style="color: #cabf00; font-weight: bold;">TODO:</span><span style="color: #989898;"> Get index in the jump table from the value in `eax'</span>
-    <span style="color: #feacd0;">jmp</span> ???
+    <span style="color: #595959;">; </span><span style="color: #808000; font-weight: bold;">TODO:</span><span style="color: #595959;"> Get index in the jump table from the value in `eax'</span>
+    <span style="color: #721045;">jmp</span> ???
 
-<span style="color: #4ae2ff;">.switch_done</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Code after the switch...</span>
-    <span style="color: #feacd0;">ret</span>
+<span style="color: #3f578f;">.switch_done</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Code after the switch...</span>
+    <span style="color: #721045;">ret</span>
 
-<span style="color: #989898;">; </span><span style="color: #989898;">------------------------------------------------------------------------------</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">------------------------------------------------------------------------------</span>
 
-<span style="color: #4ae2ff;">case_11</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 1...</span>
-    <span style="color: #feacd0;">jmp</span> my_func.switch_done
+<span style="color: #3f578f;">case_11</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 1...</span>
+    <span style="color: #721045;">jmp</span> my_func.switch_done
 
-<span style="color: #4ae2ff;">case_12</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 2...</span>
-    <span style="color: #feacd0;">jmp</span> my_func.switch_done
+<span style="color: #3f578f;">case_12</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 2...</span>
+    <span style="color: #721045;">jmp</span> my_func.switch_done
 
-<span style="color: #4ae2ff;">case_15</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 3...</span>
-    <span style="color: #feacd0;">jmp</span> my_func.switch_done
+<span style="color: #3f578f;">case_15</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 3...</span>
+    <span style="color: #721045;">jmp</span> my_func.switch_done
 
-<span style="color: #4ae2ff;">case_default</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Block 4...</span>
-    <span style="color: #feacd0;">jmp</span> my_func.switch_done
+<span style="color: #3f578f;">case_default</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Block 4...</span>
+    <span style="color: #721045;">jmp</span> my_func.switch_done
 </pre>
 </div>
 
@@ -509,12 +509,12 @@ label.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">if (eax &lt; 11 || eax &gt; 15)</span>
-<span style="color: #989898;">;     </span><span style="color: #989898;">goto case_default</span>
-<span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">11</span>
-<span style="color: #feacd0;">jl</span>  case_default
-<span style="color: #feacd0;">cmp</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">15</span>
-<span style="color: #feacd0;">jg</span>  case_default
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">if (eax &lt; 11 || eax &gt; 15)</span>
+<span style="color: #595959;">;     </span><span style="color: #595959;">goto case_default</span>
+<span style="color: #721045;">cmp</span> <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">11</span>
+<span style="color: #721045;">jl</span>  case_default
+<span style="color: #721045;">cmp</span> <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">15</span>
+<span style="color: #721045;">jg</span>  case_default
 </pre>
 </div>
 
@@ -526,21 +526,21 @@ this index by the size of each element in <code>jump_table</code> (in this case 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">Subtract the lowest case</span>
-<span style="color: #feacd0;">sub</span>  <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">11</span>
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">Subtract the lowest case</span>
+<span style="color: #721045;">sub</span>  <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">11</span>
 
-<span style="color: #989898;">; </span><span style="color: #989898;">Multiply by 8 (quad-word) to get the byte offset</span>
-<span style="color: #feacd0;">imul</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">8</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">Multiply by 8 (quad-word) to get the byte offset</span>
+<span style="color: #721045;">imul</span> <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">8</span>
 
-<span style="color: #989898;">; </span><span style="color: #989898;">Store the address of the jump table</span>
-<span style="color: #feacd0;">mov</span>  <span style="color: #6ae4b9;">rdx</span>, jump_table
+<span style="color: #595959;">; </span><span style="color: #595959;">Store the address of the jump table</span>
+<span style="color: #721045;">mov</span>  <span style="color: #005f5f;">rdx</span>, jump_table
 
-<span style="color: #989898;">; </span><span style="color: #989898;">Add the byte offset to the address, and dereference it to get the address of</span>
-<span style="color: #989898;">; </span><span style="color: #989898;">this `case'</span>
-<span style="color: #feacd0;">mov</span>  <span style="color: #6ae4b9;">rdx</span>, [<span style="color: #6ae4b9;">rdx</span>]
+<span style="color: #595959;">; </span><span style="color: #595959;">Add the byte offset to the address, and dereference it to get the address of</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">this `case'</span>
+<span style="color: #721045;">mov</span>  <span style="color: #005f5f;">rdx</span>, [<span style="color: #005f5f;">rdx</span>]
 
-<span style="color: #989898;">; </span><span style="color: #989898;">Jump to the label itself</span>
-<span style="color: #feacd0;">jmp</span>  <span style="color: #6ae4b9;">rdx</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">Jump to the label itself</span>
+<span style="color: #721045;">jmp</span>  <span style="color: #005f5f;">rdx</span>
 </pre>
 </div>
 
@@ -557,9 +557,9 @@ multiplying by 8 (a power of 2) we could have used a more optimal bit shift:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">imul</span> <span style="color: #6ae4b9;">rax</span>, <span style="color: #6ae4b9;">rax</span>, <span style="color: #88ca9f;">8</span>
-<span style="color: #989898;">; </span><span style="color: #989898;">The same as:</span>
-<span style="color: #feacd0;">shl</span>  <span style="color: #6ae4b9;">rax</span>, <span style="color: #88ca9f;">3</span>
+<pre class="src src-nasm"><span style="color: #721045;">imul</span> <span style="color: #005f5f;">rax</span>, <span style="color: #005f5f;">rax</span>, <span style="color: #2a5045;">8</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">The same as:</span>
+<span style="color: #721045;">shl</span>  <span style="color: #005f5f;">rax</span>, <span style="color: #2a5045;">3</span>
 </pre>
 </div>
 </div>

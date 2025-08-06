@@ -226,11 +226,11 @@ As the author says, this snippet is short but tricky.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">func</span>:
-    <span style="color: #feacd0;">lea</span>     <span style="color: #6ae4b9;">eax</span>, [<span style="color: #6ae4b9;">rdi</span> - <span style="color: #88ca9f;">1</span> + <span style="color: #6ae4b9;">rsi</span>]
-    <span style="color: #feacd0;">neg</span>     <span style="color: #6ae4b9;">esi</span>
-    <span style="color: #feacd0;">and</span>     <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">esi</span>
-    <span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">func</span>:
+    <span style="color: #721045;">lea</span>     <span style="color: #005f5f;">eax</span>, [<span style="color: #005f5f;">rdi</span> - <span style="color: #2a5045;">1</span> + <span style="color: #005f5f;">rsi</span>]
+    <span style="color: #721045;">neg</span>     <span style="color: #005f5f;">esi</span>
+    <span style="color: #721045;">and</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">esi</span>
+    <span style="color: #721045;">ret</span>
 </pre>
 </div>
 </div>
@@ -246,10 +246,10 @@ following.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">eax = rdi - 1 + rsi</span>
-<span style="color: #feacd0;">mov</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">edi</span>
-<span style="color: #feacd0;">sub</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">1</span>
-<span style="color: #feacd0;">add</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">esi</span>
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">eax = rdi - 1 + rsi</span>
+<span style="color: #721045;">mov</span> <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">edi</span>
+<span style="color: #721045;">sub</span> <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">1</span>
+<span style="color: #721045;">add</span> <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">esi</span>
 </pre>
 </div>
 </div>
@@ -267,8 +267,8 @@ out what it does.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">a</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">b</span>) {
-    <span style="color: #ff6f9f;">return</span> (a - <span style="color: #88ca9f;">1</span> + b) &amp; (-b);
+<pre class="src src-C"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">func</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">a</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">b</span>) {
+    <span style="color: #972500;">return</span> (a - <span style="color: #2a5045;">1</span> + b) &amp; (-b);
 }
 </pre>
 </div>
@@ -287,8 +287,8 @@ power of 2. The original C code would be something like this:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">align2boundary</span>(<span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">n</span>, <span style="color: #79a8ff;">int</span> <span style="color: #6ae4b9;">boundary</span>) {
-    <span style="color: #ff6f9f;">return</span> (n + boundary - <span style="color: #88ca9f;">1</span>) &amp; ~(boundary - <span style="color: #88ca9f;">1</span>);
+<pre class="src src-C"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">align2boundary</span>(<span style="color: #0031a9;">int</span> <span style="color: #005f5f;">n</span>, <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">boundary</span>) {
+    <span style="color: #972500;">return</span> (n + boundary - <span style="color: #2a5045;">1</span>) &amp; ~(boundary - <span style="color: #2a5045;">1</span>);
 }
 </pre>
 </div>
@@ -299,8 +299,8 @@ For example, if we have an address 0x123, and we want to know where the next
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C">align2boundary(<span style="color: #88ca9f;">0x0123</span>, <span style="color: #88ca9f;">0x1000</span>); <span style="color: #989898;">/* </span><span style="color: #989898;">Result: 0x1000</span><span style="color: #989898;"> */</span>
-align2boundary(<span style="color: #88ca9f;">0x2345</span>, <span style="color: #88ca9f;">0x1000</span>); <span style="color: #989898;">/* </span><span style="color: #989898;">Result: 0x3000</span><span style="color: #989898;"> */</span>
+<pre class="src src-C">align2boundary(<span style="color: #2a5045;">0x0123</span>, <span style="color: #2a5045;">0x1000</span>); <span style="color: #595959;">/* </span><span style="color: #595959;">Result: 0x1000</span><span style="color: #595959;"> */</span>
+align2boundary(<span style="color: #2a5045;">0x2345</span>, <span style="color: #2a5045;">0x1000</span>); <span style="color: #595959;">/* </span><span style="color: #595959;">Result: 0x3000</span><span style="color: #595959;"> */</span>
 </pre>
 </div>
 </div>
@@ -346,13 +346,13 @@ Let&rsquo;s try to reduce an example first.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #989898;">/* </span><span style="color: #989898;">align2boundary(0x3456, 0x1000)</span><span style="color: #989898;"> */</span>
-<span style="color: #88ca9f;">0x3456</span> + <span style="color: #88ca9f;">0x1000</span> - <span style="color: #88ca9f;">1</span> &amp; ~(<span style="color: #88ca9f;">0x1000</span> - <span style="color: #88ca9f;">1</span>)
-         <span style="color: #88ca9f;">0x4456</span> - <span style="color: #88ca9f;">1</span> &amp; ~(<span style="color: #88ca9f;">0x1000</span> - <span style="color: #88ca9f;">1</span>)
-             <span style="color: #88ca9f;">0x4455</span> &amp; ~(<span style="color: #88ca9f;">0x1000</span> - <span style="color: #88ca9f;">1</span>)
-             <span style="color: #88ca9f;">0x4455</span> &amp; ~(<span style="color: #88ca9f;">0x0FFF</span>)
-             <span style="color: #88ca9f;">0x4455</span> &amp; <span style="color: #88ca9f;">0xFFFFF000</span>
-             <span style="color: #88ca9f;">0x4000</span>
+<pre class="src src-C"><span style="color: #595959;">/* </span><span style="color: #595959;">align2boundary(0x3456, 0x1000)</span><span style="color: #595959;"> */</span>
+<span style="color: #2a5045;">0x3456</span> + <span style="color: #2a5045;">0x1000</span> - <span style="color: #2a5045;">1</span> &amp; ~(<span style="color: #2a5045;">0x1000</span> - <span style="color: #2a5045;">1</span>)
+         <span style="color: #2a5045;">0x4456</span> - <span style="color: #2a5045;">1</span> &amp; ~(<span style="color: #2a5045;">0x1000</span> - <span style="color: #2a5045;">1</span>)
+             <span style="color: #2a5045;">0x4455</span> &amp; ~(<span style="color: #2a5045;">0x1000</span> - <span style="color: #2a5045;">1</span>)
+             <span style="color: #2a5045;">0x4455</span> &amp; ~(<span style="color: #2a5045;">0x0FFF</span>)
+             <span style="color: #2a5045;">0x4455</span> &amp; <span style="color: #2a5045;">0xFFFFF000</span>
+             <span style="color: #2a5045;">0x4000</span>
 </pre>
 </div>
 
@@ -408,9 +408,9 @@ boundary, so we should return the untouched <code>0x4000</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #88ca9f;">0x4000</span> + <span style="color: #88ca9f;">0x1000</span> &amp; ~(<span style="color: #88ca9f;">0x1000</span> - <span style="color: #88ca9f;">1</span>)
-         <span style="color: #88ca9f;">0x5000</span> &amp; ~(<span style="color: #88ca9f;">0x1000</span> - <span style="color: #88ca9f;">1</span>)
-         <span style="color: #88ca9f;">0x5000</span>
+<pre class="src src-C"><span style="color: #2a5045;">0x4000</span> + <span style="color: #2a5045;">0x1000</span> &amp; ~(<span style="color: #2a5045;">0x1000</span> - <span style="color: #2a5045;">1</span>)
+         <span style="color: #2a5045;">0x5000</span> &amp; ~(<span style="color: #2a5045;">0x1000</span> - <span style="color: #2a5045;">1</span>)
+         <span style="color: #2a5045;">0x5000</span>
 </pre>
 </div>
 
@@ -419,10 +419,10 @@ However, if we subtract one:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #88ca9f;">0x4000</span> + <span style="color: #88ca9f;">0x1000</span> - <span style="color: #88ca9f;">1</span> &amp; ~(<span style="color: #88ca9f;">0x1000</span> - <span style="color: #88ca9f;">1</span>)
-         <span style="color: #88ca9f;">0x5000</span> - <span style="color: #88ca9f;">1</span> &amp; ~(<span style="color: #88ca9f;">0x1000</span> - <span style="color: #88ca9f;">1</span>)
-             <span style="color: #88ca9f;">0x4FFF</span> &amp; ~(<span style="color: #88ca9f;">0x1000</span> - <span style="color: #88ca9f;">1</span>)
-             <span style="color: #88ca9f;">0x4000</span>
+<pre class="src src-C"><span style="color: #2a5045;">0x4000</span> + <span style="color: #2a5045;">0x1000</span> - <span style="color: #2a5045;">1</span> &amp; ~(<span style="color: #2a5045;">0x1000</span> - <span style="color: #2a5045;">1</span>)
+         <span style="color: #2a5045;">0x5000</span> - <span style="color: #2a5045;">1</span> &amp; ~(<span style="color: #2a5045;">0x1000</span> - <span style="color: #2a5045;">1</span>)
+             <span style="color: #2a5045;">0x4FFF</span> &amp; ~(<span style="color: #2a5045;">0x1000</span> - <span style="color: #2a5045;">1</span>)
+             <span style="color: #2a5045;">0x4000</span>
 </pre>
 </div>
 </div>

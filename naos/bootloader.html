@@ -362,20 +362,20 @@ can be done by using the <a href="https://en.wikipedia.org/wiki/INT_13H">disk BI
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm">    <span style="color: #989898;">; </span><span style="color: #989898;">Set Carry Flag (CF), set AH to "Read Drive Parameters", and</span>
-    <span style="color: #989898;">; </span><span style="color: #989898;">call the "Disk" BIOS interrupt.</span>
-    <span style="color: #feacd0;">stc</span>
-    <span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">ah</span>, <span style="color: #88ca9f;">0x8</span>
-    <span style="color: #feacd0;">int</span>     <span style="color: #88ca9f;">0x13</span>
+<pre class="src src-nasm">    <span style="color: #595959;">; </span><span style="color: #595959;">Set Carry Flag (CF), set AH to "Read Drive Parameters", and</span>
+    <span style="color: #595959;">; </span><span style="color: #595959;">call the "Disk" BIOS interrupt.</span>
+    <span style="color: #721045;">stc</span>
+    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">ah</span>, <span style="color: #2a5045;">0x8</span>
+    <span style="color: #721045;">int</span>     <span style="color: #2a5045;">0x13</span>
 
-    <span style="color: #989898;">; </span><span style="color: #989898;">Jump if the Carry Flag was cleared by the BIOS.</span>
-    <span style="color: #feacd0;">jnc</span>     .success
+    <span style="color: #595959;">; </span><span style="color: #595959;">Jump if the Carry Flag was cleared by the BIOS.</span>
+    <span style="color: #721045;">jnc</span>     .success
 
-<span style="color: #4ae2ff;">.error</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">...</span>
+<span style="color: #3f578f;">.error</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">...</span>
 
-<span style="color: #4ae2ff;">.success</span>:
-    <span style="color: #989898;">; </span><span style="color: #989898;">Read relevant values, mainly from DH and CX.</span>
+<span style="color: #3f578f;">.success</span>:
+    <span style="color: #595959;">; </span><span style="color: #595959;">Read relevant values, mainly from DH and CX.</span>
 </pre>
 </div>
 
@@ -423,8 +423,8 @@ just jump there.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #44bc44; font-weight: bold;">NOTE:</span><span style="color: #989898;"> Invalid.</span>
-<span style="color: #feacd0;">jmp</span>     <span style="color: #6ae4b9;">es</span>:<span style="color: #6ae4b9;">bx</span>
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #006800; font-weight: bold;">NOTE:</span><span style="color: #595959;"> Invalid.</span>
+<span style="color: #721045;">jmp</span>     <span style="color: #005f5f;">es</span>:<span style="color: #005f5f;">bx</span>
 </pre>
 </div>
 
@@ -436,11 +436,11 @@ and offset are specified.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">my_addr</span>: <span style="color: #feacd0;">resw</span> <span style="color: #88ca9f;">2</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">my_addr</span>: <span style="color: #721045;">resw</span> <span style="color: #2a5045;">2</span>
 
-<span style="color: #feacd0;">mov</span>     <span style="color: #79a8ff;">word</span> [my_addr + <span style="color: #88ca9f;">0</span>], <span style="color: #6ae4b9;">bx</span>
-<span style="color: #feacd0;">mov</span>     <span style="color: #79a8ff;">word</span> [my_addr + <span style="color: #88ca9f;">2</span>], <span style="color: #6ae4b9;">es</span>
-<span style="color: #feacd0;">jmp</span>     <span style="color: #79a8ff;">far</span> [my_addr]
+<span style="color: #721045;">mov</span>     <span style="color: #0031a9;">word</span> [my_addr + <span style="color: #2a5045;">0</span>], <span style="color: #005f5f;">bx</span>
+<span style="color: #721045;">mov</span>     <span style="color: #0031a9;">word</span> [my_addr + <span style="color: #2a5045;">2</span>], <span style="color: #005f5f;">es</span>
+<span style="color: #721045;">jmp</span>     <span style="color: #0031a9;">far</span> [my_addr]
 </pre>
 </div>
 
@@ -452,9 +452,9 @@ without using an intermediate buffer, and with shorter instructions.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">es</span>
-<span style="color: #feacd0;">push</span>    <span style="color: #6ae4b9;">bx</span>
-<span style="color: #feacd0;">retf</span>            <span style="color: #989898;">; </span><span style="color: #989898;">Alternatively: RET FAR</span>
+<pre class="src src-nasm"><span style="color: #721045;">push</span>    <span style="color: #005f5f;">es</span>
+<span style="color: #721045;">push</span>    <span style="color: #005f5f;">bx</span>
+<span style="color: #721045;">retf</span>            <span style="color: #595959;">; </span><span style="color: #595959;">Alternatively: RET FAR</span>
 </pre>
 </div>
 
@@ -526,19 +526,19 @@ and an offset.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #989898;">; </span><span style="color: #989898;">Set data segment (DS) through intermediate register (AX).</span>
-<span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">ax</span>, <span style="color: #88ca9f;">0x13A5</span>
-<span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">ds</span>, <span style="color: #6ae4b9;">ax</span>
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">Set data segment (DS) through intermediate register (AX).</span>
+<span style="color: #721045;">mov</span>     <span style="color: #005f5f;">ax</span>, <span style="color: #2a5045;">0x13A5</span>
+<span style="color: #721045;">mov</span>     <span style="color: #005f5f;">ds</span>, <span style="color: #005f5f;">ax</span>
 
-<span style="color: #989898;">; </span><span style="color: #989898;">Write offset to the source index (SI), since not all registers can</span>
-<span style="color: #989898;">; </span><span style="color: #989898;">be used for addressing.</span>
-<span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">si</span>, <span style="color: #88ca9f;">0x3327</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">Write offset to the source index (SI), since not all registers can</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">be used for addressing.</span>
+<span style="color: #721045;">mov</span>     <span style="color: #005f5f;">si</span>, <span style="color: #2a5045;">0x3327</span>
 
-<span style="color: #989898;">;   </span><span style="color: #989898;">13A5   (Segment: DS)</span>
-<span style="color: #989898;">; </span><span style="color: #989898;">+  3327  (Offset: SI)</span>
-<span style="color: #989898;">; </span><span style="color: #989898;">-------</span>
-<span style="color: #989898;">;   </span><span style="color: #989898;">16D77  (Address)</span>
-<span style="color: #feacd0;">mov</span>     <span style="color: #6ae4b9;">ax</span>, [<span style="color: #6ae4b9;">ds</span>:<span style="color: #6ae4b9;">si</span>]
+<span style="color: #595959;">;   </span><span style="color: #595959;">13A5   (Segment: DS)</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">+  3327  (Offset: SI)</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">-------</span>
+<span style="color: #595959;">;   </span><span style="color: #595959;">16D77  (Address)</span>
+<span style="color: #721045;">mov</span>     <span style="color: #005f5f;">ax</span>, [<span style="color: #005f5f;">ds</span>:<span style="color: #005f5f;">si</span>]
 </pre>
 </div>
 
@@ -623,7 +623,7 @@ an assembly file.
 </p>
 
 
-<div id="org42b7e49" class="figure">
+<div id="org0123d48" class="figure">
 <p><img src="../img/bootloader-assembly-build.svg" alt="bootloader-assembly-build.svg" class="org-svg" />
 </p>
 </div>

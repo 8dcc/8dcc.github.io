@@ -229,34 +229,34 @@ changes to fit the <a href="https://nasm.us/">nasm</a> syntax.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-nasm"><span style="color: #4ae2ff;">.LC0</span>:
-    <span style="color: #4ae2ff;">.string</span> <span style="color: #00d3d0;">"error!"</span>
-<span style="color: #4ae2ff;">func</span>:
-    <span style="color: #feacd0;">sub</span>   <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">8</span>
-    <span style="color: #feacd0;">movzx</span> <span style="color: #6ae4b9;">eax</span>, <span style="color: #79a8ff;">BYTE</span> [<span style="color: #6ae4b9;">rdi</span>]
-    <span style="color: #feacd0;">cmp</span>   <span style="color: #6ae4b9;">al</span>, <span style="color: #88ca9f;">89</span>
-    <span style="color: #feacd0;">je</span>    .L3
-    <span style="color: #feacd0;">jle</span>   .L21
-    <span style="color: #feacd0;">cmp</span>   <span style="color: #6ae4b9;">al</span>, <span style="color: #88ca9f;">110</span>
-    <span style="color: #feacd0;">je</span>    .L6
-    <span style="color: #feacd0;">cmp</span>   <span style="color: #6ae4b9;">al</span>, <span style="color: #88ca9f;">121</span>
-    <span style="color: #feacd0;">jne</span>   .L2
-<span style="color: #4ae2ff;">.L3</span>:
-    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #88ca9f;">1</span>
-    <span style="color: #feacd0;">add</span>   <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">8</span>
-    <span style="color: #feacd0;">ret</span>
-<span style="color: #4ae2ff;">.L21</span>:
-    <span style="color: #feacd0;">cmp</span>   <span style="color: #6ae4b9;">al</span>, <span style="color: #88ca9f;">78</span>
-    <span style="color: #feacd0;">je</span>    .L6
-<span style="color: #4ae2ff;">.L2</span>:
-    <span style="color: #feacd0;">mov</span>   <span style="color: #6ae4b9;">edi</span>, .LC0
-    <span style="color: #feacd0;">call</span>  puts
-    <span style="color: #feacd0;">xor</span>   <span style="color: #6ae4b9;">edi</span>, <span style="color: #6ae4b9;">edi</span>
-    <span style="color: #feacd0;">call</span>  exit
-<span style="color: #4ae2ff;">.L6</span>:
-    <span style="color: #feacd0;">xor</span>   <span style="color: #6ae4b9;">eax</span>, <span style="color: #6ae4b9;">eax</span>
-    <span style="color: #feacd0;">add</span>   <span style="color: #6ae4b9;">rsp</span>, <span style="color: #88ca9f;">8</span>
-    <span style="color: #feacd0;">ret</span>
+<pre class="src src-nasm"><span style="color: #3f578f;">.LC0</span>:
+    <span style="color: #3f578f;">.string</span> <span style="color: #005e8b;">"error!"</span>
+<span style="color: #3f578f;">func</span>:
+    <span style="color: #721045;">sub</span>   <span style="color: #005f5f;">rsp</span>, <span style="color: #2a5045;">8</span>
+    <span style="color: #721045;">movzx</span> <span style="color: #005f5f;">eax</span>, <span style="color: #0031a9;">BYTE</span> [<span style="color: #005f5f;">rdi</span>]
+    <span style="color: #721045;">cmp</span>   <span style="color: #005f5f;">al</span>, <span style="color: #2a5045;">89</span>
+    <span style="color: #721045;">je</span>    .L3
+    <span style="color: #721045;">jle</span>   .L21
+    <span style="color: #721045;">cmp</span>   <span style="color: #005f5f;">al</span>, <span style="color: #2a5045;">110</span>
+    <span style="color: #721045;">je</span>    .L6
+    <span style="color: #721045;">cmp</span>   <span style="color: #005f5f;">al</span>, <span style="color: #2a5045;">121</span>
+    <span style="color: #721045;">jne</span>   .L2
+<span style="color: #3f578f;">.L3</span>:
+    <span style="color: #721045;">mov</span>   <span style="color: #005f5f;">eax</span>, <span style="color: #2a5045;">1</span>
+    <span style="color: #721045;">add</span>   <span style="color: #005f5f;">rsp</span>, <span style="color: #2a5045;">8</span>
+    <span style="color: #721045;">ret</span>
+<span style="color: #3f578f;">.L21</span>:
+    <span style="color: #721045;">cmp</span>   <span style="color: #005f5f;">al</span>, <span style="color: #2a5045;">78</span>
+    <span style="color: #721045;">je</span>    .L6
+<span style="color: #3f578f;">.L2</span>:
+    <span style="color: #721045;">mov</span>   <span style="color: #005f5f;">edi</span>, .LC0
+    <span style="color: #721045;">call</span>  puts
+    <span style="color: #721045;">xor</span>   <span style="color: #005f5f;">edi</span>, <span style="color: #005f5f;">edi</span>
+    <span style="color: #721045;">call</span>  exit
+<span style="color: #3f578f;">.L6</span>:
+    <span style="color: #721045;">xor</span>   <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+    <span style="color: #721045;">add</span>   <span style="color: #005f5f;">rsp</span>, <span style="color: #2a5045;">8</span>
+    <span style="color: #721045;">ret</span>
 </pre>
 </div>
 </div>
@@ -270,26 +270,26 @@ Literal translation preserving the branching.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">int</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">str</span>) {
-    <span style="color: #ff6f9f;">if</span> (*str == <span style="color: #00d3d0;">'Y'</span>) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">.L3</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">1</span>;
-    } <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (*str &lt; <span style="color: #00d3d0;">'Y'</span>) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">.L21</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">if</span> (*str == <span style="color: #00d3d0;">'N'</span>) {
-            <span style="color: #989898;">/* </span><span style="color: #989898;">.L6</span><span style="color: #989898;"> */</span>
-            <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
+<pre class="src src-C"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">func</span>(<span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">str</span>) {
+    <span style="color: #972500;">if</span> (*str == <span style="color: #005e8b;">'Y'</span>) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">.L3</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">1</span>;
+    } <span style="color: #972500;">else</span> <span style="color: #972500;">if</span> (*str &lt; <span style="color: #005e8b;">'Y'</span>) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">.L21</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">if</span> (*str == <span style="color: #005e8b;">'N'</span>) {
+            <span style="color: #595959;">/* </span><span style="color: #595959;">.L6</span><span style="color: #595959;"> */</span>
+            <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
         }
-    } <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (*str == <span style="color: #00d3d0;">'n'</span>) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">.L6</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">0</span>;
-    } <span style="color: #ff6f9f;">else</span> <span style="color: #ff6f9f;">if</span> (*str != <span style="color: #00d3d0;">'y'</span>) {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">.L2</span><span style="color: #989898;"> */</span>
-        puts(<span style="color: #00d3d0;">"error!"</span>);
-        exit(<span style="color: #88ca9f;">0</span>);
-    } <span style="color: #ff6f9f;">else</span> {
-        <span style="color: #989898;">/* </span><span style="color: #989898;">.L3</span><span style="color: #989898;"> */</span>
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">1</span>;
+    } <span style="color: #972500;">else</span> <span style="color: #972500;">if</span> (*str == <span style="color: #005e8b;">'n'</span>) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">.L6</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
+    } <span style="color: #972500;">else</span> <span style="color: #972500;">if</span> (*str != <span style="color: #005e8b;">'y'</span>) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">.L2</span><span style="color: #595959;"> */</span>
+        puts(<span style="color: #005e8b;">"error!"</span>);
+        exit(<span style="color: #2a5045;">0</span>);
+    } <span style="color: #972500;">else</span> {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">.L3</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">1</span>;
     }
 }
 </pre>
@@ -300,15 +300,15 @@ Simplified into this.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #79a8ff;">bool</span> <span style="color: #4ae2ff;">func</span>(<span style="color: #79a8ff;">char</span>* <span style="color: #6ae4b9;">str</span>) {
-    <span style="color: #ff6f9f;">if</span> (*str == <span style="color: #00d3d0;">'Y'</span> || *str == <span style="color: #00d3d0;">'y'</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">true</span>;
+<pre class="src src-C"><span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">func</span>(<span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">str</span>) {
+    <span style="color: #972500;">if</span> (*str == <span style="color: #005e8b;">'Y'</span> || *str == <span style="color: #005e8b;">'y'</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">true</span>;
 
-    <span style="color: #ff6f9f;">if</span> (*str == <span style="color: #00d3d0;">'N'</span> || *str == <span style="color: #00d3d0;">'n'</span>)
-        <span style="color: #ff6f9f;">return</span> <span style="color: #88ca9f;">false</span>;
+    <span style="color: #972500;">if</span> (*str == <span style="color: #005e8b;">'N'</span> || *str == <span style="color: #005e8b;">'n'</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
 
-    puts(<span style="color: #00d3d0;">"error!"</span>);
-    exit(<span style="color: #88ca9f;">0</span>);
+    puts(<span style="color: #005e8b;">"error!"</span>);
+    exit(<span style="color: #2a5045;">0</span>);
 }
 </pre>
 </div>
