@@ -250,10 +250,11 @@ char* func(char* str1, int n1, char* str2, int n2) {
 
     n1 = (n1 - n2) + 1;
 
-    /* NOTE: `r11` is just used to store the original `rsi` (n1), since `rsi`
+    /*
+     ,* NOTE: `r11` is just used to store the original `rsi` (n1), since `rsi`
      ,* it's going to be used as iterator for the second loop (j). Since I
-     create
-     ,* a `j` variable, I don't need this aux variable. */
+     ,* create a `j` variable, I don't need this aux variable.
+     ,*/
 
     if (n1 == 0)
         /* .L10 */

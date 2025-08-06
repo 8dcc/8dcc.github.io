@@ -513,10 +513,11 @@ After changing some variable names and simplifying:
 
     n1 = (n1 - n2) + <span style="color: #2a5045;">1</span>;
 
-    <span style="color: #595959;">/* </span><span style="color: #006800; font-weight: bold;">NOTE:</span><span style="color: #595959;"> `r11` is just used to store the original `rsi` (n1), since `rsi`</span>
+    <span style="color: #595959;">/*</span>
+<span style="color: #595959;">     * </span><span style="color: #006800; font-weight: bold;">NOTE:</span><span style="color: #595959;"> `r11` is just used to store the original `rsi` (n1), since `rsi`</span>
 <span style="color: #595959;">     * it's going to be used as iterator for the second loop (j). Since I</span>
-<span style="color: #595959;">     create</span>
-<span style="color: #595959;">     * a `j` variable, I don't need this aux variable.</span><span style="color: #595959;"> */</span>
+<span style="color: #595959;">     * create a `j` variable, I don't need this aux variable.</span>
+<span style="color: #595959;">     */</span>
 
     <span style="color: #972500;">if</span> (n1 == <span style="color: #2a5045;">0</span>)
         <span style="color: #595959;">/* </span><span style="color: #595959;">.L10</span><span style="color: #595959;"> */</span>
