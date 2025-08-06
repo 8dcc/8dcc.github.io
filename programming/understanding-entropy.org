@@ -212,7 +212,8 @@ total number of messages, it might seem logical to do something like:
 Using this formula in the last coin flip example, with probabilities of 0.7 and
 0.3, the result would be approximately 1.12, which is not accurate.
 
-Let's take a look at the actual paper from Claude Shannon[fn:shannon].
+Let's take a look at the actual paper from Claude Shannon[fn::Claude Shannon. /A
+Mathematical Theory of Communication/. 1948.  Section 7.].
 
 #+begin_quote
 For each possible state $i$ there will be a set of probabilities $p_i(j)$ of
@@ -336,8 +337,3 @@ As I mentioned in many other articles, I am not an expert on this subject. I had
 a motivation for learning about entropy, and I decided to document my progress
 in case it could help someone. If you feel like some explanations could be
 improved, feel free to [[file:../index.org::#contributing][contribute]].
-
-# -----
-
-[fn:shannon] Claude Shannon. /A Mathematical Theory of Communication/. 1948.
-Section 7.
