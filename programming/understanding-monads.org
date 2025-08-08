@@ -18,7 +18,7 @@ focusing on that.
 
 Although I haven't personally used Haskell a lot, I have known about monads for
 a long time, probably since I heard about the [[https://en.wikipedia.org/wiki/Xmonad][xmonad]] window manager. After
-researching on this topic for a few days, I decided to write a small article
+researching this topic for a few days, I decided to write a small article
 about what I learned, since it might be useful for some people. This article
 won't focus specifically on Haskell, so most concepts can be applied to many
 languages, and not a lot of programming background is required from the reader.
@@ -33,8 +33,8 @@ articles on [[https://mmhaskell.com/monads][this link]].
 :END:
 
 Before trying to understand monads and their use cases, it's important to know
-about [[https://en.wikipedia.org/wiki/Pure_function][pure functions]], and why they are desirable. Pure functions are a kind of
-function that satisfy 2 properties:
+about [[https://en.wikipedia.org/wiki/Pure_function][pure functions]], and why they are desirable. In order for a function to be
+pure, it must satisfy 2 properties:
 
 1. The value returned by the function depends only on its inputs, so identical
    values are returned across multiple calls with identical inputs.
@@ -44,10 +44,10 @@ function that satisfy 2 properties:
 For example, the following python functions are pure[fn::On lower-level
 programming languages, like C, one might argue that string-manipulation
 functions are not actually pure, since they often receive a pointer whose value
-might change across calls. I decided to still categorize the =count_uppercase=
-function as pure, in higher-level programming languages, since it produces the
-same results when given the same /string/ inputs.], since they don't break any of
-the rules above.
+might change across calls. I still decided to categorize the =count_uppercase=
+function as pure, in higher-level programming languages, since it produces
+identical results when given the same /string/ inputs.], since they don't break
+any of the rules above.
 
 #+begin_src python
 def double_sum(a, b):
@@ -95,7 +95,7 @@ testing, documenting). Some of these advantages include:
   pure, it can safely do many more optimizations, including result caching, or
   skipping calls altogether[fn::For example, if the length of the same string is
   calculated multiple times, and the string doesn't change, the
-  compiler/interpreter could perform a single call and reuse that value].
+  compiler/interpreter could perform a single call and reuse that value.].
 - *Predictability and security*: From the programmer's point of view, it's much
   easier to test a pure function than an impure one, since it doesn't depend on
   an external environment that might make the tests more unreliable or complex.
@@ -119,11 +119,12 @@ structure that extends the received integer type.
 :END:
 
 To illustrate this problem, along with a possible solution, the /writer/ monad
-will be used, which allows functions to extend a base type with a series of logs
-that will be appended together into a list. Below is some Python code that
-implements this writer functionality without using a monad. Each function
-performs some computation (in this case, simple arithmetic operations), while
-also logging a string into a global list variable.
+will be used, which enables functions that operate on a base type (e.g. on
+integers) to also write a series of logs into a common list.
+
+Below is some Python code that implements this writer functionality without
+using a monad. Each function performs some computation (in this case, simple
+arithmetic operations), while also logging a string into a global list variable.
 
 #+begin_src python
 global_log_list = []
@@ -297,9 +298,8 @@ function. Note how the log line needs to be wrapped in a one-element list, since
 the =LoggedInt= type expects a log /list/, not a string.
 
 Now that the combination logic has been removed from the arithmetic functions,
-the =bind= function can be implemented, which receives a =LoggedInt= value (=a=), one
-of the arithmetic functions, and a simple integer (=b=). It performs the following
-steps:
+the =bind= function can be implemented, which receives a =LoggedInt= value, one of
+the arithmetic functions and a simple integer. It performs the following steps:
 
 1. Unwrap/extract the original integer value from =a=, the received =LoggedInt=.
 2. Call the arithmetic function (received as an argument) with the unwrapped
@@ -383,7 +383,7 @@ def foo(a, b, c):
     return a + b * c
 
 # Define a function that receives an integer 'a', and returns an anonymous
-# function that receives an integer 'b', and returns and anonymous function that
+# function that receives an integer 'b', and returns an anonymous function that
 # receives an integer 'c' and returns an integer with the result.
 def bar(a):
     return lambda b: lambda c: a + b * c
@@ -548,7 +548,7 @@ constructor and the binding function:
 
 - Left identity ::
 
-  Promoting a simple value into a the monadic type through the constructor, and
+  Promoting a simple value into the monadic type through the constructor, and
   then binding it to a monadic function is equivalent to applying the function
   to the simple value directly.
 

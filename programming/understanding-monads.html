@@ -238,7 +238,7 @@ focusing on that.
 <p>
 Although I haven&rsquo;t personally used Haskell a lot, I have known about monads for
 a long time, probably since I heard about the <a href="https://en.wikipedia.org/wiki/Xmonad">xmonad</a> window manager. After
-researching on this topic for a few days, I decided to write a small article
+researching this topic for a few days, I decided to write a small article
 about what I learned, since it might be useful for some people. This article
 won&rsquo;t focus specifically on Haskell, so most concepts can be applied to many
 languages, and not a lot of programming background is required from the reader.
@@ -257,8 +257,8 @@ articles on <a href="https://mmhaskell.com/monads">this link</a>.
 <div class="outline-text-2" id="text-pure-functions">
 <p>
 Before trying to understand monads and their use cases, it&rsquo;s important to know
-about <a href="https://en.wikipedia.org/wiki/Pure_function">pure functions</a>, and why they are desirable. Pure functions are a kind of
-function that satisfy 2 properties:
+about <a href="https://en.wikipedia.org/wiki/Pure_function">pure functions</a>, and why they are desirable. In order for a function to be
+pure, it must satisfy 2 properties:
 </p>
 
 <ol class="org-ol">
@@ -269,8 +269,8 @@ input/output streams, etc.</li>
 </ol>
 
 <p>
-For example, the following python functions are pure<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>, since they don&rsquo;t break any of
-the rules above.
+For example, the following python functions are pure<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>, since they don&rsquo;t break
+any of the rules above.
 </p>
 
 <div class="org-src-container">
@@ -351,11 +351,14 @@ structure that extends the received integer type.
 <div class="outline-text-3" id="text-a-simple-writer">
 <p>
 To illustrate this problem, along with a possible solution, the <i>writer</i> monad
-will be used, which allows functions to extend a base type with a series of logs
-that will be appended together into a list. Below is some Python code that
-implements this writer functionality without using a monad. Each function
-performs some computation (in this case, simple arithmetic operations), while
-also logging a string into a global list variable.
+will be used, which enables functions that operate on a base type (e.g. on
+integers) to also write a series of logs into a common list.
+</p>
+
+<p>
+Below is some Python code that implements this writer functionality without
+using a monad. Each function performs some computation (in this case, simple
+arithmetic operations), while also logging a string into a global list variable.
 </p>
 
 <div class="org-src-container">
@@ -556,9 +559,8 @@ the <code>LoggedInt</code> type expects a log <i>list</i>, not a string.
 
 <p>
 Now that the combination logic has been removed from the arithmetic functions,
-the <code>bind</code> function can be implemented, which receives a <code>LoggedInt</code> value (<code>a</code>), one
-of the arithmetic functions, and a simple integer (<code>b</code>). It performs the following
-steps:
+the <code>bind</code> function can be implemented, which receives a <code>LoggedInt</code> value, one of
+the arithmetic functions and a simple integer. It performs the following steps:
 </p>
 
 <ol class="org-ol">
@@ -659,7 +661,7 @@ equivalent.
     <span style="color: #972500;">return</span> a + b * c
 
 <span style="color: #595959;"># </span><span style="color: #595959;">Define a function that receives an integer 'a', and returns an anonymous</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">function that receives an integer 'b', and returns and anonymous function that</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">function that receives an integer 'b', and returns an anonymous function that</span>
 <span style="color: #595959;"># </span><span style="color: #595959;">receives an integer 'c' and returns an integer with the result.</span>
 <span style="color: #972500;">def</span> <span style="color: #3f578f;">bar</span>(a):
     <span style="color: #972500;">return</span> <span style="color: #972500;">lambda</span> b: <span style="color: #972500;">lambda</span> c: a + b * c
@@ -840,7 +842,7 @@ constructor and the binding function:
 
 <dl class="org-dl">
 <dt>Left identity</dt><dd><p>
-Promoting a simple value into a the monadic type through the constructor, and
+Promoting a simple value into the monadic type through the constructor, and
 then binding it to a monadic function is equivalent to applying the function
 to the simple value directly.
 </p>
@@ -916,13 +918,13 @@ In the previous writer example:
 <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">On lower-level
 programming languages, like C, one might argue that string-manipulation
 functions are not actually pure, since they often receive a pointer whose value
-might change across calls. I decided to still categorize the <code>count_uppercase</code>
-function as pure, in higher-level programming languages, since it produces the
-same results when given the same <i>string</i> inputs.</p></div></div>
+might change across calls. I still decided to categorize the <code>count_uppercase</code>
+function as pure, in higher-level programming languages, since it produces
+identical results when given the same <i>string</i> inputs.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">For example, if the length of the same string is
 calculated multiple times, and the string doesn&rsquo;t change, the
-compiler/interpreter could perform a single call and reuse that value</p></div></div>
+compiler/interpreter could perform a single call and reuse that value.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This function is called <code>return</code> or <code>pure</code> in
 Haskell, but those names can be confusing, specially when used outside a <code>do</code>
