@@ -300,10 +300,10 @@ order that we allocated.
 
 Finally, once the user is done with the pool itself, it should be able to free
 it to the system. This is also pretty intuitive in this implementation, but it
-will get a bit trickier [[#changes-to-pool-new-and-pool-close][below]].
+will get a bit trickier [[#changes-to-pool-new-and-pool-destroy][below]].
 
 #+begin_src C
-void pool_close(Pool* pool) {
+void pool_destroy(Pool* pool) {
     if (pool == NULL)
         return;
 
@@ -417,9 +417,9 @@ This takes a bit more space in memory, but it's worth it. Even if we don't
 expand the pool, only the size 2 more pointers would be needed: one that points
 to the =ArrayStart= structure itself, and the (unused) =.next= member.
 
-** Changes to =pool_new= and =pool_close=
+** Changes to =pool_new= and =pool_destroy=
 :PROPERTIES:
-:CUSTOM_ID: changes-to-pool-new-and-pool-close
+:CUSTOM_ID: changes-to-pool-new-and-pool-destroy
 :END:
 
 The =pool_new= and =pool_free= functions need to be modified according to our new
@@ -464,7 +464,7 @@ When [[#closing-the-pool][closing the pool]], we will also need to traverse this
 list, freeing each chunk array and each =ArrayStart= structure in the list.
 
 #+begin_src C
-void pool_close(Pool* pool) {
+void pool_destroy(Pool* pool) {
     if (pool == NULL)
         return;
 
@@ -575,7 +575,7 @@ We will need to register an /anchor address/ (i.e. the address of our =Pool=
 structure) with =VALGRIND_CREATE_MEMPOOL= once, in =pool_new=. This /anchor address/
 is needed to associate each chunk with its specific pool whenever it's allocated
 or freed. We will also have to use =VALGRIND_DESTROY_MEMPOOL= once we are done
-with the pool, in =pool_close=.
+with the pool, in =pool_destroy=.
 
 The =VALGRIND_MAKE_MEM_NOACCESS= macro will be used when a memory region should be
 inaccessible by the user (e.g. for the =Pool= and =ArrayStart= structures); while
@@ -620,7 +620,7 @@ bool pool_expand(Pool* pool, size_t extra_sz) {
     return true;
 }
 
-void pool_close(Pool* pool) {
+void pool_destroy(Pool* pool) {
     if (pool == NULL)
         return;
 

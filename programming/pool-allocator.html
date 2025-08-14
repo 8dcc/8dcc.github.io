@@ -220,7 +220,7 @@
 <li><a href="#second-implementation-expanding-the-pool">4. Second implementation: Expanding the pool</a>
 <ul>
 <li><a href="#keeping-track-of-the-array-starts">4.1. Keeping track of the array starts</a></li>
-<li><a href="#changes-to-pool-new-and-pool-close">4.2. Changes to <code>pool_new</code> and <code>pool_close</code></a></li>
+<li><a href="#changes-to-pool-new-and-pool-destroy">4.2. Changes to <code>pool_new</code> and <code>pool_destroy</code></a></li>
 <li><a href="#expanding-without-modifying-the-array">4.3. Expanding without modifying the array</a></li>
 </ul>
 </li>
@@ -561,11 +561,11 @@ order that we allocated.
 <p>
 Finally, once the user is done with the pool itself, it should be able to free
 it to the system. This is also pretty intuitive in this implementation, but it
-will get a bit trickier <a href="#changes-to-pool-new-and-pool-close">below</a>.
+will get a bit trickier <a href="#changes-to-pool-new-and-pool-destroy">below</a>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #0031a9;">void</span> <span style="color: #3f578f;">pool_close</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>) {
+<pre class="src src-C"><span style="color: #0031a9;">void</span> <span style="color: #3f578f;">pool_destroy</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>) {
     <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span>)
         <span style="color: #972500;">return</span>;
 
@@ -716,9 +716,9 @@ to the <code>ArrayStart</code> structure itself, and the (unused) <code>.next</c
 </div>
 </div>
 
-<div id="outline-container-changes-to-pool-new-and-pool-close" class="outline-3">
-<h3 id="changes-to-pool-new-and-pool-close"><span class="section-number-3">4.2.</span> Changes to <code>pool_new</code> and <code>pool_close</code></h3>
-<div class="outline-text-3" id="text-changes-to-pool-new-and-pool-close">
+<div id="outline-container-changes-to-pool-new-and-pool-destroy" class="outline-3">
+<h3 id="changes-to-pool-new-and-pool-destroy"><span class="section-number-3">4.2.</span> Changes to <code>pool_new</code> and <code>pool_destroy</code></h3>
+<div class="outline-text-3" id="text-changes-to-pool-new-and-pool-destroy">
 <p>
 The <code>pool_new</code> and <code>pool_free</code> functions need to be modified according to our new
 <code>ArrayStart</code> structure.
@@ -768,7 +768,7 @@ list, freeing each chunk array and each <code>ArrayStart</code> structure in the
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #0031a9;">void</span> <span style="color: #3f578f;">pool_close</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>) {
+<pre class="src src-C"><span style="color: #0031a9;">void</span> <span style="color: #3f578f;">pool_destroy</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>) {
     <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span>)
         <span style="color: #972500;">return</span>;
 
@@ -903,7 +903,7 @@ We will need to register an <i>anchor address</i> (i.e. the address of our <code
 structure) with <code>VALGRIND_CREATE_MEMPOOL</code> once, in <code>pool_new</code>. This <i>anchor address</i>
 is needed to associate each chunk with its specific pool whenever it&rsquo;s allocated
 or freed. We will also have to use <code>VALGRIND_DESTROY_MEMPOOL</code> once we are done
-with the pool, in <code>pool_close</code>.
+with the pool, in <code>pool_destroy</code>.
 </p>
 
 <p>
@@ -953,7 +953,7 @@ With all that in mind, this is how our new code would look like:
     <span style="color: #972500;">return</span> <span style="color: #2a5045;">true</span>;
 }
 
-<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">pool_close</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>) {
+<span style="color: #0031a9;">void</span> <span style="color: #3f578f;">pool_destroy</span>(<span style="color: #0031a9;">Pool</span>* <span style="color: #005f5f;">pool</span>) {
     <span style="color: #972500;">if</span> (pool == <span style="color: #2a5045;">NULL</span>)
         <span style="color: #972500;">return</span>;
 
