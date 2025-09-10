@@ -1,0 +1,132 @@
+#+TITLE: Understanding decibels
+#+AUTHOR: 8dcc
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+The decibel is a unit that is mostly used for audio and signals, but it is often
+misunderstood. This article will attempt to explain precisely what it measures,
+its different types and how it can be calculated, along with a simple example.
+
+First, it is important to understand that it is a /relative/ unit of measurement,
+meaning that it always expresses the relationship between two
+quantities. Specifically, it measures the ratio of two values on a logarithmic
+scale.
+
+Although it is often used to express absolute "volume" or "signal level", it's
+actually expresses the ratio between some variable over a constant. Some of
+these constants or "reference values" are listed here, along with their unit
+suffixes. Note that some of these units will be referenced below.
+
+- *dBW*: Measures the relationship between some power in watts and 1 W.
+- *dBm*: Measures the relationship between some power in watts and 1 mW.
+- *dBV*: Measures the relationship between a RMS voltage and 1 V.
+- *dBu*: Measures the relationship between a RMS voltage and $\sqrt{0.6}$ V[fn::
+  Specifically, it is the RMS voltage that would dissipate 0 dBm (1 mW) in a 600
+  \Omega load. This unit was originally called =dBv=, but was changed to =dBu= to
+  avoid confusion with =dBV=.].
+- *dBFS*: Measures the relationship between the amplitude of a signal and the
+  maximum the device can handle before [[https://en.wikipedia.org/wiki/Clipping_(signal_processing)][clipping]] occurs. The =FS= stands for /Full
+  Scale/.
+
+The rest of this article will focus on on decibels in the context of signal
+processing and amplification, although most of these concepts can be applied in
+other fields.
+
+* Calculating decibels
+:PROPERTIES:
+:CUSTOM_ID: calculating-decibels
+:END:
+
+Given two values (in this case, an input and an output voltage), the decibels
+can be calculated from their ratio using the following formula.
+
+\begin{equation}
+\text{dB} = 20 \log_{10} \left( \frac{V_{in}}{V_{out}} \right) \\
+\end{equation}
+
+Therefore, given the decibels, the ratio between the two values can be obtained
+using a similar formula.
+
+\begin{equation}
+\left( \frac{V_{in}}{V_{out}} \right) = 10^{\frac{\text{dB}}{20}}
+\end{equation}
+
+* Example
+:PROPERTIES:
+:CUSTOM_ID: example
+:END:
+
+To illustrate this, the following amplifier circuit will be used. An input
+signal of $V_{in}$ volts is amplified using a specific [[https://en.wikipedia.org/wiki/Gain_(electronics)][gain]] of $G$ decibels into
+an output signal of $V_{out}$ volts[fn::This assumes that the input and output
+impedance ($R_{in}$ and $R_{out}$) are equal, which is not always the case.].
+
+#+NAME: fig1
+[[file:../img/understanding-decibels1.svg]]
+
+For this example, it will be assumed that the input voltage is 0.3 V (RMS), the gain
+of the amplifier is 24 dB, and the maximum input voltage supported by the device
+is 5 V (RMS).
+
+Note how the gain is expressed in decibels, not in "dBV" or "dBFS". This is
+because there is no need for a constant or "reference value", the value of the
+amplifier simply indicates the ratio that it is supposed to create between the
+input and the output voltage after the signal is amplified.
+
+** Input decibels
+:PROPERTIES:
+:CUSTOM_ID: input-decibels
+:END:
+
+One common misunderstanding about decibels stems from the fact that the input
+signal is usually not measured in volts, but in "absolute" decibels using a
+constant reference value. In other words, the input is often expressed in dBV or
+dBu, but the amplification is expressed in dB, since it measures two variables.
+
+Here are the formulas for calculating different decibels suffixes from a
+specific voltage.
+
+| Suffix | Formula                                                   | Example                                                                                     |
+|--------+-----------------------------------------------------------+---------------------------------------------------------------------------------------------|
+|  <c>   | <l>                                                       | <l>                                                                                         |
+|  *dBV*   | $$20 \log_{10} \left( \frac{V_{in}}{1} \right)$$          | $$20 \log_{10} \left( \frac{0.3}{1} \right) = 20 \log_{10}(0.3) \approx -10.45$$            |
+|  *dBu*   | $$20 \log_{10} \left( \frac{V_{in}}{\sqrt{0.6}} \right)$$ | $$20 \log_{10} \left( \frac{0.3}{0.774} \right) \approx 20 \log_{10}(0.387) \approx -8.23$$ |
+|  *dBFS*  | $$20 \log_{10} \left( \frac{V_{in}}{V_{max}} \right)$$    | $$20 \log_{10} \left( \frac{0.3}{5} \right) = 20 \log_{10}(0.06) \approx -24.43$$           |
+
+All of these values express the same input RMS voltage, 0.3 V, but they are
+expressed relative to different constants. The key detail is that the input
+value can't be expressed in decibels without another reference value, which is
+usually constant.
+
+Also note how the decibels are usually (but not necessarily always) negative,
+since the input voltage is smaller than the reference value. For example, the
+maximum dBFS value of a device should be zero, since:
+
+$$
+\log_{10} \left( \frac{V_{max}}{V_{max}} \right) = 0
+$$
+
+** COMMENT Calculating the output voltage
+:PROPERTIES:
+:CUSTOM_ID: comment-calculating-the-output-voltage
+:END:
+
+#+NAME: fig2
+[[file:../img/understanding-decibels2.svg]]
+
+TODO
+
+** COMMENT Calculating the output dBV
+:PROPERTIES:
+:CUSTOM_ID: comment-calculating-the-output-dbv
+:END:
+
+TODO
