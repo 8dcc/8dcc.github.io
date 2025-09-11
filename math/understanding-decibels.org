@@ -23,7 +23,7 @@ scale.
 Although it is often used to express absolute "volume" or "signal level", it's
 actually expresses the ratio between some variable over a constant. Some of
 these constants or "reference values" are listed here, along with their unit
-suffixes. Note that some of these units will be referenced below.
+suffixes.
 
 - *dBW*: Measures the relationship between some power in watts and 1 W.
 - *dBm*: Measures the relationship between some power in watts and 1 mW.
@@ -35,6 +35,11 @@ suffixes. Note that some of these units will be referenced below.
 - *dBFS*: Measures the relationship between the amplitude of a signal and the
   maximum the device can handle before [[https://en.wikipedia.org/wiki/Clipping_(signal_processing)][clipping]] occurs. The =FS= stands for /Full
   Scale/.
+- *dBSPL*: Measures the relationship between a sound pressure and 20 micropascals
+  (\muPa). SPL stands for /Sound Pressure Level/.
+
+Some of these units will be used below, specially those related to voltage and
+signal amplitude.
 
 * Calculating decibels
 :PROPERTIES:
