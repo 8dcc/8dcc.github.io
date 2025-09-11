@@ -1,0 +1,18 @@
+#+TITLE: Math
+#+AUTHOR: 8dcc
+#+OPTIONS: toc:nil num:nil
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
+#+HTML_LINK_UP: ../index.html
+#+HTML_LINK_HOME: ../index.html
+
+* List of articles
+:PROPERTIES:
+:CUSTOM_ID: list-of-articles
+:END:
+
+These articles are mainly about math. Most of these articles might require
+JavaScript, since they use the [[https://www.mathjax.org/][MathJax library]].
+
+- [[file:understanding-decibels.org][Understanding decibels]]

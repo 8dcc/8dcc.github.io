@@ -17,6 +17,7 @@ The articles in this blog are spread across the following categories.
 
 - [[file:programming/index.org][Programming]]
 - [[file:reversing/index.org][Reverse engineering]]
+- [[file:math/index.org][Math]]
 - [[file:naos/index.org][NAOS wiki]]
 - [[file:opinion/index.org][Opinion]]
 - [[file:reference/index.org][Reference]]

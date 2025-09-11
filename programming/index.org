@@ -12,8 +12,8 @@
 :CUSTOM_ID: list-of-articles
 :END:
 
-These articles are about programming and math. Some of these articles might
-require JavaScript, since it uses the [[https://www.mathjax.org/][MathJax library]].
+These articles are about programming. Some of these articles might require
+JavaScript, since they use the [[https://www.mathjax.org/][MathJax library]].
 
 - [[file:pool-allocator.org][Writing a simple pool allocator in C]]
 - [[file:cons-of-cons.org][The pros and cons of Cons]]
