@@ -18,7 +18,6 @@ JavaScript, since they use the [[https://www.mathjax.org/][MathJax library]].
 - [[file:pool-allocator.org][Writing a simple pool allocator in C]]
 - [[file:cons-of-cons.org][The pros and cons of Cons]]
 - [[file:understanding-y-combinator.org][Understanding the Y combinator]]
-- [[file:understanding-entropy.org][Understanding entropy]]
 - [[file:understanding-fat.org][Understanding the FAT file system]]
 - [[file:understanding-monads.org][Understanding monads]]
 - [[file:netref.org][Introduction to network programming in C]]
