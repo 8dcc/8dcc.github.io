@@ -36,27 +36,25 @@ suffixes. Note that some of these units will be referenced below.
   maximum the device can handle before [[https://en.wikipedia.org/wiki/Clipping_(signal_processing)][clipping]] occurs. The =FS= stands for /Full
   Scale/.
 
-The rest of this article will focus on on decibels in the context of signal
-processing and amplification, although most of these concepts can be applied in
-other fields.
-
 * Calculating decibels
 :PROPERTIES:
 :CUSTOM_ID: calculating-decibels
 :END:
 
-Given two values (in this case, an input and an output voltage), the decibels
-can be calculated from their ratio using the following formula.
+Given two values $a$ and $b$, the decibels can be calculated from their ratio
+using the following formula.
 
 \begin{equation}
-\text{dB} = 20 \log_{10} \left( \frac{V_{in}}{V_{out}} \right) \\
+\label{eq:ratio-to-decibels}
+\text{dB} = 20 \log_{10} \left( \frac{a}{b} \right) \\
 \end{equation}
 
-Therefore, given the decibels, the ratio between the two values can be obtained
-using a similar formula.
+Therefore, given the decibels, the ratio between the two values can also be
+obtained using a similar formula.
 
 \begin{equation}
-\left( \frac{V_{in}}{V_{out}} \right) = 10^{\frac{\text{dB}}{20}}
+\label{eq:decibels-to-ratio}
+\frac{a}{b} = 10^{\frac{\text{dB}}{20}}
 \end{equation}
 
 * Example
@@ -72,18 +70,18 @@ impedance ($R_{in}$ and $R_{out}$) are equal, which is not always the case.].
 #+NAME: fig1
 [[file:../img/understanding-decibels1.svg]]
 
-For this example, it will be assumed that the input voltage is 0.3 V (RMS), the gain
-of the amplifier is 24 dB, and the maximum input voltage supported by the device
-is 5 V (RMS).
+For this example, it will be assumed that the input voltage is 0.3 V (RMS), the
+gain of the amplifier is 24 dB, and the maximum input voltage supported by the
+device is 5 V (RMS).
 
 Note how the gain is expressed in decibels, not in "dBV" or "dBFS". This is
 because there is no need for a constant or "reference value", the value of the
 amplifier simply indicates the ratio that it is supposed to create between the
 input and the output voltage after the signal is amplified.
 
-** Input decibels
+** Calculating the input decibels
 :PROPERTIES:
-:CUSTOM_ID: input-decibels
+:CUSTOM_ID: calculating-the-input-decibels
 :END:
 
 One common misunderstanding about decibels stems from the fact that the input
@@ -101,7 +99,7 @@ specific voltage.
 |  *dBu*   | $$20 \log_{10} \left( \frac{V_{in}}{\sqrt{0.6}} \right)$$ | $$20 \log_{10} \left( \frac{0.3}{0.774} \right) \approx 20 \log_{10}(0.387) \approx -8.23$$ |
 |  *dBFS*  | $$20 \log_{10} \left( \frac{V_{in}}{V_{max}} \right)$$    | $$20 \log_{10} \left( \frac{0.3}{5} \right) = 20 \log_{10}(0.06) \approx -24.43$$           |
 
-All of these values express the same input RMS voltage, 0.3 V, but they are
+All of these values express the same input voltage, 0.3 V (RMS), but they are
 expressed relative to different constants. The key detail is that the input
 value can't be expressed in decibels without another reference value, which is
 usually constant.
@@ -114,19 +112,61 @@ $$
 \log_{10} \left( \frac{V_{max}}{V_{max}} \right) = 0
 $$
 
-** COMMENT Calculating the output voltage
+** Calculating the output voltage
 :PROPERTIES:
-:CUSTOM_ID: comment-calculating-the-output-voltage
+:CUSTOM_ID: calculating-the-output-voltage
 :END:
+
+The following figure shows the previous circuit diagram, along with the known
+values: the input voltage and the amplifier gain.
 
 #+NAME: fig2
 [[file:../img/understanding-decibels2.svg]]
 
-TODO
+By filling this know data in the formula from the previous section, the ratio
+between the input and output voltage can be obtained, and therefore the output
+voltage itself.
 
-** COMMENT Calculating the output dBV
+\begin{align*}
+\frac{V_{out}}{V_{in}} &= 10^{\frac{\text{dB}}{20}} \\
+\frac{V_{out}}{0.3} &= 10^{\frac{24}{20}} \\
+\frac{V_{out}}{0.3} &= 10^{1.2} \\
+\frac{V_{out}}{0.3} &\approx 15.84 \\
+V_{out} &\approx 0.3 \times 15.84 \\
+V_{out} &\approx 4.75 \\
+\end{align*}
+
+In the previous formula, 15.84 is the final ratio between the input and output
+voltage, which can be applied it to the input to obtain an output value of 4.75
+volts. Notice how the output voltage grows logarithmically; it isn't directly
+multiplied by 24, which would result in 7.2 output volts RMS.
+
+** Calculating the output dBV
 :PROPERTIES:
-:CUSTOM_ID: comment-calculating-the-output-dbv
+:CUSTOM_ID: calculating-the-output-dbv
 :END:
 
-TODO
+Similarly to how the input voltage was converted to dBV, the same can be done to
+the output voltage.
+
+\begin{split}
+\text{dBV} &= 20 \log_{10} \left( \frac{V_{out}}{1} \right) \\
+           &= 20 \log_{10} \left( \frac{4.75}{1} \right) \\
+           &= 20 \log_{10}(4.75) \\
+           &\approx 20 \times 0.67 \\
+           &\approx 13.53
+\end{split}
+
+Just like with any other value expressed in decibel, this 13.53 expresses a
+ratio between two values, in this case the output voltage and a constant
+reference value of 1 volt, both RMS. This new value, although expressed in
+decibels, is completely independent from the input or the amplification, it
+simply indicates a ratio between a signal level and a constant.
+
+Also note that, by subtracting the input and output dBV, the gain can be
+obtained. This can be done with a simple subtraction because the input and
+output dBV values were calculated using a logarithmic scale, which is also used
+to express the gain of the amplifier. In other words, a value expressed in
+"suffixed" decibels can be added to another value in "plain" decibels to obtain
+a result back in "suffixed" decibels because all decibels use the same
+logarithmic formula \eqref{eq:ratio-to-decibels}.
