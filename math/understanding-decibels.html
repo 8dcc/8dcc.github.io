@@ -274,15 +274,16 @@ suffixes.
 </p>
 
 <ul class="org-ul">
-<li><b>dBW</b>: Measures the relationship between some power in watts and 1 W.</li>
-<li><b>dBm</b>: Measures the relationship between some power in watts and 1 mW.</li>
-<li><b>dBV</b>: Measures the relationship between a RMS voltage and 1 V.</li>
-<li><b>dBu</b>: Measures the relationship between a RMS voltage and \(\sqrt{0.6}\) V<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>.</li>
+<li><b>dBW</b>: Measures the relationship between some power in watts and 1 watt.</li>
+<li><b>dBm</b>: Measures the relationship between some power in watts and 1 milliwatt.</li>
+<li><b>dBV</b>: Measures the relationship between a RMS voltage and 1 volt.</li>
+<li><b>dBu</b>: Measures the relationship between a RMS voltage and \(\sqrt{0.6}\)
+volts<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>.</li>
 <li><b>dBFS</b>: Measures the relationship between the amplitude of a signal and the
 maximum the device can handle before <a href="https://en.wikipedia.org/wiki/Clipping_(signal_processing)">clipping</a> occurs. The <code>FS</code> stands for <i>Full
 Scale</i>.</li>
 <li><b>dBSPL</b>: Measures the relationship between a sound pressure and 20 micropascals
-(\muPa). SPL stands for <i>Sound Pressure Level</i>.</li>
+(&mu;Pa). SPL stands for <i>Sound Pressure Level</i>.</li>
 </ul>
 
 <p>
@@ -333,9 +334,9 @@ an output signal of \(V_{out}\) volts<sup><a id="fnr.2" class="footref" href="#f
 </div>
 
 <p>
-For this example, it will be assumed that the input voltage is 0.3 V (RMS), the
-gain of the amplifier is 24 dB, and the maximum input voltage supported by the
-device is 5 V (RMS).
+For this example, it will be assumed that the input voltage is 0.3 volts RMS,
+the gain of the amplifier is 24 decibels, and the maximum input voltage
+supported by the device is 5 volts RMS.
 </p>
 
 <p>
@@ -400,7 +401,7 @@ specific voltage.
 </table>
 
 <p>
-All of these values express the same input voltage, 0.3 V (RMS), but they are
+All of these values express the same input voltage, 0.3 volts RMS, but they are
 expressed relative to different constants. The key detail is that the input
 value can&rsquo;t be expressed in decibels without another reference value, which is
 usually constant.
@@ -498,9 +499,9 @@ logarithmic formula \eqref{eq:ratio-to-decibels}.
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Specifically, it is the RMS voltage that would dissipate 0 dBm (1 mW) in a 600
-&Omega; load. This unit was originally called <code>dBv</code>, but was changed to <code>dBu</code> to
-avoid confusion with <code>dBV</code>.</p></div></div>
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Specifically, it is the RMS voltage that would dissipate 0 dBm (1
+mW) in a 600 &Omega; load. This unit was originally called <code>dBv</code>, but was changed
+to <code>dBu</code> to avoid confusion with <code>dBV</code>.</p></div></div>
 
 <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This assumes that the input and output
 impedance (\(R_{in}\) and \(R_{out}\)) are equal, which is not always the case.</p></div></div>
