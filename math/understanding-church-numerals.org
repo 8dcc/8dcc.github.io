@@ -1,0 +1,157 @@
+#+TITLE: Understanding Church numerals
+#+AUTHOR: 8dcc
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
+#+LATEX_HEADER: \usepackage{svg}
+
+#+begin_comment org
+TODO: Move section about lambda calculus from Y combinator. Rename article to
+"Understanding lambda calculus and Church numerals". Update introduction.
+#+end_comment
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+Church numerals are a representation of the natural numbers in the context of
+/lambda calculus/. Church numerals, as well as lambda calculus itself, was
+invented by the mathematician and computer scientist [[https://en.wikipedia.org/wiki/Alonzo_Church][Alonzo Church]].
+
+This article was mainly motivated by [[https://web.mit.edu/6.001/6.037/sicp.pdf#section*.65][Exercise 2.6]] of [[https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs][Structure and
+Interpretation of Computer Programs]].
+
+#+begin_comment org
+Furthermore, the original explanation about lambda calculus was moved from my
+article on [[file:../programming/understanding-y-combinator.org][the Y combinator.]]
+#+end_comment
+
+#+begin_comment org
+TODO: (About beta reduction in lambda calculus section)
+
+The expression $(\lambda p. b) a$ reduces to $b[p := a]$, where the notation
+$b[p := a]$ indicates the operation of substituting the parameter $p$ with the
+argument $a$ in the body $b$.
+#+end_comment
+
+* Zero and one
+:PROPERTIES:
+:CUSTOM_ID: zero-and-one
+:END:
+
+#+begin_comment org
+TODO: Finish explanation.
+#+end_comment
+
+The definition of =zero= is:
+
+$$
+\lambda f. \lambda x. x
+$$
+
+The definition of =one= is:
+
+$$
+\lambda f. \lambda x. f\ x
+$$
+
+
+* Increasing a number
+:PROPERTIES:
+:CUSTOM_ID: increasing-a-number
+:END:
+
+As mentioned in the introduction, this article was motivated by Exercise 2.6 of
+SICP. This exercise provides the reader with the previous definition of =zero=
+along with an =add-1= procedure, which increases its input; from those
+definitions, the reader is expected to calculate =one=.
+
+Although the value of =one= was shown in the previous section for illustrating
+Church numerals, it's worth going over the expansion of =add-1= in detail.
+
+** Definition of =add-1=
+:PROPERTIES:
+:CUSTOM_ID: definition-of-add-1
+:END:
+
+This is the definition of =add-1= in \lambda-notation[fn::The expression can be
+simplified through [[https://en.wikipedia.org/wiki/Currying][currying]], that is, by transforming multiple lambdas that
+receive one argument into a single lambda that receives multiple arguments (in
+this case, $f$ and $x$). The the simplified definition would be $\lambda
+n. \lambda fx. f (n f x)$.].
+
+$$
+\lambda n. \lambda f. \lambda x. f (n\ f\ x)
+$$
+
+This is the equivalent definition of =add-1= in Lisp.
+
+#+begin_src scheme
+(define add-1
+  (lambda (n)
+    (lambda (f)
+      (lambda (x)
+        (f ((n f) x))))))
+#+end_src
+
+
+** Beta reduction
+:PROPERTIES:
+:CUSTOM_ID: beta-reduction
+:END:
+
+Through \beta-reduction, a call to =add-1= with an argument of =zero= can be
+examined, understanding why the Church numeral for =one= is returned. Each step
+of the reduction will be explained and highlighted using Lisp syntax.
+
+First, the call to =add-1= is expanded, replacing each symbol with its bound
+expression.
+
+#+NAME: fig1
+[[file:../img/understanding-church-numerals1.svg]]
+
+Then, the outer-most call is evaluated, replacing the =n= parameter in the body of
+=add-1= with the value of =zero=. Specifically, to avoid naming collisions, =n= is
+replaced with the \alpha-conversion of =zero=, where the symbols =f= and =x= are
+substituted with =y= and =z=, respectively.
+
+#+NAME: fig2
+[[file:../img/understanding-church-numerals2.svg]]
+
+Once the outer call has been evaluated, the expression can be simplified by
+evaluating the call to =zero=, that is, the call to the lambda whose parameter is
+=y=, and whose argument is =f=. Since the parameter =y= does not appear in the body,
+is is essentially discarded, resulting in =(lambda (z) z)=, the /identity/ function.
+
+#+NAME: fig3
+[[file:../img/understanding-church-numerals3.svg]]
+
+Finally, the call to the identity lambda can be evaluated, that is, the call to
+the lambda whose parameter is =z= and whose argument is =x=. This call simply
+evaluates to the argument, =x=. This final expression matches the definition of
+=one= from the previous section.
+
+#+NAME: fig4
+[[file:../img/understanding-church-numerals4.svg]]
+
+Naturally, the same \beta-reduction process can be expressed in
+\lambda-notation.
+
+\begin{align*}
+\text{one} &= (\lambda n. \lambda f. \lambda x. f\ (n\ f\ x)) (\lambda f. \lambda x. x) \\
+           &= \lambda f. \lambda x. f\ ((\lambda y. \lambda z. z)\ f\ x) \\
+           &= \lambda f. \lambda x. f\ ((\lambda z. z)\ x) \\
+           &= \lambda f. \lambda x. f\ x
+\end{align*}
+
+#+begin_comment org
+TODO: Expand (add-1 one), shortly and directly in lambda notation.
+#+end_comment
+
+* COMMENT Arbitrary addition
+:PROPERTIES:
+:CUSTOM_ID: comment-arbitrary-addition
+:END:
