@@ -246,6 +246,12 @@
 <li><a href="#calculating-two">3.3. Calculating <code>two</code></a></li>
 </ul>
 </li>
+<li><a href="#arbitrary-addition">4. Arbitrary addition</a>
+<ul>
+<li><a href="#the-abstract-objective">4.1. The abstract objective</a></li>
+<li><a href="#building-the-procedure">4.2. Building the procedure</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -490,6 +496,157 @@ inner-most lambda is &beta;-reduced in \(\eqref{eq:reduction2}\) produce
 argument. Finally, the call to that lambda, whose argument is \(x\), is also
 reduced into \((f\ x)\); this result \(\eqref{eq:solution}\) matches the definition
 of <code>two</code> from the <a href="#church-numerals">previous section</a>.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-arbitrary-addition" class="outline-2">
+<h2 id="arbitrary-addition"><span class="section-number-2">4.</span> Arbitrary addition</h2>
+<div class="outline-text-2" id="text-arbitrary-addition">
+<p>
+Although the previous section explained how to increase a Church numeral, the
+<code>add-1</code> function was already provided. The second part of the exercise asks for a
+definition of the addition procedure, avoiding repeated calls to <code>add-1</code>.
+</p>
+
+<p>
+It is helpful to analyze the inputs of this new addition function, along with
+the expected output. In Lisp, these would be defined as the following three
+expressions.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #a60000;">(</span><span style="color: #972500;">lambda</span> <span style="color: #695500;">(</span>f<span style="color: #695500;">)</span> <span style="color: #695500;">(</span><span style="color: #972500;">lambda</span> <span style="color: #006800;">(</span>x<span style="color: #006800;">)</span> <span style="color: #006800;">(</span>f <span style="color: #008899;">(</span>f x<span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>              <span style="color: #595959;">; </span><span style="color: #595959;">Input `a': Two</span>
+<span style="color: #a60000;">(</span><span style="color: #972500;">lambda</span> <span style="color: #695500;">(</span>f<span style="color: #695500;">)</span> <span style="color: #695500;">(</span><span style="color: #972500;">lambda</span> <span style="color: #006800;">(</span>x<span style="color: #006800;">)</span> <span style="color: #006800;">(</span>f <span style="color: #008899;">(</span>f <span style="color: #0000ff;">(</span>f x<span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>          <span style="color: #595959;">; </span><span style="color: #595959;">Input `b': Three</span>
+<span style="color: #a60000;">(</span><span style="color: #972500;">lambda</span> <span style="color: #695500;">(</span>f<span style="color: #695500;">)</span> <span style="color: #695500;">(</span><span style="color: #972500;">lambda</span> <span style="color: #006800;">(</span>x<span style="color: #006800;">)</span> <span style="color: #006800;">(</span>f <span style="color: #008899;">(</span>f <span style="color: #0000ff;">(</span>f <span style="color: #dd22dd;">(</span>f <span style="color: #a60000;">(</span>f x<span style="color: #a60000;">)</span><span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>  <span style="color: #595959;">; </span><span style="color: #595959;">Result: Five</span>
+</pre>
+</div>
+</div>
+
+<div id="outline-container-the-abstract-objective" class="outline-3">
+<h3 id="the-abstract-objective"><span class="section-number-3">4.1.</span> The abstract objective</h3>
+<div class="outline-text-3" id="text-the-abstract-objective">
+<p>
+From the previous expressions, it can be concluded that the new addition
+function should essentially replace <code>x</code> (in either expression, because addition is
+<a href="https://en.wikipedia.org/wiki/Commutative_property">commutative</a>) with the entire body of the other expression&rsquo;s inner-most
+lambda.
+</p>
+
+<p>
+This abstract process is represented in the following figure, which shows the
+expected behavior when adding the Church numeral representation of 2 and 3.
+</p>
+
+
+<div id="fig5" class="figure">
+<p><img src="../img/understanding-church-numerals5.svg" alt="understanding-church-numerals5.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+For simplicity, this approach will be used for the rest of the section, where
+the body of the first argument <code>a</code> is is &ldquo;placed&rdquo; in the second argument <code>b</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-building-the-procedure" class="outline-3">
+<h3 id="building-the-procedure"><span class="section-number-3">4.2.</span> Building the procedure</h3>
+<div class="outline-text-3" id="text-building-the-procedure">
+<p>
+Since the parameters of <code>add</code> are known, its initial structure can be defined. The
+following figure shows the initial definition, which will evolve trough this
+section.
+</p>
+
+
+<div id="fig6" class="figure">
+<p><img src="../img/understanding-church-numerals6.svg" alt="understanding-church-numerals6.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+Since the function will manipulate the bodies of the inner-most lambdas, it must
+be able to access them. Specifically, it needs to:
+</p>
+
+<ol class="org-ol">
+<li>Extract the inner-most body from <code>a</code>, that is, <code>(f (f x))</code>.</li>
+<li>Replace <code>x</code> in the inner-most body of <code>b</code>.</li>
+</ol>
+
+<p>
+Since the numbers themselves are functions, replacing <code>x</code> in the inner body of <code>b</code>
+should be as simple as calling its inner lambda with the desired value as an
+argument. To access and call the inner lambda, the outer lambda, whose parameter
+is <code>f</code>, needs to be called first, but it obviously needs some value as its
+argument.
+</p>
+
+<p>
+As noted above, Church numerals express &ldquo;repeated actions&rdquo;, and their <code>f</code> argument
+represents the function that performs the action itself. Since the result of
+adding two Church numerals must be another Church numeral, which will also
+express some &ldquo;repeated action&rdquo;, there is no way for <code>add</code> to know the action that
+the result is expected to repeat; therefore, the result must also be a function
+with an <code>f</code> parameter, which lets the caller specify a function to be repeated.
+</p>
+
+<p>
+Since the result of <code>add</code> now contains a lambda with an <code>f</code> parameter, that unknown
+value of <code>f</code> can be used to call <code>b</code>, accessing the inner lambda. Although there is
+now a way of calling the inner lambda of <code>b</code> for altering <code>x</code>, it&rsquo;s still
+not clear how to obtain the argument: the body of <code>a</code>. Either way, the definition
+of <code>add</code> can be expanded to reflect this new knowledge.
+</p>
+
+
+<div id="fig7" class="figure">
+<p><img src="../img/understanding-church-numerals7.svg" alt="understanding-church-numerals7.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+The inner body of <code>a</code> can be obtained through a similar process. Just like when
+calling <code>b</code>, the value of <code>f</code> can be used for calling the outer lambda; however,
+in this case the inner lambda needs to be called for retrieving the body.
+</p>
+
+<p>
+A similar problem emerges: what value should be used as the <code>x</code> argument of the
+inner lambda of <code>a</code>? Going back to the &ldquo;repeated actions&rdquo;, <code>x</code> represents the
+input of the action, in other words, the value to which the action should be
+applied. Just like with the function itself, <code>add</code> cannot know this value when
+computing its result, so it must use another generic lambda that receives <code>x</code>.
+</p>
+
+<p>
+With this, the previous two steps of <i>extraction</i> and <i>replacement</i> can be
+performed. The following figure shows the final definition of <code>add</code> in Lisp.
+</p>
+
+
+<div id="fig8" class="figure">
+<p><img src="../img/understanding-church-numerals8.svg" alt="understanding-church-numerals8.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+Note that the previous Lisp definition &ldquo;replaces&rdquo; the body of <code>a</code> into <code>b</code>, but the
+conventional definition in &lambda;-notation is:
+</p>
+
+<p>
+\[
+\text{add} = \lambda ab. \lambda f. \lambda x. a\ f\ (b\ f\ x)
+\]
+</p>
+
+<p>
+Which would move the body of <code>b</code> into <code>a</code>. Again, this is not an issue because
+addition is commutative.
 </p>
 </div>
 </div>

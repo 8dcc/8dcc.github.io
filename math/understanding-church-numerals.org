@@ -189,7 +189,106 @@ argument. Finally, the call to that lambda, whose argument is $x$, is also
 reduced into $(f\ x)$; this result $\eqref{eq:solution}$ matches the definition
 of =two= from the [[#church-numerals][previous section]].
 
-* COMMENT Arbitrary addition
+* Arbitrary addition
 :PROPERTIES:
-:CUSTOM_ID: comment-arbitrary-addition
+:CUSTOM_ID: arbitrary-addition
 :END:
+
+Although the previous section explained how to increase a Church numeral, the
+=add-1= function was already provided. The second part of the exercise asks for a
+definition of the addition procedure, avoiding repeated calls to =add-1=.
+
+It is helpful to analyze the inputs of this new addition function, along with
+the expected output. In Lisp, these would be defined as the following three
+expressions.
+
+#+begin_src scheme
+(lambda (f) (lambda (x) (f (f x))))              ; Input `a': Two
+(lambda (f) (lambda (x) (f (f (f x)))))          ; Input `b': Three
+(lambda (f) (lambda (x) (f (f (f (f (f x)))))))  ; Result: Five
+#+end_src
+
+** The abstract objective
+:PROPERTIES:
+:CUSTOM_ID: the-abstract-objective
+:END:
+
+From the previous expressions, it can be concluded that the new addition
+function should essentially replace =x= (in either expression, because addition is
+[[https://en.wikipedia.org/wiki/Commutative_property][commutative]]) with the entire body of the other expression's inner-most
+lambda.
+
+This abstract process is represented in the following figure, which shows the
+expected behavior when adding the Church numeral representation of 2 and 3.
+
+#+NAME: fig5
+[[file:../img/understanding-church-numerals5.svg]]
+
+For simplicity, this approach will be used for the rest of the section, where
+the body of the first argument =a= is is "placed" in the second argument =b=.
+
+** Building the procedure
+:PROPERTIES:
+:CUSTOM_ID: building-the-procedure
+:END:
+
+Since the parameters of =add= are known, its initial structure can be defined. The
+following figure shows the initial definition, which will evolve trough this
+section.
+
+#+NAME: fig6
+[[file:../img/understanding-church-numerals6.svg]]
+
+Since the function will manipulate the bodies of the inner-most lambdas, it must
+be able to access them. Specifically, it needs to:
+
+1. Extract the inner-most body from =a=, that is, =(f (f x))=.
+2. Replace =x= in the inner-most body of =b=.
+
+Since the numbers themselves are functions, replacing =x= in the inner body of =b=
+should be as simple as calling its inner lambda with the desired value as an
+argument. To access and call the inner lambda, the outer lambda, whose parameter
+is =f=, needs to be called first, but it obviously needs some value as its
+argument.
+
+As noted above, Church numerals express "repeated actions", and their =f= argument
+represents the function that performs the action itself. Since the result of
+adding two Church numerals must be another Church numeral, which will also
+express some "repeated action", there is no way for =add= to know the action that
+the result is expected to repeat; therefore, the result must also be a function
+with an =f= parameter, which lets the caller specify a function to be repeated.
+
+Since the result of =add= now contains a lambda with an =f= parameter, that unknown
+value of =f= can be used to call =b=, accessing the inner lambda. Although there is
+now a way of calling the inner lambda of =b= for altering =x=, it's still
+not clear how to obtain the argument: the body of =a=. Either way, the definition
+of =add= can be expanded to reflect this new knowledge.
+
+#+NAME: fig7
+[[file:../img/understanding-church-numerals7.svg]]
+
+The inner body of =a= can be obtained through a similar process. Just like when
+calling =b=, the value of =f= can be used for calling the outer lambda; however,
+in this case the inner lambda needs to be called for retrieving the body.
+
+A similar problem emerges: what value should be used as the =x= argument of the
+inner lambda of =a=? Going back to the "repeated actions", =x= represents the
+input of the action, in other words, the value to which the action should be
+applied. Just like with the function itself, =add= cannot know this value when
+computing its result, so it must use another generic lambda that receives =x=.
+
+With this, the previous two steps of /extraction/ and /replacement/ can be
+performed. The following figure shows the final definition of =add= in Lisp.
+
+#+NAME: fig8
+[[file:../img/understanding-church-numerals8.svg]]
+
+Note that the previous Lisp definition "replaces" the body of =a= into =b=, but the
+conventional definition in \lambda-notation is:
+
+$$
+\text{add} = \lambda ab. \lambda f. \lambda x. a\ f\ (b\ f\ x)
+$$
+
+Which would move the body of =b= into =a=. Again, this is not an issue because
+addition is commutative.
