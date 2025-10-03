@@ -25,8 +25,8 @@ This article was mainly motivated by [[https://web.mit.edu/6.001/6.037/sicp.pdf#
 Interpretation of Computer Programs]].
 
 #+begin_comment org
-Furthermore, the original explanation about lambda calculus was moved from my
-article on [[file:../programming/understanding-y-combinator.org][the Y combinator.]]
+TODO: Furthermore, the original explanation about lambda calculus was moved from
+my article on [[file:../programming/understanding-y-combinator.org][the Y combinator.]]
 #+end_comment
 
 #+begin_comment org
@@ -37,27 +37,29 @@ $b[p := a]$ indicates the operation of substituting the parameter $p$ with the
 argument $a$ in the body $b$.
 #+end_comment
 
-* Zero and one
+* Church numerals
 :PROPERTIES:
-:CUSTOM_ID: zero-and-one
+:CUSTOM_ID: church-numerals
 :END:
 
-#+begin_comment org
-TODO: Finish explanation.
-#+end_comment
+In \lambda-calculus, numbers are encoded as functions, where the value of the
+number depends on the number of function calls that are performed from the
+body. The following table shows the first four numbers encoded as church
+numerals in lambda notation and conventional function notation (after /uncurrying/
+them into two-argument functions).
 
-The definition of =zero= is:
+| Decimal | \lambda-notation                       | Function notation                 |
+|---------+----------------------------------------+-----------------------------------|
+| <l>     | <l>                                    | <l>                               |
+| 0       | $\lambda f. \lambda x. x$              | $\text{zero}(f, x) = x$           |
+| 1       | $\lambda f. \lambda x. f\ x$           | $\text{one}(f, x) = f(x)$         |
+| 2       | $\lambda f. \lambda x. f\ (f\ x)$      | $\text{two}(f, x) = f(f(x))$      |
+| 3       | $\lambda f. \lambda x. f\ (f\ (f\ x))$ | $\text{three}(f, x) = f(f(f(x)))$ |
+| ...     | ...                                    | ...                               |
 
-$$
-\lambda f. \lambda x. x
-$$
-
-The definition of =one= is:
-
-$$
-\lambda f. \lambda x. f\ x
-$$
-
+Note how the decimal value matches the number of recursive applications of $f$
+inside the body of the inner-most lambda. Therefore, a Church numeral with a
+value of 3 is simply a function that does something three times.
 
 * Increasing a number
 :PROPERTIES:
@@ -77,11 +79,16 @@ Church numerals, it's worth going over the expansion of =add-1= in detail.
 :CUSTOM_ID: definition-of-add-1
 :END:
 
+#+begin_comment org
+TODO: Remove currying comment after mentioning it in section above.
+TODO: Mention origin of term /currying/ (Haskell Brooks Curry).
+#+end_comment
+
 This is the definition of =add-1= in \lambda-notation[fn::The expression can be
 simplified through [[https://en.wikipedia.org/wiki/Currying][currying]], that is, by transforming multiple lambdas that
 receive one argument into a single lambda that receives multiple arguments (in
-this case, $f$ and $x$). The the simplified definition would be $\lambda
-n. \lambda fx. f (n f x)$.].
+this case, both $f$ and $x$). The the simplified definition would be $\lambda
+n. \lambda f\ x. f (n f x)$.].
 
 $$
 \lambda n. \lambda f. \lambda x. f (n\ f\ x)
@@ -131,8 +138,8 @@ is is essentially discarded, resulting in =(lambda (z) z)=, the /identity/ funct
 
 Finally, the call to the identity lambda can be evaluated, that is, the call to
 the lambda whose parameter is =z= and whose argument is =x=. This call simply
-evaluates to the argument, =x=. This final expression matches the definition of
-=one= from the previous section.
+evaluates to the argument, =x=. The final expression matches the definition of =one=
+from the previous section.
 
 #+NAME: fig4
 [[file:../img/understanding-church-numerals4.svg]]
@@ -141,15 +148,46 @@ Naturally, the same \beta-reduction process can be expressed in
 \lambda-notation.
 
 \begin{align*}
-\text{one} &= (\lambda n. \lambda f. \lambda x. f\ (n\ f\ x)) (\lambda f. \lambda x. x) \\
+\text{one} &= (\lambda n. \lambda f. \lambda x. f\ (n\ f\ x))
+              (\lambda f. \lambda x. x) \\
            &= \lambda f. \lambda x. f\ ((\lambda y. \lambda z. z)\ f\ x) \\
            &= \lambda f. \lambda x. f\ ((\lambda z. z)\ x) \\
            &= \lambda f. \lambda x. f\ x
 \end{align*}
 
-#+begin_comment org
-TODO: Expand (add-1 one), shortly and directly in lambda notation.
-#+end_comment
+** Calculating =two=
+:PROPERTIES:
+:CUSTOM_ID: calculating-two
+:END:
+
+The same process can be done to \beta-reduce a call to =add-1= with an argument of
+=one=. From the previous definitions:
+
+\begin{align*}
+\text{add-1} &= \lambda n. \lambda f. \lambda x. f\ (n\ f\ x) \\
+\text{one} &= \lambda f. \lambda x. f\ x \\
+\end{align*}
+
+The following \beta-reduction process can be performed:
+
+\begin{align}
+\text{two} &= (\lambda n. \lambda f. \lambda x. f\ (n\ f\ x))
+              (\lambda f. \lambda x. f\ x) \label{eq:definition} \\
+           &= \lambda f. \lambda x. f\ ((\lambda y. \lambda z. y\ z)\ f\ x) \label{eq:reduction} \\
+           &= \lambda f. \lambda x. f\ ((\lambda z. f\ z)\ x) \label{eq:reduction2} \\
+           &= \lambda f. \lambda x. f\ (f\ x) \label{eq:solution}
+\end{align}
+
+The initial expression $\eqref{eq:definition}$ is simply the call to =add-1=,
+replacing the symbols with the values defined above. Then, the call is
+\beta-reduced in $\eqref{eq:reduction}$ by replacing the parameter $n$ with the
+argument =one=, which was \alpha-converted to avoid parameter collisions, just
+like when examining the example from the previous section. The call to the
+inner-most lambda is \beta-reduced in $\eqref{eq:reduction2}$ produce
+$(\lambda z. f\ z)$, that is, a function that applies $f$ to its
+argument. Finally, the call to that lambda, whose argument is $x$, is also
+reduced into $(f\ x)$; this result $\eqref{eq:solution}$ matches the definition
+of =two= from the [[#church-numerals][previous section]].
 
 * COMMENT Arbitrary addition
 :PROPERTIES:
