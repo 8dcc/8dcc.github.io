@@ -292,3 +292,60 @@ $$
 
 Which would move the body of =b= into =a=. Again, this is not an issue because
 addition is commutative.
+
+* Calling Church numerals
+:PROPERTIES:
+:CUSTOM_ID: calling-church-numerals
+:END:
+
+To further illustrate why Church numerals are functions that represent repeated
+operations, a call to one of them will be made below. First, a simple definition
+of =increase=:
+
+#+begin_src scheme
+(define increase
+  (lambda (val)
+    (+ val 1)))
+
+(increase 5)  ; Returns 6
+#+end_src
+
+This =increase= function can be used as the =f= argument when calling a Church numeral,
+and the result will be another function which applies the operation /N/ times.
+
+#+begin_src scheme
+(define church-three
+  (lambda (f)
+    (lambda (x)
+      (f (f (f x))))))
+
+(define increase-by-three (church-three increase))
+#+end_src
+
+In the previous example, =increase-by-three= is a function which receives an
+argument =x= and applies =increase= to it 3 times. Therefore, the two expressions
+are equivalent:
+
+#+begin_src scheme
+(increase-by-three 10)               ; Returns 13
+(increase (increase (increase 10)))  ; Returns 13
+#+end_src
+
+Naturally, this is infinitely versatile, as it can be done with any function an
+argument:
+
+#+begin_src scheme
+(define square
+  (lambda (val)
+    (* val val)))
+
+;; The following expression is equivalent to:
+;;
+;;   (square (square (square 3)))
+;;
+;; Which returns:
+;;
+;;   ((3^2)^2)^2 = 3^(2*2*2) = 3^8 = 6561
+;;
+((church-three square) 3)
+#+end_src

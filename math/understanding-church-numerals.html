@@ -252,6 +252,7 @@
 <li><a href="#building-the-procedure">4.2. Building the procedure</a></li>
 </ul>
 </li>
+<li><a href="#calling-church-numerals">5. Calling Church numerals</a></li>
 </ul>
 </div>
 </div>
@@ -648,6 +649,75 @@ conventional definition in &lambda;-notation is:
 Which would move the body of <code>b</code> into <code>a</code>. Again, this is not an issue because
 addition is commutative.
 </p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-calling-church-numerals" class="outline-2">
+<h2 id="calling-church-numerals"><span class="section-number-2">5.</span> Calling Church numerals</h2>
+<div class="outline-text-2" id="text-calling-church-numerals">
+<p>
+To further illustrate why Church numerals are functions that represent repeated
+operations, a call to one of them will be made below. First, a simple definition
+of <code>increase</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #a60000;">(</span><span style="color: #972500;">define</span> <span style="color: #3f578f;">increase</span>
+  <span style="color: #695500;">(</span><span style="color: #972500;">lambda</span> <span style="color: #006800;">(</span>val<span style="color: #006800;">)</span>
+    <span style="color: #006800;">(</span>+ val <span style="color: #2a5045;">1</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+
+<span style="color: #a60000;">(</span>increase <span style="color: #2a5045;">5</span><span style="color: #a60000;">)</span>  <span style="color: #595959;">; </span><span style="color: #595959;">Returns 6</span>
+</pre>
+</div>
+
+<p>
+This <code>increase</code> function can be used as the <code>f</code> argument when calling a Church numeral,
+and the result will be another function which applies the operation <i>N</i> times.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #a60000;">(</span><span style="color: #972500;">define</span> <span style="color: #3f578f;">church-three</span>
+  <span style="color: #695500;">(</span><span style="color: #972500;">lambda</span> <span style="color: #006800;">(</span>f<span style="color: #006800;">)</span>
+    <span style="color: #006800;">(</span><span style="color: #972500;">lambda</span> <span style="color: #008899;">(</span>x<span style="color: #008899;">)</span>
+      <span style="color: #008899;">(</span>f <span style="color: #0000ff;">(</span>f <span style="color: #dd22dd;">(</span>f x<span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+
+<span style="color: #a60000;">(</span><span style="color: #972500;">define</span> <span style="color: #3f578f;">increase-by-three</span> <span style="color: #695500;">(</span>church-three increase<span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+</pre>
+</div>
+
+<p>
+In the previous example, <code>increase-by-three</code> is a function which receives an
+argument <code>x</code> and applies <code>increase</code> to it 3 times. Therefore, the two expressions
+are equivalent:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #a60000;">(</span>increase-by-three <span style="color: #2a5045;">10</span><span style="color: #a60000;">)</span>               <span style="color: #595959;">; </span><span style="color: #595959;">Returns 13</span>
+<span style="color: #a60000;">(</span>increase <span style="color: #695500;">(</span>increase <span style="color: #006800;">(</span>increase <span style="color: #2a5045;">10</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>  <span style="color: #595959;">; </span><span style="color: #595959;">Returns 13</span>
+</pre>
+</div>
+
+<p>
+Naturally, this is infinitely versatile, as it can be done with any function an
+argument:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #a60000;">(</span><span style="color: #972500;">define</span> <span style="color: #3f578f;">square</span>
+  <span style="color: #695500;">(</span><span style="color: #972500;">lambda</span> <span style="color: #006800;">(</span>val<span style="color: #006800;">)</span>
+    <span style="color: #006800;">(</span>* val val<span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+
+<span style="color: #595959;">;; </span><span style="color: #595959;">The following expression is equivalent to:</span>
+<span style="color: #595959;">;;</span>
+<span style="color: #595959;">;;   </span><span style="color: #595959;">(square (square (square 3)))</span>
+<span style="color: #595959;">;;</span>
+<span style="color: #595959;">;; </span><span style="color: #595959;">Which returns:</span>
+<span style="color: #595959;">;;</span>
+<span style="color: #595959;">;;   </span><span style="color: #595959;">((3^2)^2)^2 = 3^(2*2*2) = 3^8 = 6561</span>
+<span style="color: #595959;">;;</span>
+<span style="color: #a60000;">(</span><span style="color: #695500;">(</span>church-three square<span style="color: #695500;">)</span> <span style="color: #2a5045;">3</span><span style="color: #a60000;">)</span>
+</pre>
 </div>
 </div>
 </div>
