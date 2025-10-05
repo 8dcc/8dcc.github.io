@@ -335,7 +335,7 @@ them into two-argument functions).
 
 <p>
 Note how the decimal value matches the number of recursive applications of \(f\)
-inside the body of the inner-most lambda. Therefore, a Church numeral with a
+inside the body of the innermost lambda. Therefore, a Church numeral with a
 value of 3 is simply a function that does something three times.
 </p>
 </div>
@@ -407,7 +407,7 @@ expression.
 </div>
 
 <p>
-Then, the outer-most call is evaluated, replacing the <code>n</code> parameter in the body of
+Then, the outermost call is evaluated, replacing the <code>n</code> parameter in the body of
 <code>add-1</code> with the value of <code>zero</code>. Specifically, to avoid naming collisions, <code>n</code> is
 replaced with the &alpha;-conversion of <code>zero</code>, where the symbols <code>f</code> and <code>x</code> are
 substituted with <code>y</code> and <code>z</code>, respectively.
@@ -491,7 +491,7 @@ replacing the symbols with the values defined above. Then, the call is
 &beta;-reduced in \(\eqref{eq:reduction}\) by replacing the parameter \(n\) with the
 argument <code>one</code>, which was &alpha;-converted to avoid parameter collisions, just
 like when examining the example from the previous section. The call to the
-inner-most lambda is &beta;-reduced in \(\eqref{eq:reduction2}\) produce
+innermost lambda is &beta;-reduced in \(\eqref{eq:reduction2}\) produce
 \((\lambda z. f\ z)\), that is, a function that applies \(f\) to its
 argument. Finally, the call to that lambda, whose argument is \(x\), is also
 reduced into \((f\ x)\); this result \(\eqref{eq:solution}\) matches the definition
@@ -530,8 +530,7 @@ expressions.
 <p>
 From the previous expressions, it can be concluded that the new addition
 function should essentially replace <code>x</code> (in either expression, because addition is
-<a href="https://en.wikipedia.org/wiki/Commutative_property">commutative</a>) with the entire body of the other expression&rsquo;s inner-most
-lambda.
+<a href="https://en.wikipedia.org/wiki/Commutative_property">commutative</a>) with the entire body of the other expression&rsquo;s innermost lambda.
 </p>
 
 <p>
@@ -547,7 +546,7 @@ expected behavior when adding the Church numeral representation of 2 and 3.
 
 <p>
 For simplicity, this approach will be used for the rest of the section, where
-the body of the first argument <code>a</code> is is &ldquo;placed&rdquo; in the second argument <code>b</code>.
+the body of the first argument <code>a</code> is &ldquo;placed&rdquo; in the second argument <code>b</code>.
 </p>
 </div>
 </div>
@@ -568,13 +567,13 @@ section.
 </div>
 
 <p>
-Since the function will manipulate the bodies of the inner-most lambdas, it must
+Since the function will manipulate the bodies of the innermost lambdas, it must
 be able to access them. Specifically, it needs to:
 </p>
 
 <ol class="org-ol">
-<li>Extract the inner-most body from <code>a</code>, that is, <code>(f (f x))</code>.</li>
-<li>Replace <code>x</code> in the inner-most body of <code>b</code>.</li>
+<li>Extract the innermost body from <code>a</code>, that is, <code>(f (f x))</code>.</li>
+<li>Replace <code>x</code> in the innermost body of <code>b</code>.</li>
 </ol>
 
 <p>
@@ -659,8 +658,8 @@ addition is commutative.
 <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">The expression can be
 simplified through <a href="https://en.wikipedia.org/wiki/Currying">currying</a>, that is, by transforming multiple lambdas that
 receive one argument into a single lambda that receives multiple arguments (in
-this case, both \(f\) and \(x\)). The the simplified definition would be \(\lambda
-n. \lambda f\ x. f (n f x)\).</p></div></div>
+this case, both \(f\) and \(x\)). The simplified definition would be
+\(\lambda n. \lambda f\ x. f (n f x)\).</p></div></div>
 
 
 </div>

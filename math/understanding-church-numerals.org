@@ -58,7 +58,7 @@ them into two-argument functions).
 | ...     | ...                                    | ...                               |
 
 Note how the decimal value matches the number of recursive applications of $f$
-inside the body of the inner-most lambda. Therefore, a Church numeral with a
+inside the body of the innermost lambda. Therefore, a Church numeral with a
 value of 3 is simply a function that does something three times.
 
 * Increasing a number
@@ -87,8 +87,8 @@ TODO: Mention origin of term /currying/ (Haskell Brooks Curry).
 This is the definition of =add-1= in \lambda-notation[fn::The expression can be
 simplified through [[https://en.wikipedia.org/wiki/Currying][currying]], that is, by transforming multiple lambdas that
 receive one argument into a single lambda that receives multiple arguments (in
-this case, both $f$ and $x$). The the simplified definition would be $\lambda
-n. \lambda f\ x. f (n f x)$.].
+this case, both $f$ and $x$). The simplified definition would be
+$\lambda n. \lambda f\ x. f (n f x)$.].
 
 $$
 \lambda n. \lambda f. \lambda x. f (n\ f\ x)
@@ -120,7 +120,7 @@ expression.
 #+NAME: fig1
 [[file:../img/understanding-church-numerals1.svg]]
 
-Then, the outer-most call is evaluated, replacing the =n= parameter in the body of
+Then, the outermost call is evaluated, replacing the =n= parameter in the body of
 =add-1= with the value of =zero=. Specifically, to avoid naming collisions, =n= is
 replaced with the \alpha-conversion of =zero=, where the symbols =f= and =x= are
 substituted with =y= and =z=, respectively.
@@ -183,7 +183,7 @@ replacing the symbols with the values defined above. Then, the call is
 \beta-reduced in $\eqref{eq:reduction}$ by replacing the parameter $n$ with the
 argument =one=, which was \alpha-converted to avoid parameter collisions, just
 like when examining the example from the previous section. The call to the
-inner-most lambda is \beta-reduced in $\eqref{eq:reduction2}$ produce
+innermost lambda is \beta-reduced in $\eqref{eq:reduction2}$ produce
 $(\lambda z. f\ z)$, that is, a function that applies $f$ to its
 argument. Finally, the call to that lambda, whose argument is $x$, is also
 reduced into $(f\ x)$; this result $\eqref{eq:solution}$ matches the definition
@@ -215,8 +215,7 @@ expressions.
 
 From the previous expressions, it can be concluded that the new addition
 function should essentially replace =x= (in either expression, because addition is
-[[https://en.wikipedia.org/wiki/Commutative_property][commutative]]) with the entire body of the other expression's inner-most
-lambda.
+[[https://en.wikipedia.org/wiki/Commutative_property][commutative]]) with the entire body of the other expression's innermost lambda.
 
 This abstract process is represented in the following figure, which shows the
 expected behavior when adding the Church numeral representation of 2 and 3.
@@ -225,7 +224,7 @@ expected behavior when adding the Church numeral representation of 2 and 3.
 [[file:../img/understanding-church-numerals5.svg]]
 
 For simplicity, this approach will be used for the rest of the section, where
-the body of the first argument =a= is is "placed" in the second argument =b=.
+the body of the first argument =a= is "placed" in the second argument =b=.
 
 ** Building the procedure
 :PROPERTIES:
@@ -239,11 +238,11 @@ section.
 #+NAME: fig6
 [[file:../img/understanding-church-numerals6.svg]]
 
-Since the function will manipulate the bodies of the inner-most lambdas, it must
+Since the function will manipulate the bodies of the innermost lambdas, it must
 be able to access them. Specifically, it needs to:
 
-1. Extract the inner-most body from =a=, that is, =(f (f x))=.
-2. Replace =x= in the inner-most body of =b=.
+1. Extract the innermost body from =a=, that is, =(f (f x))=.
+2. Replace =x= in the innermost body of =b=.
 
 Since the numbers themselves are functions, replacing =x= in the inner body of =b=
 should be as simple as calling its inner lambda with the desired value as an
