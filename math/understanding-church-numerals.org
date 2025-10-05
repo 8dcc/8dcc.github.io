@@ -251,12 +251,13 @@ argument. To access and call the inner lambda, the outer lambda, whose parameter
 is =f=, needs to be called first, but it obviously needs some value as its
 argument.
 
-As noted above, Church numerals express "repeated actions", and their =f= argument
-represents the function that performs the action itself. Since the result of
-adding two Church numerals must be another Church numeral, which will also
-express some "repeated action", there is no way for =add= to know the action that
-the result is expected to repeat; therefore, the result must also be a function
-with an =f= parameter, which lets the caller specify a function to be repeated.
+As noted above, Church numerals express "repeated operations", and their =f=
+argument represents the function that performs the operation itself. Since the
+result of adding two Church numerals must be another Church numeral, which will
+also express some "repeated operation", there is no way for =add= to know the
+operation that the result is expected to repeat; therefore, the result must also
+be a function with an =f= parameter, which lets the caller specify a function to
+be repeated.
 
 Since the result of =add= now contains a lambda with an =f= parameter, that unknown
 value of =f= can be used to call =b=, accessing the inner lambda. Although there is
@@ -272,9 +273,9 @@ calling =b=, the value of =f= can be used for calling the outer lambda; however,
 in this case the inner lambda needs to be called for retrieving the body.
 
 A similar problem emerges: what value should be used as the =x= argument of the
-inner lambda of =a=? Going back to the "repeated actions", =x= represents the
-input of the action, in other words, the value to which the action should be
-applied. Just like with the function itself, =add= cannot know this value when
+inner lambda of =a=? Going back to the "repeated operations", =x= represents the
+input of the operation, in other words, the value to which the operation should
+be applied. Just like with the function itself, =add= cannot know this value when
 computing its result, so it must use another generic lambda that receives =x=.
 
 With this, the previous two steps of /extraction/ and /replacement/ can be

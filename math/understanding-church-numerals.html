@@ -586,12 +586,13 @@ argument.
 </p>
 
 <p>
-As noted above, Church numerals express &ldquo;repeated actions&rdquo;, and their <code>f</code> argument
-represents the function that performs the action itself. Since the result of
-adding two Church numerals must be another Church numeral, which will also
-express some &ldquo;repeated action&rdquo;, there is no way for <code>add</code> to know the action that
-the result is expected to repeat; therefore, the result must also be a function
-with an <code>f</code> parameter, which lets the caller specify a function to be repeated.
+As noted above, Church numerals express &ldquo;repeated operations&rdquo;, and their <code>f</code>
+argument represents the function that performs the operation itself. Since the
+result of adding two Church numerals must be another Church numeral, which will
+also express some &ldquo;repeated operation&rdquo;, there is no way for <code>add</code> to know the
+operation that the result is expected to repeat; therefore, the result must also
+be a function with an <code>f</code> parameter, which lets the caller specify a function to
+be repeated.
 </p>
 
 <p>
@@ -616,9 +617,9 @@ in this case the inner lambda needs to be called for retrieving the body.
 
 <p>
 A similar problem emerges: what value should be used as the <code>x</code> argument of the
-inner lambda of <code>a</code>? Going back to the &ldquo;repeated actions&rdquo;, <code>x</code> represents the
-input of the action, in other words, the value to which the action should be
-applied. Just like with the function itself, <code>add</code> cannot know this value when
+inner lambda of <code>a</code>? Going back to the &ldquo;repeated operations&rdquo;, <code>x</code> represents the
+input of the operation, in other words, the value to which the operation should
+be applied. Just like with the function itself, <code>add</code> cannot know this value when
 computing its result, so it must use another generic lambda that receives <code>x</code>.
 </p>
 
