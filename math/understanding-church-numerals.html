@@ -249,7 +249,12 @@
 <li><a href="#arbitrary-addition">4. Arbitrary addition</a>
 <ul>
 <li><a href="#the-abstract-objective">4.1. The abstract objective</a></li>
-<li><a href="#building-the-procedure">4.2. Building the procedure</a></li>
+<li><a href="#building-the-procedure">4.2. Building the procedure</a>
+<ul>
+<li><a href="#replacing-x-in-b">4.2.1. Replacing <code>x</code> in <code>b</code></a></li>
+<li><a href="#obtaining-the-body-of-a">4.2.2. Obtaining the body of <code>a</code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#calling-church-numerals">5. Calling Church numerals</a></li>
@@ -594,6 +599,15 @@ be able to access them. Specifically, it needs to:
 </ol>
 
 <p>
+It might be easier to understand this process by first examining the second
+step, the replacement of <code>x</code>.
+</p>
+</div>
+
+<div id="outline-container-replacing-x-in-b" class="outline-4">
+<h4 id="replacing-x-in-b"><span class="section-number-4">4.2.1.</span> Replacing <code>x</code> in <code>b</code></h4>
+<div class="outline-text-4" id="text-replacing-x-in-b">
+<p>
 Since the numbers themselves are functions, replacing <code>x</code> in the inner body of <code>b</code>
 should be as simple as calling its inner lambda with the desired value as an
 argument. To access and call the inner lambda, the outer lambda, whose parameter
@@ -627,7 +641,12 @@ lambda.
 Although there is now a way of calling the inner lambda of <code>b</code> for altering <code>x</code>,
 it&rsquo;s still not clear how to obtain the argument: the body of <code>a</code>.
 </p>
+</div>
+</div>
 
+<div id="outline-container-obtaining-the-body-of-a" class="outline-4">
+<h4 id="obtaining-the-body-of-a"><span class="section-number-4">4.2.2.</span> Obtaining the body of <code>a</code></h4>
+<div class="outline-text-4" id="text-obtaining-the-body-of-a">
 <p>
 The inner body of <code>a</code> can be obtained through a similar process. Just like when
 calling <code>b</code>, the value of <code>f</code> can be used for calling the outer lambda; however,
@@ -668,6 +687,7 @@ conventional definition in &lambda;-notation is:
 Which would move the body of <code>b</code> into <code>a</code>. Again, this is not an issue because
 addition is commutative.
 </p>
+</div>
 </div>
 </div>
 </div>

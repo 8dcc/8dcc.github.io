@@ -256,6 +256,14 @@ be able to access them. Specifically, it needs to:
 1. Extract the innermost body from =a=, that is, =(f (f x))=.
 2. Replace =x= in the innermost body of =b=.
 
+It might be easier to understand this process by first examining the second
+step, the replacement of =x=.
+
+*** Replacing =x= in =b=
+:PROPERTIES:
+:CUSTOM_ID: replacing-x-in-b
+:END:
+
 Since the numbers themselves are functions, replacing =x= in the inner body of =b=
 should be as simple as calling its inner lambda with the desired value as an
 argument. To access and call the inner lambda, the outer lambda, whose parameter
@@ -279,6 +287,11 @@ lambda.
 
 Although there is now a way of calling the inner lambda of =b= for altering =x=,
 it's still not clear how to obtain the argument: the body of =a=.
+
+*** Obtaining the body of =a=
+:PROPERTIES:
+:CUSTOM_ID: obtaining-the-body-of-a
+:END:
 
 The inner body of =a= can be obtained through a similar process. Just like when
 calling =b=, the value of =f= can be used for calling the outer lambda; however,
