@@ -262,8 +262,14 @@
 <div class="outline-text-2" id="text-introduction">
 <p>
 Church numerals are a representation of the natural numbers in the context of
-<i>lambda calculus</i>. Church numerals, as well as lambda calculus itself, was
-invented by the mathematician and computer scientist <a href="https://en.wikipedia.org/wiki/Alonzo_Church">Alonzo Church</a>.
+<i>lambda calculus</i> (&lambda;-calculus). Although encoding numbers as functions may
+not be the most practical method, it has some interesting properties, specially
+when computing arithmetical operations.
+</p>
+
+<p>
+Church numerals, as well as &lambda;-calculus itself, was invented by the
+mathematician and computer scientist <a href="https://en.wikipedia.org/wiki/Alonzo_Church">Alonzo Church</a>.
 </p>
 
 <p>
@@ -277,11 +283,18 @@ Interpretation of Computer Programs</a>.
 <h2 id="church-numerals"><span class="section-number-2">2.</span> Church numerals</h2>
 <div class="outline-text-2" id="text-church-numerals">
 <p>
-In &lambda;-calculus, numbers are encoded as functions, where the value of the
-number depends on the number of function calls that are performed from the
-body. The following table shows the first four numbers encoded as church
-numerals in lambda notation and conventional function notation (after <i>uncurrying</i>
-them into two-argument functions).
+Since &lambda;-calculus does not support the decimal representation of numbers,
+they have to be encoded as functions. Usually, the value of the number number
+depends on the number of calls that are performed from the body of the
+function. The general method of encoding data as functions is called <i>Church
+encoding</i>, and the representation of a natural number in this context is called a
+<i>Church numeral</i>.
+</p>
+
+<p>
+The following table shows the first four numbers encoded as church numerals in
+lambda notation and conventional function notation (after <i>uncurrying</i> them into
+two-argument functions).
 </p>
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -335,9 +348,10 @@ them into two-argument functions).
 </table>
 
 <p>
-Note how the decimal value matches the number of recursive applications of \(f\)
+Note how the decimal value matches the number of nested applications of \(f\)
 inside the body of the innermost lambda. Therefore, a Church numeral with a
-value of 3 is simply a function that does something three times.
+value of 3 is simply a function that does something three times. This notion of
+a number as a series of repeated operations will be referenced below.
 </p>
 </div>
 </div>
@@ -347,7 +361,7 @@ value of 3 is simply a function that does something three times.
 <div class="outline-text-2" id="text-increasing-a-number">
 <p>
 As mentioned in the introduction, this article was motivated by Exercise 2.6 of
-SICP. This exercise provides the reader with the previous definition of <code>zero</code>
+SICP. The exercise provides the reader with the previous definition of <code>zero</code>
 along with an <code>add-1</code> procedure, which increases its input; from those
 definitions, the reader is expected to calculate <code>one</code>.
 </p>
@@ -391,9 +405,9 @@ This is the equivalent definition of <code>add-1</code> in Lisp.
 <h3 id="beta-reduction"><span class="section-number-3">3.2.</span> Beta reduction</h3>
 <div class="outline-text-3" id="text-beta-reduction">
 <p>
-Through &beta;-reduction, a call to <code>add-1</code> with an argument of <code>zero</code> can be
-examined, understanding why the Church numeral for <code>one</code> is returned. Each step
-of the reduction will be explained and highlighted using Lisp syntax.
+A call to <code>add-1</code> with an argument of <code>zero</code> can be examined through &beta;-reduction
+to understand why the Church numeral for <code>one</code> is returned. Each step of the
+reduction will be highlighted and explained using Lisp syntax.
 </p>
 
 <p>
@@ -410,7 +424,7 @@ expression.
 <p>
 Then, the outermost call is evaluated, replacing the <code>n</code> parameter in the body of
 <code>add-1</code> with the value of <code>zero</code>. Specifically, to avoid naming collisions, <code>n</code> is
-replaced with the &alpha;-conversion of <code>zero</code>, where the symbols <code>f</code> and <code>x</code> are
+replaced with the &alpha;-conversion of <code>zero</code>, where the <code>f</code> and <code>x</code> symbols are
 substituted with <code>g</code> and <code>y</code>, respectively.
 </p>
 
@@ -435,9 +449,8 @@ is is essentially discarded, resulting in <code>(lambda (y) y)</code>, the <i>id
 
 <p>
 Finally, the call to the identity lambda can be evaluated, that is, the call to
-the lambda whose parameter is <code>z</code> and whose argument is <code>x</code>. This call simply
-evaluates to the argument, <code>x</code>. The final expression matches the definition of <code>one</code>
-from the previous section.
+the lambda whose parameter is <code>z</code> and whose argument is <code>x</code>. A call to this function
+simply evaluates to the argument, in this case, <code>x</code>.
 </p>
 
 
@@ -445,6 +458,12 @@ from the previous section.
 <p><img src="../img/understanding-church-numerals4.svg" alt="understanding-church-numerals4.svg" class="org-svg" />
 </p>
 </div>
+
+<p>
+This final expression matches the definition of <code>one</code> from the previous section: a
+function that receives a function <code>f</code>, and returns another function that applies <code>f</code>
+to its argument <code>x</code>.
+</p>
 
 <p>
 Naturally, the same &beta;-reduction process can be expressed in
@@ -491,12 +510,11 @@ The initial expression \(\eqref{eq:definition}\) is simply the call to <code>add
 replacing the symbols with the values defined above. Then, the call is
 &beta;-reduced in \(\eqref{eq:reduction}\) by replacing the parameter \(n\) with the
 argument <code>one</code>, which was &alpha;-converted to avoid parameter collisions, just
-like when examining the example from the previous section. The call to the
-innermost lambda is &beta;-reduced in \(\eqref{eq:reduction2}\) produce
-\((\lambda y. f\ y)\), that is, a function that applies \(f\) to its
-argument. Finally, the call to that lambda, whose argument is \(x\), is also
-reduced into \((f\ x)\); this result \(\eqref{eq:solution}\) matches the definition
-of <code>two</code> from the <a href="#church-numerals">previous section</a>.
+like in the example from the previous section. The call to the innermost lambda
+is &beta;-reduced in \(\eqref{eq:reduction2}\) produce \((\lambda y. f\ y)\), that
+is, a function that applies \(f\) to its argument. Finally, the call to that
+lambda, whose argument is \(x\), is also reduced into \((f\ x)\); this result
+\(\eqref{eq:solution}\) matches the <a href="#church-numerals">previous</a> definition of <code>two</code>.
 </p>
 </div>
 </div>
@@ -530,13 +548,11 @@ expressions.
 <div class="outline-text-3" id="text-the-abstract-objective">
 <p>
 From the previous expressions, it can be concluded that the new addition
-function should essentially replace <code>x</code> (in either expression, because addition is
-<a href="https://en.wikipedia.org/wiki/Commutative_property">commutative</a>) with the entire body of the other expression&rsquo;s innermost lambda.
-</p>
-
-<p>
-This abstract process is represented in the following figure, which shows the
-expected behavior when adding the Church numeral representation of 2 and 3.
+function should essentially replace <code>x</code> (in either expression, since addition is
+<a href="https://en.wikipedia.org/wiki/Commutative_property">commutative</a>) with the entire body of the other expression&rsquo;s innermost
+lambda. This abstract process is represented in the following figure, which
+shows the expected behavior when adding the Church numeral representation of 2
+and 3.
 </p>
 
 
@@ -557,7 +573,7 @@ the body of the first argument <code>a</code> is &ldquo;placed&rdquo; in the sec
 <div class="outline-text-3" id="text-building-the-procedure">
 <p>
 Since the parameters of <code>add</code> are known, its initial structure can be defined. The
-following figure shows the initial definition, which will evolve trough this
+following figure shows the partial definition, which will evolve trough this
 section.
 </p>
 
@@ -591,16 +607,14 @@ argument represents the function that performs the operation itself. Since the
 result of adding two Church numerals must be another Church numeral, which will
 also express some &ldquo;repeated operation&rdquo;, there is no way for <code>add</code> to know the
 operation that the result is expected to repeat; therefore, the result must also
-be a function with an <code>f</code> parameter, which lets the caller specify a function to
+be a function with an <code>f</code> parameter, which lets the caller specify the function to
 be repeated.
 </p>
 
 <p>
-Since the result of <code>add</code> now contains a lambda with an <code>f</code> parameter, that unknown
-value of <code>f</code> can be used to call <code>b</code>, accessing the inner lambda. Although there is
-now a way of calling the inner lambda of <code>b</code> for altering <code>x</code>, it&rsquo;s still
-not clear how to obtain the argument: the body of <code>a</code>. Either way, the definition
-of <code>add</code> can be expanded to reflect this new knowledge.
+Since the result of <code>add</code> now contains a lambda with an <code>f</code> parameter, the
+(currently unknown) value of <code>f</code> can be used to call <code>b</code>, accessing the inner
+lambda.
 </p>
 
 
@@ -608,6 +622,11 @@ of <code>add</code> can be expanded to reflect this new knowledge.
 <p><img src="../img/understanding-church-numerals7.svg" alt="understanding-church-numerals7.svg" class="org-svg" />
 </p>
 </div>
+
+<p>
+Although there is now a way of calling the inner lambda of <code>b</code> for altering <code>x</code>,
+it&rsquo;s still not clear how to obtain the argument: the body of <code>a</code>.
+</p>
 
 <p>
 The inner body of <code>a</code> can be obtained through a similar process. Just like when
@@ -659,7 +678,7 @@ addition is commutative.
 <p>
 To further illustrate why Church numerals are functions that represent repeated
 operations, a call to one of them will be made below. First, a simple definition
-of <code>increase</code>:
+of <code>increase</code>, which adds one to its argument:
 </p>
 
 <div class="org-src-container">
@@ -688,7 +707,7 @@ and the result will be another function which applies the operation <i>N</i> tim
 
 <p>
 In the previous example, <code>increase-by-three</code> is a function which receives an
-argument <code>x</code> and applies <code>increase</code> to it 3 times. Therefore, the two expressions
+argument <code>x</code> and applies <code>increase</code> to it 3 times. Therefore, these two expressions
 are equivalent:
 </p>
 
@@ -699,8 +718,8 @@ are equivalent:
 </div>
 
 <p>
-Naturally, this is infinitely versatile, as it can be done with any function an
-argument:
+Naturally, this is extremely versatile, as it can be done with any functions as
+an argument:
 </p>
 
 <div class="org-src-container">

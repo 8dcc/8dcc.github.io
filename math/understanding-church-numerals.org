@@ -18,8 +18,12 @@ TODO: Move section about lambda calculus from Y combinator. Rename article to
 :END:
 
 Church numerals are a representation of the natural numbers in the context of
-/lambda calculus/. Church numerals, as well as lambda calculus itself, was
-invented by the mathematician and computer scientist [[https://en.wikipedia.org/wiki/Alonzo_Church][Alonzo Church]].
+/lambda calculus/ (\lambda-calculus). Although encoding numbers as functions may
+not be the most practical method, it has some interesting properties, specially
+when computing arithmetical operations.
+
+Church numerals, as well as \lambda-calculus itself, was invented by the
+mathematician and computer scientist [[https://en.wikipedia.org/wiki/Alonzo_Church][Alonzo Church]].
 
 This article was mainly motivated by [[https://web.mit.edu/6.001/6.037/sicp.pdf#section*.65][Exercise 2.6]] of [[https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs][Structure and
 Interpretation of Computer Programs]].
@@ -42,11 +46,16 @@ argument $a$ in the body $b$.
 :CUSTOM_ID: church-numerals
 :END:
 
-In \lambda-calculus, numbers are encoded as functions, where the value of the
-number depends on the number of function calls that are performed from the
-body. The following table shows the first four numbers encoded as church
-numerals in lambda notation and conventional function notation (after /uncurrying/
-them into two-argument functions).
+Since \lambda-calculus does not support the decimal representation of numbers,
+they have to be encoded as functions. Usually, the value of the number number
+depends on the number of calls that are performed from the body of the
+function. The general method of encoding data as functions is called /Church
+encoding/, and the representation of a natural number in this context is called a
+/Church numeral/.
+
+The following table shows the first four numbers encoded as church numerals in
+lambda notation and conventional function notation (after /uncurrying/ them into
+two-argument functions).
 
 | Decimal | \lambda-notation                       | Function notation                 |
 |---------+----------------------------------------+-----------------------------------|
@@ -57,9 +66,10 @@ them into two-argument functions).
 | 3       | $\lambda f. \lambda x. f\ (f\ (f\ x))$ | $\text{three}(f, x) = f(f(f(x)))$ |
 | ...     | ...                                    | ...                               |
 
-Note how the decimal value matches the number of recursive applications of $f$
+Note how the decimal value matches the number of nested applications of $f$
 inside the body of the innermost lambda. Therefore, a Church numeral with a
-value of 3 is simply a function that does something three times.
+value of 3 is simply a function that does something three times. This notion of
+a number as a series of repeated operations will be referenced below.
 
 * Increasing a number
 :PROPERTIES:
@@ -67,7 +77,7 @@ value of 3 is simply a function that does something three times.
 :END:
 
 As mentioned in the introduction, this article was motivated by Exercise 2.6 of
-SICP. This exercise provides the reader with the previous definition of =zero=
+SICP. The exercise provides the reader with the previous definition of =zero=
 along with an =add-1= procedure, which increases its input; from those
 definitions, the reader is expected to calculate =one=.
 
@@ -110,9 +120,9 @@ This is the equivalent definition of =add-1= in Lisp.
 :CUSTOM_ID: beta-reduction
 :END:
 
-Through \beta-reduction, a call to =add-1= with an argument of =zero= can be
-examined, understanding why the Church numeral for =one= is returned. Each step
-of the reduction will be explained and highlighted using Lisp syntax.
+A call to =add-1= with an argument of =zero= can be examined through \beta-reduction
+to understand why the Church numeral for =one= is returned. Each step of the
+reduction will be highlighted and explained using Lisp syntax.
 
 First, the call to =add-1= is expanded, replacing each symbol with its bound
 expression.
@@ -122,7 +132,7 @@ expression.
 
 Then, the outermost call is evaluated, replacing the =n= parameter in the body of
 =add-1= with the value of =zero=. Specifically, to avoid naming collisions, =n= is
-replaced with the \alpha-conversion of =zero=, where the symbols =f= and =x= are
+replaced with the \alpha-conversion of =zero=, where the =f= and =x= symbols are
 substituted with =g= and =y=, respectively.
 
 #+NAME: fig2
@@ -137,12 +147,15 @@ is is essentially discarded, resulting in =(lambda (y) y)=, the /identity/ funct
 [[file:../img/understanding-church-numerals3.svg]]
 
 Finally, the call to the identity lambda can be evaluated, that is, the call to
-the lambda whose parameter is =z= and whose argument is =x=. This call simply
-evaluates to the argument, =x=. The final expression matches the definition of =one=
-from the previous section.
+the lambda whose parameter is =z= and whose argument is =x=. A call to this function
+simply evaluates to the argument, in this case, =x=.
 
 #+NAME: fig4
 [[file:../img/understanding-church-numerals4.svg]]
+
+This final expression matches the definition of =one= from the previous section: a
+function that receives a function =f=, and returns another function that applies =f=
+to its argument =x=.
 
 Naturally, the same \beta-reduction process can be expressed in
 \lambda-notation.
@@ -182,12 +195,11 @@ The initial expression $\eqref{eq:definition}$ is simply the call to =add-1=,
 replacing the symbols with the values defined above. Then, the call is
 \beta-reduced in $\eqref{eq:reduction}$ by replacing the parameter $n$ with the
 argument =one=, which was \alpha-converted to avoid parameter collisions, just
-like when examining the example from the previous section. The call to the
-innermost lambda is \beta-reduced in $\eqref{eq:reduction2}$ produce
-$(\lambda y. f\ y)$, that is, a function that applies $f$ to its
-argument. Finally, the call to that lambda, whose argument is $x$, is also
-reduced into $(f\ x)$; this result $\eqref{eq:solution}$ matches the definition
-of =two= from the [[#church-numerals][previous section]].
+like in the example from the previous section. The call to the innermost lambda
+is \beta-reduced in $\eqref{eq:reduction2}$ produce $(\lambda y. f\ y)$, that
+is, a function that applies $f$ to its argument. Finally, the call to that
+lambda, whose argument is $x$, is also reduced into $(f\ x)$; this result
+$\eqref{eq:solution}$ matches the [[#church-numerals][previous]] definition of =two=.
 
 * Arbitrary addition
 :PROPERTIES:
@@ -214,11 +226,11 @@ expressions.
 :END:
 
 From the previous expressions, it can be concluded that the new addition
-function should essentially replace =x= (in either expression, because addition is
-[[https://en.wikipedia.org/wiki/Commutative_property][commutative]]) with the entire body of the other expression's innermost lambda.
-
-This abstract process is represented in the following figure, which shows the
-expected behavior when adding the Church numeral representation of 2 and 3.
+function should essentially replace =x= (in either expression, since addition is
+[[https://en.wikipedia.org/wiki/Commutative_property][commutative]]) with the entire body of the other expression's innermost
+lambda. This abstract process is represented in the following figure, which
+shows the expected behavior when adding the Church numeral representation of 2
+and 3.
 
 #+NAME: fig5
 [[file:../img/understanding-church-numerals5.svg]]
@@ -232,7 +244,7 @@ the body of the first argument =a= is "placed" in the second argument =b=.
 :END:
 
 Since the parameters of =add= are known, its initial structure can be defined. The
-following figure shows the initial definition, which will evolve trough this
+following figure shows the partial definition, which will evolve trough this
 section.
 
 #+NAME: fig6
@@ -255,17 +267,18 @@ argument represents the function that performs the operation itself. Since the
 result of adding two Church numerals must be another Church numeral, which will
 also express some "repeated operation", there is no way for =add= to know the
 operation that the result is expected to repeat; therefore, the result must also
-be a function with an =f= parameter, which lets the caller specify a function to
+be a function with an =f= parameter, which lets the caller specify the function to
 be repeated.
 
-Since the result of =add= now contains a lambda with an =f= parameter, that unknown
-value of =f= can be used to call =b=, accessing the inner lambda. Although there is
-now a way of calling the inner lambda of =b= for altering =x=, it's still
-not clear how to obtain the argument: the body of =a=. Either way, the definition
-of =add= can be expanded to reflect this new knowledge.
+Since the result of =add= now contains a lambda with an =f= parameter, the
+(currently unknown) value of =f= can be used to call =b=, accessing the inner
+lambda.
 
 #+NAME: fig7
 [[file:../img/understanding-church-numerals7.svg]]
+
+Although there is now a way of calling the inner lambda of =b= for altering =x=,
+it's still not clear how to obtain the argument: the body of =a=.
 
 The inner body of =a= can be obtained through a similar process. Just like when
 calling =b=, the value of =f= can be used for calling the outer lambda; however,
@@ -300,7 +313,7 @@ addition is commutative.
 
 To further illustrate why Church numerals are functions that represent repeated
 operations, a call to one of them will be made below. First, a simple definition
-of =increase=:
+of =increase=, which adds one to its argument:
 
 #+begin_src scheme
 (define increase
@@ -323,7 +336,7 @@ and the result will be another function which applies the operation /N/ times.
 #+end_src
 
 In the previous example, =increase-by-three= is a function which receives an
-argument =x= and applies =increase= to it 3 times. Therefore, the two expressions
+argument =x= and applies =increase= to it 3 times. Therefore, these two expressions
 are equivalent:
 
 #+begin_src scheme
@@ -331,8 +344,8 @@ are equivalent:
 (increase (increase (increase 10)))  ; Returns 13
 #+end_src
 
-Naturally, this is infinitely versatile, as it can be done with any function an
-argument:
+Naturally, this is extremely versatile, as it can be done with any functions as
+an argument:
 
 #+begin_src scheme
 (define square
