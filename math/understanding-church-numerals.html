@@ -411,7 +411,7 @@ expression.
 Then, the outermost call is evaluated, replacing the <code>n</code> parameter in the body of
 <code>add-1</code> with the value of <code>zero</code>. Specifically, to avoid naming collisions, <code>n</code> is
 replaced with the &alpha;-conversion of <code>zero</code>, where the symbols <code>f</code> and <code>x</code> are
-substituted with <code>y</code> and <code>z</code>, respectively.
+substituted with <code>g</code> and <code>y</code>, respectively.
 </p>
 
 
@@ -423,8 +423,8 @@ substituted with <code>y</code> and <code>z</code>, respectively.
 <p>
 Once the outer call has been evaluated, the expression can be simplified by
 evaluating the call to <code>zero</code>, that is, the call to the lambda whose parameter is
-<code>y</code>, and whose argument is <code>f</code>. Since the parameter <code>y</code> does not appear in the body,
-is is essentially discarded, resulting in <code>(lambda (z) z)</code>, the <i>identity</i> function.
+<code>y</code>, and whose argument is <code>f</code>. Since the parameter <code>g</code> does not appear in the body,
+is is essentially discarded, resulting in <code>(lambda (y) y)</code>, the <i>identity</i> function.
 </p>
 
 
@@ -454,8 +454,8 @@ Naturally, the same &beta;-reduction process can be expressed in
 \begin{align*}
 \text{one} &= (\lambda n. \lambda f. \lambda x. f\ (n\ f\ x))
               (\lambda f. \lambda x. x) \\
-           &= \lambda f. \lambda x. f\ ((\lambda y. \lambda z. z)\ f\ x) \\
-           &= \lambda f. \lambda x. f\ ((\lambda z. z)\ x) \\
+           &= \lambda f. \lambda x. f\ ((\lambda g. \lambda y. y)\ f\ x) \\
+           &= \lambda f. \lambda x. f\ ((\lambda y. y)\ x) \\
            &= \lambda f. \lambda x. f\ x
 \end{align*}
 </div>
@@ -481,8 +481,8 @@ The following &beta;-reduction process can be performed:
 \begin{align}
 \text{two} &= (\lambda n. \lambda f. \lambda x. f\ (n\ f\ x))
               (\lambda f. \lambda x. f\ x) \label{eq:definition} \\
-           &= \lambda f. \lambda x. f\ ((\lambda y. \lambda z. y\ z)\ f\ x) \label{eq:reduction} \\
-           &= \lambda f. \lambda x. f\ ((\lambda z. f\ z)\ x) \label{eq:reduction2} \\
+           &= \lambda f. \lambda x. f\ ((\lambda g. \lambda y. g\ y)\ f\ x) \label{eq:reduction} \\
+           &= \lambda f. \lambda x. f\ ((\lambda y. f\ y)\ x) \label{eq:reduction2} \\
            &= \lambda f. \lambda x. f\ (f\ x) \label{eq:solution}
 \end{align}
 
@@ -493,7 +493,7 @@ replacing the symbols with the values defined above. Then, the call is
 argument <code>one</code>, which was &alpha;-converted to avoid parameter collisions, just
 like when examining the example from the previous section. The call to the
 innermost lambda is &beta;-reduced in \(\eqref{eq:reduction2}\) produce
-\((\lambda z. f\ z)\), that is, a function that applies \(f\) to its
+\((\lambda y. f\ y)\), that is, a function that applies \(f\) to its
 argument. Finally, the call to that lambda, whose argument is \(x\), is also
 reduced into \((f\ x)\); this result \(\eqref{eq:solution}\) matches the definition
 of <code>two</code> from the <a href="#church-numerals">previous section</a>.
