@@ -15,5 +15,6 @@
 These articles are mainly about math. Most of these articles might require
 JavaScript, since they use the [[https://www.mathjax.org/][MathJax library]].
 
+- [[file:understanding-church-numerals.org][Understanding Church numerals]]
 - [[file:understanding-entropy.org][Understanding entropy]]
 - [[file:understanding-decibels.org][Understanding decibels]]
