@@ -238,26 +238,33 @@
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
 <li><a href="#introduction">1. Introduction</a></li>
-<li><a href="#church-numerals">2. Church numerals</a></li>
-<li><a href="#increasing-a-number">3. Increasing a number</a>
+<li><a href="#lambda-calculus">2. Lambda calculus</a>
 <ul>
-<li><a href="#definition-of-add-1">3.1. Definition of <code>add-1</code></a></li>
-<li><a href="#beta-reduction">3.2. Beta reduction</a></li>
-<li><a href="#calculating-two">3.3. Calculating <code>two</code></a></li>
+<li><a href="#rules-of-lambda-calculus">2.1. Rules of lambda calculus</a></li>
+<li><a href="#conversion-and-reduction-operations">2.2. Conversion and reduction operations</a></li>
+<li><a href="#notation">2.3. Notation</a></li>
 </ul>
 </li>
-<li><a href="#arbitrary-addition">4. Arbitrary addition</a>
+<li><a href="#church-numerals">3. Church numerals</a></li>
+<li><a href="#increasing-a-number">4. Increasing a number</a>
 <ul>
-<li><a href="#the-abstract-objective">4.1. The abstract objective</a></li>
-<li><a href="#building-the-procedure">4.2. Building the procedure</a>
+<li><a href="#definition-of-add-1">4.1. Definition of <code>add-1</code></a></li>
+<li><a href="#beta-reduction">4.2. Beta reduction</a></li>
+<li><a href="#calculating-two">4.3. Calculating <code>two</code></a></li>
+</ul>
+</li>
+<li><a href="#arbitrary-addition">5. Arbitrary addition</a>
 <ul>
-<li><a href="#replacing-x-in-b">4.2.1. Replacing <code>x</code> in <code>b</code></a></li>
-<li><a href="#obtaining-the-body-of-a">4.2.2. Obtaining the body of <code>a</code></a></li>
+<li><a href="#the-abstract-objective">5.1. The abstract objective</a></li>
+<li><a href="#building-the-procedure">5.2. Building the procedure</a>
+<ul>
+<li><a href="#replacing-x-in-b">5.2.1. Replacing <code>x</code> in <code>b</code></a></li>
+<li><a href="#obtaining-the-body-of-a">5.2.2. Obtaining the body of <code>a</code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#calling-church-numerals">5. Calling Church numerals</a></li>
+<li><a href="#calling-church-numerals">6. Calling Church numerals</a></li>
 </ul>
 </div>
 </div>
@@ -267,9 +274,9 @@
 <div class="outline-text-2" id="text-introduction">
 <p>
 Church numerals are a representation of the natural numbers in the context of
-<i>lambda calculus</i> (&lambda;-calculus). Although encoding numbers as functions may
-not be the most practical method, it has some interesting properties, specially
-when computing arithmetical operations.
+lambda calculus. Although encoding numbers as functions may not be the most
+practical method, it has some interesting properties, specially when computing
+arithmetical operations.
 </p>
 
 <p>
@@ -279,13 +286,215 @@ mathematician and computer scientist <a href="https://en.wikipedia.org/wiki/Alon
 
 <p>
 This article was mainly motivated by <a href="https://web.mit.edu/6.001/6.037/sicp.pdf#section*.65">Exercise 2.6</a> of <a href="https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs">Structure and
-Interpretation of Computer Programs</a>.
+Interpretation of Computer Programs</a>. Furthermore, the original explanation
+about lambda calculus was moved from my article on <a href="../programming/understanding-y-combinator.html">the Y combinator</a>.
 </p>
 </div>
 </div>
 
+<div id="outline-container-lambda-calculus" class="outline-2">
+<h2 id="lambda-calculus"><span class="section-number-2">2.</span> Lambda calculus</h2>
+<div class="outline-text-2" id="text-lambda-calculus">
+<p>
+<a href="https://en.wikipedia.org/wiki/Lambda_calculus">Lambda calculus</a> (&lambda;-calculus) is a mathematical system for expressing
+computation based on function abstraction and application. As mentioned above,
+it was invented by Alonzo Church in the 1930s.
+</p>
+
+<p>
+The simplicity of &lambda;-calculus, along with its potential, makes it very
+interesting from both a theoretical and practical point of view. This is the
+reason why it&rsquo;s the predecesor of functional programming in general, and many
+programming languages in particular (Lisp, Haskell, etc.).
+</p>
+</div>
+
+<div id="outline-container-rules-of-lambda-calculus" class="outline-3">
+<h3 id="rules-of-lambda-calculus"><span class="section-number-3">2.1.</span> Rules of lambda calculus</h3>
+<div class="outline-text-3" id="text-rules-of-lambda-calculus">
+<p>
+The lambda calculus syntax is so simple that it can be defined in the following
+three rules:
+</p>
+
+<ol class="org-ol">
+<li>A <i>variable</i> \(x\) is a character or string that represents a parameter.</li>
+<li>A <i>lambda abstraction</i> \((\lambda x. M)\) defines an anonymous function, with a
+parameter \(x\) (between the &lambda; and the dot), that returns the body \(M\).</li>
+<li>An <i>application</i> \((M\ N)\), where the function \(M\) is called with \(N\) as its
+argument.</li>
+</ol>
+
+<p>
+In a function application, \(M\) and \(N\) are <i>lambda terms</i>. A lambda terms is
+simply a valid expression in the lambda calculus system. To determine if an
+expression is valid, the following three rules can be used:
+</p>
+
+<ol class="org-ol">
+<li>A variable \(x\) is itself a valid lambda term.</li>
+<li>If \(M\) is a lambda term, and \(x\) is a variable, then \((\lambda x. M)\) is also
+a lambda term.</li>
+<li>If \(M\) and \(N\) are lambda terms, then \((M\ N)\) is also a lambda term.</li>
+</ol>
+
+<p>
+The recursive nature of &lambda;-calculus is present in the definition of the
+syntax itself, where:
+</p>
+
+<ul class="org-ul">
+<li>Variables provide a way of naming an unknown lambda term.</li>
+<li>Lambda abstractions provide a way of extracting part of a lambda term.</li>
+<li>Applications provide a way of filling a variable, which was
+extracted/abstracted, with new a lambda term (the argument of the
+application).</li>
+<li>Lambda terms themselves are any of the above.</li>
+</ul>
+
+<p>
+At first glance, a system that doesn&rsquo;t directly deal with specific data (such as
+numbers) may seem pointless, but it has helped shape many modern languages, and
+understanding how to use these simple rules in these complex systems can be
+extremely helpful.
+</p>
+</div>
+</div>
+
+<div id="outline-container-conversion-and-reduction-operations" class="outline-3">
+<h3 id="conversion-and-reduction-operations"><span class="section-number-3">2.2.</span> Conversion and reduction operations</h3>
+<div class="outline-text-3" id="text-conversion-and-reduction-operations">
+<p>
+Since &lambda;-calculus doesn&rsquo;t deal with specific values such as numbers, the
+value of the system lies in the way lambda terms can be transformed.
+</p>
+
+<p>
+Before diving into the transformation methods, it&rsquo;s important to mention the
+<i>substitution notation</i> that is often used in this context. An expression like
+\(b[p := a]\), denotes the operation of substituting the parameter \(p\) with the
+argument \(a\) in the body \(b\). Similarly, the syntax \(M[x]\) is used to denote &ldquo;a
+lambda expression \(M\) which contains a <a href="https://en.wikipedia.org/wiki/Free_variables_and_bound_variables">bound</a> variable \(x\)&rdquo;.
+</p>
+
+<p>
+There are three kinds of transformations, which are used to convert lambda
+expressions to equivalent ones.
+</p>
+
+<dl class="org-dl">
+<dt>Alpha conversion (&alpha;-conversion)</dt><dd><p>
+Consists on renaming the bound variables in an expression. It is mainly used
+to avoid name collisions.
+</p>
+
+<p>
+\[
+  (\lambda x. M[x]) \to (\lambda y. M[y])
+  \]
+</p></dd>
+
+<dt>Beta reduction (&beta;-reduction)</dt><dd><p>
+Consists on reducing an application by substituting the bound variable in the
+body of the abstraction with the argument of the application. Essentially,
+applying a function call.
+</p>
+
+<p>
+\[
+  ((\lambda x. M)\ N) \to M[x := N]
+  \]
+</p>
+
+<p>
+In this case, the reduction consists on substituting \(x\) in the body \(M\) with
+\(N\).
+</p>
+
+<p>
+The inverse of this process is called <i>beta abstraction</i>, which instead of
+simplifying an expression, adds an extra function call. This can be useful in
+languages such as Lisp for delaying the evaluation of the arguments.
+</p>
+
+<p>
+\[
+  M[N] \to ((\lambda x. M)\ N)
+  \]
+</p></dd>
+</dl>
+
+
+<dl class="org-dl">
+<dt>Eta reduction (&eta;-reduction)</dt><dd><p>
+Expresses the idea of <a href="https://en.wikipedia.org/wiki/Extensionality"><i>extensionality</i></a>, which
+applied to this context establishes that two functions are the same if and
+only if they give the same result for all arguments.
+</p>
+
+<p>
+It is used to simplify redundant abstractions; for example, given that \(x\)
+does not appear <a href="https://en.wikipedia.org/wiki/Free_variables_and_bound_variables">free</a> in \(f\):
+</p>
+
+<p>
+\[
+  (\lambda x. f\ x) \to f
+  \]
+</p>
+
+<p>
+The inverse of this process is called <i>eta expansion</i>, which essentially wraps a
+function into a lambda abstraction:
+</p>
+
+<p>
+\[
+  f \to (\lambda x. f\ x)
+  \]
+</p></dd>
+</dl>
+
+<p>
+These transformations can be used to transform computations into simpler and
+more efficient ones.
+</p>
+</div>
+</div>
+
+<div id="outline-container-notation" class="outline-3">
+<h3 id="notation"><span class="section-number-3">2.3.</span> Notation</h3>
+<div class="outline-text-3" id="text-notation">
+<p>
+Finally, to fully understand &lambda;-notation, there are some conventions that
+should be kept in mind when it comes to notation.
+</p>
+
+<ul class="org-ul">
+<li>Outermost parentheses are dropped: \((M N)\) can be noted as \(M N\).</li>
+<li>Applications are assumed to be left associative: \(M N P\) is equivalent to
+\(((M N) P)\), instead of \((M (N P))\).</li>
+<li>The body of an abstraction extends as far right as possible:
+\((\lambda x. M N P)\) means \((\lambda x. (M N P))\), instead of
+\(((\lambda x. M) N P)\) or \(((\lambda x. M N) P)\).</li>
+<li>A sequence of abstractions can be contracted:
+\((\lambda x. \lambda y. \lambda z. N)\) can be expressed as
+\((\lambda x\ y\ z. N)\). This is related to the notion of <a href="https://en.wikipedia.org/wiki/Currying">currying</a>.</li>
+<li>When all variables are single-letter, the space in applications may be
+omitted: \((xyz)\) instead of \((x\ y\ z)\).</li>
+</ul>
+
+<p>
+For the sake of readability, this article will intentionally avoid using some of
+these conventions (e.g. dropping outermost parentheses), specially for the
+expressions embedded in text.
+</p>
+</div>
+</div>
+</div>
+
 <div id="outline-container-church-numerals" class="outline-2">
-<h2 id="church-numerals"><span class="section-number-2">2.</span> Church numerals</h2>
+<h2 id="church-numerals"><span class="section-number-2">3.</span> Church numerals</h2>
 <div class="outline-text-2" id="text-church-numerals">
 <p>
 Since &lambda;-calculus does not support the decimal representation of numbers,
@@ -362,7 +571,7 @@ a number as a series of repeated operations will be referenced below.
 </div>
 
 <div id="outline-container-increasing-a-number" class="outline-2">
-<h2 id="increasing-a-number"><span class="section-number-2">3.</span> Increasing a number</h2>
+<h2 id="increasing-a-number"><span class="section-number-2">4.</span> Increasing a number</h2>
 <div class="outline-text-2" id="text-increasing-a-number">
 <p>
 As mentioned in the introduction, this article was motivated by Exercise 2.6 of
@@ -378,7 +587,7 @@ Church numerals, it&rsquo;s worth going over the expansion of <code>add-1</code>
 </div>
 
 <div id="outline-container-definition-of-add-1" class="outline-3">
-<h3 id="definition-of-add-1"><span class="section-number-3">3.1.</span> Definition of <code>add-1</code></h3>
+<h3 id="definition-of-add-1"><span class="section-number-3">4.1.</span> Definition of <code>add-1</code></h3>
 <div class="outline-text-3" id="text-definition-of-add-1">
 <p>
 This is the definition of <code>add-1</code> in &lambda;-notation<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>.
@@ -405,9 +614,8 @@ This is the equivalent definition of <code>add-1</code> in Lisp.
 </div>
 </div>
 
-
 <div id="outline-container-beta-reduction" class="outline-3">
-<h3 id="beta-reduction"><span class="section-number-3">3.2.</span> Beta reduction</h3>
+<h3 id="beta-reduction"><span class="section-number-3">4.2.</span> Beta reduction</h3>
 <div class="outline-text-3" id="text-beta-reduction">
 <p>
 A call to <code>add-1</code> with an argument of <code>zero</code> can be examined through &beta;-reduction
@@ -486,7 +694,7 @@ Naturally, the same &beta;-reduction process can be expressed in
 </div>
 
 <div id="outline-container-calculating-two" class="outline-3">
-<h3 id="calculating-two"><span class="section-number-3">3.3.</span> Calculating <code>two</code></h3>
+<h3 id="calculating-two"><span class="section-number-3">4.3.</span> Calculating <code>two</code></h3>
 <div class="outline-text-3" id="text-calculating-two">
 <p>
 The same process can be done to &beta;-reduce a call to <code>add-1</code> with an argument of
@@ -526,7 +734,7 @@ lambda, whose argument is \(x\), is also reduced into \((f\ x)\); this result
 </div>
 
 <div id="outline-container-arbitrary-addition" class="outline-2">
-<h2 id="arbitrary-addition"><span class="section-number-2">4.</span> Arbitrary addition</h2>
+<h2 id="arbitrary-addition"><span class="section-number-2">5.</span> Arbitrary addition</h2>
 <div class="outline-text-2" id="text-arbitrary-addition">
 <p>
 Although the previous section explained how to increase a Church numeral, the
@@ -549,7 +757,7 @@ expressions.
 </div>
 
 <div id="outline-container-the-abstract-objective" class="outline-3">
-<h3 id="the-abstract-objective"><span class="section-number-3">4.1.</span> The abstract objective</h3>
+<h3 id="the-abstract-objective"><span class="section-number-3">5.1.</span> The abstract objective</h3>
 <div class="outline-text-3" id="text-the-abstract-objective">
 <p>
 From the previous expressions, it can be concluded that the new addition
@@ -574,7 +782,7 @@ the body of the first argument <code>a</code> is &ldquo;placed&rdquo; in the sec
 </div>
 
 <div id="outline-container-building-the-procedure" class="outline-3">
-<h3 id="building-the-procedure"><span class="section-number-3">4.2.</span> Building the procedure</h3>
+<h3 id="building-the-procedure"><span class="section-number-3">5.2.</span> Building the procedure</h3>
 <div class="outline-text-3" id="text-building-the-procedure">
 <p>
 Since the parameters of <code>add</code> are known, its initial structure can be defined. The
@@ -605,7 +813,7 @@ step, the replacement of <code>x</code>.
 </div>
 
 <div id="outline-container-replacing-x-in-b" class="outline-4">
-<h4 id="replacing-x-in-b"><span class="section-number-4">4.2.1.</span> Replacing <code>x</code> in <code>b</code></h4>
+<h4 id="replacing-x-in-b"><span class="section-number-4">5.2.1.</span> Replacing <code>x</code> in <code>b</code></h4>
 <div class="outline-text-4" id="text-replacing-x-in-b">
 <p>
 Since the numbers themselves are functions, replacing <code>x</code> in the inner body of <code>b</code>
@@ -645,7 +853,7 @@ it&rsquo;s still not clear how to obtain the argument: the body of <code>a</code
 </div>
 
 <div id="outline-container-obtaining-the-body-of-a" class="outline-4">
-<h4 id="obtaining-the-body-of-a"><span class="section-number-4">4.2.2.</span> Obtaining the body of <code>a</code></h4>
+<h4 id="obtaining-the-body-of-a"><span class="section-number-4">5.2.2.</span> Obtaining the body of <code>a</code></h4>
 <div class="outline-text-4" id="text-obtaining-the-body-of-a">
 <p>
 The inner body of <code>a</code> can be obtained through a similar process. Just like when
@@ -693,7 +901,7 @@ addition is commutative.
 </div>
 
 <div id="outline-container-calling-church-numerals" class="outline-2">
-<h2 id="calling-church-numerals"><span class="section-number-2">5.</span> Calling Church numerals</h2>
+<h2 id="calling-church-numerals"><span class="section-number-2">6.</span> Calling Church numerals</h2>
 <div class="outline-text-2" id="text-calling-church-numerals">
 <p>
 To further illustrate why Church numerals are functions that represent repeated

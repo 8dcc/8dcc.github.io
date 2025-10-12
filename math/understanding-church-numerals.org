@@ -18,27 +18,172 @@ TODO: Move section about lambda calculus from Y combinator. Rename article to
 :END:
 
 Church numerals are a representation of the natural numbers in the context of
-/lambda calculus/ (\lambda-calculus). Although encoding numbers as functions may
-not be the most practical method, it has some interesting properties, specially
-when computing arithmetical operations.
+lambda calculus. Although encoding numbers as functions may not be the most
+practical method, it has some interesting properties, specially when computing
+arithmetical operations.
 
 Church numerals, as well as \lambda-calculus itself, was invented by the
 mathematician and computer scientist [[https://en.wikipedia.org/wiki/Alonzo_Church][Alonzo Church]].
 
 This article was mainly motivated by [[https://web.mit.edu/6.001/6.037/sicp.pdf#section*.65][Exercise 2.6]] of [[https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs][Structure and
-Interpretation of Computer Programs]].
-
-#+begin_comment org
-TODO: Furthermore, the original explanation about lambda calculus was moved from
-my article on [[file:../programming/understanding-y-combinator.org][the Y combinator.]]
-#+end_comment
+Interpretation of Computer Programs]]. Furthermore, the original explanation
+about lambda calculus was moved from my article on [[file:../programming/understanding-y-combinator.org][the Y combinator]].
 
 #+begin_comment org
 TODO: (About beta reduction in lambda calculus section)
 
-The expression $(\lambda p. b) a$ reduces to $b[p := a]$, where the notation
-$b[p := a]$ indicates the operation of substituting the parameter $p$ with the
-argument $a$ in the body $b$.
+The expression $(\lambda p. b) a$ reduces to
+#+end_comment
+
+* Lambda calculus
+:PROPERTIES:
+:CUSTOM_ID: lambda-calculus
+:END:
+
+[[https://en.wikipedia.org/wiki/Lambda_calculus][Lambda calculus]] (\lambda-calculus) is a mathematical system for expressing
+computation based on function abstraction and application. As mentioned above,
+it was invented by Alonzo Church in the 1930s.
+
+The simplicity of \lambda-calculus, along with its potential, makes it very
+interesting from both a theoretical and practical point of view. This is the
+reason why it's the predecesor of functional programming in general, and many
+programming languages in particular (Lisp, Haskell, etc.).
+
+** Rules of lambda calculus
+:PROPERTIES:
+:CUSTOM_ID: rules-of-lambda-calculus
+:END:
+
+The lambda calculus syntax is so simple that it can be defined in the following
+three rules:
+
+1. A /variable/ $x$ is a character or string that represents a parameter.
+2. A /lambda abstraction/ $(\lambda x. M)$ defines an anonymous function, with a
+   parameter $x$ (between the \lambda and the dot), that returns the body $M$.
+3. An /application/ $(M\ N)$, where the function $M$ is called with $N$ as its
+   argument.
+
+In a function application, $M$ and $N$ are /lambda terms/. A lambda terms is
+simply a valid expression in the lambda calculus system. To determine if an
+expression is valid, the following three rules can be used:
+
+1. A variable $x$ is itself a valid lambda term.
+2. If $M$ is a lambda term, and $x$ is a variable, then $(\lambda x. M)$ is also
+   a lambda term.
+3. If $M$ and $N$ are lambda terms, then $(M\ N)$ is also a lambda term.
+
+The recursive nature of \lambda-calculus is present in the definition of the
+syntax itself, where:
+
+- Variables provide a way of naming an unknown lambda term.
+- Lambda abstractions provide a way of extracting part of a lambda term.
+- Applications provide a way of filling a variable, which was
+  extracted/abstracted, with new a lambda term (the argument of the
+  application).
+- Lambda terms themselves are any of the above.
+
+At first glance, a system that doesn't directly deal with specific data (such as
+numbers) may seem pointless, but it has helped shape many modern languages, and
+understanding how to use these simple rules in these complex systems can be
+extremely helpful.
+
+** Conversion and reduction operations
+:PROPERTIES:
+:CUSTOM_ID: conversion-and-reduction-operations
+:END:
+
+Since \lambda-calculus doesn't deal with specific values such as numbers, the
+value of the system lies in the way lambda terms can be transformed.
+
+Before diving into the transformation methods, it's important to mention the
+/substitution notation/ that is often used in this context. An expression like
+$b[p := a]$, denotes the operation of substituting the parameter $p$ with the
+argument $a$ in the body $b$. Similarly, the syntax $M[x]$ is used to denote "a
+lambda expression $M$ which contains a [[https://en.wikipedia.org/wiki/Free_variables_and_bound_variables][bound]] variable $x$".
+
+There are three kinds of transformations, which are used to convert lambda
+expressions to equivalent ones.
+
+- Alpha conversion (\alpha-conversion) ::
+
+  Consists on renaming the bound variables in an expression. It is mainly used
+  to avoid name collisions.
+
+  $$
+  (\lambda x. M[x]) \to (\lambda y. M[y])
+  $$
+
+- Beta reduction (\beta-reduction) ::
+
+  Consists on reducing an application by substituting the bound variable in the
+  body of the abstraction with the argument of the application. Essentially,
+  applying a function call.
+
+  $$
+  ((\lambda x. M)\ N) \to M[x := N]
+  $$
+
+  In this case, the reduction consists on substituting $x$ in the body $M$ with
+  $N$.
+
+  The inverse of this process is called /beta abstraction/, which instead of
+  simplifying an expression, adds an extra function call. This can be useful in
+  languages such as Lisp for delaying the evaluation of the arguments.
+
+  $$
+  M[N] \to ((\lambda x. M)\ N)
+  $$
+
+
+- Eta reduction (\eta-reduction) ::
+
+  Expresses the idea of [[https://en.wikipedia.org/wiki/Extensionality][/extensionality/]], which
+  applied to this context establishes that two functions are the same if and
+  only if they give the same result for all arguments.
+
+  It is used to simplify redundant abstractions; for example, given that $x$
+  does not appear [[https://en.wikipedia.org/wiki/Free_variables_and_bound_variables][free]] in $f$:
+
+  $$
+  (\lambda x. f\ x) \to f
+  $$
+
+  The inverse of this process is called /eta expansion/, which essentially wraps a
+  function into a lambda abstraction:
+
+  $$
+  f \to (\lambda x. f\ x)
+  $$
+
+These transformations can be used to transform computations into simpler and
+more efficient ones.
+
+** Notation
+:PROPERTIES:
+:CUSTOM_ID: notation
+:END:
+
+Finally, to fully understand \lambda-notation, there are some conventions that
+should be kept in mind when it comes to notation.
+
+- Outermost parentheses are dropped: $(M N)$ can be noted as $M N$.
+- Applications are assumed to be left associative: $M N P$ is equivalent to
+  $((M N) P)$, instead of $(M (N P))$.
+- The body of an abstraction extends as far right as possible:
+  $(\lambda x. M N P)$ means $(\lambda x. (M N P))$, instead of
+  $((\lambda x. M) N P)$ or $((\lambda x. M N) P)$.
+- A sequence of abstractions can be contracted:
+  $(\lambda x. \lambda y. \lambda z. N)$ can be expressed as
+  $(\lambda x\ y\ z. N)$. This is related to the notion of [[https://en.wikipedia.org/wiki/Currying][currying]].
+- When all variables are single-letter, the space in applications may be
+  omitted: $(xyz)$ instead of $(x\ y\ z)$.
+
+For the sake of readability, this article will intentionally avoid using some of
+these conventions (e.g. dropping outermost parentheses), specially for the
+expressions embedded in text.
+
+#+begin_comment org
+TODO: Express idea of currying in detail, perhaps in a previous subsection.
 #+end_comment
 
 * Church numerals
@@ -113,7 +258,6 @@ This is the equivalent definition of =add-1= in Lisp.
       (lambda (x)
         (f ((n f) x))))))
 #+end_src
-
 
 ** Beta reduction
 :PROPERTIES:
