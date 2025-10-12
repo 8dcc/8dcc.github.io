@@ -141,6 +141,7 @@ Which can be simplified into:
 This is how the two plots compare.
 
 #+ATTR_HTML: :style max-width:400px
+#+ATTR_LATEX: :width 250px
 #+NAME: fig1
 [[file:../img/entropy1.png]]
 
