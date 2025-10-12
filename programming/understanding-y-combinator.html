@@ -237,150 +237,27 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#quick-introduction-to-lambda-calculus">1. Quick introduction to lambda calculus</a>
+<li><a href="#sicp-lisp-and-javascript">1. SICP, Lisp and JavaScript</a></li>
+<li><a href="#simple-example-factorial">2. Simple example: Factorial</a></li>
+<li><a href="#simple-recursion-with-anonymous-functions">3. Simple recursion with anonymous functions</a></li>
+<li><a href="#fixed-points">4. Fixed points</a></li>
+<li><a href="#fixed-point-combinators">5. Fixed-point combinators</a></li>
+<li><a href="#y-combinator">6. Y combinator</a></li>
+<li><a href="#applications-of-the-y-combinator">7. Applications of the Y combinator</a></li>
+<li><a href="#implementation-in-scheme">8. Implementation in Scheme</a>
 <ul>
-<li><a href="#rules">1.1. Rules</a></li>
-<li><a href="#lambda-terms">1.2. Lambda terms</a></li>
-<li><a href="#reduction-operations">1.3. Reduction operations</a></li>
-<li><a href="#notation">1.4. Notation</a></li>
+<li><a href="#beta-abstraction-in-scheme">8.1. Delaying evaluation with beta abstraction</a></li>
+<li><a href="#evaluation-process-of-our-y-combinator">8.2. Evaluation process of our Y combinator</a></li>
+<li><a href="#complete-scheme-example">8.3. Complete Scheme example</a></li>
 </ul>
 </li>
-<li><a href="#sicp-lisp-and-javascript">2. SICP, Lisp and JavaScript</a></li>
-<li><a href="#simple-example-factorial">3. Simple example: Factorial</a></li>
-<li><a href="#simple-recursion-with-anonymous-functions">4. Simple recursion with anonymous functions</a></li>
-<li><a href="#fixed-points">5. Fixed points</a></li>
-<li><a href="#fixed-point-combinators">6. Fixed-point combinators</a></li>
-<li><a href="#y-combinator">7. Y combinator</a></li>
-<li><a href="#applications-of-the-y-combinator">8. Applications of the Y combinator</a></li>
-<li><a href="#implementation-in-scheme">9. Implementation in Scheme</a>
-<ul>
-<li><a href="#beta-abstraction-in-scheme">9.1. Delaying evaluation with beta abstraction</a></li>
-<li><a href="#evaluation-process-of-our-y-combinator">9.2. Evaluation process of our Y combinator</a></li>
-<li><a href="#complete-scheme-example">9.3. Complete Scheme example</a></li>
+<li><a href="#final-note">9. Final note</a></li>
 </ul>
-</li>
-<li><a href="#final-note">10. Final note</a></li>
-</ul>
-</div>
-</div>
-
-<div id="outline-container-quick-introduction-to-lambda-calculus" class="outline-2">
-<h2 id="quick-introduction-to-lambda-calculus"><span class="section-number-2">1.</span> Quick introduction to lambda calculus</h2>
-<div class="outline-text-2" id="text-quick-introduction-to-lambda-calculus">
-<p>
-<b>Lambda calculus</b> (&lambda;-calculus) is a mathematical system for computation
-based on <b>function abstraction</b> and <b>application</b>, using <b>variable binding</b> and
-substitution.<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
-</p>
-</div>
-
-<div id="outline-container-rules" class="outline-3">
-<h3 id="rules"><span class="section-number-3">1.1.</span> Rules</h3>
-<div class="outline-text-3" id="text-rules">
-<p>
-The beauty of lambda calculus is its simplicity. These are the only 3 rules:
-</p>
-
-<ol class="org-ol">
-<li>\(x\): A <b>variable</b> represents a parameter.</li>
-<li>\((\lambda x. M)\): A <b>lambda abstraction</b> is an anonymous function, with a
-parameter \(x\) (between the &lambda; and the dot), that returns the body \(M\).</li>
-<li>\((M\ N)\): An <b>application</b> of function \(M\) to an argument \(N\).</li>
-</ol>
-
-<p>
-In the last rule, both \(M\) and \(N\) are lambda terms.
-</p>
-</div>
-</div>
-
-<div id="outline-container-lambda-terms" class="outline-3">
-<h3 id="lambda-terms"><span class="section-number-3">1.2.</span> Lambda terms</h3>
-<div class="outline-text-3" id="text-lambda-terms">
-<p>
-A <b>lambda term</b> is just a valid expression in the lambda calculus system. Well,
-what makes an expression valid? The following 3 rules are used to determine if a
-lambda expression is valid:
-</p>
-
-<ol class="org-ol">
-<li>A <b>variable</b> \(x\) is itself a valid lambda term.</li>
-<li>If \(M\) is a lambda term, and \(x\) is a variable, then \((\lambda x. M)\) is also
-a lambda term (An <b>abstraction</b>).</li>
-<li>If \(M\) and \(N\) are lambda terms, then \((M\ N)\) is also a lambda term (An
-<b>application</b>).</li>
-</ol>
-
-<p>
-You can begin to feel the recursive magic of lambda calculus, before even
-getting into an example.
-</p>
-</div>
-</div>
-
-<div id="outline-container-reduction-operations" class="outline-3">
-<h3 id="reduction-operations"><span class="section-number-3">1.3.</span> Reduction operations</h3>
-<div class="outline-text-3" id="text-reduction-operations">
-<p>
-Lambda calculus also has 2 main reduction operations:
-</p>
-
-<ol class="org-ol">
-<li>\((\lambda x. M[x])\) &rarr; \((\lambda y. M[y])\): <b>Alpha conversion</b>
-(&alpha;-conversion), renaming the bound variables in the expression. Used to
-avoid name collisions.</li>
-<li>\(((\lambda x. M) N)\) &rarr; \((M[x := N])\): <b>Beta reduction</b> (&beta;-reduction),
-replacing the bound variables (\(x\)) with the argument expression (\(N\)) in the
-body (\(M\)) of the abstraction.</li>
-</ol>
-
-<p>
-There is also <b>eta reduction</b> (&eta;-reduction), which expresses the idea of
-<i>extensionality</i>,<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup> which applied to
-this context establishes that two functions are the same if and only if they
-give the same result for all arguments.
-</p>
-
-<p>
-<a href="#implementation-in-scheme">Later</a> we will also mention the opposite of the beta reduction, the <b>beta
-abstraction</b>, which instead of simplifying an expression, it adds an extra
-function call that might be useful (e.g. in Lisps) for delaying the evaluation
-of the arguments.
-</p>
-</div>
-</div>
-
-<div id="outline-container-notation" class="outline-3">
-<h3 id="notation"><span class="section-number-3">1.4.</span> Notation</h3>
-<div class="outline-text-3" id="text-notation">
-<p>
-For understanding lambda notation, you will also have to keep in mind these
-conventions:
-</p>
-
-<ol class="org-ol">
-<li>Outermost parentheses are dropped: \(M N\) instead of \((M N)\).</li>
-<li>Applications are assumed to be left associative: \(M N P\) instead of
-\(((M N) P)\).</li>
-<li>The body of an abstraction extends as far right as possible:
-\((\lambda x. M N)\) means \((\lambda x. (M N))\) and not \(((\lambda x. M) N)\).</li>
-<li>A sequence of abstractions is contracted:
-\((\lambda x. \lambda y. \lambda z. N)\) is abbreviated as
-\((\lambda x\ y\ z. N)\).</li>
-<li>When all variables are single-letter, the space in applications may be
-omitted: \((M N P)\) instead of \((M\ N\ P)\).</li>
-</ol>
-
-<p>
-Some of these look a bit confusing to me, specially when embedding expressions
-in text, so I will try to make each expression as readable as possible.
-</p>
-</div>
 </div>
 </div>
 
 <div id="outline-container-sicp-lisp-and-javascript" class="outline-2">
-<h2 id="sicp-lisp-and-javascript"><span class="section-number-2">2.</span> SICP, Lisp and JavaScript</h2>
+<h2 id="sicp-lisp-and-javascript"><span class="section-number-2">1.</span> SICP, Lisp and JavaScript</h2>
 <div class="outline-text-2" id="text-sicp-lisp-and-javascript">
 <p>
 <a href="https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs">Structure and Interpretation of Computer Programs</a> is an amazing book by Harold
@@ -414,7 +291,7 @@ useful not only when using functions, but also when designing them.
 </div>
 
 <div id="outline-container-simple-example-factorial" class="outline-2">
-<h2 id="simple-example-factorial"><span class="section-number-2">3.</span> Simple example: Factorial</h2>
+<h2 id="simple-example-factorial"><span class="section-number-2">2.</span> Simple example: Factorial</h2>
 <div class="outline-text-2" id="text-simple-example-factorial">
 <p>
 This is the function for calculating the factorial of a number \(n\), using the
@@ -473,7 +350,7 @@ function can&rsquo;t call itself by name, so we will have to find an alternative
 </div>
 
 <div id="outline-container-simple-recursion-with-anonymous-functions" class="outline-2">
-<h2 id="simple-recursion-with-anonymous-functions"><span class="section-number-2">4.</span> Simple recursion with anonymous functions</h2>
+<h2 id="simple-recursion-with-anonymous-functions"><span class="section-number-2">3.</span> Simple recursion with anonymous functions</h2>
 <div class="outline-text-2" id="text-simple-recursion-with-anonymous-functions">
 <p>
 Before trying to understand the Y combinator, let&rsquo;s have a look at an example of
@@ -535,7 +412,7 @@ indefinitely, and a similar form will be used for the Y combinator below.
 </div>
 
 <div id="outline-container-fixed-points" class="outline-2">
-<h2 id="fixed-points"><span class="section-number-2">5.</span> Fixed points</h2>
+<h2 id="fixed-points"><span class="section-number-2">4.</span> Fixed points</h2>
 <div class="outline-text-2" id="text-fixed-points">
 <p>
 Before getting into the fixed-point combinators, we need to define what a fixed
@@ -544,7 +421,7 @@ point is.
 
 <p>
 A fixed point of function \(f\) is a value that is mapped to itself by the
-function.<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup> In other words, \(x\) is a
+function.<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup> In other words, \(x\) is a
 fixed point of \(f\) if \(f(x) = x\). For this to be possible, \(x\) has to belong to
 both the <i>domain</i> of \(f\) (set of values that it can take), and the <i>codomain</i> of \(f\)
 (set of values that it can return).
@@ -585,12 +462,12 @@ with the result.
 </div>
 
 <div id="outline-container-fixed-point-combinators" class="outline-2">
-<h2 id="fixed-point-combinators"><span class="section-number-2">6.</span> Fixed-point combinators</h2>
+<h2 id="fixed-point-combinators"><span class="section-number-2">5.</span> Fixed-point combinators</h2>
 <div class="outline-text-2" id="text-fixed-point-combinators">
 <p>
 A <b>fixed-point combinator</b> is a higher-order function (i.e. a function that takes
 a function as argument) that returns some fixed point of its argument
-function.<sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>
+function.<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>
 </p>
 
 <p>
@@ -611,7 +488,7 @@ In lambda calculus, every function has a fixed point.
 </div>
 
 <div id="outline-container-y-combinator" class="outline-2">
-<h2 id="y-combinator"><span class="section-number-2">7.</span> Y combinator</h2>
+<h2 id="y-combinator"><span class="section-number-2">6.</span> Y combinator</h2>
 <div class="outline-text-2" id="text-y-combinator">
 <p>
 An example of a fixed-point combinator is the Y combinator. This is the
@@ -714,7 +591,7 @@ Notice how the first call to \(f\) was not necessary, since this expression also
 </div>
 
 <div id="outline-container-applications-of-the-y-combinator" class="outline-2">
-<h2 id="applications-of-the-y-combinator"><span class="section-number-2">8.</span> Applications of the Y combinator</h2>
+<h2 id="applications-of-the-y-combinator"><span class="section-number-2">7.</span> Applications of the Y combinator</h2>
 <div class="outline-text-2" id="text-applications-of-the-y-combinator">
 <p>
 You might be wondering what makes the Y combinator so special. As we said,
@@ -812,7 +689,7 @@ do.
 </div>
 
 <div id="outline-container-implementation-in-scheme" class="outline-2">
-<h2 id="implementation-in-scheme"><span class="section-number-2">9.</span> Implementation in Scheme</h2>
+<h2 id="implementation-in-scheme"><span class="section-number-2">8.</span> Implementation in Scheme</h2>
 <div class="outline-text-2" id="text-implementation-in-scheme">
 <p>
 Our Scheme version of the Y combinator was not really correct. Evaluation in
@@ -822,13 +699,13 @@ Scheme (and most Lisps) is <i>strict</i>, meaning that each argument is evaluate
 </div>
 
 <div id="outline-container-beta-abstraction-in-scheme" class="outline-3">
-<h3 id="beta-abstraction-in-scheme"><span class="section-number-3">9.1.</span> Delaying evaluation with beta abstraction</h3>
+<h3 id="beta-abstraction-in-scheme"><span class="section-number-3">8.1.</span> Delaying evaluation with beta abstraction</h3>
 <div class="outline-text-3" id="text-beta-abstraction-in-scheme">
 <p>
 Defining <code>Y</code> like we did before would result in infinite recursive calls when
 trying to apply the <code>(x x)</code> expressions. This will be more obvious when analyzing
 the combinator below, so let&rsquo;s look at a possible solution first. We can fix our
-Y combinator by <b>beta abstracting</b><sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup> those two applications.
+Y combinator by <b>beta abstracting</b><sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup> those two applications.
 </p>
 
 <blockquote>
@@ -858,6 +735,11 @@ as a &ldquo;proxy&rdquo;.
   <span style="color: #695500;">(</span><span style="color: #972500;">lambda</span> <span style="color: #006800;">(</span>f<span style="color: #006800;">)</span>
     <span style="color: #006800;">(</span><span style="color: #008899;">(</span><span style="color: #972500;">lambda</span> <span style="color: #0000ff;">(</span>x<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>f <span style="color: #dd22dd;">(</span><span style="color: #972500;">lambda</span> <span style="color: #a60000;">(</span>n<span style="color: #a60000;">)</span> <span style="color: #a60000;">(</span><span style="color: #695500;">(</span>x x<span style="color: #695500;">)</span> n<span style="color: #a60000;">)</span><span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span>
      <span style="color: #008899;">(</span><span style="color: #972500;">lambda</span> <span style="color: #0000ff;">(</span>x<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>f <span style="color: #dd22dd;">(</span><span style="color: #972500;">lambda</span> <span style="color: #a60000;">(</span>n<span style="color: #a60000;">)</span> <span style="color: #a60000;">(</span><span style="color: #695500;">(</span>x x<span style="color: #695500;">)</span> n<span style="color: #a60000;">)</span><span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
+
+<span style="color: #a60000;">(</span><span style="color: #972500;">define</span> <span style="color: #3f578f;">Y</span>
+  <span style="color: #695500;">(</span><span style="color: #972500;">lambda</span> <span style="color: #006800;">(</span>f<span style="color: #006800;">)</span>
+    <span style="color: #006800;">(</span><span style="color: #008899;">(</span><span style="color: #972500;">lambda</span> <span style="color: #0000ff;">(</span>x<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>f <span style="color: #dd22dd;">(</span>x x<span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span>
+     <span style="color: #008899;">(</span><span style="color: #972500;">lambda</span> <span style="color: #0000ff;">(</span>x<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>f <span style="color: #dd22dd;">(</span>x x<span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -870,7 +752,7 @@ so so let&rsquo;s try to visualize the evaluation process of a call to our <code
 </div>
 
 <div id="outline-container-evaluation-process-of-our-y-combinator" class="outline-3">
-<h3 id="evaluation-process-of-our-y-combinator"><span class="section-number-3">9.2.</span> Evaluation process of our Y combinator</h3>
+<h3 id="evaluation-process-of-our-y-combinator"><span class="section-number-3">8.2.</span> Evaluation process of our Y combinator</h3>
 <div class="outline-text-3" id="text-evaluation-process-of-our-y-combinator">
 <p>
 The following diagram represents the evaluation of a call to our <code>Y</code>
@@ -953,7 +835,7 @@ Which is just what we wanted to achieve earlier.
 </div>
 
 <div id="outline-container-complete-scheme-example" class="outline-3">
-<h3 id="complete-scheme-example"><span class="section-number-3">9.3.</span> Complete Scheme example</h3>
+<h3 id="complete-scheme-example"><span class="section-number-3">8.3.</span> Complete Scheme example</h3>
 <div class="outline-text-3" id="text-complete-scheme-example">
 <p>
 Finally, we can <a href="https://try.scheme.org/">try</a> our full example.
@@ -983,7 +865,7 @@ Finally, we can <a href="https://try.scheme.org/">try</a> our full example.
 </div>
 
 <div id="outline-container-final-note" class="outline-2">
-<h2 id="final-note"><span class="section-number-2">10.</span> Final note</h2>
+<h2 id="final-note"><span class="section-number-2">9.</span> Final note</h2>
 <div class="outline-text-2" id="text-final-note">
 <p>
 If you reached this far, I hope you have learned something. Everything in this
@@ -997,15 +879,11 @@ so if you feel like some explanations could be improved, feel free to
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Lambda_calculus">Wikipedia page</a> for lambda calculus.</p></div></div>
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Fixed_point_(mathematics)">Wikipedia page</a> for fixed point.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Extensionality">Wikipedia page</a> for extensionality.</p></div></div>
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator">Wikipedia page</a> for fixed-point combinator.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Fixed_point_(mathematics)">Wikipedia page</a> for fixed point.</p></div></div>
-
-<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator">Wikipedia page</a> for fixed-point combinator.</p></div></div>
-
-<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See <a href="https://jao.io/blog/2014/08/06/spj-s-y-combinator-in-scheme/">jao.io</a> article about the Y combinator
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See <a href="https://jao.io/blog/2014/08/06/spj-s-y-combinator-in-scheme/">jao.io</a> article about the Y combinator
 in Scheme, and about how to design good websites.</p></div></div>
 
 

@@ -5,98 +5,16 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css" />
 #+HTML_LINK_UP: index.html
 #+HTML_LINK_HOME: ../index.html
-
-* Quick introduction to lambda calculus
-:PROPERTIES:
-:CUSTOM_ID: quick-introduction-to-lambda-calculus
-:END:
-
-*Lambda calculus* (\lambda-calculus) is a mathematical system for computation
-based on *function abstraction* and *application*, using *variable binding* and
-substitution.[fn::See the [[https://en.wikipedia.org/wiki/Lambda_calculus][Wikipedia page]] for lambda calculus.]
-
-** Rules
-:PROPERTIES:
-:CUSTOM_ID: rules
-:END:
-
-The beauty of lambda calculus is its simplicity. These are the only 3 rules:
-
-1. $x$: A *variable* represents a parameter.
-2. $(\lambda x. M)$: A *lambda abstraction* is an anonymous function, with a
-   parameter $x$ (between the \lambda and the dot), that returns the body $M$.
-3. $(M\ N)$: An *application* of function $M$ to an argument $N$.
-
-In the last rule, both $M$ and $N$ are lambda terms.
-
-** Lambda terms
-:PROPERTIES:
-:CUSTOM_ID: lambda-terms
-:END:
-
-A *lambda term* is just a valid expression in the lambda calculus system. Well,
-what makes an expression valid? The following 3 rules are used to determine if a
-lambda expression is valid:
-
-1. A *variable* $x$ is itself a valid lambda term.
-2. If $M$ is a lambda term, and $x$ is a variable, then $(\lambda x. M)$ is also
-   a lambda term (An *abstraction*).
-3. If $M$ and $N$ are lambda terms, then $(M\ N)$ is also a lambda term (An
-   *application*).
-
-You can begin to feel the recursive magic of lambda calculus, before even
-getting into an example.
-
-** Reduction operations
-:PROPERTIES:
-:CUSTOM_ID: reduction-operations
-:END:
-
-Lambda calculus also has 2 main reduction operations:
-
-1. $(\lambda x. M[x])$ \to $(\lambda y. M[y])$: *Alpha conversion*
-   (\alpha-conversion), renaming the bound variables in the expression. Used to
-   avoid name collisions.
-2. $((\lambda x. M) N)$ \to $(M[x := N])$: *Beta reduction* (\beta-reduction),
-   replacing the bound variables ($x$) with the argument expression ($N$) in the
-   body ($M$) of the abstraction.
-
-There is also *eta reduction* (\eta-reduction), which expresses the idea of
-/extensionality/,[fn::See the [[https://en.wikipedia.org/wiki/Extensionality][Wikipedia page]] for extensionality.] which applied to
-this context establishes that two functions are the same if and only if they
-give the same result for all arguments.
-
-[[*Implementation in Scheme][Later]] we will also mention the opposite of the beta reduction, the *beta
-abstraction*, which instead of simplifying an expression, it adds an extra
-function call that might be useful (e.g. in Lisps) for delaying the evaluation
-of the arguments.
-
-** Notation
-:PROPERTIES:
-:CUSTOM_ID: notation
-:END:
-
-For understanding lambda notation, you will also have to keep in mind these
-conventions:
-
-1. Outermost parentheses are dropped: $M N$ instead of $(M N)$.
-2. Applications are assumed to be left associative: $M N P$ instead of
-   $((M N) P)$.
-3. The body of an abstraction extends as far right as possible:
-   $(\lambda x. M N)$ means $(\lambda x. (M N))$ and not $((\lambda x. M) N)$.
-4. A sequence of abstractions is contracted:
-   $(\lambda x. \lambda y. \lambda z. N)$ is abbreviated as
-   $(\lambda x\ y\ z. N)$.
-5. When all variables are single-letter, the space in applications may be
-   omitted: $(M N P)$ instead of $(M\ N\ P)$.
-
-Some of these look a bit confusing to me, specially when embedding expressions
-in text, so I will try to make each expression as readable as possible.
+#+LATEX_HEADER: \usepackage{svg}
 
 * SICP, Lisp and JavaScript
 :PROPERTIES:
 :CUSTOM_ID: sicp-lisp-and-javascript
 :END:
+
+#+begin_comment org
+TODO: Link lambda calculus section of Church numerals.
+#+end_comment
 
 [[https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs][Structure and Interpretation of Computer Programs]] is an amazing book by Harold
 Abelson and Gerald Jay Sussman. The book teaches the fundamental principles of
@@ -430,6 +348,10 @@ Scheme (and most Lisps) is /strict/, meaning that each argument is evaluated
 :PROPERTIES:
 :CUSTOM_ID: beta-abstraction-in-scheme
 :END:
+
+#+begin_comment org
+TODO: Isn't this "eta expansion"?
+#+end_comment
 
 Defining =Y= like we did before would result in infinite recursive calls when
 trying to apply the ~(x x)~ expressions. This will be more obvious when analyzing
