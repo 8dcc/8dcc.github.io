@@ -237,7 +237,7 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#sicp-lisp-and-javascript">1. SICP, Lisp and JavaScript</a></li>
+<li><a href="#introduction">1. Introduction</a></li>
 <li><a href="#simple-example-factorial">2. Simple example: Factorial</a></li>
 <li><a href="#simple-recursion-with-anonymous-functions">3. Simple recursion with anonymous functions</a></li>
 <li><a href="#fixed-points">4. Fixed points</a></li>
@@ -246,7 +246,7 @@
 <li><a href="#applications-of-the-y-combinator">7. Applications of the Y combinator</a></li>
 <li><a href="#implementation-in-scheme">8. Implementation in Scheme</a>
 <ul>
-<li><a href="#beta-abstraction-in-scheme">8.1. Delaying evaluation with beta abstraction</a></li>
+<li><a href="#delaying-evaluation-with-beta-abstraction">8.1. Delaying evaluation with beta abstraction</a></li>
 <li><a href="#evaluation-process-of-our-y-combinator">8.2. Evaluation process of our Y combinator</a></li>
 <li><a href="#complete-scheme-example">8.3. Complete Scheme example</a></li>
 </ul>
@@ -256,36 +256,36 @@
 </div>
 </div>
 
-<div id="outline-container-sicp-lisp-and-javascript" class="outline-2">
-<h2 id="sicp-lisp-and-javascript"><span class="section-number-2">1.</span> SICP, Lisp and JavaScript</h2>
-<div class="outline-text-2" id="text-sicp-lisp-and-javascript">
+<div id="outline-container-introduction" class="outline-2">
+<h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-introduction">
 <p>
-<a href="https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs">Structure and Interpretation of Computer Programs</a> is an amazing book by Harold
-Abelson and Gerald Jay Sussman. The book teaches the fundamental principles of
-computer programming, including recursion, abstraction, modularity, and much
-more. I recommend the book to anyone who is interested in programming, I am sure
-they will learn something.
+This article is about the Y combinator, a fixed-point combinator that provides a
+way of using recursion in scenarios and programming languages where symbols are
+not available. The concept of the Y combinator itself is closely related to
+lambda calculus (&lambda;-calculus) and functional programming languages. More
+information on this topic can be found on my article about <a href="../math/understanding-church-numerals.html">Understanding Church
+numerals</a>.
 </p>
 
 <p>
-This book has two editions. The first one uses <a href="https://en.wikipedia.org/wiki/Scheme_(programming_language)">Scheme</a> (a dialect of <a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a>), for
-its examples and explanations, while the second uses <a href="https://en.wikipedia.org/wiki/JavaScript">JavaScript</a>. I have not
-programmed much in JavaScript at the time of writing this, but I will try to
-provide all examples in both lambda notation, Scheme and JavaScript.
+For the examples and code snippets in this article, the <a href="https://en.wikipedia.org/wiki/Scheme_(programming_language)">Scheme</a> programming
+language will be used, which is a dialect of <a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a>. However, since most people
+are more familiar with the JavaScript syntax, and it is able to express the same
+concepts, it will also be used whenever possible. Lastly, some lambda calculus
+notation is used, which is explained in detail in <a href="../math/understanding-church-numerals.html">my previously mentioned
+article</a>.
 </p>
 
 <p>
-At one point, in section 1.3.3, they talk about finding fixed points of
-functions. This was the first time I heard about this, and it&rsquo;s what mainly
-motivated me to write this article. If you are interested on the general Lisp
-approach, and not on the Y combinator itself, I recommend you check it out.
-</p>
-
-<p>
-One of the most valuable things that SICP has taught me is that sometimes it&rsquo;s
-extremely useful to treat functions as black boxes that are able to transform
-some inputs into some outputs. They call this <i>wishful thinking</i>, and it has been
-useful not only when using functions, but also when designing them.
+This article was heavily inspired by <a href="https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs">Structure and Interpretation of Computer
+Programs</a> (SICP), a book by Harold Abelson and Gerald Jay Sussman. The book
+teaches the fundamental principles of computer programming, including recursion,
+abstraction, modularity, and much more. Section 1.3.3 of this book covers the
+topic of finding the fixed points of functions, which was the main motivation
+for this article. I strongly recommend, specially since it has a modern
+JavaScript version<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup> for those
+who are not interested in Lisp.
 </p>
 </div>
 </div>
@@ -421,7 +421,7 @@ point is.
 
 <p>
 A fixed point of function \(f\) is a value that is mapped to itself by the
-function.<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup> In other words, \(x\) is a
+function.<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup> In other words, \(x\) is a
 fixed point of \(f\) if \(f(x) = x\). For this to be possible, \(x\) has to belong to
 both the <i>domain</i> of \(f\) (set of values that it can take), and the <i>codomain</i> of \(f\)
 (set of values that it can return).
@@ -467,7 +467,7 @@ with the result.
 <p>
 A <b>fixed-point combinator</b> is a higher-order function (i.e. a function that takes
 a function as argument) that returns some fixed point of its argument
-function.<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>
+function.<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>
 </p>
 
 <p>
@@ -698,14 +698,14 @@ Scheme (and most Lisps) is <i>strict</i>, meaning that each argument is evaluate
 </p>
 </div>
 
-<div id="outline-container-beta-abstraction-in-scheme" class="outline-3">
-<h3 id="beta-abstraction-in-scheme"><span class="section-number-3">8.1.</span> Delaying evaluation with beta abstraction</h3>
-<div class="outline-text-3" id="text-beta-abstraction-in-scheme">
+<div id="outline-container-delaying-evaluation-with-beta-abstraction" class="outline-3">
+<h3 id="delaying-evaluation-with-beta-abstraction"><span class="section-number-3">8.1.</span> Delaying evaluation with beta abstraction</h3>
+<div class="outline-text-3" id="text-delaying-evaluation-with-beta-abstraction">
 <p>
 Defining <code>Y</code> like we did before would result in infinite recursive calls when
 trying to apply the <code>(x x)</code> expressions. This will be more obvious when analyzing
 the combinator below, so let&rsquo;s look at a possible solution first. We can fix our
-Y combinator by <b>beta abstracting</b><sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup> those two applications.
+Y combinator by <b>beta abstracting</b><sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup> those two applications.
 </p>
 
 <blockquote>
@@ -735,11 +735,6 @@ as a &ldquo;proxy&rdquo;.
   <span style="color: #695500;">(</span><span style="color: #972500;">lambda</span> <span style="color: #006800;">(</span>f<span style="color: #006800;">)</span>
     <span style="color: #006800;">(</span><span style="color: #008899;">(</span><span style="color: #972500;">lambda</span> <span style="color: #0000ff;">(</span>x<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>f <span style="color: #dd22dd;">(</span><span style="color: #972500;">lambda</span> <span style="color: #a60000;">(</span>n<span style="color: #a60000;">)</span> <span style="color: #a60000;">(</span><span style="color: #695500;">(</span>x x<span style="color: #695500;">)</span> n<span style="color: #a60000;">)</span><span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span>
      <span style="color: #008899;">(</span><span style="color: #972500;">lambda</span> <span style="color: #0000ff;">(</span>x<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>f <span style="color: #dd22dd;">(</span><span style="color: #972500;">lambda</span> <span style="color: #a60000;">(</span>n<span style="color: #a60000;">)</span> <span style="color: #a60000;">(</span><span style="color: #695500;">(</span>x x<span style="color: #695500;">)</span> n<span style="color: #a60000;">)</span><span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
-
-<span style="color: #a60000;">(</span><span style="color: #972500;">define</span> <span style="color: #3f578f;">Y</span>
-  <span style="color: #695500;">(</span><span style="color: #972500;">lambda</span> <span style="color: #006800;">(</span>f<span style="color: #006800;">)</span>
-    <span style="color: #006800;">(</span><span style="color: #008899;">(</span><span style="color: #972500;">lambda</span> <span style="color: #0000ff;">(</span>x<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>f <span style="color: #dd22dd;">(</span>x x<span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span>
-     <span style="color: #008899;">(</span><span style="color: #972500;">lambda</span> <span style="color: #0000ff;">(</span>x<span style="color: #0000ff;">)</span> <span style="color: #0000ff;">(</span>f <span style="color: #dd22dd;">(</span>x x<span style="color: #dd22dd;">)</span><span style="color: #0000ff;">)</span><span style="color: #008899;">)</span><span style="color: #006800;">)</span><span style="color: #695500;">)</span><span style="color: #a60000;">)</span>
 </pre>
 </div>
 
@@ -879,11 +874,14 @@ so if you feel like some explanations could be improved, feel free to
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Fixed_point_(mathematics)">Wikipedia page</a> for fixed point.</p></div></div>
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">The exact differences between the Lisp and JavaScript
+editions can be checked in <a href="https://sicp.sourceacademy.org/">this website</a>, which has been very helpful.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator">Wikipedia page</a> for fixed-point combinator.</p></div></div>
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Fixed_point_(mathematics)">Wikipedia page</a> for fixed point.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See <a href="https://jao.io/blog/2014/08/06/spj-s-y-combinator-in-scheme/">jao.io</a> article about the Y combinator
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See the <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator">Wikipedia page</a> for fixed-point combinator.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">See <a href="https://jao.io/blog/2014/08/06/spj-s-y-combinator-in-scheme/">jao.io</a> article about the Y combinator
 in Scheme, and about how to design good websites.</p></div></div>
 
 
