@@ -29,7 +29,12 @@ The articles in this blog are spread across the following categories.
 
 These are some articles that I have written across my different projects.
 
-- The [[https://github.com/fs-os/fs-os/wiki][fs-os wiki]], explaining the details of [[https://github.com/fs-os/fs-os][my simple operating system]].
+#+begin_comment org
+TODO: Remove =fs-os= link after the wiki is migrated to this blog (or rather, this
+repository, since it's supposed to be independent).
+#+end_comment
+
+- The [[https://github.com/8dcc/naos/wiki][fs-os wiki]], explaining the details of [[https://github.com/8dcc/naos][my simple operating system]].
 - [[https://github.com/8dcc/bms-cheat/wiki/Hooking-CreateMove][Hooking CreateMove]] in the Source 1 game engine.
 - Finding offsets and [[https://github.com/8dcc/tf2-cheat/wiki/Getting-SDL-offsets][hooking SDL functions]].
 
