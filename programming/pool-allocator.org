@@ -54,9 +54,10 @@ itself. Free chunks are used to store information, so the memory impact is
 minimal.
 
 Lastly, I would like to mention that this article is based on my ANSI C library
-for pool allocation, [[https://github.com/8dcc/libpool][libpool]]. In the future, I might make small changes to the
-code on that repository and they won't be reflected here, so feel free to check
-it out as well.
+for pool allocation, [[https://github.com/8dcc/libpool][libpool]]. Some new features, as well as fixes, have been
+added to that repository, and they might not be reflected here. These new
+features include thread safety, pointer alignment, logging and support for
+non-POSIX systems, so feel free to check it out as well.
 
 * Writing the initial implementation
 :PROPERTIES:
