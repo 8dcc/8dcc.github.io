@@ -57,7 +57,7 @@ using the following formula.
 
 \begin{equation}
 \label{eq:ratio-to-decibels}
-\text{dB} = 20 \log_{10} \left( \frac{a}{b} \right) \\
+\mathrm{dB} = 20 \log_{10} \left( \frac{a}{b} \right) \\
 \end{equation}
 
 Therefore, given the decibels, the ratio between the two values can also be
@@ -65,7 +65,7 @@ obtained using a similar formula.
 
 \begin{equation}
 \label{eq:decibels-to-ratio}
-\frac{a}{b} = 10^{\frac{\text{dB}}{20}}
+\frac{a}{b} = 10^{\frac{\mathrm{dB}}{20}}
 \end{equation}
 
 * Example
@@ -139,7 +139,7 @@ between the input and output voltage can be obtained, and therefore the output
 voltage itself.
 
 \begin{align*}
-\frac{V_{out}}{V_{in}} &= 10^{\frac{\text{dB}}{20}} \\
+\frac{V_{out}}{V_{in}} &= 10^{\frac{\mathrm{dB}}{20}} \\
 \frac{V_{out}}{0.3} &= 10^{\frac{24}{20}} \\
 \frac{V_{out}}{0.3} &= 10^{1.2} \\
 \frac{V_{out}}{0.3} &\approx 15.84 \\
@@ -161,11 +161,11 @@ Similarly to how the input voltage was converted to dBV, the same can be done to
 the output voltage.
 
 \begin{split}
-\text{dBV} &= 20 \log_{10} \left( \frac{V_{out}}{1} \right) \\
-           &= 20 \log_{10} \left( \frac{4.75}{1} \right) \\
-           &= 20 \log_{10}(4.75) \\
-           &\approx 20 \times 0.67 \\
-           &\approx 13.53
+\mathrm{dBV} &= 20 \log_{10} \left( \frac{V_{out}}{1} \right) \\
+             &= 20 \log_{10} \left( \frac{4.75}{1} \right) \\
+             &= 20 \log_{10}(4.75) \\
+             &\approx 20 \times 0.67 \\
+             &\approx 13.53
 \end{split}
 
 Just like with any other value expressed in decibel, this 13.53 expresses a
