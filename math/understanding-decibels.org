@@ -56,7 +56,7 @@ Given two values $a$ and $b$, the decibels can be calculated from their ratio
 using the following formula.
 
 \begin{equation}
-\label{eq:ratio-to-decibels}
+\label{eq:power-ratio-to-decibels}
 \mathrm{dB} = 20 \log_{10} \left( \frac{a}{b} \right) \\
 \end{equation}
 
@@ -64,7 +64,7 @@ Therefore, given the decibels, the ratio between the two values can also be
 obtained using a similar formula.
 
 \begin{equation}
-\label{eq:decibels-to-ratio}
+\label{eq:decibels-to-power-ratio}
 \frac{a}{b} = 10^{\frac{\mathrm{dB}}{20}}
 \end{equation}
 
@@ -180,4 +180,4 @@ output dBV values were calculated using a logarithmic scale, which is also used
 to express the gain of the amplifier. In other words, a value expressed in
 "suffixed" decibels can be added to another value in "plain" decibels to obtain
 a result back in "suffixed" decibels because all decibels use the same
-logarithmic formula \eqref{eq:ratio-to-decibels}.
+logarithmic formula \eqref{eq:power-ratio-to-decibels}.
