@@ -23,13 +23,22 @@ its different types and how it can be calculated, along with a simple example.
 
 First, it is important to understand that it is a /relative/ unit of measurement,
 meaning that it always expresses the relationship between two
-quantities. Specifically, it measures the ratio of two values on a logarithmic
-scale.
+quantities. Specifically, it measures the ratio of two /power/ values on a
+logarithmic scale. It is designed for power quantities (e.g. watts) and
+root-power quantities (e.g. voltage, current, sound pressure)[fn::A /power
+quantity/ is directly proporcional to power, while a /root-power quantity/ is a
+quantity whose square is proportional to power. For example, if an amplifier
+triples its input voltage, it would be multiplying the total power by 9.].
 
-Although it is often used to express absolute "volume" or "signal level", it's
-actually expresses the ratio between some variable over a constant. Some of
-these constants or "reference values" are listed here, along with their unit
-suffixes.
+The decibel is an ideal unit for expressing gain or amplification in a circuit,
+since it is able to accurately express the relationship between the input signal
+of the amplifier and the amplified output signal.
+
+Although it is often used to express absolute "audio volume" or "signal level",
+it always expresses a ratio. When it is used as an absolute value, it usually
+expresses the ratio between some variable and a constant/reference value. Some
+of these constants or "reference values" are standard, and have their own
+suffixed unit; the most common are listed below.
 
 - *dBW*: Measures the relationship between some power in watts and 1 watt.
 - *dBm*: Measures the relationship between some power in watts and 1 milliwatt.
@@ -39,7 +48,7 @@ suffixes.
   mW) in a 600 \Omega load. This unit was originally called =dBv=, but was changed
   to =dBu= to avoid confusion with =dBV=.].
 - *dBFS*: Measures the relationship between the amplitude of a signal and the
-  maximum the device can handle before [[https://en.wikipedia.org/wiki/Clipping_(signal_processing)][clipping]] occurs. The =FS= stands for /Full
+  maximum the device can handle before [[https://en.wikipedia.org/wiki/Clipping_(signal_processing)][clipping]] occurs. The "FS" stands for /Full
   Scale/.
 - *dBSPL*: Measures the relationship between a sound pressure and 20 micropascals
   (\mu{}Pa). SPL stands for /Sound Pressure Level/.
@@ -52,12 +61,20 @@ signal amplitude.
 :CUSTOM_ID: calculating-decibels
 :END:
 
-Given two values $a$ and $b$, the decibels can be calculated from their ratio
-using the following formula.
+Depending on whether the quantities that are used are directly-proportional to
+power or if they need to be squared, a different formula is used.
+
+** Calculating decibels for power quantities
+:PROPERTIES:
+:CUSTOM_ID: calculating-decibels-for-power-quantities
+:END:
+
+Given two power quantities $a$ and $b$, the decibels can be calculated from
+their ratio using the following formula.
 
 \begin{equation}
 \label{eq:power-ratio-to-decibels}
-\mathrm{dB} = 20 \log_{10} \left( \frac{a}{b} \right) \\
+\mathrm{dB} = 10 \log_{10} \left( \frac{a}{b} \right) \\
 \end{equation}
 
 Therefore, given the decibels, the ratio between the two values can also be
@@ -65,8 +82,54 @@ obtained using a similar formula.
 
 \begin{equation}
 \label{eq:decibels-to-power-ratio}
+\frac{a}{b} = 10^{\frac{\mathrm{dB}}{10}}
+\end{equation}
+
+** Calculating decibels for root-power quantities
+:PROPERTIES:
+:CUSTOM_ID: calculating-decibels-for-root-power-quantities
+:END:
+
+However, if those values are root-power quantities, a factor of 20 must be used.
+
+\begin{equation}
+\label{eq:root-power-ratio-to-decibels}
+\mathrm{dB} = 20 \log_{10} \left( \frac{a}{b} \right) \\
+\end{equation}
+
+Again, given the decibels, the ratio can also be obtained using 20 as the
+factor.
+
+\begin{equation}
+\label{eq:decibels-to-root-power-ratio}
 \frac{a}{b} = 10^{\frac{\mathrm{dB}}{20}}
 \end{equation}
+
+** Understanding the difference
+:PROPERTIES:
+:CUSTOM_ID: understanding-the-difference
+:END:
+
+To understand why 20 must be used for certain units, we can inspect the
+equivalence between the two formulas for watts (power quantity) and volts
+(root-power quantity). First, it's important to understand that power is
+proportional to the squared voltage, assuming the load is constant.
+
+\begin{align*}
+P = V \times I = V \times \frac{V}{R} = \frac{V^2}{R}
+\end{align*}
+
+This equivalence can be replaced in the formula of decibels for power
+quantities (again, assuming both power quantities are under the same load),
+resulting in the previous formula for root-power quantities.
+
+\begin{align*}
+\mathrm{dB} &= 10 \log_{10} \left( \frac{P_2}{P_1} \right) \\
+            &= 10 \log_{10} \left( \frac{V_2^2/R}{V_1^2/R} \right) \\
+            &= 10 \log_{10} \left( \left( \frac{V_2}{V_1} \right)^2 \right) \\
+            &= 10 \cdot 2 \log_{10} \left( \frac{V_2}{V_1} \right) \\
+            &= 20 \log_{10} \left( \frac{V_2}{V_1} \right)
+\end{align*}
 
 * Example
 :PROPERTIES:

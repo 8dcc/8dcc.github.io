@@ -238,7 +238,13 @@
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
 <li><a href="#introduction">1. Introduction</a></li>
-<li><a href="#calculating-decibels">2. Calculating decibels</a></li>
+<li><a href="#calculating-decibels">2. Calculating decibels</a>
+<ul>
+<li><a href="#calculating-decibels-for-power-quantities">2.1. Calculating decibels for power quantities</a></li>
+<li><a href="#calculating-decibels-for-root-power-quantities">2.2. Calculating decibels for root-power quantities</a></li>
+<li><a href="#understanding-the-difference">2.3. Understanding the difference</a></li>
+</ul>
+</li>
 <li><a href="#example">3. Example</a>
 <ul>
 <li><a href="#calculating-the-input-decibels">3.1. Calculating the input decibels</a></li>
@@ -262,15 +268,23 @@ its different types and how it can be calculated, along with a simple example.
 <p>
 First, it is important to understand that it is a <i>relative</i> unit of measurement,
 meaning that it always expresses the relationship between two
-quantities. Specifically, it measures the ratio of two values on a logarithmic
-scale.
+quantities. Specifically, it measures the ratio of two <i>power</i> values on a
+logarithmic scale. It is designed for power quantities (e.g. watts) and
+root-power quantities (e.g. voltage, current, sound pressure)<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>.
 </p>
 
 <p>
-Although it is often used to express absolute &ldquo;volume&rdquo; or &ldquo;signal level&rdquo;, it&rsquo;s
-actually expresses the ratio between some variable over a constant. Some of
-these constants or &ldquo;reference values&rdquo; are listed here, along with their unit
-suffixes.
+The decibel is an ideal unit for expressing gain or amplification in a circuit,
+since it is able to accurately express the relationship between the input signal
+of the amplifier and the amplified output signal.
+</p>
+
+<p>
+Although it is often used to express absolute &ldquo;audio volume&rdquo; or &ldquo;signal level&rdquo;,
+it always expresses a ratio. When it is used as an absolute value, it usually
+expresses the ratio between some variable and a constant/reference value. Some
+of these constants or &ldquo;reference values&rdquo; are standard, and have their own
+suffixed unit; the most common are listed below.
 </p>
 
 <ul class="org-ul">
@@ -278,9 +292,9 @@ suffixes.
 <li><b>dBm</b>: Measures the relationship between some power in watts and 1 milliwatt.</li>
 <li><b>dBV</b>: Measures the relationship between a RMS voltage and 1 volt.</li>
 <li><b>dBu</b>: Measures the relationship between a RMS voltage and \(\sqrt{0.6}\)
-volts<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>.</li>
+volts<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>.</li>
 <li><b>dBFS</b>: Measures the relationship between the amplitude of a signal and the
-maximum the device can handle before <a href="https://en.wikipedia.org/wiki/Clipping_(signal_processing)">clipping</a> occurs. The <code>FS</code> stands for <i>Full
+maximum the device can handle before <a href="https://en.wikipedia.org/wiki/Clipping_(signal_processing)">clipping</a> occurs. The &ldquo;FS&rdquo; stands for <i>Full
 Scale</i>.</li>
 <li><b>dBSPL</b>: Measures the relationship between a sound pressure and 20 micropascals
 (&mu;Pa). SPL stands for <i>Sound Pressure Level</i>.</li>
@@ -297,13 +311,22 @@ signal amplitude.
 <h2 id="calculating-decibels"><span class="section-number-2">2.</span> Calculating decibels</h2>
 <div class="outline-text-2" id="text-calculating-decibels">
 <p>
-Given two values \(a\) and \(b\), the decibels can be calculated from their ratio
-using the following formula.
+Depending on whether the quantities that are used are directly-proportional to
+power or if they need to be squared, a different formula is used.
+</p>
+</div>
+
+<div id="outline-container-calculating-decibels-for-power-quantities" class="outline-3">
+<h3 id="calculating-decibels-for-power-quantities"><span class="section-number-3">2.1.</span> Calculating decibels for power quantities</h3>
+<div class="outline-text-3" id="text-calculating-decibels-for-power-quantities">
+<p>
+Given two power quantities \(a\) and \(b\), the decibels can be calculated from
+their ratio using the following formula.
 </p>
 
 \begin{equation}
 \label{eq:power-ratio-to-decibels}
-\mathrm{dB} = 20 \log_{10} \left( \frac{a}{b} \right) \\
+\mathrm{dB} = 10 \log_{10} \left( \frac{a}{b} \right) \\
 \end{equation}
 
 <p>
@@ -313,8 +336,63 @@ obtained using a similar formula.
 
 \begin{equation}
 \label{eq:decibels-to-power-ratio}
+\frac{a}{b} = 10^{\frac{\mathrm{dB}}{10}}
+\end{equation}
+</div>
+</div>
+
+<div id="outline-container-calculating-decibels-for-root-power-quantities" class="outline-3">
+<h3 id="calculating-decibels-for-root-power-quantities"><span class="section-number-3">2.2.</span> Calculating decibels for root-power quantities</h3>
+<div class="outline-text-3" id="text-calculating-decibels-for-root-power-quantities">
+<p>
+However, if those values are root-power quantities, a factor of 20 must be used.
+</p>
+
+\begin{equation}
+\label{eq:root-power-ratio-to-decibels}
+\mathrm{dB} = 20 \log_{10} \left( \frac{a}{b} \right) \\
+\end{equation}
+
+<p>
+Again, given the decibels, the ratio can also be obtained using 20 as the
+factor.
+</p>
+
+\begin{equation}
+\label{eq:decibels-to-root-power-ratio}
 \frac{a}{b} = 10^{\frac{\mathrm{dB}}{20}}
 \end{equation}
+</div>
+</div>
+
+<div id="outline-container-understanding-the-difference" class="outline-3">
+<h3 id="understanding-the-difference"><span class="section-number-3">2.3.</span> Understanding the difference</h3>
+<div class="outline-text-3" id="text-understanding-the-difference">
+<p>
+To understand why 20 must be used for certain units, we can inspect the
+equivalence between the two formulas for watts (power quantity) and volts
+(root-power quantity). First, it&rsquo;s important to understand that power is
+proportional to the squared voltage, assuming the load is constant.
+</p>
+
+\begin{align*}
+P = V \times I = V \times \frac{V}{R} = \frac{V^2}{R}
+\end{align*}
+
+<p>
+This equivalence can be replaced in the formula of decibels for power
+quantities (again, assuming both power quantities are under the same load),
+resulting in the previous formula for root-power quantities.
+</p>
+
+\begin{align*}
+\mathrm{dB} &= 10 \log_{10} \left( \frac{P_2}{P_1} \right) \\
+            &= 10 \log_{10} \left( \frac{V_2^2/R}{V_1^2/R} \right) \\
+            &= 10 \log_{10} \left( \left( \frac{V_2}{V_1} \right)^2 \right) \\
+            &= 10 \cdot 2 \log_{10} \left( \frac{V_2}{V_1} \right) \\
+            &= 20 \log_{10} \left( \frac{V_2}{V_1} \right)
+\end{align*}
+</div>
 </div>
 </div>
 
@@ -324,7 +402,7 @@ obtained using a similar formula.
 <p>
 To illustrate this, the following amplifier circuit will be used. An input
 signal of \(V_{in}\) volts is amplified using a specific <a href="https://en.wikipedia.org/wiki/Gain_(electronics)">gain</a> of \(G\) decibels into
-an output signal of \(V_{out}\) volts<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>.
+an output signal of \(V_{out}\) volts<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>.
 </p>
 
 
@@ -499,11 +577,16 @@ logarithmic formula \eqref{eq:power-ratio-to-decibels}.
 <h2 class="footnotes">Footnotes: </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Specifically, it is the RMS voltage that would dissipate 0 dBm (1
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">A <i>power
+quantity</i> is directly proporcional to power, while a <i>root-power quantity</i> is a
+quantity whose square is proportional to power. For example, if an amplifier
+triples its input voltage, it would be multiplying the total power by 9.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Specifically, it is the RMS voltage that would dissipate 0 dBm (1
 mW) in a 600 &Omega; load. This unit was originally called <code>dBv</code>, but was changed
 to <code>dBu</code> to avoid confusion with <code>dBV</code>.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This assumes that the input and output
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This assumes that the input and output
 impedance (\(R_{in}\) and \(R_{out}\)) are equal, which is not always the case.</p></div></div>
 
 
