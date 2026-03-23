@@ -42,7 +42,7 @@ suffixed unit; the most common are listed below.
 
 - *dBW*: Measures the relationship between some power in watts and 1 watt.
 - *dBm*: Measures the relationship between some power in watts and 1 milliwatt.
-- *dBV*: Measures the relationship between a RMS voltage and 1 volt.
+- *dBV*: Measures the relationship between a [[https://en.wikipedia.org/wiki/Root_mean_square_AC_voltage][RMS]] voltage and 1 volt.
 - *dBu*: Measures the relationship between a RMS voltage and $\sqrt{0.6}$
   volts[fn:: Specifically, it is the RMS voltage that would dissipate 0 dBm (1
   mW) in a 600 \Omega load. This unit was originally called =dBv=, but was changed
@@ -136,22 +136,79 @@ resulting in the previous formula for root-power quantities.
 :CUSTOM_ID: example
 :END:
 
-To illustrate this, the following amplifier circuit will be used. An input
-signal of $V_{in}$ volts is amplified using a specific [[https://en.wikipedia.org/wiki/Gain_(electronics)][gain]] of $G$ decibels into
-an output signal of $V_{out}$ volts[fn::This assumes that the input and output
-impedance ($R_{in}$ and $R_{out}$) are equal, which is not always the case.].
+To illustrate this, a simple amplifier circuit will be used. An input signal of
+$V_{in}$ volts RMS is amplified using a specific [[https://en.wikipedia.org/wiki/Gain_(electronics)][gain]] of $G$ decibels into an
+output signal of $V_{out}$ volts[fn::This assumes that the input and output
+impedance ($R_{in}$ and $R_{out}$) are equal, which is not always the
+case.]. For this example, it will be assumed that the input voltage is 2 volts
+RMS, the gain of the amplifier is 5 decibels, and the maximum input voltage
+supported by the device is 6 volts RMS.
 
 #+NAME: fig1
 [[file:../img/understanding-decibels1.svg]]
 
-For this example, it will be assumed that the input voltage is 0.3 volts RMS,
-the gain of the amplifier is 24 decibels, and the maximum input voltage
-supported by the device is 5 volts RMS.
+Note how the gain is expressed in decibels, not in a suffixed unit like "dBV" or
+"dBFS". This is because there is no need for a constant or "reference value",
+the value of the amplifier simply indicates the ratio that it is supposed to
+create between the input and the output voltage after the signal is amplified.
 
-Note how the gain is expressed in decibels, not in "dBV" or "dBFS". This is
-because there is no need for a constant or "reference value", the value of the
-amplifier simply indicates the ratio that it is supposed to create between the
-input and the output voltage after the signal is amplified.
+The following figure plots an example input signal, a sinusoidal wave of 2 volts
+RMS. The peak and the RMS values of the wave are highlighted, along with the
+clip limit of 6 volts.
+
+#+NAME: fig2
+[[file:../img/understanding-decibels2.svg]]
+
+#+begin_comment python
+import numpy as np
+import matplotlib.pyplot as plt
+
+GAIN_DB = 5.0
+RMS_A = 2.0
+CLIP_LIMIT = 6
+PLOT_AMPLIFIED = True
+
+rms_b = RMS_A * 10 ** (GAIN_DB / 20)
+peak_a = RMS_A * np.sqrt(2)
+
+peak_b = rms_b * np.sqrt(2)
+
+t = np.linspace(0, 4 * np.pi, 1000)
+a = peak_a * np.sin(t)
+b = peak_b * np.sin(t)
+
+
+fig, ax = plt.subplots(figsize=(10, 6))
+
+ax.plot(t, a, label="A (original)", color="steelblue")
+ax.axhline(peak_a,  linestyle="--", color="steelblue",  alpha=0.7, label=f"Peak A = {peak_a:.2f}")
+ax.axhline(RMS_A,   linestyle=":",  color="steelblue",  alpha=0.7, label=f"RMS A = {RMS_A:.2f}")
+
+if PLOT_AMPLIFIED:
+    ax.plot(t, b, label=f"B (amplified {GAIN_DB} dB)", color="darkorange")
+    ax.axhline(peak_b,  linestyle="--", color="darkorange", alpha=0.7, label=f"Peak B = {peak_b:.2f}")
+    ax.axhline(rms_b,   linestyle=":",  color="darkorange", alpha=0.7, label=f"RMS B = {rms_b:.2f}")
+
+ax.axhline(CLIP_LIMIT, linestyle=":", color="red", alpha=0.8, label=f"Clip limit = {CLIP_LIMIT:.2f}")
+ax.axhline(0, color="black", linewidth=1)
+
+ax.set_xlabel("Time")
+ax.set_ylabel("Amplitude")
+ax.legend(loc="upper right")
+
+plt.tight_layout()
+plt.savefig(f"understanding-decibels{"3" if PLOT_AMPLIFIED else "2"}.svg", dpi=150)
+#+end_comment
+
+As a reminder, the RMS of alternating current equals the value of direct current
+that would dissipate the same power in a resistive load. With this in mind, the
+peak value of the sinusoidal wave can be easily calculated from the RMS value.
+
+\begin{align*}
+V_{peak} &= V_{RMS} \times \sqrt{2} \\
+         &= 2 \times \sqrt{2} \\
+         &\approx 2.8284
+\end{align*}
 
 ** Calculating the input decibels
 :PROPERTIES:
@@ -160,60 +217,60 @@ input and the output voltage after the signal is amplified.
 
 One common misunderstanding about decibels stems from the fact that the input
 signal is usually not measured in volts, but in "absolute" decibels using a
-constant reference value. In other words, the input is often expressed in dBV or
-dBu, but the amplification is expressed in dB, since it measures two variables.
+constant reference value; in other words, the input is often expressed in dBV or
+dBu. Note, however, that the amplification is expressed in dB, since it measures
+two variables (input and output signals).
 
-Here are the formulas for calculating different decibels suffixes from a
-specific voltage.
+Here are the formulas for converting from voltage to different "suffixed
+decibel" units.
 
-| Suffix | Formula                                                   | Example                                                                                     |
-|--------+-----------------------------------------------------------+---------------------------------------------------------------------------------------------|
-|  <c>   | <l>                                                       | <l>                                                                                         |
-|  *dBV*   | $$20 \log_{10} \left( \frac{V_{in}}{1} \right)$$          | $$20 \log_{10} \left( \frac{0.3}{1} \right) = 20 \log_{10}(0.3) \approx -10.45$$            |
-|  *dBu*   | $$20 \log_{10} \left( \frac{V_{in}}{\sqrt{0.6}} \right)$$ | $$20 \log_{10} \left( \frac{0.3}{0.774} \right) \approx 20 \log_{10}(0.387) \approx -8.23$$ |
-|  *dBFS*  | $$20 \log_{10} \left( \frac{V_{in}}{V_{max}} \right)$$    | $$20 \log_{10} \left( \frac{0.3}{5} \right) = 20 \log_{10}(0.06) \approx -24.43$$           |
+| Suffix | Formula                                                   | Example                                                                                  |
+|--------+-----------------------------------------------------------+------------------------------------------------------------------------------------------|
+|  <c>   | <l>                                                       | <l>                                                                                      |
+|  *dBV*   | $$20 \log_{10} \left( \frac{V_{in}}{1} \right)$$          | $$20 \log_{10} \left( \frac{2}{1} \right) = 20 \log_{10}(2) \approx 6.02$$               |
+|  *dBu*   | $$20 \log_{10} \left( \frac{V_{in}}{\sqrt{0.6}} \right)$$ | $$20 \log_{10} \left( \frac{2}{0.774} \right) \approx 20 \log_{10}(2.581) \approx 8.23$$ |
+|  *dBFS*  | $$20 \log_{10} \left( \frac{V_{in}}{V_{max}} \right)$$    | $$20 \log_{10} \left( \frac{2}{6} \right) \approx 20 \log_{10}(0.333) \approx -9.54$$    |
 
-All of these values express the same input voltage, 0.3 volts RMS, but they are
-expressed relative to different constants. The key detail is that the input
-value can't be expressed in decibels without another reference value, which is
-usually constant.
-
-Also note how the decibels are usually (but not necessarily always) negative,
-since the input voltage is smaller than the reference value. For example, the
-maximum dBFS value of a device should be zero, since:
-
-$$
-\log_{10} \left( \frac{V_{max}}{V_{max}} \right) = 0
-$$
+All of these values express the same quantity, an input voltage of 2 volts RMS,
+but with different units. The key detail is that the input value can't be
+expressed in decibels without another reference value, which is usually constant
+and varies depending on the unit. Also notice how a factor of 20 is used in the
+formulas, since we are dealing with a root-power quantity, volts, and not a
+power quantity like watts.
 
 ** Calculating the output voltage
 :PROPERTIES:
 :CUSTOM_ID: calculating-the-output-voltage
 :END:
 
-The following figure shows the previous circuit diagram, along with the known
-values: the input voltage and the amplifier gain.
-
-#+NAME: fig2
-[[file:../img/understanding-decibels2.svg]]
-
-By filling this know data in the formula from the previous section, the ratio
-between the input and output voltage can be obtained, and therefore the output
-voltage itself.
+Since the input voltage and the gain of the amplifier are known, the output
+voltage can be obtained with the formula from the [[#calculating-decibels-for-root-power-quantities][previous section]]. First, the
+ratio between the input and output voltages is calculated by replacing the
+amplifier gain, 5 dB.
 
 \begin{align*}
 \frac{V_{out}}{V_{in}} &= 10^{\frac{\mathrm{dB}}{20}} \\
-\frac{V_{out}}{0.3} &= 10^{\frac{24}{20}} \\
-\frac{V_{out}}{0.3} &= 10^{1.2} \\
-\frac{V_{out}}{0.3} &\approx 15.84 \\
-V_{out} &\approx 0.3 \times 15.84 \\
-V_{out} &\approx 4.75 \\
+                       &= 10^{\frac{5}{20}} \\
+                       &= 10^{0.25} \\
+                       &\approx 1.778
 \end{align*}
 
-In the previous formula, 15.84 is the final ratio between the input and output
-voltage, which can be applied it to the input to obtain an output value of 4.75
-volts. Notice how the output voltage grows logarithmically; it isn't directly
-multiplied by 24, which would result in 7.2 output volts RMS.
+Then, the input voltage of 2 volts RMS is replaced to obtain the output voltage.
+
+\begin{align*}
+V_{out} &\approx 1.778 \times 2 \\
+        &\approx 3.556 \\
+\end{align*}
+
+Notice how the output voltage grows logarithmically, not linearly; if the input
+of 2 volts RMS was directly multiplied by the gain of 5 dB, the output would
+become 10 volts RMS.
+
+The following figure plots the resulting sinusoidal wave after being amplified
+by a gain of 5 dB. Again, its peak and RMS values are highlighted.
+
+#+NAME: fig3
+[[file:../img/understanding-decibels3.svg]]
 
 ** Calculating the output dBV
 :PROPERTIES:
@@ -225,22 +282,22 @@ the output voltage.
 
 \begin{split}
 \mathrm{dBV} &= 20 \log_{10} \left( \frac{V_{out}}{1} \right) \\
-             &= 20 \log_{10} \left( \frac{4.75}{1} \right) \\
-             &= 20 \log_{10}(4.75) \\
-             &\approx 20 \times 0.67 \\
-             &\approx 13.53
+             &\approx 20 \log_{10} \left( \frac{3.556}{1} \right) \\
+             &\approx 20 \log_{10}(3.556) \\
+             &\approx 20 \times 0.551 \\
+             &\approx 11.02
 \end{split}
 
-Just like with any other value expressed in decibel, this 13.53 expresses a
+Just like with any other value expressed in decibels, this 11.02 expresses a
 ratio between two values, in this case the output voltage and a constant
-reference value of 1 volt, both RMS. This new value, although expressed in
-decibels, is completely independent from the input or the amplification, it
-simply indicates a ratio between a signal level and a constant.
+reference value of 1 volt. This new value, although expressed in decibels, is
+completely independent from the input or the amplification, it simply indicates
+a ratio between a signal level and a constant.
 
 Also note that, by subtracting the input and output dBV, the gain can be
 obtained. This can be done with a simple subtraction because the input and
-output dBV values were calculated using a logarithmic scale, which is also used
-to express the gain of the amplifier. In other words, a value expressed in
-"suffixed" decibels can be added to another value in "plain" decibels to obtain
-a result back in "suffixed" decibels because all decibels use the same
-logarithmic formula \eqref{eq:power-ratio-to-decibels}.
+output dBV values were calculated using the same logarithmic scale, which is
+also used to express the gain of the amplifier. In other words, a value
+expressed in "suffixed" decibels can be added to another value in "plain"
+decibels to obtain a result back in "suffixed" decibels because all decibels use
+the same logarithmic formula \eqref{eq:power-ratio-to-decibels}.
