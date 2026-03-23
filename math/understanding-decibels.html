@@ -401,10 +401,10 @@ resulting in the previous formula for root-power quantities.
 <div class="outline-text-2" id="text-example">
 <p>
 To illustrate this, a simple amplifier circuit will be used. An input signal of
-\(V_{in}\) volts RMS is amplified using a specific <a href="https://en.wikipedia.org/wiki/Gain_(electronics)">gain</a> of \(G\) decibels into an
-output signal of \(V_{out}\) volts<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>. For this example, it will be assumed that the input voltage is 2 volts
-RMS, the gain of the amplifier is 5 decibels, and the maximum input voltage
-supported by the device is 6 volts RMS.
+\(V_{\mathrm{in}}\) volts RMS is amplified using a specific <a href="https://en.wikipedia.org/wiki/Gain_(electronics)">gain</a> of \(G\) decibels
+into an output signal of \(V_{\mathrm{out}}\) volts<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>. For this example, it will be assumed that the
+input voltage is 2 volts RMS, the gain of the amplifier is 5 decibels, and the
+maximum input voltage supported by the device is 6 volts RMS.
 </p>
 
 
@@ -439,9 +439,9 @@ peak value of the sinusoidal wave can be easily calculated from the RMS value.
 </p>
 
 \begin{align*}
-V_{peak} &= V_{RMS} \times \sqrt{2} \\
-         &= 2 \times \sqrt{2} \\
-         &\approx 2.8284
+V_{\mathrm{peak}} &= V_{\mathrm{RMS}} \times \sqrt{2} \\
+                  &= 2 \times \sqrt{2} \\
+                  &\approx 2.8284
 \end{align*}
 </div>
 
@@ -481,19 +481,19 @@ decibel&rdquo; units.
 <tbody>
 <tr>
 <td class="org-center"><b>dBV</b></td>
-<td class="org-left">\[20 \log_{10} \left( \frac{V_{in}}{1} \right)\]</td>
+<td class="org-left">\[20 \log_{10} \left( \frac{V_{\mathrm{in}}}{1} \right)\]</td>
 <td class="org-left">\[20 \log_{10} \left( \frac{2}{1} \right) = 20 \log_{10}(2) \approx 6.02\]</td>
 </tr>
 
 <tr>
 <td class="org-center"><b>dBu</b></td>
-<td class="org-left">\[20 \log_{10} \left( \frac{V_{in}}{\sqrt{0.6}} \right)\]</td>
+<td class="org-left">\[20 \log_{10} \left( \frac{V_{\mathrm{in}}}{\sqrt{0.6}} \right)\]</td>
 <td class="org-left">\[20 \log_{10} \left( \frac{2}{0.774} \right) \approx 20 \log_{10}(2.581) \approx 8.23\]</td>
 </tr>
 
 <tr>
 <td class="org-center"><b>dBFS</b></td>
-<td class="org-left">\[20 \log_{10} \left( \frac{V_{in}}{V_{max}} \right)\]</td>
+<td class="org-left">\[20 \log_{10} \left( \frac{V_{\mathrm{in}}}{V_{\mathrm{max}}} \right)\]</td>
 <td class="org-left">\[20 \log_{10} \left( \frac{2}{6} \right) \approx 20 \log_{10}(0.333) \approx -9.54\]</td>
 </tr>
 </tbody>
@@ -521,10 +521,10 @@ amplifier gain, 5 dB.
 </p>
 
 \begin{align*}
-\frac{V_{out}}{V_{in}} &= 10^{\frac{\mathrm{dB}}{20}} \\
-                       &= 10^{\frac{5}{20}} \\
-                       &= 10^{0.25} \\
-                       &\approx 1.778
+\frac{V_{\mathrm{out}}}{V_{\mathrm{in}}} &= 10^{\frac{\mathrm{dB}}{20}} \\
+                                         &= 10^{\frac{5}{20}} \\
+                                         &= 10^{0.25} \\
+                                         &\approx 1.778
 \end{align*}
 
 <p>
@@ -532,8 +532,8 @@ Then, the input voltage of 2 volts RMS is replaced to obtain the output voltage.
 </p>
 
 \begin{align*}
-V_{out} &\approx 1.778 \times 2 \\
-        &\approx 3.556 \\
+V_{\mathrm{out}} &\approx 1.778 \times 2 \\
+                 &\approx 3.556
 \end{align*}
 
 <p>
@@ -564,7 +564,7 @@ the output voltage.
 </p>
 
 \begin{split}
-\mathrm{dBV} &= 20 \log_{10} \left( \frac{V_{out}}{1} \right) \\
+\mathrm{dBV} &= 20 \log_{10} \left( \frac{V_{\mathrm{out}}}{1} \right) \\
              &\approx 20 \log_{10} \left( \frac{3.556}{1} \right) \\
              &\approx 20 \log_{10}(3.556) \\
              &\approx 20 \times 0.551 \\
@@ -604,9 +604,9 @@ triples its input voltage, it would be multiplying the total power by 9.</p></di
 mW) in a 600 &Omega; load. This unit was originally called <code>dBv</code>, but was changed
 to <code>dBu</code> to avoid confusion with <code>dBV</code>.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This assumes that the input and output
-impedance (\(R_{in}\) and \(R_{out}\)) are equal, which is not always the
-case.</p></div></div>
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">This assumes that the
+input and output impedance (\(R_{\mathrm{in}}\) and \(R_{\mathrm{out}}\)) are equal,
+which is not always the case.</p></div></div>
 
 
 </div>

@@ -137,12 +137,12 @@ resulting in the previous formula for root-power quantities.
 :END:
 
 To illustrate this, a simple amplifier circuit will be used. An input signal of
-$V_{in}$ volts RMS is amplified using a specific [[https://en.wikipedia.org/wiki/Gain_(electronics)][gain]] of $G$ decibels into an
-output signal of $V_{out}$ volts[fn::This assumes that the input and output
-impedance ($R_{in}$ and $R_{out}$) are equal, which is not always the
-case.]. For this example, it will be assumed that the input voltage is 2 volts
-RMS, the gain of the amplifier is 5 decibels, and the maximum input voltage
-supported by the device is 6 volts RMS.
+$V_{\mathrm{in}}$ volts RMS is amplified using a specific [[https://en.wikipedia.org/wiki/Gain_(electronics)][gain]] of $G$ decibels
+into an output signal of $V_{\mathrm{out}}$ volts[fn::This assumes that the
+input and output impedance ($R_{\mathrm{in}}$ and $R_{\mathrm{out}}$) are equal,
+which is not always the case.]. For this example, it will be assumed that the
+input voltage is 2 volts RMS, the gain of the amplifier is 5 decibels, and the
+maximum input voltage supported by the device is 6 volts RMS.
 
 #+NAME: fig1
 [[file:../img/understanding-decibels1.svg]]
@@ -205,9 +205,9 @@ that would dissipate the same power in a resistive load. With this in mind, the
 peak value of the sinusoidal wave can be easily calculated from the RMS value.
 
 \begin{align*}
-V_{peak} &= V_{RMS} \times \sqrt{2} \\
-         &= 2 \times \sqrt{2} \\
-         &\approx 2.8284
+V_{\mathrm{peak}} &= V_{\mathrm{RMS}} \times \sqrt{2} \\
+                  &= 2 \times \sqrt{2} \\
+                  &\approx 2.8284
 \end{align*}
 
 ** Calculating the input decibels
@@ -224,12 +224,12 @@ two variables (input and output signals).
 Here are the formulas for converting from voltage to different "suffixed
 decibel" units.
 
-| Suffix | Formula                                                   | Example                                                                                  |
-|--------+-----------------------------------------------------------+------------------------------------------------------------------------------------------|
-|  <c>   | <l>                                                       | <l>                                                                                      |
-|  *dBV*   | $$20 \log_{10} \left( \frac{V_{in}}{1} \right)$$          | $$20 \log_{10} \left( \frac{2}{1} \right) = 20 \log_{10}(2) \approx 6.02$$               |
-|  *dBu*   | $$20 \log_{10} \left( \frac{V_{in}}{\sqrt{0.6}} \right)$$ | $$20 \log_{10} \left( \frac{2}{0.774} \right) \approx 20 \log_{10}(2.581) \approx 8.23$$ |
-|  *dBFS*  | $$20 \log_{10} \left( \frac{V_{in}}{V_{max}} \right)$$    | $$20 \log_{10} \left( \frac{2}{6} \right) \approx 20 \log_{10}(0.333) \approx -9.54$$    |
+| Suffix | Formula                                                                  | Example                                                                                  |
+|--------+--------------------------------------------------------------------------+------------------------------------------------------------------------------------------|
+|  <c>   | <l>                                                                      | <l>                                                                                      |
+|  *dBV*   | $$20 \log_{10} \left( \frac{V_{\mathrm{in}}}{1} \right)$$                | $$20 \log_{10} \left( \frac{2}{1} \right) = 20 \log_{10}(2) \approx 6.02$$               |
+|  *dBu*   | $$20 \log_{10} \left( \frac{V_{\mathrm{in}}}{\sqrt{0.6}} \right)$$       | $$20 \log_{10} \left( \frac{2}{0.774} \right) \approx 20 \log_{10}(2.581) \approx 8.23$$ |
+|  *dBFS*  | $$20 \log_{10} \left( \frac{V_{\mathrm{in}}}{V_{\mathrm{max}}} \right)$$ | $$20 \log_{10} \left( \frac{2}{6} \right) \approx 20 \log_{10}(0.333) \approx -9.54$$    |
 
 All of these values express the same quantity, an input voltage of 2 volts RMS,
 but with different units. The key detail is that the input value can't be
@@ -249,17 +249,17 @@ ratio between the input and output voltages is calculated by replacing the
 amplifier gain, 5 dB.
 
 \begin{align*}
-\frac{V_{out}}{V_{in}} &= 10^{\frac{\mathrm{dB}}{20}} \\
-                       &= 10^{\frac{5}{20}} \\
-                       &= 10^{0.25} \\
-                       &\approx 1.778
+\frac{V_{\mathrm{out}}}{V_{\mathrm{in}}} &= 10^{\frac{\mathrm{dB}}{20}} \\
+                                         &= 10^{\frac{5}{20}} \\
+                                         &= 10^{0.25} \\
+                                         &\approx 1.778
 \end{align*}
 
 Then, the input voltage of 2 volts RMS is replaced to obtain the output voltage.
 
 \begin{align*}
-V_{out} &\approx 1.778 \times 2 \\
-        &\approx 3.556 \\
+V_{\mathrm{out}} &\approx 1.778 \times 2 \\
+                 &\approx 3.556
 \end{align*}
 
 Notice how the output voltage grows logarithmically, not linearly; if the input
@@ -281,7 +281,7 @@ Similarly to how the input voltage was converted to dBV, the same can be done to
 the output voltage.
 
 \begin{split}
-\mathrm{dBV} &= 20 \log_{10} \left( \frac{V_{out}}{1} \right) \\
+\mathrm{dBV} &= 20 \log_{10} \left( \frac{V_{\mathrm{out}}}{1} \right) \\
              &\approx 20 \log_{10} \left( \frac{3.556}{1} \right) \\
              &\approx 20 \log_{10}(3.556) \\
              &\approx 20 \times 0.551 \\
