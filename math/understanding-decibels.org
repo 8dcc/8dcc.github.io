@@ -142,7 +142,7 @@ into an output signal of $V_{\mathrm{out}}$ volts[fn::This assumes that the
 input and output impedance ($R_{\mathrm{in}}$ and $R_{\mathrm{out}}$) are equal,
 which is not always the case.]. For this example, it will be assumed that the
 input voltage is 2 volts RMS, the gain of the amplifier is 5 decibels, and the
-maximum input voltage supported by the device is 6 volts RMS.
+maximum input voltage supported by the device is 4.5 volts RMS.
 
 #+NAME: fig1
 [[file:../img/understanding-decibels1.svg]]
@@ -154,19 +154,19 @@ create between the input and the output voltage after the signal is amplified.
 
 The following figure plots an example input signal, a sinusoidal wave of 2 volts
 RMS. The peak and the RMS values of the wave are highlighted, along with the
-clip limit of 6 volts.
+clip limit of 4.5 volts.
 
 #+NAME: fig2
 [[file:../img/understanding-decibels2.svg]]
 
-#+begin_comment python
+#+begin_comment python :results none
 import numpy as np
 import matplotlib.pyplot as plt
 
 GAIN_DB = 5.0
 RMS_A = 2.0
-CLIP_LIMIT = 6
-PLOT_AMPLIFIED = True
+CLIP_LIMIT = 4.5
+PLOT_AMPLIFIED = False
 
 rms_b = RMS_A * 10 ** (GAIN_DB / 20)
 peak_a = RMS_A * np.sqrt(2)
@@ -197,7 +197,7 @@ ax.set_ylabel("Amplitude")
 ax.legend(loc="upper right")
 
 plt.tight_layout()
-plt.savefig(f"understanding-decibels{"3" if PLOT_AMPLIFIED else "2"}.svg", dpi=150)
+plt.savefig(f"../img/understanding-decibels{"3" if PLOT_AMPLIFIED else "2"}.svg", dpi=150)
 #+end_comment
 
 As a reminder, the RMS of alternating current equals the value of direct current
@@ -229,7 +229,7 @@ decibel" units.
 |  <c>   | <l>                                                                      | <l>                                                                                      |
 |  *dBV*   | $$20 \log_{10} \left( \frac{V_{\mathrm{in}}}{1} \right)$$                | $$20 \log_{10} \left( \frac{2}{1} \right) = 20 \log_{10}(2) \approx 6.02$$               |
 |  *dBu*   | $$20 \log_{10} \left( \frac{V_{\mathrm{in}}}{\sqrt{0.6}} \right)$$       | $$20 \log_{10} \left( \frac{2}{0.774} \right) \approx 20 \log_{10}(2.581) \approx 8.23$$ |
-|  *dBFS*  | $$20 \log_{10} \left( \frac{V_{\mathrm{in}}}{V_{\mathrm{max}}} \right)$$ | $$20 \log_{10} \left( \frac{2}{6} \right) \approx 20 \log_{10}(0.333) \approx -9.54$$    |
+|  *dBFS*  | $$20 \log_{10} \left( \frac{V_{\mathrm{in}}}{V_{\mathrm{max}}} \right)$$ | $$20 \log_{10} \left( \frac{2}{4.5} \right) \approx 20 \log_{10}(0.444) \approx -7.04$$  |
 
 All of these values express the same quantity, an input voltage of 2 volts RMS,
 but with different units. The key detail is that the input value can't be
@@ -271,6 +271,10 @@ by a gain of 5 dB. Again, its peak and RMS values are highlighted.
 
 #+NAME: fig3
 [[file:../img/understanding-decibels3.svg]]
+
+From the plot, we can also observe that the RMS value of the output is below the
+clip limiter, while the peaks are above it and would not be processed by the
+device.
 
 ** Calculating the output dBV
 :PROPERTIES:

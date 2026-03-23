@@ -404,7 +404,7 @@ To illustrate this, a simple amplifier circuit will be used. An input signal of
 \(V_{\mathrm{in}}\) volts RMS is amplified using a specific <a href="https://en.wikipedia.org/wiki/Gain_(electronics)">gain</a> of \(G\) decibels
 into an output signal of \(V_{\mathrm{out}}\) volts<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup>. For this example, it will be assumed that the
 input voltage is 2 volts RMS, the gain of the amplifier is 5 decibels, and the
-maximum input voltage supported by the device is 6 volts RMS.
+maximum input voltage supported by the device is 4.5 volts RMS.
 </p>
 
 
@@ -423,7 +423,7 @@ create between the input and the output voltage after the signal is amplified.
 <p>
 The following figure plots an example input signal, a sinusoidal wave of 2 volts
 RMS. The peak and the RMS values of the wave are highlighted, along with the
-clip limit of 6 volts.
+clip limit of 4.5 volts.
 </p>
 
 
@@ -494,7 +494,7 @@ decibel&rdquo; units.
 <tr>
 <td class="org-center"><b>dBFS</b></td>
 <td class="org-left">\[20 \log_{10} \left( \frac{V_{\mathrm{in}}}{V_{\mathrm{max}}} \right)\]</td>
-<td class="org-left">\[20 \log_{10} \left( \frac{2}{6} \right) \approx 20 \log_{10}(0.333) \approx -9.54\]</td>
+<td class="org-left">\[20 \log_{10} \left( \frac{2}{4.5} \right) \approx 20 \log_{10}(0.444) \approx -7.04\]</td>
 </tr>
 </tbody>
 </table>
@@ -552,6 +552,12 @@ by a gain of 5 dB. Again, its peak and RMS values are highlighted.
 <p><img src="../img/understanding-decibels3.svg" alt="understanding-decibels3.svg" class="org-svg" />
 </p>
 </div>
+
+<p>
+From the plot, we can also observe that the RMS value of the output is below the
+clip limiter, while the peaks are above it and would not be processed by the
+device.
+</p>
 </div>
 </div>
 
