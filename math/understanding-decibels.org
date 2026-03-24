@@ -19,7 +19,8 @@ For more information on how to export this file to PDF, see the comment in
 
 The decibel is a unit that is mostly used for audio and signals, but it is often
 misunderstood. This article will attempt to explain precisely what it measures,
-its different types and how it can be calculated, along with a simple example.
+the different unit types and how they can be calculated, along with a simple
+example.
 
 First, it is important to understand that it is a /relative/ unit of measurement,
 meaning that it always expresses the relationship between two
@@ -32,13 +33,13 @@ triples its input voltage, it would be multiplying the total power by 9.].
 
 The decibel is an ideal unit for expressing gain or amplification in a circuit,
 since it is able to accurately express the relationship between the input signal
-of the amplifier and the amplified output signal.
+of the amplifier and the resulting output signal.
 
 Although it is often used to express absolute "audio volume" or "signal level",
 it always expresses a ratio. When it is used as an absolute value, it usually
 expresses the ratio between some variable and a constant/reference value. Some
 of these constants or "reference values" are standard, and have their own
-suffixed unit; the most common are listed below.
+suffixed unit; the most common are listed below for reference.
 
 - *dBW*: Measures the relationship between some power in watts and 1 watt.
 - *dBm*: Measures the relationship between some power in watts and 1 milliwatt.
@@ -53,8 +54,8 @@ suffixed unit; the most common are listed below.
 - *dBSPL*: Measures the relationship between a sound pressure and 20 micropascals
   (\mu{}Pa). SPL stands for /Sound Pressure Level/.
 
-Some of these units will be used below, specially those related to voltage and
-signal amplitude.
+Some of these units will be mentioned below, specially those related to voltage
+and signal amplitude.
 
 * Calculating decibels
 :PROPERTIES:
