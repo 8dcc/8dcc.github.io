@@ -1,0 +1,135 @@
+#+TITLE: Understanding latches and flip-flops
+#+AUTHOR: 8dcc
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+#+HTML_HEAD: <script type="text/javascript" src="../js/logic-diagram.js"></script>
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+This article covers latches and flip-flops, two kinds of bistable circuits used
+in electronics.
+
+Bistable circuits are those which can remain indefinitely stable in one of two
+possible states. This can be extremely useful, as it allows the circuit to store
+or "remember" a bit of memory (i.e., a digital signal which is high or low, 1 or
+0). This is usually accomplished through retroalimentation; some outputs are fed
+back into the circuit, self-reinforcing the current state indefinitely.
+
+Note that all diagrams are interactive, and are rendered and simulated in the
+browser through [[https://github.com/8dcc/logic-diagram.js][a custom JavaScript library]]; the inputs can be toggled, and the
+state of the circuit will change accordingly.
+
+* SR Latch
+:PROPERTIES:
+:CUSTOM_ID: sr-latch
+:END:
+
+The SR latch is the most basic form of latch, and it is used to built the rest
+of the latches and flip-flops.
+
+It has two inputs, /S/ and /R/, which stand for "Set"
+and "Reset". When both inputs are low, the circuit outputs its stored value
+through /Q/. When input /S/ becomes high, the circuit stores a high signal;
+similarly, when input /R/ becomes high, the circuit stores a low signal. The /~Q/
+output stores the inverted value of /Q/. Both inputs are not supposed to be high;
+that is considered an invalid input, since both /Q/ and /~Q/ would become low.
+
+The circuit is composed of two NOR gates, and the output of each one is fed back
+into the other. This is what causes the stabilization, if both inputs are low,
+when one of the NOR gates outputs a low signal, it is fed into the other gate,
+producing a high signal which is then fed back into the other, keeping that
+original signal low indefinitely.
+
+#+begin_export html
+<script type="text/logicdiag">
+    input R
+    input S
+
+    stage 1
+    nor nor_A  R nor_B
+    nor nor_B  nor_A S
+
+    output nor_A "Q"
+    output nor_B "~Q"
+</script>
+#+end_export
+
+An alternative version of this latch will be shown below. It uses NAND gates
+instead of NOR gates, which can be desirable in some scenarios. It uses the same
+retroalimentation principle, but the circuit reacts to low inputs instead of
+high ones; both /S/ and /R/ are high by default, and a low signal is used to set or
+reset the stored value.
+
+* Gated SR Latch
+:PROPERTIES:
+:CUSTOM_ID: gated-sr-latch
+:END:
+
+The gated SR latch is simply a regular SR latch with an extra input /E/, which
+controls, through two new AND gates, whether inputs /S/ and /R/ are enabled or
+disabled. If the /E/ signal is low, the SR latch doesn't receive any updates from
+the other inputs, holding its "stored" value.
+
+#+begin_export html
+<script type="text/logicdiag">
+    input R
+    row 0.5
+    input E
+    row 1
+    input S
+
+    stage 1
+    and and_A R E
+    and and_B E S
+
+    # SR Latch rectangle
+    label "SR Latch" 1.9 -0.6
+    rect 1.3 -0.5 2.6 1.5
+
+    # SR Latch
+    stage 2
+    nor nor_A  and_A nor_B
+    nor nor_B  nor_A and_B
+
+    output nor_A "Q"
+    output nor_B "~Q"
+</script>
+#+end_export
+
+An alternative version of the gated SR latch can be built with only 4 NAND
+gates. This is convenient in most applications, since NAND gates are cheaper to
+fabricate on chips than NOR gates.
+
+In the following diagram, notice how input /S/ is on top, aligned with output /Q/,
+and input /R/ is at the bottom, aligned with /~Q/. This is because the entire logic
+of the circuit is "inverted"; the two AND gates from the previous circuit are
+negated into NAND gates, producing a low signal when both inputs are high. The
+NOR gates are just replaced to compensate for this change.
+
+#+begin_export html
+<script type="text/logicdiag">
+    input S
+    row 0.5
+    input E
+    row 1
+    input R
+
+    stage 1
+    nand nand_A S E
+    nand nand_B E R
+
+    stage 2
+    nand nand_C  nand_A nand_D
+    nand nand_D  nand_C nand_B
+
+    output nand_C "Q"
+    output nand_D "~Q"
+</script>
+#+end_export
+
