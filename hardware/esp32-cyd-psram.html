@@ -205,20 +205,20 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org39456ae">1. Introduction</a></li>
-<li><a href="#org1a63e58">2. Understanding the CYD board</a>
+<li><a href="#introduction">1. Introduction</a></li>
+<li><a href="#understanding-the-cyd-board">2. Understanding the CYD board</a>
 <ul>
-<li><a href="#orgac7a239">2.1. The SPI buses</a></li>
-<li><a href="#org279bf71">2.2. Choosing the right PSRAM chip</a></li>
+<li><a href="#the-spi-buses">2.1. The SPI buses</a></li>
+<li><a href="#choosing-the-right-psram-chip">2.2. Choosing the right PSRAM chip</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org39456ae" class="outline-2">
-<h2 id="org39456ae"><span class="section-number-2">1.</span> Introduction</h2>
-<div class="outline-text-2" id="text-1">
+<div id="outline-container-introduction" class="outline-2">
+<h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-introduction">
 <p>
 Some weeks ago, I started working on <a href="https://github.com/8dcc/esp32-cyd-obd2">a project</a> that involves an <a href="https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display">ESP32 Cheap
 Yellow Display</a> (CYD) board. In total, this board has 520KiB of RAM<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>, which is a reasonable amount for
@@ -319,9 +319,9 @@ Note that the memory from the PSRAM chip is not suitable for DMA operations.
 </div>
 </div>
 
-<div id="outline-container-org1a63e58" class="outline-2">
-<h2 id="org1a63e58"><span class="section-number-2">2.</span> Understanding the CYD board</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-understanding-the-cyd-board" class="outline-2">
+<h2 id="understanding-the-cyd-board"><span class="section-number-2">2.</span> Understanding the CYD board</h2>
+<div class="outline-text-2" id="text-understanding-the-cyd-board">
 <p>
 In most CYD boards, there is a <a href="https://en.wikipedia.org/wiki/Small_outline_integrated_circuit">SOIC-8 footprint</a> labeled as U4. This footprint is
 meant for an SPI flash chip<sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>, and the default hardware
@@ -336,9 +336,9 @@ mistakes.
 </p>
 </div>
 
-<div id="outline-container-orgac7a239" class="outline-3">
-<h3 id="orgac7a239"><span class="section-number-3">2.1.</span> The SPI buses</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-the-spi-buses" class="outline-3">
+<h3 id="the-spi-buses"><span class="section-number-3">2.1.</span> The SPI buses</h3>
+<div class="outline-text-3" id="text-the-spi-buses">
 <p>
 These boards usually come with an ESP32-WROOM module. From <a href="https://documentation.espressif.com/esp32-wroom-32_datasheet_en.html">its datasheet</a>, we can
 obtain most relevant information about the SPI buses, their purpose, and their
@@ -442,7 +442,7 @@ the main components of the CYD board are connected.
 </p>
 
 
-<div id="orgc429ac8" class="figure">
+<div id="org20ef046" class="figure">
 <p><img src="../img/esp32-cyd-psram1.svg" alt="esp32-cyd-psram1.svg" class="org-svg" />
 </p>
 </div>
@@ -466,9 +466,9 @@ used without affecting <code>SPI0</code>.
 </div>
 </div>
 
-<div id="outline-container-org279bf71" class="outline-3">
-<h3 id="org279bf71"><span class="section-number-3">2.2.</span> Choosing the right PSRAM chip</h3>
-<div class="outline-text-3" id="text-2-2">
+<div id="outline-container-choosing-the-right-psram-chip" class="outline-3">
+<h3 id="choosing-the-right-psram-chip"><span class="section-number-3">2.2.</span> Choosing the right PSRAM chip</h3>
+<div class="outline-text-3" id="text-choosing-the-right-psram-chip">
 <p>
 Generally, when trying to install external RAM in the ESP32, the logical
 decision is to trust <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/external-ram.html">the official ESP-IDF documentation</a>, which states:
@@ -488,7 +488,7 @@ through <code>idf.py menuconfig</code>, also shows other supported models.
 </p>
 
 
-<div id="org319f0b8" class="figure">
+<div id="orgabc12c5" class="figure">
 <p><img src="../img/esp32-cyd-psram2.png" alt="esp32-cyd-psram2.png" />
 </p>
 </div>

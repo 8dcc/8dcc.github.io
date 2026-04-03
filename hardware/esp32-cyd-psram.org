@@ -7,6 +7,9 @@
 #+HTML_LINK_HOME: ../index.html
 
 * Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
 
 Some weeks ago, I started working on [[https://github.com/8dcc/esp32-cyd-obd2][a project]] that involves an [[https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display][ESP32 Cheap
 Yellow Display]] (CYD) board. In total, this board has 520KiB of RAM[fn::The
@@ -55,6 +58,9 @@ TODO: Explain why this is important (e.g. accessing other SPI components, etc.).
 #+end_comment
 
 * Understanding the CYD board
+:PROPERTIES:
+:CUSTOM_ID: understanding-the-cyd-board
+:END:
 
 In most CYD boards, there is a [[https://en.wikipedia.org/wiki/Small_outline_integrated_circuit][SOIC-8 footprint]] labeled as U4. This footprint is
 meant for an SPI flash chip[fn::For example, a W25Q32 or W25Q32JV. Personally, I
@@ -69,6 +75,9 @@ attempts, I was not aware of some of this information, and led me to some
 mistakes.
 
 ** The SPI buses
+:PROPERTIES:
+:CUSTOM_ID: the-spi-buses
+:END:
 
 These boards usually come with an ESP32-WROOM module. From [[https://documentation.espressif.com/esp32-wroom-32_datasheet_en.html][its datasheet]], we can
 obtain most relevant information about the SPI buses, their purpose, and their
@@ -116,6 +125,9 @@ this: rerouting the necessary hardware pins so that the =SPI1= controller can be
 used without affecting =SPI0=.
 
 ** Choosing the right PSRAM chip
+:PROPERTIES:
+:CUSTOM_ID: choosing-the-right-psram-chip
+:END:
 
 Generally, when trying to install external RAM in the ESP32, the logical
 decision is to trust [[https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/external-ram.html][the official ESP-IDF documentation]], which states:
