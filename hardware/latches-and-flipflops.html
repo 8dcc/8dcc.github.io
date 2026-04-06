@@ -207,8 +207,13 @@
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
 <li><a href="#introduction">1. Introduction</a></li>
-<li><a href="#sr-latch">2. SR Latch</a></li>
-<li><a href="#gated-sr-latch">3. Gated SR Latch</a></li>
+<li><a href="#latches">2. Latches</a>
+<ul>
+<li><a href="#sr-latch">2.1. SR Latch</a></li>
+<li><a href="#gated-sr-latch">2.2. Gated SR Latch</a></li>
+<li><a href="#d-latch">2.3. D Latch</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -237,12 +242,22 @@ state of the circuit will change accordingly.
 </div>
 </div>
 
-<div id="outline-container-sr-latch" class="outline-2">
-<h2 id="sr-latch"><span class="section-number-2">2.</span> SR Latch</h2>
-<div class="outline-text-2" id="text-sr-latch">
+<div id="outline-container-latches" class="outline-2">
+<h2 id="latches"><span class="section-number-2">2.</span> Latches</h2>
+<div class="outline-text-2" id="text-latches">
+<p>
+A <i>latch</i> is a bistable circuit that is <i>level-sensitive</i>, meaning that a signal
+must remain high for the &ldquo;stored bit&rdquo; of the circuit to change. Below are some
+of the most popular latch circuits, from simplest to most complex.
+</p>
+</div>
+
+<div id="outline-container-sr-latch" class="outline-3">
+<h3 id="sr-latch"><span class="section-number-3">2.1.</span> SR Latch</h3>
+<div class="outline-text-3" id="text-sr-latch">
 <p>
 The SR latch is the most basic form of latch, and it is used to built the rest
-of the latches and flip-flops.
+of the latches and flip-flops in this article.
 </p>
 
 <p>
@@ -284,9 +299,9 @@ reset the stored value.
 </div>
 </div>
 
-<div id="outline-container-gated-sr-latch" class="outline-2">
-<h2 id="gated-sr-latch"><span class="section-number-2">3.</span> Gated SR Latch</h2>
-<div class="outline-text-2" id="text-gated-sr-latch">
+<div id="outline-container-gated-sr-latch" class="outline-3">
+<h3 id="gated-sr-latch"><span class="section-number-3">2.2.</span> Gated SR Latch</h3>
+<div class="outline-text-3" id="text-gated-sr-latch">
 <p>
 The gated SR latch is simply a regular SR latch with an extra input <i>E</i>, which
 controls, through two new AND gates, whether inputs <i>S</i> and <i>R</i> are enabled or
@@ -350,6 +365,51 @@ NOR gates are just replaced to compensate for this change.
     output nand_C "Q"
     output nand_D "~Q"
 </script>
+</div>
+</div>
+
+<div id="outline-container-d-latch" class="outline-3">
+<h3 id="d-latch"><span class="section-number-3">2.3.</span> D Latch</h3>
+<div class="outline-text-3" id="text-d-latch">
+<p>
+The D latch is similar to the gated SR latch, but inputs <i>S</i> and <i>R</i> are replaced
+with a data input <i>D</i>. Whenever the <i>E</i> signal is high, the <i>D</i> signal will be stored
+directly as the &ldquo;stored bit&rdquo; of the circuit.
+</p>
+
+<p>
+This is accomplished by negating the <i>D</i> signal and using it as the old &ldquo;reset&rdquo;
+input, while simultaneously keeping <i>D</i> as the old &ldquo;set&rdquo; signal. Therefore, if <i>D</i>
+is high, then the old <i>S</i> remains high but the old <i>R</i> is negated to low, and
+viceversa.
+</p>
+
+<script type="text/logicdiag">
+    input D
+    input E
+
+    stage 1
+    not not_A D
+    wire wire_E E 1 0.5
+    wire wire_D D 1 1
+
+    # Gated SR Latch rectangle
+    label "Gated SR Latch" 2.4 -0.6
+    rect 1.3 -0.5 3.6 1.5
+
+    # Gated SR Latch
+    stage 2
+    and and_A not_A wire_E
+    and and_B wire_E wire_D
+
+    stage 3
+    nor nor_A and_A nor_B
+    nor nor_B nor_A and_B
+
+    output nor_A "Q"
+    output nor_B "~Q"
+</script>
+</div>
 </div>
 </div>
 </div>

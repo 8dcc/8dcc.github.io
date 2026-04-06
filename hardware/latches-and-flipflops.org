@@ -25,13 +25,22 @@ Note that all diagrams are interactive, and are rendered and simulated in the
 browser through [[https://github.com/8dcc/logic-diagram.js][a custom JavaScript library]]; the inputs can be toggled, and the
 state of the circuit will change accordingly.
 
-* SR Latch
+* Latches
+:PROPERTIES:
+:CUSTOM_ID: latches
+:END:
+
+A /latch/ is a bistable circuit that is /level-sensitive/, meaning that a signal
+must remain high for the "stored bit" of the circuit to change. Below are some
+of the most popular latch circuits, from simplest to most complex.
+
+** SR Latch
 :PROPERTIES:
 :CUSTOM_ID: sr-latch
 :END:
 
 The SR latch is the most basic form of latch, and it is used to built the rest
-of the latches and flip-flops.
+of the latches and flip-flops in this article.
 
 It has two inputs, /S/ and /R/, which stand for "Set"
 and "Reset". When both inputs are low, the circuit outputs its stored value
@@ -66,7 +75,7 @@ retroalimentation principle, but the circuit reacts to low inputs instead of
 high ones; both /S/ and /R/ are high by default, and a low signal is used to set or
 reset the stored value.
 
-* Gated SR Latch
+** Gated SR Latch
 :PROPERTIES:
 :CUSTOM_ID: gated-sr-latch
 :END:
@@ -133,3 +142,44 @@ NOR gates are just replaced to compensate for this change.
 </script>
 #+end_export
 
+** D Latch
+:PROPERTIES:
+:CUSTOM_ID: d-latch
+:END:
+
+The D latch is similar to the gated SR latch, but inputs /S/ and /R/ are replaced
+with a data input /D/. Whenever the /E/ signal is high, the /D/ signal will be stored
+directly as the "stored bit" of the circuit.
+
+This is accomplished by negating the /D/ signal and using it as the old "reset"
+input, while simultaneously keeping /D/ as the old "set" signal. Therefore, if /D/
+is high, then the old /S/ remains high but the old /R/ is negated to low, and
+viceversa.
+
+#+begin_export html
+<script type="text/logicdiag">
+    input D
+    input E
+
+    stage 1
+    not not_A D
+    wire wire_E E 1 0.5
+    wire wire_D D 1 1
+
+    # Gated SR Latch rectangle
+    label "Gated SR Latch" 2.4 -0.6
+    rect 1.3 -0.5 3.6 1.5
+
+    # Gated SR Latch
+    stage 2
+    and and_A not_A wire_E
+    and and_B wire_E wire_D
+
+    stage 3
+    nor nor_A and_A nor_B
+    nor nor_B nor_A and_B
+
+    output nor_A "Q"
+    output nor_B "~Q"
+</script>
+#+end_export
