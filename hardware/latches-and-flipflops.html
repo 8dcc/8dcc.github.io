@@ -214,6 +214,12 @@
 <li><a href="#d-latch">2.3. D Latch</a></li>
 </ul>
 </li>
+<li><a href="#flip-flops">3. Flip-flops</a>
+<ul>
+<li><a href="#d-flip-flop">3.1. D Flip-Flop</a></li>
+</ul>
+</li>
+<li><a href="#comparison">4. Comparison</a></li>
 </ul>
 </div>
 </div>
@@ -410,6 +416,131 @@ viceversa.
     output nor_B "~Q"
 </script>
 </div>
+</div>
+</div>
+
+<div id="outline-container-flip-flops" class="outline-2">
+<h2 id="flip-flops"><span class="section-number-2">3.</span> Flip-flops</h2>
+<div class="outline-text-2" id="text-flip-flops">
+<p>
+A <i>flip-flop</i> is a bistable circuit that is <i>edge-sensitive</i>, meaning that the
+&ldquo;stored bit&rdquo; of the circuit is updated whenever a clock signal changes from low
+to high. Unlike latches, the data signal is not read during a period of time
+(i.e., when the <i>enable</i> signal is high), but at the exact moment when the clock
+signal becomes high; if the data signal changes with the clock already high,
+those changes are ignored.
+</p>
+
+<p>
+This section only covers one of the most popular flip-flop circuits, the D
+flip-flop. Note that there are other useful flip-flop circuits like the <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#JK_flip-flop">JK
+flip-flop</a>.
+</p>
+</div>
+
+<div id="outline-container-d-flip-flop" class="outline-3">
+<h3 id="d-flip-flop"><span class="section-number-3">3.1.</span> D Flip-Flop</h3>
+<div class="outline-text-3" id="text-d-flip-flop">
+<p>
+The D flip-flop is built with two D latches connected in series, one acting as
+&ldquo;master&rdquo; and one acting as &ldquo;slave&rdquo;. They are both connected to the same clock
+signal, but the master latch receives it inverted.
+</p>
+
+<script type="text/logicdiag">
+    input D
+    input CLK
+
+    stage 1
+    row 1
+    not not_CLK CLK
+    wire wire_CLK CLK 0.75 2
+
+    # D Latch 1 rectangle
+    label "Master D Latch" 2.9 -0.6
+    rect 1.3 -0.5 4.65 1.5
+
+    # D Latch 1
+    stage 2
+    not not_L1_D D
+    wire wire_L1_E not_CLK 2 0.5
+    wire wire_L1_D D 2 1
+
+    stage 3
+    and and_L1_A not_L1_D  wire_L1_E
+    and and_L1_B wire_L1_E wire_L1_D
+
+    stage 4
+    nor nor_L1_A and_L1_A nor_L1_B
+    nor nor_L1_B nor_L1_A and_L1_B
+    output nor_L1_B ~Q1
+
+    stage 5
+    wire wire_dst_CLK wire_CLK 5.25 0.5
+
+    # D Latch 2 rectangle
+    label "Slave D Latch" 6.9 -0.6
+    rect 5.3 -0.5 8.6 1.5
+
+    # D Latch 2
+    stage 6
+    not not_L2_D nor_L1_A
+    wire wire_L2_E wire_dst_CLK 6 0.5
+    wire wire_L2_D nor_L1_A 6 1
+
+    stage 7
+    and and_L2_A not_L2_D  wire_L2_E
+    and and_L2_B wire_L2_E wire_L2_D
+
+    stage 8
+    nor nor_L2_A and_L2_A nor_L2_B
+    nor nor_L2_B nor_L2_A and_L2_B
+    output nor_L2_A Q
+    output nor_L2_B ~Q
+</script>
+
+<p>
+This design allows the D flip-flop to only update the stored value at the exact
+moment when the <i>CLK</i> signal changes from low to high. The overall behavior of the
+circuit is:
+</p>
+
+<ol class="org-ol">
+<li>Clock is low. Master stores values of <i>D</i>, but slave holds.</li>
+<li>Clock becomes high. Master holds, and slave starts storing value from master,
+which won&rsquo;t change while the clock is high.</li>
+<li>Clock becomes low. Master stores values of <i>D</i>, but slave starts holding the
+value it received while the clock was high.</li>
+</ol>
+
+<p>
+This results in the desired edge-sensitive behavior.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-comparison" class="outline-2">
+<h2 id="comparison"><span class="section-number-2">4.</span> Comparison</h2>
+<div class="outline-text-2" id="text-comparison">
+<p>
+As mentioned above, latches are level-sensitive while flip-flops are
+edge-triggered. This difference is easier to understand with a timing diagram
+which shows how the signals update over time. The following figure compares the
+behaviors of a D latch and a D flip-flop under the same inputs. Gray areas are
+used to highlight the intervals when the clock or enable signal is high.
+</p>
+
+
+<div id="fig1" class="figure">
+<p><img src="../img/latches-and-flipflops1.svg" alt="latches-and-flipflops1.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+Notice how the D flip flop only updates its value at the exact moment when the
+<i>CLK</i> changes from low to high, and how the D latch updates whenever <i>E</i> is high.
+</p>
 </div>
 </div>
 </div>
