@@ -15,15 +15,15 @@
 This article covers latches and flip-flops, two kinds of bistable circuits used
 in electronics.
 
-Bistable circuits are those which can remain indefinitely stable in one of two
+Bistable circuits are those that can remain indefinitely stable in one of two
 possible states. This can be extremely useful, as it allows the circuit to store
-or "remember" a bit of memory (i.e., a digital signal which is high or low, 1 or
-0). This is usually accomplished through feedback; some outputs are fed back
-into the circuit, self-reinforcing the current state indefinitely.
+or "remember" a bit of information (i.e., a digital signal that is either high
+or low, 1 or 0). This is usually accomplished through feedback; some outputs are
+fed back into the circuit, self-reinforcing the current state indefinitely.
 
-Note that all diagrams are interactive, and are rendered and simulated in the
-browser through [[https://github.com/8dcc/logic-diagram.js][a custom JavaScript library]]; the inputs can be toggled, and the
-state of the circuit will change accordingly.
+Note that all diagrams in this article are interactive, and are rendered and
+simulated in the browser through [[https://github.com/8dcc/logic-diagram.js][a custom JavaScript library]]; the inputs can be
+toggled, and the state of the circuit will change accordingly.
 
 * Latches
 :PROPERTIES:
@@ -42,14 +42,14 @@ of the most popular latch circuits, from simplest to most complex.
 The SR latch is the most basic form of latch, and it is used to build the rest
 of the latches and flip-flops in this article.
 
-It has two inputs, /S/ and /R/, which stand for "Set"
-and "Reset". When both inputs are low, the circuit outputs its stored value
-through /Q/. When input /S/ becomes high, the circuit stores a high signal;
-similarly, when input /R/ becomes high, the circuit stores a low signal. The /~Q/
-output stores the inverted value of /Q/. Both inputs are not supposed to be high;
-that is considered an invalid input, since both /Q/ and /~Q/ would become low.
+It has two inputs, /S/ and /R/, which stand for "Set" and "Reset". When both inputs
+are low, the circuit outputs its stored value through /Q/. When input /S/ becomes
+high, the circuit stores a high signal; similarly, when input /R/ becomes high,
+the circuit stores a low signal. The /~Q/ output stores the inverted value of
+/Q/. Both inputs should not be high simultaneously; that is considered an invalid
+input, since both /Q/ and /~Q/ would become low.
 
-The circuit is composed of two NOR gates, and the output of each one is fed back
+The circuit is composed of two NOR gates, with each gate's output feeding back
 into the other. This is what causes the stabilization, if both inputs are low,
 when one of the NOR gates outputs a low signal, it is fed into the other gate,
 producing a high signal which is then fed back into the other, keeping that
@@ -151,10 +151,9 @@ The D latch is similar to the gated SR latch, but inputs /S/ and /R/ are replace
 with a data input /D/. Whenever the /E/ signal is high, the /D/ signal will be stored
 directly as the "stored bit" of the circuit.
 
-This is accomplished by negating the /D/ signal and using it as the old "reset"
-input, while simultaneously keeping /D/ as the old "set" signal. Therefore, if /D/
-is high, then the old /S/ remains high but the old /R/ is negated to low, and
-vice versa.
+This is achieved by negating the /D/ signal and using it as the old "reset" input,
+while simultaneously keeping /D/ as the old "set" signal. Therefore, if /D/ is high,
+then the old /S/ remains high but the old /R/ is negated to low, and vice versa.
 
 #+begin_export html
 <script type="text/logicdiag">
@@ -196,7 +195,7 @@ to high. Unlike latches, the data signal is not read during a period of time
 signal becomes high; if the data signal changes with the clock already high,
 those changes are ignored.
 
-This section only covers one of the most popular flip-flop circuits, the D
+This section covers one of the most popular flip-flop circuits: the D
 flip-flop. Note that there are other useful flip-flop circuits like the [[https://en.wikipedia.org/wiki/Flip-flop_(electronics)#JK_flip-flop][JK
 flip-flop]].
 
@@ -280,11 +279,11 @@ This results in the desired edge-sensitive behavior.
 :CUSTOM_ID: comparison
 :END:
 
-As mentioned above, latches are level-sensitive while flip-flops are
+As mentioned above, latches are level-sensitive, whereas flip-flops are
 edge-triggered. This difference is easier to understand with a timing diagram
-which shows how the signals update over time. The following figure compares the
-behaviors of a D latch and a D flip-flop under the same inputs. Gray areas are
-used to highlight the intervals when the clock or enable signal is high.
+that shows how the signals update over time. The following figure compares the
+behaviors of a D latch and a D flip-flop under the same inputs. Gray areas
+highlight the intervals when the clock or enable signal is high.
 
 #+NAME: fig1
 [[file:../img/latches-and-flipflops1.svg]]

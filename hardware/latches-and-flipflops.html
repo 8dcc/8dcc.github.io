@@ -233,17 +233,17 @@ in electronics.
 </p>
 
 <p>
-Bistable circuits are those which can remain indefinitely stable in one of two
+Bistable circuits are those that can remain indefinitely stable in one of two
 possible states. This can be extremely useful, as it allows the circuit to store
-or &ldquo;remember&rdquo; a bit of memory (i.e., a digital signal which is high or low, 1 or
-0). This is usually accomplished through feedback; some outputs are fed back
-into the circuit, self-reinforcing the current state indefinitely.
+or &ldquo;remember&rdquo; a bit of information (i.e., a digital signal that is either high
+or low, 1 or 0). This is usually accomplished through feedback; some outputs are
+fed back into the circuit, self-reinforcing the current state indefinitely.
 </p>
 
 <p>
-Note that all diagrams are interactive, and are rendered and simulated in the
-browser through <a href="https://github.com/8dcc/logic-diagram.js">a custom JavaScript library</a>; the inputs can be toggled, and the
-state of the circuit will change accordingly.
+Note that all diagrams in this article are interactive, and are rendered and
+simulated in the browser through <a href="https://github.com/8dcc/logic-diagram.js">a custom JavaScript library</a>; the inputs can be
+toggled, and the state of the circuit will change accordingly.
 </p>
 </div>
 </div>
@@ -267,16 +267,16 @@ of the latches and flip-flops in this article.
 </p>
 
 <p>
-It has two inputs, <i>S</i> and <i>R</i>, which stand for &ldquo;Set&rdquo;
-and &ldquo;Reset&rdquo;. When both inputs are low, the circuit outputs its stored value
-through <i>Q</i>. When input <i>S</i> becomes high, the circuit stores a high signal;
-similarly, when input <i>R</i> becomes high, the circuit stores a low signal. The <i>~Q</i>
-output stores the inverted value of <i>Q</i>. Both inputs are not supposed to be high;
-that is considered an invalid input, since both <i>Q</i> and <i>~Q</i> would become low.
+It has two inputs, <i>S</i> and <i>R</i>, which stand for &ldquo;Set&rdquo; and &ldquo;Reset&rdquo;. When both inputs
+are low, the circuit outputs its stored value through <i>Q</i>. When input <i>S</i> becomes
+high, the circuit stores a high signal; similarly, when input <i>R</i> becomes high,
+the circuit stores a low signal. The <i>~Q</i> output stores the inverted value of
+<i>Q</i>. Both inputs should not be high simultaneously; that is considered an invalid
+input, since both <i>Q</i> and <i>~Q</i> would become low.
 </p>
 
 <p>
-The circuit is composed of two NOR gates, and the output of each one is fed back
+The circuit is composed of two NOR gates, with each gate&rsquo;s output feeding back
 into the other. This is what causes the stabilization, if both inputs are low,
 when one of the NOR gates outputs a low signal, it is fed into the other gate,
 producing a high signal which is then fed back into the other, keeping that
@@ -384,10 +384,9 @@ directly as the &ldquo;stored bit&rdquo; of the circuit.
 </p>
 
 <p>
-This is accomplished by negating the <i>D</i> signal and using it as the old &ldquo;reset&rdquo;
-input, while simultaneously keeping <i>D</i> as the old &ldquo;set&rdquo; signal. Therefore, if <i>D</i>
-is high, then the old <i>S</i> remains high but the old <i>R</i> is negated to low, and
-vice versa.
+This is achieved by negating the <i>D</i> signal and using it as the old &ldquo;reset&rdquo; input,
+while simultaneously keeping <i>D</i> as the old &ldquo;set&rdquo; signal. Therefore, if <i>D</i> is high,
+then the old <i>S</i> remains high but the old <i>R</i> is negated to low, and vice versa.
 </p>
 
 <script type="text/logicdiag">
@@ -432,7 +431,7 @@ those changes are ignored.
 </p>
 
 <p>
-This section only covers one of the most popular flip-flop circuits, the D
+This section covers one of the most popular flip-flop circuits: the D
 flip-flop. Note that there are other useful flip-flop circuits like the <a href="https://en.wikipedia.org/wiki/Flip-flop_(electronics)#JK_flip-flop">JK
 flip-flop</a>.
 </p>
@@ -524,11 +523,11 @@ This results in the desired edge-sensitive behavior.
 <h2 id="comparison"><span class="section-number-2">4.</span> Comparison</h2>
 <div class="outline-text-2" id="text-comparison">
 <p>
-As mentioned above, latches are level-sensitive while flip-flops are
+As mentioned above, latches are level-sensitive, whereas flip-flops are
 edge-triggered. This difference is easier to understand with a timing diagram
-which shows how the signals update over time. The following figure compares the
-behaviors of a D latch and a D flip-flop under the same inputs. Gray areas are
-used to highlight the intervals when the clock or enable signal is high.
+that shows how the signals update over time. The following figure compares the
+behaviors of a D latch and a D flip-flop under the same inputs. Gray areas
+highlight the intervals when the clock or enable signal is high.
 </p>
 
 
