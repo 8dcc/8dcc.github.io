@@ -18,8 +18,8 @@ in electronics.
 Bistable circuits are those which can remain indefinitely stable in one of two
 possible states. This can be extremely useful, as it allows the circuit to store
 or "remember" a bit of memory (i.e., a digital signal which is high or low, 1 or
-0). This is usually accomplished through retroalimentation; some outputs are fed
-back into the circuit, self-reinforcing the current state indefinitely.
+0). This is usually accomplished through feedback; some outputs are fed back
+into the circuit, self-reinforcing the current state indefinitely.
 
 Note that all diagrams are interactive, and are rendered and simulated in the
 browser through [[https://github.com/8dcc/logic-diagram.js][a custom JavaScript library]]; the inputs can be toggled, and the
@@ -39,7 +39,7 @@ of the most popular latch circuits, from simplest to most complex.
 :CUSTOM_ID: sr-latch
 :END:
 
-The SR latch is the most basic form of latch, and it is used to built the rest
+The SR latch is the most basic form of latch, and it is used to build the rest
 of the latches and flip-flops in this article.
 
 It has two inputs, /S/ and /R/, which stand for "Set"
@@ -71,9 +71,9 @@ original signal low indefinitely.
 
 An alternative version of this latch will be shown below. It uses NAND gates
 instead of NOR gates, which can be desirable in some scenarios. It uses the same
-retroalimentation principle, but the circuit reacts to low inputs instead of
-high ones; both /S/ and /R/ are high by default, and a low signal is used to set or
-reset the stored value.
+feedback principle, but the circuit reacts to low inputs instead of high ones;
+both /S/ and /R/ are high by default, and a low signal is used to set or reset the
+stored value.
 
 ** Gated SR Latch
 :PROPERTIES:
@@ -154,7 +154,7 @@ directly as the "stored bit" of the circuit.
 This is accomplished by negating the /D/ signal and using it as the old "reset"
 input, while simultaneously keeping /D/ as the old "set" signal. Therefore, if /D/
 is high, then the old /S/ remains high but the old /R/ is negated to low, and
-viceversa.
+vice versa.
 
 #+begin_export html
 <script type="text/logicdiag">
@@ -289,5 +289,5 @@ used to highlight the intervals when the clock or enable signal is high.
 #+NAME: fig1
 [[file:../img/latches-and-flipflops1.svg]]
 
-Notice how the D flip flop only updates its value at the exact moment when the
+Notice how the D flip-flop only updates its value at the exact moment when the
 /CLK/ changes from low to high, and how the D latch updates whenever /E/ is high.
