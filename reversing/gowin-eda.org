@@ -1,0 +1,292 @@
+#+TITLE: Reverse engineering and bypassing the Gowin EDA
+#+AUTHOR: 8dcc
+#+STARTUP: nofold
+#+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../css/main.css">
+#+HTML_LINK_UP: index.html
+#+HTML_LINK_HOME: ../index.html
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+The [[https://wiki.sipeed.com/hardware/en/tang/Tang-Nano-9K/Nano-9K.html][Tang Nano 9K]] is a development board made by Sipeed, which uses a Gowin
+[[https://cdn.gowinsemi.com.cn/DS117E.pdf][GW1NR-9]] FPGA chip. Different steps are needed to program an FPGA, including
+synthetization, place and route, and the programming itself. The /Gowin EDA/
+(Electronic Design Automation) tool was developed by Gowin to perform all these
+tasks from a single GUI program.
+
+For this article, the GNU/Linux version of Gowin EDA 1.9.12.02 will be used,
+which can be downloaded from [[https://www.gowinsemi.com/en/support/download_eda][this link]]. I have personally installed it from the
+[[https://aur.archlinux.org/packages/gowin-eda-ide][Arch User Repository]] (AUR), and the file structure after the installation is:
+
+- =/opt/gowin-eda-ide/=: Main installation directory of the Gowin EDA. Contains
+  binaries, libraries, data, etc.
+- =/usr/bin/gw_ide=: Simple script which exports the Gowin library path
+  (=/opt/gowin-eda-ide/lib=) for the dynamic loader and transfers control to the
+  main binary (=/opt/gowin-eda-ide/bin/gw_ide=).
+
+By inspecting the type of that binary, we can determine that it is a 64-bit ELF
+executable whose symbols have been stripped.
+
+#+begin_src
+$ file /opt/gowin-eda-ide/bin/gw_ide
+/opt/gowin-eda-ide/bin/gw_ide: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, stripped
+#+end_src
+
+Note that this article will use the CLI version of [[https://rizin.re/][Rizin]], an open-source reverse
+engineering framework, but other GUI tools such as [[https://cutter.re/][Cutter]], [[https://ghidra-sre.org/][Ghidra]] or [[https://hex-rays.com/ida-pro][IDA Pro]].
+
+* Locating the license validation code
+:PROPERTIES:
+:CUSTOM_ID: locating-the-license-validation-code
+:END:
+
+That binary file is not too big for an executable, only around 69 kilobytes in
+size, but it's worth having a look inside, since it must either contain or call
+the license validation code. First, tell rizin to analyze the binary with =aaa=.
+
+#+begin_src
+$ rizin /opt/gowin-eda-ide/bin/gw_ide
+[0x0040563d]> aaa
+[x] Analyze all flags starting with sym. and entry0 (aa)
+[x] Analyze function calls
+[x] Analyze len bytes of instructions for references
+[x] Check for classes
+[x] Analyze local variables and arguments
+[x] Type matching analysis for all functions
+[x] Applied 0 FLIRT signatures via sigdb
+[x] Propagate noreturn information
+[x] Integrate dwarf function information.
+[x] Resolve pointers to data sections
+[x] Use -AA or aaaa to perform additional experimental analysis.
+[0x0040563d]>
+#+end_src
+
+Then, we can take a look at the list of strings with the =iz= command. We can
+filter the output of the command with the =~TERM= syntax; in this case, looking
+for strings containing "license".
+
+#+begin_src
+[0x0040563d]> iz ~license
+  7 0x0000d8a6 0x0040d8a6  29   30 .rodata ascii License verification failed.\n
+  9 0x0000d8ca 0x0040d8ca  19   20 .rodata ascii /license_config_gui
+ 15 0x0000d920 0x0040d920  25   26 .rodata ascii License information lost.
+ 16 0x0000d93a 0x0040d93a  23   24 .rodata ascii License mode not match.
+ 17 0x0000d952 0x0040d952  25   26 .rodata ascii License hostid not match.
+ 18 0x0000d96c 0x0040d96c  26   27 .rodata ascii No more license available.
+ 27 0x0000da21 0x0040da21  23   24 .rodata ascii The license expires in
+ 29 0x0000da40 0x0040da40  26   27 .rodata ascii The license expires today.
+ 38 0x0000dac9 0x0040dac9  14   15 .rodata ascii /gwlicense.ini
+ 41 0x0000daf0 0x0040daf0  59   60 .rodata ascii Invalid license file, check if this file has been modified.
+ 42 0x0000db30 0x0040db30  72   73 .rodata ascii Software require license 2.0 file, please contact GOWIN for new license.
+ 44 0x0000dba8 0x0040dba8  31   32 .rodata ascii The license expires in one day.
+ 46 0x0000dbf8 0x0040dbf8  38   39 .rodata ascii License created by Gowin_LIC_Generator
+#+end_src
+
+There are a lot of matches. Furthermore, the unfiltered string list is not too
+long, and it contains some interesting strings that stand out, like some public
+and private keys. This means that we are probably in the right binary.
+
+** Locating the top-level validation function
+:PROPERTIES:
+:CUSTOM_ID: locating-the-top-level-validation-function
+:END:
+
+From the strings we found, the "License verification failed" string is the most
+promising. We can inspect its cross-references with the =axt= command. The =@
+0x1234= syntax is used to execute an instruction at an specific address (instead
+of the current one).
+
+#+begin_src nasm
+[0x0040563d]> axt @ 0x0040d8a6
+main 0x40547e [DATA] lea rsi, str.License_verification_failed.
+#+end_src
+
+There is only one cross-reference, a =lea= instruction inside the =main=
+function. We can inspect the disassembly of that function with the =pdf=
+command. I have filtered the output to only show the relevant instructions.
+
+#+begin_src nasm
+[0x0040d8a6]> pdf @ 0x40547e
+
+          ; Omitted...
+
+│         0x00405421      be 01 00 00 00              mov     esi, 1 ; int64_t arg2
+│         0x00405426      bf 01 00 00 00              mov     edi, 1 ; int64_t arg1
+│         0x0040542b      e8 60 3a 00 00              call    fcn.00408e90 ; fcn.00408e90
+│         0x00405430      85 c0                       test    eax, eax
+│     ┌─< 0x00405432      75 31                       jne     0x405465
+│     │   0x00405434      8b 7c 24 1c                 mov     edi, dword [rsp + 0x1c]
+│     │   0x00405438      4c 89 f6                    mov     rsi, r14
+│     │   0x0040543b      e8 f0 ee ff ff              call    imp.launchIDE(int, char**) ; sy
+│     │   0x00405440      41 89 c4                    mov     r12d, eax
+│     │   ; CODE XREF from main @ 0x4055a8
+│    ┌──> 0x00405443      48 89 ef                    mov     rdi, rbp
+│    ╎│   0x00405446      e8 d5 f0 ff ff              call    imp.QApplication::~QApplication() ; method.Q
+│    ╎│   0x0040544b      4c 89 ef                    mov     rdi, r13 ; int64_t arg1
+│    ╎│   0x0040544e      e8 ed 02 00 00              call    fcn.00405740 ; fcn.00405740
+│    ╎│   0x00405453      48 83 c4 78                 add     rsp, 0x78
+│    ╎│   0x00405457      44 89 e0                    mov     eax, r12d
+│    ╎│   0x0040545a      5b                          pop     rbx
+│    ╎│   0x0040545b      5d                          pop     rbp
+│    ╎│   0x0040545c      41 5c                       pop     r12
+│    ╎│   0x0040545e      41 5d                       pop     r13
+│    ╎│   0x00405460      41 5e                       pop     r14
+│    ╎│   0x00405462      41 5f                       pop     r15
+│    ╎│   0x00405464      c3                          ret
+│    ╎└─> 0x00405465      4c 8d 7c 24 48              lea     r15, [rsp + 0x48]
+│    ╎    0x0040546a      89 c6                       mov     esi, eax ; unsigned long long arg2
+│    ╎    0x0040546c      4c 89 ff                    mov     rdi, r15 ; int64_t arg1
+│    ╎    0x0040546f      e8 2c 11 00 00              call    fcn.004065a0 ; fcn.004065a0
+│    ╎    0x00405474      4c 8d 74 24 50              lea     r14, [rsp + 0x50]
+│    ╎    0x00405479      ba 1d 00 00 00              mov     edx, 0x1d ; 29
+│    ╎    0x0040547e      48 8d 35 21 84 00 00        lea     rsi, [rip + str.License_verification_failed.
+
+          ; Omitted...
+
+#+end_src
+
+The string is loaded into the =rsi= register at the bottom of the code snippet, at
+address =0x0040547e=.
+
+There are two alternative branches shown in the previous disassembly. First,
+some unknown function =fcn.00408e90= is called, and the return value is saved in
+=eax=[fn::According to Section 3.2.3 and Figure 3.4 of the [[https://cs61.seas.harvard.edu/site/pdf/x86-64-abi-20210928.pdf][AMD64 calling
+convention]], the first two arguments are passed in =rdi= and =rsi=, and the return
+value is passed to the caller in =rax=.]. If the value of =eax= is not zero, the
+jump to =0x00405465= is taken and the "License verification failed" string is
+loaded into =rsi=; however, if the value of =eax= was zero, the jump is not
+performed and the code from =0x00405434= to =0x00405464= is executed, returning from
+=main=. This disassembly of =main= can be translated into the following pseudo-code.
+
+#+begin_src C
+int main() {
+    /* ... */
+
+    /*
+     ,* Instructions 0x00405421..0x00405432.
+     ,* Where 'func' corresponds to 'fcn.00408e90'.
+     ,*/
+    uint32_t result = func(1, 1);
+    if (result == 0) {
+
+        /*
+         ,* Omiting instructions 0x00405434..0x00405464.
+         ,* Contains call to 'imp.launchIDE', etc.
+         ,*/
+
+        return 0;
+    }
+
+    /*
+     ,* Instructions 0x00405465..0x0040547e.
+     ,* Omiting the call to 'fcn.004065a0'.
+     ,*/
+    const char* str = "License verification failed.\n";
+
+    /* ... */
+}
+#+end_src
+
+It looks like that =fcn.00408e90= function is doing some license verification, and
+depending on its returned value, the IDE is launched or an error message is shown.
+
+** Analyzing the top-level validation function
+:PROPERTIES:
+:CUSTOM_ID: analyzing-the-top-level-validation-function
+:END:
+
+If we /disassemble/ this function with =pdf=, we see that it's somewhat big. By
+using the =pdg= command on that function, we can instead /decompile/ it using the
+[[https://github.com/rizinorg/rz-ghidra][Ghidra plugin]]. The following code shows the relevant parts of the
+decompilation, after cleaning the type casts and simplifying the function names.
+
+#+begin_src C++
+int fcn00408e90(int64_t arg1, int64_t arg2) {
+    uVar2 = fcn0040d570(0, 0, 0);
+    arg1_00 = imp.operator new[](unsigned long)((uVar2 + 1));
+    fcn0040d570(arg1_00, uVar2, 0);
+    /* ... */
+    var_40h = QString.fromAscii_helper(arg1_00, uVar5);
+    /* ... */
+    QString.fromUtf8_helper(&var_40h, "/gwlicense.ini", 0xe);
+    QString.append(&var_48h, &var_40h);
+
+    /* ... */
+
+    iVar3 = fcn00407b40((int64_t)&var_48h, (int64_t)&var_58h);
+    if (*var_48h == 0) {
+        /* ... */
+
+        var_40h = QString.fromAscii_helper("^(.*):(\\d+)$", 0xc);
+        QRegExp::PatternSyntax(&var_50h, &var_40h, 1, 0);
+        /* ... */
+        cVar1 = QRegExp.exactMatch(&var_50h, &var_58h);
+
+        if (cVar1 == '\0') {
+            uVar4 = fcn00407f70((int64_t)&var_58h, arg1 & 0xff, arg2 & 0xff);
+        } else {
+            /* ... */
+            uVar4 = fcn00408170((int64_t)&var_48h, arg2_00, arg1 & 0xff, arg2 & 0xff, 0, in_stack_00000078);
+            /* ... */
+        }
+    } else {
+        /* ... */
+        uVar4 = 0x10;
+    }
+
+    /* ... */
+    return uVar4;
+}
+#+end_src
+
+From this, we can see the general structure of the function.
+
+1. Calls some =fcn.0040d570= function twice, first with null values (likely to
+   calculate some size), and then with an allocated buffer. This buffer is
+   converted between ASCII and UTF-8, and the string ="/gwlicense.ini"= is
+   appended to it.
+2. Calls some =fcn.00407b40= function unconditionally, passing the result of the
+   appended string. The normal execution path continues if this function sets
+   the value of =*var_48h= to zero, probably because that indicates that it
+   processed the entire input string up to the null-terminator. If the string
+   was not processed entirely, =0x10= is returned.
+3. A new =QRegExp= object is initialized with the pattern ~"^(.*):(\\d+)$"~. It is
+   checked against the second argument of =fcn.00407b40=, likely because that
+   function writes something the buffer which may or may not match the regexp.
+4. If the regexp matches, function =fcn.00407f70= is called and its return value
+   is propagated. Otherwise, if the regexp didn't match function =fcn.00408170= is
+   called, also propagating its return value.
+
+This can be converted into simpler pseudo-code:
+
+#+begin_src C++
+int fcn00408e90(int64_t arg1, int64_t arg2) {
+    int length = fcn0040d570(0, 0, 0);
+    char* base_path = new char[length + 1];
+    fcn0040d570(base_path, length, 0);
+    QString full_path = base_path + "/gwlicense.ini";
+
+    /* ... */
+
+    QString out_value;
+    fcn00407b40(full_path, &out_value);
+    if (*full_path != '\0') {
+        /* ... */
+        return 0x10;
+    }
+
+    /* ... */
+
+    QRegExp rx("^(.*):(\\d+)$");
+    if (!rx.exactMatch(out_value)) {
+        return fcn00407f70(out_value, arg1, arg2);
+    } else {
+        /* ... */
+        return fcn00408170(full_path, out_value, arg1, arg2, 0, ...);
+    }
+}
+#+end_src
+

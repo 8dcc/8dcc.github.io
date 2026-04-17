@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reverse engineering and bypassing the Gowin EDA</title>
+<meta property="og:title" content="Reverse engineering and bypassing the Gowin EDA" />
+<meta name="author" content="8dcc" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="icon" type="image/x-icon" href="../img/favicon.png">
+<link rel="stylesheet" type="text/css" href="../css/main.css">
+</head>
+<body>
+<div id="org-div-home-and-up">
+  <a accesskey="u" href="index.html">Up</a> | <a accesskey="h" href="../index.html">Home</a>
+</div><div id="content" class="content">
+<h1 class="title">Reverse engineering and bypassing the Gowin EDA</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#introduction">1. Introduction</a></li>
+<li><a href="#locating-the-license-validation-code">2. Locating the license validation code</a>
+<ul>
+<li><a href="#locating-the-top-level-validation-function">2.1. Locating the top-level validation function</a></li>
+<li><a href="#analyzing-the-top-level-validation-function">2.2. Analyzing the top-level validation function</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-introduction" class="outline-2">
+<h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-introduction">
+<p>
+The <a href="https://wiki.sipeed.com/hardware/en/tang/Tang-Nano-9K/Nano-9K.html">Tang Nano 9K</a> is a development board made by Sipeed, which uses a Gowin
+<a href="https://cdn.gowinsemi.com.cn/DS117E.pdf">GW1NR-9</a> FPGA chip. Different steps are needed to program an FPGA, including
+synthetization, place and route, and the programming itself. The <i>Gowin EDA</i>
+(Electronic Design Automation) tool was developed by Gowin to perform all these
+tasks from a single GUI program.
+</p>
+
+<p>
+For this article, the GNU/Linux version of Gowin EDA 1.9.12.02 will be used,
+which can be downloaded from <a href="https://www.gowinsemi.com/en/support/download_eda">this link</a>. I have personally installed it from the
+<a href="https://aur.archlinux.org/packages/gowin-eda-ide">Arch User Repository</a> (AUR), and the file structure after the installation is:
+</p>
+
+<ul class="org-ul">
+<li><code>/opt/gowin-eda-ide/</code>: Main installation directory of the Gowin EDA. Contains
+binaries, libraries, data, etc.</li>
+<li><code>/usr/bin/gw_ide</code>: Simple script which exports the Gowin library path
+(<code>/opt/gowin-eda-ide/lib</code>) for the dynamic loader and transfers control to the
+main binary (<code>/opt/gowin-eda-ide/bin/gw_ide</code>).</li>
+</ul>
+
+<p>
+By inspecting the type of that binary, we can determine that it is a 64-bit ELF
+executable whose symbols have been stripped.
+</p>
+
+<pre class="example">
+$ file /opt/gowin-eda-ide/bin/gw_ide
+/opt/gowin-eda-ide/bin/gw_ide: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, stripped
+</pre>
+
+<p>
+Note that this article will use the CLI version of <a href="https://rizin.re/">Rizin</a>, an open-source reverse
+engineering framework, but other GUI tools such as <a href="https://cutter.re/">Cutter</a>, <a href="https://ghidra-sre.org/">Ghidra</a> or <a href="https://hex-rays.com/ida-pro">IDA Pro</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-locating-the-license-validation-code" class="outline-2">
+<h2 id="locating-the-license-validation-code"><span class="section-number-2">2.</span> Locating the license validation code</h2>
+<div class="outline-text-2" id="text-locating-the-license-validation-code">
+<p>
+That binary file is not too big for an executable, only around 69 kilobytes in
+size, but it&rsquo;s worth having a look inside, since it must either contain or call
+the license validation code. First, tell rizin to analyze the binary with <code>aaa</code>.
+</p>
+
+<pre class="example">
+$ rizin /opt/gowin-eda-ide/bin/gw_ide
+[0x0040563d]&gt; aaa
+[x] Analyze all flags starting with sym. and entry0 (aa)
+[x] Analyze function calls
+[x] Analyze len bytes of instructions for references
+[x] Check for classes
+[x] Analyze local variables and arguments
+[x] Type matching analysis for all functions
+[x] Applied 0 FLIRT signatures via sigdb
+[x] Propagate noreturn information
+[x] Integrate dwarf function information.
+[x] Resolve pointers to data sections
+[x] Use -AA or aaaa to perform additional experimental analysis.
+[0x0040563d]&gt;
+</pre>
+
+<p>
+Then, we can take a look at the list of strings with the <code>iz</code> command. We can
+filter the output of the command with the <code>~TERM</code> syntax; in this case, looking
+for strings containing &ldquo;license&rdquo;.
+</p>
+
+<pre class="example">
+[0x0040563d]&gt; iz ~license
+  7 0x0000d8a6 0x0040d8a6  29   30 .rodata ascii License verification failed.\n
+  9 0x0000d8ca 0x0040d8ca  19   20 .rodata ascii /license_config_gui
+ 15 0x0000d920 0x0040d920  25   26 .rodata ascii License information lost.
+ 16 0x0000d93a 0x0040d93a  23   24 .rodata ascii License mode not match.
+ 17 0x0000d952 0x0040d952  25   26 .rodata ascii License hostid not match.
+ 18 0x0000d96c 0x0040d96c  26   27 .rodata ascii No more license available.
+ 27 0x0000da21 0x0040da21  23   24 .rodata ascii The license expires in
+ 29 0x0000da40 0x0040da40  26   27 .rodata ascii The license expires today.
+ 38 0x0000dac9 0x0040dac9  14   15 .rodata ascii /gwlicense.ini
+ 41 0x0000daf0 0x0040daf0  59   60 .rodata ascii Invalid license file, check if this file has been modified.
+ 42 0x0000db30 0x0040db30  72   73 .rodata ascii Software require license 2.0 file, please contact GOWIN for new license.
+ 44 0x0000dba8 0x0040dba8  31   32 .rodata ascii The license expires in one day.
+ 46 0x0000dbf8 0x0040dbf8  38   39 .rodata ascii License created by Gowin_LIC_Generator
+</pre>
+
+<p>
+There are a lot of matches. Furthermore, the unfiltered string list is not too
+long, and it contains some interesting strings that stand out, like some public
+and private keys. This means that we are probably in the right binary.
+</p>
+</div>
+
+<div id="outline-container-locating-the-top-level-validation-function" class="outline-3">
+<h3 id="locating-the-top-level-validation-function"><span class="section-number-3">2.1.</span> Locating the top-level validation function</h3>
+<div class="outline-text-3" id="text-locating-the-top-level-validation-function">
+<p>
+From the strings we found, the &ldquo;License verification failed&rdquo; string is the most
+promising. We can inspect its cross-references with the <code>axt</code> command. The <code>@
+0x1234</code> syntax is used to execute an instruction at an specific address (instead
+of the current one).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm">[<span style="color: #2a5045;">0x0040563d</span>]&gt; axt @ <span style="color: #2a5045;">0x0040d8a6</span>
+main <span style="color: #2a5045;">0x40547e</span> [DATA] <span style="color: #721045;">lea</span> <span style="color: #005f5f;">rsi</span>, str.License_verification_failed.
+</pre>
+</div>
+
+<p>
+There is only one cross-reference, a <code>lea</code> instruction inside the <code>main</code>
+function. We can inspect the disassembly of that function with the <code>pdf</code>
+command. I have filtered the output to only show the relevant instructions.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm">[<span style="color: #2a5045;">0x0040d8a6</span>]&gt; pdf @ <span style="color: #2a5045;">0x40547e</span>
+
+          <span style="color: #595959;">; </span><span style="color: #595959;">Omitted...</span>
+
+&#9474;         <span style="color: #2a5045;">0x00405421</span>      be <span style="color: #2a5045;">01</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>              <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">esi</span>, <span style="color: #2a5045;">1</span> <span style="color: #595959;">; </span><span style="color: #595959;">int64_t arg2</span>
+&#9474;         <span style="color: #2a5045;">0x00405426</span>      bf <span style="color: #2a5045;">01</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>              <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">edi</span>, <span style="color: #2a5045;">1</span> <span style="color: #595959;">; </span><span style="color: #595959;">int64_t arg1</span>
+&#9474;         <span style="color: #2a5045;">0x0040542b</span>      e8 <span style="color: #2a5045;">60</span> <span style="color: #2a5045;">3a</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>              <span style="color: #721045;">call</span>    fcn.00408e90 <span style="color: #595959;">; </span><span style="color: #595959;">fcn.00408e90</span>
+&#9474;         <span style="color: #2a5045;">0x00405430</span>      <span style="color: #2a5045;">85</span> c0                       <span style="color: #721045;">test</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+&#9474;     &#9484;&#9472;&lt; <span style="color: #2a5045;">0x00405432</span>      <span style="color: #2a5045;">75</span> <span style="color: #2a5045;">31</span>                       <span style="color: #721045;">jne</span>     <span style="color: #2a5045;">0x405465</span>
+&#9474;     &#9474;   <span style="color: #2a5045;">0x00405434</span>      <span style="color: #2a5045;">8b</span> <span style="color: #2a5045;">7c</span> <span style="color: #2a5045;">24</span> <span style="color: #2a5045;">1c</span>                 <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">edi</span>, <span style="color: #0031a9;">dword</span> [<span style="color: #005f5f;">rsp</span> + <span style="color: #2a5045;">0x1c</span>]
+&#9474;     &#9474;   <span style="color: #2a5045;">0x00405438</span>      <span style="color: #2a5045;">4c</span> <span style="color: #2a5045;">89</span> f6                    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rsi</span>, <span style="color: #005f5f;">r14</span>
+&#9474;     &#9474;   <span style="color: #2a5045;">0x0040543b</span>      e8 f0 ee ff ff              <span style="color: #721045;">call</span>    imp.launchIDE(<span style="color: #721045;">int</span>, char**) <span style="color: #595959;">; </span><span style="color: #595959;">sy</span>
+&#9474;     &#9474;   <span style="color: #2a5045;">0x00405440</span>      <span style="color: #2a5045;">41</span> <span style="color: #2a5045;">89</span> c4                    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">r12d</span>, <span style="color: #005f5f;">eax</span>
+&#9474;     &#9474;   <span style="color: #595959;">; </span><span style="color: #595959;">CODE XREF from main @ 0x4055a8</span>
+&#9474;    &#9484;&#9472;&#9472;&gt; <span style="color: #2a5045;">0x00405443</span>      <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">89</span> ef                    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rdi</span>, <span style="color: #005f5f;">rbp</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x00405446</span>      e8 d5 f0 ff ff              <span style="color: #721045;">call</span>    imp.QApplication::~QApplication() <span style="color: #595959;">; </span><span style="color: #595959;">method.Q</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x0040544b</span>      <span style="color: #2a5045;">4c</span> <span style="color: #2a5045;">89</span> ef                    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rdi</span>, <span style="color: #005f5f;">r13</span> <span style="color: #595959;">; </span><span style="color: #595959;">int64_t arg1</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x0040544e</span>      e8 ed <span style="color: #2a5045;">02</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>              <span style="color: #721045;">call</span>    fcn.00405740 <span style="color: #595959;">; </span><span style="color: #595959;">fcn.00405740</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x00405453</span>      <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">83</span> c4 <span style="color: #2a5045;">78</span>                 <span style="color: #721045;">add</span>     <span style="color: #005f5f;">rsp</span>, <span style="color: #2a5045;">0x78</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x00405457</span>      <span style="color: #2a5045;">44</span> <span style="color: #2a5045;">89</span> e0                    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">r12d</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x0040545a</span>      <span style="color: #2a5045;">5b</span>                          <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">rbx</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x0040545b</span>      <span style="color: #2a5045;">5d</span>                          <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">rbp</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x0040545c</span>      <span style="color: #2a5045;">41</span> <span style="color: #2a5045;">5c</span>                       <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">r12</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x0040545e</span>      <span style="color: #2a5045;">41</span> <span style="color: #2a5045;">5d</span>                       <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">r13</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x00405460</span>      <span style="color: #2a5045;">41</span> <span style="color: #2a5045;">5e</span>                       <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">r14</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x00405462</span>      <span style="color: #2a5045;">41</span> <span style="color: #2a5045;">5f</span>                       <span style="color: #721045;">pop</span>     <span style="color: #005f5f;">r15</span>
+&#9474;    &#9550;&#9474;   <span style="color: #2a5045;">0x00405464</span>      c3                          <span style="color: #721045;">ret</span>
+&#9474;    &#9550;&#9492;&#9472;&gt; <span style="color: #2a5045;">0x00405465</span>      <span style="color: #2a5045;">4c</span> <span style="color: #2a5045;">8d</span> <span style="color: #2a5045;">7c</span> <span style="color: #2a5045;">24</span> <span style="color: #2a5045;">48</span>              <span style="color: #721045;">lea</span>     <span style="color: #005f5f;">r15</span>, [<span style="color: #005f5f;">rsp</span> + <span style="color: #2a5045;">0x48</span>]
+&#9474;    &#9550;    <span style="color: #2a5045;">0x0040546a</span>      <span style="color: #2a5045;">89</span> c6                       <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">esi</span>, <span style="color: #005f5f;">eax</span> <span style="color: #595959;">; </span><span style="color: #595959;">unsigned long long arg2</span>
+&#9474;    &#9550;    <span style="color: #2a5045;">0x0040546c</span>      <span style="color: #2a5045;">4c</span> <span style="color: #2a5045;">89</span> ff                    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rdi</span>, <span style="color: #005f5f;">r15</span> <span style="color: #595959;">; </span><span style="color: #595959;">int64_t arg1</span>
+&#9474;    &#9550;    <span style="color: #2a5045;">0x0040546f</span>      e8 <span style="color: #2a5045;">2c</span> <span style="color: #2a5045;">11</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>              <span style="color: #721045;">call</span>    fcn.004065a0 <span style="color: #595959;">; </span><span style="color: #595959;">fcn.004065a0</span>
+&#9474;    &#9550;    <span style="color: #2a5045;">0x00405474</span>      <span style="color: #2a5045;">4c</span> <span style="color: #2a5045;">8d</span> <span style="color: #2a5045;">74</span> <span style="color: #2a5045;">24</span> <span style="color: #2a5045;">50</span>              <span style="color: #721045;">lea</span>     <span style="color: #005f5f;">r14</span>, [<span style="color: #005f5f;">rsp</span> + <span style="color: #2a5045;">0x50</span>]
+&#9474;    &#9550;    <span style="color: #2a5045;">0x00405479</span>      ba <span style="color: #2a5045;">1d</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>              <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">edx</span>, <span style="color: #2a5045;">0x1d</span> <span style="color: #595959;">; </span><span style="color: #595959;">29</span>
+&#9474;    &#9550;    <span style="color: #2a5045;">0x0040547e</span>      <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">8d</span> <span style="color: #2a5045;">35</span> <span style="color: #2a5045;">21</span> <span style="color: #2a5045;">84</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>        <span style="color: #721045;">lea</span>     <span style="color: #005f5f;">rsi</span>, [rip + str.License_verification_failed.
+
+          <span style="color: #595959;">; </span><span style="color: #595959;">Omitted...</span>
+
+</pre>
+</div>
+
+<p>
+The string is loaded into the <code>rsi</code> register at the bottom of the code snippet, at
+address <code>0x0040547e</code>.
+</p>
+
+<p>
+There are two alternative branches shown in the previous disassembly. First,
+some unknown function <code>fcn.00408e90</code> is called, and the return value is saved in
+<code>eax</code><sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>. If the value of <code>eax</code> is not zero, the
+jump to <code>0x00405465</code> is taken and the &ldquo;License verification failed&rdquo; string is
+loaded into <code>rsi</code>; however, if the value of <code>eax</code> was zero, the jump is not
+performed and the code from <code>0x00405434</code> to <code>0x00405464</code> is executed, returning from
+<code>main</code>. This disassembly of <code>main</code> can be translated into the following pseudo-code.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">main</span>() {
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+
+    <span style="color: #595959;">/*</span>
+<span style="color: #595959;">     * Instructions 0x00405421..0x00405432.</span>
+<span style="color: #595959;">     * Where 'func' corresponds to 'fcn.00408e90'.</span>
+<span style="color: #595959;">     */</span>
+    <span style="color: #0031a9;">uint32_t</span> <span style="color: #005f5f;">result</span> = func(<span style="color: #2a5045;">1</span>, <span style="color: #2a5045;">1</span>);
+    <span style="color: #972500;">if</span> (result == <span style="color: #2a5045;">0</span>) {
+
+        <span style="color: #595959;">/*</span>
+<span style="color: #595959;">         * Omiting instructions 0x00405434..0x00405464.</span>
+<span style="color: #595959;">         * Contains call to 'imp.launchIDE', etc.</span>
+<span style="color: #595959;">         */</span>
+
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
+    }
+
+    <span style="color: #595959;">/*</span>
+<span style="color: #595959;">     * Instructions 0x00405465..0x0040547e.</span>
+<span style="color: #595959;">     * Omiting the call to 'fcn.004065a0'.</span>
+<span style="color: #595959;">     */</span>
+    <span style="color: #972500;">const</span> <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">str</span> = <span style="color: #005e8b;">"License verification failed.</span><span style="color: #972500;">\n</span><span style="color: #005e8b;">"</span>;
+
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+}
+</pre>
+</div>
+
+<p>
+It looks like that <code>fcn.00408e90</code> function is doing some license verification, and
+depending on its returned value, the IDE is launched or an error message is shown.
+</p>
+</div>
+</div>
+
+<div id="outline-container-analyzing-the-top-level-validation-function" class="outline-3">
+<h3 id="analyzing-the-top-level-validation-function"><span class="section-number-3">2.2.</span> Analyzing the top-level validation function</h3>
+<div class="outline-text-3" id="text-analyzing-the-top-level-validation-function">
+<p>
+If we <i>disassemble</i> this function with <code>pdf</code>, we see that it&rsquo;s somewhat big. By
+using the <code>pdg</code> command on that function, we can instead <i>decompile</i> it using the
+<a href="https://github.com/rizinorg/rz-ghidra">Ghidra plugin</a>. The following code shows the relevant parts of the
+decompilation, after cleaning the type casts and simplifying the function names.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">fcn00408e90</span>(<span style="color: #0031a9;">int64_t</span> <span style="color: #005f5f;">arg1</span>, <span style="color: #0031a9;">int64_t</span> <span style="color: #005f5f;">arg2</span>) {
+    uVar2 = fcn0040d570(<span style="color: #2a5045;">0</span>, <span style="color: #2a5045;">0</span>, <span style="color: #2a5045;">0</span>);
+    arg1_00 = imp.<span style="color: #972500;">operator</span> <span style="color: #972500;">new</span>[](<span style="color: #0031a9;">unsigned</span> <span style="color: #0031a9;">long</span>)((uVar2 + <span style="color: #2a5045;">1</span>));
+    fcn0040d570(arg1_00, uVar2, <span style="color: #2a5045;">0</span>);
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+    var_40h = QString.fromAscii_helper(arg1_00, uVar5);
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+    QString.fromUtf8_helper(&amp;var_40h, <span style="color: #005e8b;">"/gwlicense.ini"</span>, <span style="color: #2a5045;">0xe</span>);
+    QString.append(&amp;var_48h, &amp;var_40h);
+
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+
+    iVar3 = fcn00407b40((<span style="color: #0031a9;">int64_t</span>)&amp;var_48h, (<span style="color: #0031a9;">int64_t</span>)&amp;var_58h);
+    <span style="color: #972500;">if</span> (*var_48h == <span style="color: #2a5045;">0</span>) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+
+        var_40h = QString.fromAscii_helper(<span style="color: #005e8b;">"^(.*):(</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">d+)$"</span>, <span style="color: #2a5045;">0xc</span>);
+        <span style="color: #2a5045;">QRegExp</span>::PatternSyntax(&amp;var_50h, &amp;var_40h, <span style="color: #2a5045;">1</span>, <span style="color: #2a5045;">0</span>);
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+        cVar1 = QRegExp.exactMatch(&amp;var_50h, &amp;var_58h);
+
+        <span style="color: #972500;">if</span> (cVar1 == <span style="color: #005e8b;">'</span><span style="color: #972500;">\0</span><span style="color: #005e8b;">'</span>) {
+            uVar4 = fcn00407f70((<span style="color: #0031a9;">int64_t</span>)&amp;var_58h, arg1 &amp; <span style="color: #2a5045;">0xff</span>, arg2 &amp; <span style="color: #2a5045;">0xff</span>);
+        } <span style="color: #972500;">else</span> {
+            <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+            uVar4 = fcn00408170((<span style="color: #0031a9;">int64_t</span>)&amp;var_48h, arg2_00, arg1 &amp; <span style="color: #2a5045;">0xff</span>, arg2 &amp; <span style="color: #2a5045;">0xff</span>, <span style="color: #2a5045;">0</span>, in_stack_00000078);
+            <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+        }
+    } <span style="color: #972500;">else</span> {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+        uVar4 = <span style="color: #2a5045;">0x10</span>;
+    }
+
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">return</span> uVar4;
+}
+</pre>
+</div>
+
+<p>
+From this, we can see the general structure of the function.
+</p>
+
+<ol class="org-ol">
+<li>Calls some <code>fcn.0040d570</code> function twice, first with null values (likely to
+calculate some size), and then with an allocated buffer. This buffer is
+converted between ASCII and UTF-8, and the string <code>"/gwlicense.ini"</code> is
+appended to it.</li>
+<li>Calls some <code>fcn.00407b40</code> function unconditionally, passing the result of the
+appended string. The normal execution path continues if this function sets
+the value of <code>*var_48h</code> to zero, probably because that indicates that it
+processed the entire input string up to the null-terminator. If the string
+was not processed entirely, <code>0x10</code> is returned.</li>
+<li>A new <code>QRegExp</code> object is initialized with the pattern <code>"^(.*):(\\d+)$"</code>. It is
+checked against the second argument of <code>fcn.00407b40</code>, likely because that
+function writes something the buffer which may or may not match the regexp.</li>
+<li>If the regexp matches, function <code>fcn.00407f70</code> is called and its return value
+is propagated. Otherwise, if the regexp didn&rsquo;t match function <code>fcn.00408170</code> is
+called, also propagating its return value.</li>
+</ol>
+
+<p>
+This can be converted into simpler pseudo-code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">fcn00408e90</span>(<span style="color: #0031a9;">int64_t</span> <span style="color: #005f5f;">arg1</span>, <span style="color: #0031a9;">int64_t</span> <span style="color: #005f5f;">arg2</span>) {
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">length</span> = fcn0040d570(<span style="color: #2a5045;">0</span>, <span style="color: #2a5045;">0</span>, <span style="color: #2a5045;">0</span>);
+    <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">base_path</span> = <span style="color: #972500;">new</span> <span style="color: #0031a9;">char</span>[length + <span style="color: #2a5045;">1</span>];
+    fcn0040d570(base_path, length, <span style="color: #2a5045;">0</span>);
+    <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">full_path</span> = base_path + <span style="color: #005e8b;">"/gwlicense.ini"</span>;
+
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+
+    <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">out_value</span>;
+    fcn00407b40(full_path, &amp;out_value);
+    <span style="color: #972500;">if</span> (*full_path != <span style="color: #005e8b;">'</span><span style="color: #972500;">\0</span><span style="color: #005e8b;">'</span>) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">0x10</span>;
+    }
+
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+
+    <span style="color: #0031a9;">QRegExp</span> <span style="color: #005f5f;">rx</span>(<span style="color: #005e8b;">"^(.*):(</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">d+)$"</span>);
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>rx.exactMatch(out_value)) {
+        <span style="color: #972500;">return</span> fcn00407f70(out_value, arg1, arg2);
+    } <span style="color: #972500;">else</span> {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">return</span> fcn00408170(full_path, out_value, arg1, arg2, <span style="color: #2a5045;">0</span>, ...);
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">According to Section 3.2.3 and Figure 3.4 of the <a href="https://cs61.seas.harvard.edu/site/pdf/x86-64-abi-20210928.pdf">AMD64 calling
+convention</a>, the first two arguments are passed in <code>rdi</code> and <code>rsi</code>, and the return
+value is passed to the caller in <code>rax</code>.</p></div></div>
+
+
+</div>
+</div></div>
+</body>
+</html>
