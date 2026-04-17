@@ -58,7 +58,7 @@ First of all, it loads the function argument into =edx=.
 mov     edx, edi
 #+end_src
 
-Keep in mind that this is a 64-bit program, so the [[https://raw.githubusercontent.com/wiki/hjl-tools/x86-psABI/x86-64-psABI-1.0.pdf][x86-64 calling convention]] is
+Keep in mind that this is a 64-bit program, so the [[https://cs61.seas.harvard.edu/site/pdf/x86-64-abi-20210928.pdf][x86-64 calling convention]] is
 different from the [[https://www.sco.com/developers/devspecs/abi386-4.pdf][i386 calling convention]]:
 
 #+begin_quote
