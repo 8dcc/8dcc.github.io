@@ -6,6 +6,8 @@
 #+HTML_LINK_UP: index.html
 #+HTML_LINK_HOME: ../index.html
 
+#+MACRO: man [[https://man.cx/$1][=$1=]]
+
 * Introduction
 :PROPERTIES:
 :CUSTOM_ID: introduction
@@ -38,9 +40,9 @@ $ file /opt/gowin-eda-ide/bin/gw_ide
 Note that this article will use the CLI version of [[https://rizin.re/][Rizin]], an open-source reverse
 engineering framework, but other GUI tools such as [[https://cutter.re/][Cutter]], [[https://ghidra-sre.org/][Ghidra]] or [[https://hex-rays.com/ida-pro][IDA Pro]].
 
-* Locating the license validation code
+* Analyzing the license validation code
 :PROPERTIES:
-:CUSTOM_ID: locating-the-license-validation-code
+:CUSTOM_ID: analyzing-the-license-validation-code
 :END:
 
 That binary file is not too big for an executable, only around 69 kilobytes in
@@ -289,4 +291,46 @@ int fcn00408e90(int64_t arg1, int64_t arg2) {
     }
 }
 #+end_src
+
+We should analyze what each of this functions is doing internally.
+
+** Analyzing the base path function
+:PROPERTIES:
+:CUSTOM_ID: analyzing-the-base-path-function
+:END:
+
+The first function that is called when validating a license is =fcn.0040d570=,
+apparently to obtain some sort of base path, to which ="/gwlicense.ini"= will be
+appended. It receives 3 arguments, but since the last one is always null, we can
+ignore its logic[fn::If the function receives a non-null pointer as its third
+argument, it iterates the output path looking for the index of the last slash,
+and then writes it to the integer that the third argument points to.].
+
+Since the logic of the function is pretty straight-forward, I will just include
+the simplified disassembly.
+
+#+begin_src C
+int32_t fcn0040d570(char *out_buf, int32_t buf_size, int32_t *arg3) {
+    char path[4104];
+    if (realpath("/proc/self/exe", path) == NULL)
+        return -1;
+
+    int32_t len = strlen(path);
+    if (len > buf_size)
+        return len;
+
+    memcpy(out_buf, path, len);
+
+    if (arg3 != NULL) {
+        /* ... */
+    }
+
+    return len;
+}
+#+end_src
+
+It reads the real path of its own binary, and writes it to an output
+buffer. Note that {{{man(realpath(3))}}} is used to expand symbolic links, relative
+paths, etc. This necessary because =/proc/self/exe= is "a symbolic link containing
+the actual pathname of the executed command", as described in {{{man(proc(5))}}}.
 

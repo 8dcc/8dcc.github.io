@@ -206,10 +206,11 @@
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
 <li><a href="#introduction">1. Introduction</a></li>
-<li><a href="#locating-the-license-validation-code">2. Locating the license validation code</a>
+<li><a href="#analyzing-the-license-validation-code">2. Analyzing the license validation code</a>
 <ul>
 <li><a href="#locating-the-top-level-validation-function">2.1. Locating the top-level validation function</a></li>
 <li><a href="#analyzing-the-top-level-validation-function">2.2. Analyzing the top-level validation function</a></li>
+<li><a href="#analyzing-the-base-path-function">2.3. Analyzing the base path function</a></li>
 </ul>
 </li>
 </ul>
@@ -258,9 +259,9 @@ engineering framework, but other GUI tools such as <a href="https://cutter.re/">
 </div>
 </div>
 
-<div id="outline-container-locating-the-license-validation-code" class="outline-2">
-<h2 id="locating-the-license-validation-code"><span class="section-number-2">2.</span> Locating the license validation code</h2>
-<div class="outline-text-2" id="text-locating-the-license-validation-code">
+<div id="outline-container-analyzing-the-license-validation-code" class="outline-2">
+<h2 id="analyzing-the-license-validation-code"><span class="section-number-2">2.</span> Analyzing the license validation code</h2>
+<div class="outline-text-2" id="text-analyzing-the-license-validation-code">
 <p>
 That binary file is not too big for an executable, only around 69 kilobytes in
 size, but it&rsquo;s worth having a look inside, since it must either contain or call
@@ -533,6 +534,55 @@ This can be converted into simpler pseudo-code:
 }
 </pre>
 </div>
+
+<p>
+We should analyze what each of this functions is doing internally.
+</p>
+</div>
+</div>
+
+<div id="outline-container-analyzing-the-base-path-function" class="outline-3">
+<h3 id="analyzing-the-base-path-function"><span class="section-number-3">2.3.</span> Analyzing the base path function</h3>
+<div class="outline-text-3" id="text-analyzing-the-base-path-function">
+<p>
+The first function that is called when validating a license is <code>fcn.0040d570</code>,
+apparently to obtain some sort of base path, to which <code>"/gwlicense.ini"</code> will be
+appended. It receives 3 arguments, but since the last one is always null, we can
+ignore its logic<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>.
+</p>
+
+<p>
+Since the logic of the function is pretty straight-forward, I will just include
+the simplified disassembly.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C"><span style="color: #0031a9;">int32_t</span> <span style="color: #3f578f;">fcn0040d570</span>(<span style="color: #0031a9;">char</span> *<span style="color: #005f5f;">out_buf</span>, <span style="color: #0031a9;">int32_t</span> <span style="color: #005f5f;">buf_size</span>, <span style="color: #0031a9;">int32_t</span> *<span style="color: #005f5f;">arg3</span>) {
+    <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">path</span>[<span style="color: #2a5045;">4104</span>];
+    <span style="color: #972500;">if</span> (realpath(<span style="color: #005e8b;">"/proc/self/exe"</span>, path) == <span style="color: #2a5045;">NULL</span>)
+        <span style="color: #972500;">return</span> -<span style="color: #2a5045;">1</span>;
+
+    <span style="color: #0031a9;">int32_t</span> <span style="color: #005f5f;">len</span> = strlen(path);
+    <span style="color: #972500;">if</span> (len &gt; buf_size)
+        <span style="color: #972500;">return</span> len;
+
+    memcpy(out_buf, path, len);
+
+    <span style="color: #972500;">if</span> (arg3 != <span style="color: #2a5045;">NULL</span>) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+    }
+
+    <span style="color: #972500;">return</span> len;
+}
+</pre>
+</div>
+
+<p>
+It reads the real path of its own binary, and writes it to an output
+buffer. Note that <a href="https://man.cx/realpath(3)"><code>realpath(3)</code></a> is used to expand symbolic links, relative
+paths, etc. This necessary because <code>/proc/self/exe</code> is &ldquo;a symbolic link containing
+the actual pathname of the executed command&rdquo;, as described in <a href="https://man.cx/proc(5)"><code>proc(5)</code></a>.
+</p>
 </div>
 </div>
 </div>
@@ -543,6 +593,10 @@ This can be converted into simpler pseudo-code:
 <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">According to Section 3.2.3 and Figure 3.4 of the <a href="https://cs61.seas.harvard.edu/site/pdf/x86-64-abi-20210928.pdf">AMD64 calling
 convention</a>, the first two arguments are passed in <code>rdi</code> and <code>rsi</code>, and the return
 value is passed to the caller in <code>rax</code>.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">If the function receives a non-null pointer as its third
+argument, it iterates the output path looking for the index of the last slash,
+and then writes it to the integer that the third argument points to.</p></div></div>
 
 
 </div>
