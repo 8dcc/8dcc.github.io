@@ -447,6 +447,10 @@ decompilation, after cleaning the type casts and simplifying the function names.
     fcn0040d570(arg1_00, uVar2, <span style="color: #2a5045;">0</span>);
     <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
     var_40h = QString.fromAscii_helper(arg1_00, uVar5);
+    method.QFileInfo.QFileInfo_QString_const(&amp;var_60h, &amp;var_40h);
+    method.QFileInfo.absolutePath___const(&amp;var_50h, &amp;var_60h);
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+    var_48h = var_50h;
     <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
     QString.fromUtf8_helper(&amp;var_40h, <span style="color: #005e8b;">"/gwlicense.ini"</span>, <span style="color: #2a5045;">0xe</span>);
     QString.append(&amp;var_48h, &amp;var_40h);
@@ -509,9 +513,11 @@ This can be converted into simpler pseudo-code:
 <div class="org-src-container">
 <pre class="src src-C++"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">fcn00408e90</span>(<span style="color: #0031a9;">int64_t</span> <span style="color: #005f5f;">arg1</span>, <span style="color: #0031a9;">int64_t</span> <span style="color: #005f5f;">arg2</span>) {
     <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">length</span> = fcn0040d570(<span style="color: #2a5045;">0</span>, <span style="color: #2a5045;">0</span>, <span style="color: #2a5045;">0</span>);
-    <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">base_path</span> = <span style="color: #972500;">new</span> <span style="color: #0031a9;">char</span>[length + <span style="color: #2a5045;">1</span>];
-    fcn0040d570(base_path, length, <span style="color: #2a5045;">0</span>);
-    <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">full_path</span> = base_path + <span style="color: #005e8b;">"/gwlicense.ini"</span>;
+    <span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">path_buf</span> = <span style="color: #972500;">new</span> <span style="color: #0031a9;">char</span>[length + <span style="color: #2a5045;">1</span>];
+    fcn0040d570(path_buf, length, <span style="color: #2a5045;">0</span>);
+    <span style="color: #0031a9;">QFileInfo</span> <span style="color: #005f5f;">file_info</span> = QFileInfo(path_buf);
+    <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">file_dir</span> = file_info.absolutePath();
+    <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">full_path</span> = file_dir + <span style="color: #005e8b;">"/gwlicense.ini"</span>;
 
     <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 
@@ -547,17 +553,17 @@ We should analyze what each of this functions is doing internally.
 <p>
 The first function that is called when validating a license is <code>fcn.0040d570</code>,
 apparently to obtain some sort of base path, to which <code>"/gwlicense.ini"</code> will be
-appended. It receives 3 arguments, but since the last one is always null, we can
-ignore its logic<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>.
+appended. It receives 3 arguments, but since the last one is always null, I will
+ignore it<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>.
 </p>
 
 <p>
-Since the logic of the function is pretty straight-forward, I will just include
-the simplified disassembly.
+Since the logic of the function is pretty straight-forward, the following code
+directly shows the simplified decompilation.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-C"><span style="color: #0031a9;">int32_t</span> <span style="color: #3f578f;">fcn0040d570</span>(<span style="color: #0031a9;">char</span> *<span style="color: #005f5f;">out_buf</span>, <span style="color: #0031a9;">int32_t</span> <span style="color: #005f5f;">buf_size</span>, <span style="color: #0031a9;">int32_t</span> *<span style="color: #005f5f;">arg3</span>) {
+<pre class="src src-C"><span style="color: #0031a9;">int32_t</span> <span style="color: #3f578f;">fcn0040d570</span>(<span style="color: #0031a9;">char</span>* <span style="color: #005f5f;">out_buf</span>, <span style="color: #0031a9;">int32_t</span> <span style="color: #005f5f;">buf_size</span>, <span style="color: #0031a9;">int32_t</span>* <span style="color: #005f5f;">arg3</span>) {
     <span style="color: #0031a9;">char</span> <span style="color: #005f5f;">path</span>[<span style="color: #2a5045;">4104</span>];
     <span style="color: #972500;">if</span> (realpath(<span style="color: #005e8b;">"/proc/self/exe"</span>, path) == <span style="color: #2a5045;">NULL</span>)
         <span style="color: #972500;">return</span> -<span style="color: #2a5045;">1</span>;
@@ -578,10 +584,30 @@ the simplified disassembly.
 </div>
 
 <p>
-It reads the real path of its own binary, and writes it to an output
+It simply reads the real path of its own binary, and writes it to an output
 buffer. Note that <a href="https://man.cx/realpath(3)"><code>realpath(3)</code></a> is used to expand symbolic links, relative
 paths, etc. This necessary because <code>/proc/self/exe</code> is &ldquo;a symbolic link containing
 the actual pathname of the executed command&rdquo;, as described in <a href="https://man.cx/proc(5)"><code>proc(5)</code></a>.
+</p>
+
+<p>
+The caller of this function extracts the directory using <code>QFileInfo.absolutePath</code>,
+and appends the string <code>"/gwlicense.ini"</code>. If we look at the directory where the
+<code>gw_ide</code> binary is located, we can see that there is indeed a <code>gwlicense.ini</code>
+file. It is a plain text file with just two lines.
+</p>
+
+<pre class="example">
+$ cat /opt/gowin-eda-ide/bin/gwlicense.ini
+[license]
+lic="jinan3016:10559"
+</pre>
+
+<p>
+This is likely the information of a license validation server, where <code>jinan3016</code>
+could be the hostname of a Gowin developer, and <code>10559</code> is the port. Naturally, we
+aren&rsquo;t able to access this hostname from our machine, so this isn&rsquo;t a valid
+license file.
 </p>
 </div>
 </div>

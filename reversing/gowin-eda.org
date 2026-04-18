@@ -212,6 +212,10 @@ int fcn00408e90(int64_t arg1, int64_t arg2) {
     fcn0040d570(arg1_00, uVar2, 0);
     /* ... */
     var_40h = QString.fromAscii_helper(arg1_00, uVar5);
+    method.QFileInfo.QFileInfo_QString_const(&var_60h, &var_40h);
+    method.QFileInfo.absolutePath___const(&var_50h, &var_60h);
+    /* ... */
+    var_48h = var_50h;
     /* ... */
     QString.fromUtf8_helper(&var_40h, "/gwlicense.ini", 0xe);
     QString.append(&var_48h, &var_40h);
@@ -267,9 +271,11 @@ This can be converted into simpler pseudo-code:
 #+begin_src C++
 int fcn00408e90(int64_t arg1, int64_t arg2) {
     int length = fcn0040d570(0, 0, 0);
-    char* base_path = new char[length + 1];
-    fcn0040d570(base_path, length, 0);
-    QString full_path = base_path + "/gwlicense.ini";
+    char* path_buf = new char[length + 1];
+    fcn0040d570(path_buf, length, 0);
+    QFileInfo file_info = QFileInfo(path_buf);
+    QString file_dir = file_info.absolutePath();
+    QString full_path = file_dir + "/gwlicense.ini";
 
     /* ... */
 
@@ -301,16 +307,16 @@ We should analyze what each of this functions is doing internally.
 
 The first function that is called when validating a license is =fcn.0040d570=,
 apparently to obtain some sort of base path, to which ="/gwlicense.ini"= will be
-appended. It receives 3 arguments, but since the last one is always null, we can
-ignore its logic[fn::If the function receives a non-null pointer as its third
+appended. It receives 3 arguments, but since the last one is always null, I will
+ignore it[fn::If the function receives a non-null pointer as its third
 argument, it iterates the output path looking for the index of the last slash,
 and then writes it to the integer that the third argument points to.].
 
-Since the logic of the function is pretty straight-forward, I will just include
-the simplified disassembly.
+Since the logic of the function is pretty straight-forward, the following code
+directly shows the simplified decompilation.
 
 #+begin_src C
-int32_t fcn0040d570(char *out_buf, int32_t buf_size, int32_t *arg3) {
+int32_t fcn0040d570(char* out_buf, int32_t buf_size, int32_t* arg3) {
     char path[4104];
     if (realpath("/proc/self/exe", path) == NULL)
         return -1;
@@ -329,8 +335,24 @@ int32_t fcn0040d570(char *out_buf, int32_t buf_size, int32_t *arg3) {
 }
 #+end_src
 
-It reads the real path of its own binary, and writes it to an output
+It simply reads the real path of its own binary, and writes it to an output
 buffer. Note that {{{man(realpath(3))}}} is used to expand symbolic links, relative
 paths, etc. This necessary because =/proc/self/exe= is "a symbolic link containing
 the actual pathname of the executed command", as described in {{{man(proc(5))}}}.
+
+The caller of this function extracts the directory using =QFileInfo.absolutePath=,
+and appends the string ~"/gwlicense.ini"~. If we look at the directory where the
+=gw_ide= binary is located, we can see that there is indeed a =gwlicense.ini=
+file. It is a plain text file with just two lines.
+
+#+begin_src
+$ cat /opt/gowin-eda-ide/bin/gwlicense.ini
+[license]
+lic="jinan3016:10559"
+#+end_src
+
+This is likely the information of a license validation server, where =jinan3016=
+could be the hostname of a Gowin developer, and =10559= is the port. Naturally, we
+aren't able to access this hostname from our machine, so this isn't a valid
+license file.
 
