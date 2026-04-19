@@ -211,6 +211,7 @@
 <li><a href="#locating-the-top-level-validation-function">2.1. Locating the top-level validation function</a></li>
 <li><a href="#analyzing-the-top-level-validation-function">2.2. Analyzing the top-level validation function</a></li>
 <li><a href="#analyzing-the-base-path-function">2.3. Analyzing the base path function</a></li>
+<li><a href="#analyzing-the-parsing-function">2.4. Analyzing the parsing function</a></li>
 </ul>
 </li>
 </ul>
@@ -447,8 +448,8 @@ decompilation, after cleaning the type casts and simplifying the function names.
     fcn0040d570(arg1_00, uVar2, <span style="color: #2a5045;">0</span>);
     <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
     var_40h = QString.fromAscii_helper(arg1_00, uVar5);
-    method.QFileInfo.QFileInfo_QString_const(&amp;var_60h, &amp;var_40h);
-    method.QFileInfo.absolutePath___const(&amp;var_50h, &amp;var_60h);
+    QFileInfo.QFileInfo(&amp;var_60h, &amp;var_40h);
+    QFileInfo.absolutePath(&amp;var_50h, &amp;var_60h);
     <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
     var_48h = var_50h;
     <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
@@ -501,8 +502,8 @@ was not processed entirely, <code>0x10</code> is returned.</li>
 <li>A new <code>QRegExp</code> object is initialized with the pattern <code>"^(.*):(\\d+)$"</code>. It is
 checked against the second argument of <code>fcn.00407b40</code>, likely because that
 function writes something the buffer which may or may not match the regexp.</li>
-<li>If the regexp matches, function <code>fcn.00407f70</code> is called and its return value
-is propagated. Otherwise, if the regexp didn&rsquo;t match function <code>fcn.00408170</code> is
+<li>If the regexp matches, function <code>fcn.00408170</code> is called and its return value
+is propagated. Otherwise, if the regexp didn&rsquo;t match function <code>fcn.00407f70</code> is
 called, also propagating its return value.</li>
 </ol>
 
@@ -521,8 +522,8 @@ This can be converted into simpler pseudo-code:
 
     <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 
-    <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">out_value</span>;
-    fcn00407b40(full_path, &amp;out_value);
+    <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">parsed</span>;
+    fcn00407b40(full_path, &amp;parsed);
     <span style="color: #972500;">if</span> (*full_path != <span style="color: #005e8b;">'</span><span style="color: #972500;">\0</span><span style="color: #005e8b;">'</span>) {
         <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
         <span style="color: #972500;">return</span> <span style="color: #2a5045;">0x10</span>;
@@ -530,19 +531,19 @@ This can be converted into simpler pseudo-code:
 
     <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
 
-    <span style="color: #0031a9;">QRegExp</span> <span style="color: #005f5f;">rx</span>(<span style="color: #005e8b;">"^(.*):(</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">d+)$"</span>);
-    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>rx.exactMatch(out_value)) {
-        <span style="color: #972500;">return</span> fcn00407f70(out_value, arg1, arg2);
-    } <span style="color: #972500;">else</span> {
+    <span style="color: #0031a9;">QRegExp</span> <span style="color: #005f5f;">rx</span> = QRegExp(<span style="color: #005e8b;">"^(.*):(</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">d+)$"</span>);
+    <span style="color: #972500;">if</span> (rx.exactMatch(parsed)) {
         <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
-        <span style="color: #972500;">return</span> fcn00408170(full_path, out_value, arg1, arg2, <span style="color: #2a5045;">0</span>, ...);
+        <span style="color: #972500;">return</span> fcn00408170(full_path, parsed, arg1, arg2, <span style="color: #2a5045;">0</span>, ...);
+    } <span style="color: #972500;">else</span> {
+        <span style="color: #972500;">return</span> fcn00407f70(parsed, arg1, arg2);
     }
 }
 </pre>
 </div>
 
 <p>
-We should analyze what each of this functions is doing internally.
+The following sections analyze what each of this functions is doing internally.
 </p>
 </div>
 </div>
@@ -611,6 +612,118 @@ license file.
 </p>
 </div>
 </div>
+
+<div id="outline-container-analyzing-the-parsing-function" class="outline-3">
+<h3 id="analyzing-the-parsing-function"><span class="section-number-3">2.4.</span> Analyzing the parsing function</h3>
+<div class="outline-text-3" id="text-analyzing-the-parsing-function">
+<p>
+After building the full path to the <code>gwlicense.ini</code> file, the top-level function
+calls <code>fcn.00407b40</code>, passing it as argument. This function receives the path to
+the license file and another string, probably for writing to it.
+</p>
+
+<p>
+When decompiling this function, Ghidra generates a lot of labels and <code>goto</code>
+statements, while IDA Pro uses more comprehensive loops. The following code
+shows a mix of the two for readability.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">fcn00407b40</span>(<span style="color: #0031a9;">int64_t</span> <span style="color: #005f5f;">arg1</span>, <span style="color: #0031a9;">int64_t</span> <span style="color: #005f5f;">arg2</span>) {
+    QFile.QFile(&amp;var_58h, arg1);
+    <span style="color: #972500;">if</span> (QFile.open(&amp;var_58h, <span style="color: #2a5045;">1</span>) == <span style="color: #2a5045;">0</span>) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">0x10</span>;
+    }
+
+    QTextStream.QTextStream(&amp;var_48h, &amp;var_58h);
+    QTextStream.setCodec(&amp;var_48h, <span style="color: #005e8b;">"UTF-8"</span>);
+
+    var_60h = QString.fromAscii_helper(<span style="color: #005e8b;">"lic</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">s*=</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">s*</span><span style="color: #972500;">\"</span><span style="color: #005e8b;">(.*)</span><span style="color: #972500;">\"</span><span style="color: #005e8b;">"</span>, <span style="color: #2a5045;">0x10</span>);
+    QRegExp.QRegExp(&amp;var_78h, &amp;var_60h, <span style="color: #2a5045;">1</span>, <span style="color: #2a5045;">0</span>);
+
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+
+    <span style="color: #972500;">while</span> (<span style="color: #972500; font-weight: bold;">!</span>QTextStream.atEnd(&amp;var_48h)) {
+        QTextStream.readLine(&amp;var_68h, &amp;var_48h, <span style="color: #2a5045;">0</span>);
+        <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>QString.startsWith(&amp;var_68h, <span style="color: #2a5045;">0x23</span>, <span style="color: #2a5045;">1</span>) &amp;&amp; QRegExp.exactMatch(&amp;var_78h, &amp;var_68h)) {
+            QRegExp.cap(&amp;var_60h, &amp;var_78h, <span style="color: #2a5045;">1</span>);
+            iVar4 = var_60h;
+            <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+            var_70h = iVar4;
+            <span style="color: #972500;">break</span>;
+        }
+    }
+
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+
+    QString.<span style="color: #972500;">operator</span>=(arg2, &amp;var_70h);
+    QFileDevice.close(&amp;var_58h);
+    <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
+}
+</pre>
+</div>
+
+<p>
+The basic process of the function is:
+</p>
+
+<ol class="org-ol">
+<li>Open the file at the path received in <code>arg1</code>, in this case the path to
+<code>gwlicense.ini</code>.</li>
+<li>Declare a <code>QTextStream</code> with UTF-8 codification, which will be used later to
+read lines of the file.</li>
+<li>Declare a <code>QRegExp</code> with the pattern <code>"lic\\s*=\\s*\"(.*)\""</code>.</li>
+<li>Read lines until the file ends. For each one:
+<ul class="org-ul">
+<li>Ensure the line doesn&rsquo;t start with <code>0x23</code> (ASCII <code>'#'</code>); probably because they
+are considered comments.</li>
+<li>Check if the line matches the previous regexp pattern; for example,
+<code>lic="FOO"</code>. If it does, capture the first regexp group<sup><a id="fnr.3" class="footref" href="#fn.3" role="doc-backlink">3</a></sup> (e.g., <code>FOO</code>) in a variable and
+break out of the loop.</li>
+</ul></li>
+<li>Assign the captured regexp match to the second argument.</li>
+</ol>
+
+<p>
+After simplifying the function, we obtain something more readable.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">fcn00407b40</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">QString</span>* <span style="color: #005f5f;">path</span>, <span style="color: #0031a9;">QString</span>* <span style="color: #005f5f;">out_contents</span>) {
+    <span style="color: #0031a9;">QFile</span> <span style="color: #005f5f;">file</span> = QFile(*path);
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>file.open(<span style="color: #2a5045;">QIODevice</span>::ReadOnly)) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">...</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">0x10</span>;
+    }
+
+    <span style="color: #0031a9;">QRegExp</span> <span style="color: #005f5f;">rx</span> = QRegExp(<span style="color: #005e8b;">"lic</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">s*=</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">s*</span><span style="color: #972500;">\"</span><span style="color: #005e8b;">(.*)</span><span style="color: #972500;">\"</span><span style="color: #005e8b;">"</span>);
+    <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">result</span>;
+
+    <span style="color: #0031a9;">QTextStream</span> <span style="color: #005f5f;">stream</span> = QTextStream(&amp;file);
+    stream.setCodec(<span style="color: #005e8b;">"UTF-8"</span>);
+    <span style="color: #972500;">while</span> (<span style="color: #972500; font-weight: bold;">!</span>stream.atEnd()) {
+        <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">line</span> = stream.readLine();
+        <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>line.startsWith(<span style="color: #005e8b;">'#'</span>) &amp;&amp; rx.exactMatch(line)) {
+            result = rx.cap(<span style="color: #2a5045;">1</span>);
+            <span style="color: #972500;">break</span>;
+        }
+    }
+
+    *out_contents = result;
+    file.close();
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
+}
+</pre>
+</div>
+
+<p>
+It simply reads the contents of the <code>lic="..."</code> line and writes it to its second
+argument.
+</p>
+</div>
+</div>
 </div>
 <div id="footnotes">
 <h2 class="footnotes">Footnotes: </h2>
@@ -623,6 +736,12 @@ value is passed to the caller in <code>rax</code>.</p></div></div>
 <div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">If the function receives a non-null pointer as its third
 argument, it iterates the output path looking for the index of the last slash,
 and then writes it to the integer that the third argument points to.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3" role="doc-backlink">3</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Note that the
+<code>index</code> parameter of the <code>QRegExp::cap</code> function uses a special value 0 to
+indicate &ldquo;the entire match&rdquo;, that is, the entire regular
+expression. Therefore, the explicit capture groups, specified in the regexp
+with the <code>(...)</code> syntax, start from index 1.</p></div></div>
 
 
 </div>

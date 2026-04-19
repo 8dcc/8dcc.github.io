@@ -212,8 +212,8 @@ int fcn00408e90(int64_t arg1, int64_t arg2) {
     fcn0040d570(arg1_00, uVar2, 0);
     /* ... */
     var_40h = QString.fromAscii_helper(arg1_00, uVar5);
-    method.QFileInfo.QFileInfo_QString_const(&var_60h, &var_40h);
-    method.QFileInfo.absolutePath___const(&var_50h, &var_60h);
+    QFileInfo.QFileInfo(&var_60h, &var_40h);
+    QFileInfo.absolutePath(&var_50h, &var_60h);
     /* ... */
     var_48h = var_50h;
     /* ... */
@@ -262,8 +262,8 @@ From this, we can see the general structure of the function.
 3. A new =QRegExp= object is initialized with the pattern ~"^(.*):(\\d+)$"~. It is
    checked against the second argument of =fcn.00407b40=, likely because that
    function writes something the buffer which may or may not match the regexp.
-4. If the regexp matches, function =fcn.00407f70= is called and its return value
-   is propagated. Otherwise, if the regexp didn't match function =fcn.00408170= is
+4. If the regexp matches, function =fcn.00408170= is called and its return value
+   is propagated. Otherwise, if the regexp didn't match function =fcn.00407f70= is
    called, also propagating its return value.
 
 This can be converted into simpler pseudo-code:
@@ -279,8 +279,8 @@ int fcn00408e90(int64_t arg1, int64_t arg2) {
 
     /* ... */
 
-    QString out_value;
-    fcn00407b40(full_path, &out_value);
+    QString parsed;
+    fcn00407b40(full_path, &parsed);
     if (*full_path != '\0') {
         /* ... */
         return 0x10;
@@ -288,17 +288,17 @@ int fcn00408e90(int64_t arg1, int64_t arg2) {
 
     /* ... */
 
-    QRegExp rx("^(.*):(\\d+)$");
-    if (!rx.exactMatch(out_value)) {
-        return fcn00407f70(out_value, arg1, arg2);
-    } else {
+    QRegExp rx = QRegExp("^(.*):(\\d+)$");
+    if (rx.exactMatch(parsed)) {
         /* ... */
-        return fcn00408170(full_path, out_value, arg1, arg2, 0, ...);
+        return fcn00408170(full_path, parsed, arg1, arg2, 0, ...);
+    } else {
+        return fcn00407f70(parsed, arg1, arg2);
     }
 }
 #+end_src
 
-We should analyze what each of this functions is doing internally.
+The following sections analyze what each of this functions is doing internally.
 
 ** Analyzing the base path function
 :PROPERTIES:
@@ -355,4 +355,104 @@ This is likely the information of a license validation server, where =jinan3016=
 could be the hostname of a Gowin developer, and =10559= is the port. Naturally, we
 aren't able to access this hostname from our machine, so this isn't a valid
 license file.
+
+** Analyzing the parsing function
+:PROPERTIES:
+:CUSTOM_ID: analyzing-the-parsing-function
+:END:
+
+After building the full path to the =gwlicense.ini= file, the top-level function
+calls =fcn.00407b40=, passing it as argument. This function receives the path to
+the license file and another string, probably for writing to it.
+
+When decompiling this function, Ghidra generates a lot of labels and =goto=
+statements, while IDA Pro uses more comprehensive loops. The following code
+shows a mix of the two for readability.
+
+#+begin_src C++
+int fcn00407b40(int64_t arg1, int64_t arg2) {
+    QFile.QFile(&var_58h, arg1);
+    if (QFile.open(&var_58h, 1) == 0) {
+        /* ... */
+        return 0x10;
+    }
+
+    QTextStream.QTextStream(&var_48h, &var_58h);
+    QTextStream.setCodec(&var_48h, "UTF-8");
+
+    var_60h = QString.fromAscii_helper("lic\\s*=\\s*\"(.*)\"", 0x10);
+    QRegExp.QRegExp(&var_78h, &var_60h, 1, 0);
+
+    /* ... */
+
+    while (!QTextStream.atEnd(&var_48h)) {
+        QTextStream.readLine(&var_68h, &var_48h, 0);
+        if (!QString.startsWith(&var_68h, 0x23, 1) && QRegExp.exactMatch(&var_78h, &var_68h)) {
+            QRegExp.cap(&var_60h, &var_78h, 1);
+            iVar4 = var_60h;
+            /* ... */
+            var_70h = iVar4;
+            break;
+        }
+    }
+
+    /* ... */
+
+    QString.operator=(arg2, &var_70h);
+    QFileDevice.close(&var_58h);
+    /* ... */
+    return 0;
+}
+#+end_src
+
+The basic process of the function is:
+
+1. Open the file at the path received in =arg1=, in this case the path to
+   =gwlicense.ini=.
+2. Declare a =QTextStream= with UTF-8 codification, which will be used later to
+   read lines of the file.
+3. Declare a =QRegExp= with the pattern ~"lic\\s*=\\s*\"(.*)\""~.
+4. Read lines until the file ends. For each one:
+   - Ensure the line doesn't start with =0x23= (ASCII ='#'=); probably because they
+     are considered comments.
+   - Check if the line matches the previous regexp pattern; for example,
+     ~lic="FOO"~. If it does, capture the first regexp group[fn::Note that the
+     =index= parameter of the =QRegExp::cap= function uses a special value 0 to
+     indicate "the entire match", that is, the entire regular
+     expression. Therefore, the explicit capture groups, specified in the regexp
+     with the =(...)= syntax, start from index 1.] (e.g., ~FOO~) in a variable and
+     break out of the loop.
+5. Assign the captured regexp match to the second argument.
+
+After simplifying the function, we obtain something more readable.
+
+#+begin_src C++
+int fcn00407b40(const QString* path, QString* out_contents) {
+    QFile file = QFile(*path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        /* ... */
+        return 0x10;
+    }
+
+    QRegExp rx = QRegExp("lic\\s*=\\s*\"(.*)\"");
+    QString result;
+
+    QTextStream stream = QTextStream(&file);
+    stream.setCodec("UTF-8");
+    while (!stream.atEnd()) {
+        QString line = stream.readLine();
+        if (!line.startsWith('#') && rx.exactMatch(line)) {
+            result = rx.cap(1);
+            break;
+        }
+    }
+
+    ,*out_contents = result;
+    file.close();
+    return 0;
+}
+#+end_src
+
+It simply reads the contents of the ~lic="..."~ line and writes it to its second
+argument.
 
