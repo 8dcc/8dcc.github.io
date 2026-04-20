@@ -5,8 +5,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reverse engineering and bypassing the Gowin EDA</title>
-<meta property="og:title" content="Reverse engineering and bypassing the Gowin EDA" />
+<title>Reverse engineering and bypassing license verification by flipping a bit</title>
+<meta property="og:title" content="Reverse engineering and bypassing license verification by flipping a bit" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -200,7 +200,7 @@
 <div id="org-div-home-and-up">
   <a accesskey="u" href="index.html">Up</a> | <a accesskey="h" href="../index.html">Home</a>
 </div><div id="content" class="content">
-<h1 class="title">Reverse engineering and bypassing the Gowin EDA</h1>
+<h1 class="title">Reverse engineering and bypassing license verification by flipping a bit</h1>
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
@@ -212,6 +212,7 @@
 <li><a href="#analyzing-the-top-level-validation-function">2.2. Analyzing the top-level validation function</a></li>
 <li><a href="#analyzing-the-base-path-function">2.3. Analyzing the base path function</a></li>
 <li><a href="#analyzing-the-parsing-function">2.4. Analyzing the parsing function</a></li>
+<li><a href="#analyzing-the-online-validation-function">2.5. Analyzing the online validation function</a></li>
 </ul>
 </li>
 </ul>
@@ -222,11 +223,21 @@
 <h2 id="introduction"><span class="section-number-2">1.</span> Introduction</h2>
 <div class="outline-text-2" id="text-introduction">
 <p>
-The <a href="https://wiki.sipeed.com/hardware/en/tang/Tang-Nano-9K/Nano-9K.html">Tang Nano 9K</a> is a development board made by Sipeed, which uses a Gowin
-<a href="https://cdn.gowinsemi.com.cn/DS117E.pdf">GW1NR-9</a> FPGA chip. Different steps are needed to program an FPGA, including
-synthetization, place and route, and the programming itself. The <i>Gowin EDA</i>
-(Electronic Design Automation) tool was developed by Gowin to perform all these
-tasks from a single GUI program.
+This article explains how to reverse-engineer the license validation code of an
+IDE program, and how it can be bypassed at different levels. The content in this
+article is for educational purposes only, and tries to raise awareness among
+software developers and security researchers; I am not responsible for any
+misuse.
+</p>
+
+<p>
+I recently bought a development board which uses uses a Gowin <a href="https://cdn.gowinsemi.com.cn/DS117E.pdf">GW1NR-9</a> FPGA
+chip. Different steps are needed to program an FPGA, including synthetization,
+place and route, and the programming itself. The <i>Gowin EDA</i> (Electronic Design
+Automation) tool was developed by <a href="https://www.gowinsemi.com/en/">Gowin</a> to perform all these tasks from a single
+GUI program. Unfortunately, the Gowin EDA requires a license which you must
+request from them, providing your personal details and the MAC address of your
+PC.
 </p>
 
 <p>
@@ -724,6 +735,105 @@ argument.
 </p>
 </div>
 </div>
+
+<div id="outline-container-analyzing-the-online-validation-function" class="outline-3">
+<h3 id="analyzing-the-online-validation-function"><span class="section-number-3">2.5.</span> Analyzing the online validation function</h3>
+<div class="outline-text-3" id="text-analyzing-the-online-validation-function">
+<p>
+After reading the contents of the license file, the top-level function compares
+it to the regexp <code>"^(.*):(\\d+)$"</code>, if it matches, the function <code>fcn.00408170</code>
+is called.
+</p>
+
+<p>
+This function is pretty big, and even the simplified decompilation is too big
+for this article. In short, what the function does is:
+</p>
+
+<ol class="org-ol">
+<li>Build <code>QTcpSocket</code> from first two arguments (host and port). Connect to it with
+a 5 second timeout.</li>
+<li><p>
+Build <code>QVariantMap</code> and convert to JSON:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-js-json">{
+    <span style="color: #005e8b;">"cmd"</span>: <span style="color: #005e8b;">"check"</span>,
+    <span style="color: #005e8b;">"user-name"</span>: currentUserName(),
+    <span style="color: #005e8b;">"host-name"</span>: QHostInfo::localHostName(),
+    <span style="color: #005e8b;">"pid"</span>: getpid(),
+}
+</pre>
+</div></li>
+
+<li>Encrypt with public key of the server, which is embedded in the binary as a
+string. This is done through <code>fcn.406420</code>.</li>
+<li>Build <code>QDataStream</code> from socket, send signed payload.</li>
+<li>Read first 4 bytes from the server to get the response body size; this is
+retried up to 5 times, waiting 100ms between attempts. Then, wait for the
+socket to receive the full response; this is also retried 5 times with the
+same delay.</li>
+<li>Read the full response from the server into a <code>QByteArray</code>.</li>
+<li>Decrypt the response from the server with the private key of the client (us),
+which is also embedded in the binary as a plain string. This is done through
+<code>fcn.406550</code>.</li>
+<li>Convert the decrypted response to a <code>QJsonDocument</code>, and then to a <code>QVariantMap</code>.</li>
+<li>Extract the <code>"lic"</code> field from the deserialized JSON to a <code>QByteArray</code>.</li>
+<li>Call <code>fcn.4071A0</code> to parse and verify the license into an unknown
+<code>ParsedLicense</code> structure. If the license is invalid, return an error. This
+step is important, and will be expanded below.</li>
+<li>Obtain the current date using <code>QDate.currentDate()</code>, and compare it to the
+&ldquo;expiry date&rdquo; field of the <code>ParsedLicense</code> structure. If the license is
+expired, return an error.</li>
+<li>Write the <code>ParsedLicense</code> to an output structure, if specified as the 5th
+argument of the function.</li>
+<li>On success, return the <code>"res"</code> field of the JSON that was received from the
+server.</li>
+</ol>
+
+<p>
+As mentioned, the license parsing function (<code>fcn.4071A0</code>) will be examined below,
+but it&rsquo;s important to note something from the caller first. This license parsing
+function receives a data structure which I labeled <code>ParsedLicense</code>, and we can
+determine the offset of its &ldquo;expiry date&rdquo; field from the date comparison
+code. The following assembly snippet shows all relevant instructions surrounding
+the call to the license parser from the online validation function.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #2a5045;">0x004081e8</span>      <span style="color: #2a5045;">4c</span> <span style="color: #2a5045;">8d</span> a4 <span style="color: #2a5045;">24</span> <span style="color: #2a5045;">10</span> <span style="color: #2a5045;">01</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>           <span style="color: #721045;">lea</span>     <span style="color: #005f5f;">r12</span>, [<span style="color: #005f5f;">rsp</span> + <span style="color: #2a5045;">0x110</span>]
+<span style="color: #595959;">; </span><span style="color: #595959;">...</span>
+<span style="color: #2a5045;">0x00408b95</span>      <span style="color: #2a5045;">4c</span> <span style="color: #2a5045;">89</span> e6                          <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rsi</span>, <span style="color: #005f5f;">r12</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">...</span>
+<span style="color: #2a5045;">0x00408bb1</span>      <span style="color: #2a5045;">48</span> b8 <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">80</span>     movabs  <span style="color: #005f5f;">rax</span>, <span style="color: #2a5045;">0x8000000000000000</span>  <span style="color: #595959;">; </span><span style="color: #595959;">LLONG_MIN</span>
+<span style="color: #2a5045;">0x00408bbb</span>      <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">89</span> <span style="color: #2a5045;">84</span> <span style="color: #2a5045;">24</span> <span style="color: #2a5045;">28</span> <span style="color: #2a5045;">01</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>           <span style="color: #721045;">mov</span>     <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rsp</span> + <span style="color: #2a5045;">0x128</span>], <span style="color: #005f5f;">rax</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">...</span>
+<span style="color: #2a5045;">0x00408bcb</span>      e8 d0 e5 ff ff                    <span style="color: #721045;">call</span>    fcn.004071a0  <span style="color: #595959;">; </span><span style="color: #595959;">License parser</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">...</span>
+<span style="color: #2a5045;">0x00408bdd</span>      e8 <span style="color: #2a5045;">6e</span> bc ff ff                    <span style="color: #721045;">call</span>    QDate::currentDate()
+<span style="color: #2a5045;">0x00408be2</span>      <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">3b</span> <span style="color: #2a5045;">84</span> <span style="color: #2a5045;">24</span> <span style="color: #2a5045;">28</span> <span style="color: #2a5045;">01</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>           <span style="color: #721045;">cmp</span>     <span style="color: #005f5f;">rax</span>, <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rsp</span> + <span style="color: #2a5045;">0x128</span>]
+</pre>
+</div>
+
+<p>
+The current date (result of calling <code>QDate::currentDate</code>, stored in <code>rax</code>) is
+compared against some 8-byte location on the stack at <code>[rsp + 0x128]</code><sup><a id="fnr.4" class="footref" href="#fn.4" role="doc-backlink">4</a></sup>, which was cleared at <code>0x00408bbb</code>; this <code>0x128</code>
+is the position on the stack frame where the &ldquo;expiry date&rdquo; field resides. Since
+<code>fcn.004071a0</code> receives its &ldquo;destination pointer&rdquo; parameter in its second
+argument (this will be shown below), the base of the <code>ParsedLicense</code> structure
+must be loaded into the <code>rsi</code> register by the caller. The last write to the <code>rsi</code>
+register was at <code>0x00408b95</code>, using the value of <code>r12</code>; the last write to <code>r12</code> was at
+<code>0x004081e8</code>, using the address of <code>[rsp + 0x110]</code><sup><a id="fnr.5" class="footref" href="#fn.5" role="doc-backlink">5</a></sup>.
+</p>
+
+<p>
+Therefore, <code>0x110</code> is the offset on the stack frame where the structure starts,
+and <code>0x128</code> is the offset where the &ldquo;expiry date&rdquo; lives; <code>0x18</code> is the offset in the
+<code>ParsedLicense</code> structure.
+</p>
+</div>
+</div>
 </div>
 <div id="footnotes">
 <h2 class="footnotes">Footnotes: </h2>
@@ -742,6 +852,19 @@ and then writes it to the integer that the third argument points to.</p></div></
 indicate &ldquo;the entire match&rdquo;, that is, the entire regular
 expression. Therefore, the explicit capture groups, specified in the regexp
 with the <code>(...)</code> syntax, start from index 1.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4" role="doc-backlink">4</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">If you
+are not familiar with how local variables are stored on the stack, functions
+usually decrease the <code>rsp</code> register in the function prologue to reserve space for
+local variables, and then add positive offsets to that register to access
+addresses of that reserved space. In this function, <code>rsp</code> was decreased by <code>0x148</code>
+in <code>0x408184</code>, reserving 328 bytes; this is where the <code>ParsedLicense</code> structure
+lives, until the function returns.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5" role="doc-backlink">5</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">We are able to easily trace
+back the write to <code>r12</code> because it is callee-saved according to Section 3.2.1 of
+the AMD64 ABI. This means that, although functions might use <code>r12</code> internally,
+they are required to restore its value before returning.</p></div></div>
 
 
 </div>

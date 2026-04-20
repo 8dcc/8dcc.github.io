@@ -1,4 +1,4 @@
-#+TITLE: Reverse engineering and bypassing the Gowin EDA
+#+TITLE: Reverse engineering and bypassing license verification by flipping a bit
 #+AUTHOR: 8dcc
 #+STARTUP: nofold
 #+HTML_HEAD: <link rel="icon" type="image/x-icon" href="../img/favicon.png">
@@ -13,11 +13,19 @@
 :CUSTOM_ID: introduction
 :END:
 
-The [[https://wiki.sipeed.com/hardware/en/tang/Tang-Nano-9K/Nano-9K.html][Tang Nano 9K]] is a development board made by Sipeed, which uses a Gowin
-[[https://cdn.gowinsemi.com.cn/DS117E.pdf][GW1NR-9]] FPGA chip. Different steps are needed to program an FPGA, including
-synthetization, place and route, and the programming itself. The /Gowin EDA/
-(Electronic Design Automation) tool was developed by Gowin to perform all these
-tasks from a single GUI program.
+This article explains how to reverse-engineer the license validation code of an
+IDE program, and how it can be bypassed at different levels. The content in this
+article is for educational purposes only, and tries to raise awareness among
+software developers and security researchers; I am not responsible for any
+misuse.
+
+I recently bought a development board which uses uses a Gowin [[https://cdn.gowinsemi.com.cn/DS117E.pdf][GW1NR-9]] FPGA
+chip. Different steps are needed to program an FPGA, including synthetization,
+place and route, and the programming itself. The /Gowin EDA/ (Electronic Design
+Automation) tool was developed by [[https://www.gowinsemi.com/en/][Gowin]] to perform all these tasks from a single
+GUI program. Unfortunately, the Gowin EDA requires a license which you must
+request from them, providing your personal details and the MAC address of your
+PC.
 
 For this article, the GNU/Linux version of Gowin EDA 1.9.12.02 will be used,
 which can be downloaded from [[https://www.gowinsemi.com/en/support/download_eda][this link]]. I have personally installed it from the
@@ -456,3 +464,94 @@ int fcn00407b40(const QString* path, QString* out_contents) {
 It simply reads the contents of the ~lic="..."~ line and writes it to its second
 argument.
 
+** Analyzing the online validation function
+:PROPERTIES:
+:CUSTOM_ID: analyzing-the-online-validation-function
+:END:
+
+After reading the contents of the license file, the top-level function compares
+it to the regexp ~"^(.*):(\\d+)$"~, if it matches, the function =fcn.00408170=
+is called.
+
+This function is pretty big, and even the simplified decompilation is too big
+for this article. In short, what the function does is:
+
+1. Build =QTcpSocket= from first two arguments (host and port). Connect to it with
+   a 5 second timeout.
+2. Build =QVariantMap= and convert to JSON:
+
+   #+begin_src js-json
+   {
+       "cmd": "check",
+       "user-name": currentUserName(),
+       "host-name": QHostInfo::localHostName(),
+       "pid": getpid(),
+   }
+   #+end_src
+
+3. Encrypt with public key of the server, which is embedded in the binary as a
+   string. This is done through =fcn.406420=.
+4. Build =QDataStream= from socket, send signed payload.
+5. Read first 4 bytes from the server to get the response body size; this is
+   retried up to 5 times, waiting 100ms between attempts. Then, wait for the
+   socket to receive the full response; this is also retried 5 times with the
+   same delay.
+6. Read the full response from the server into a =QByteArray=.
+7. Decrypt the response from the server with the private key of the client (us),
+   which is also embedded in the binary as a plain string. This is done through
+   =fcn.406550=.
+8. Convert the decrypted response to a =QJsonDocument=, and then to a =QVariantMap=.
+9. Extract the ="lic"= field from the deserialized JSON to a =QByteArray=.
+10. Call =fcn.4071A0= to parse and verify the license into an unknown
+    =ParsedLicense= structure. If the license is invalid, return an error. This
+    step is important, and will be expanded below.
+11. Obtain the current date using =QDate.currentDate()=, and compare it to the
+    "expiry date" field of the =ParsedLicense= structure. If the license is
+    expired, return an error.
+12. Write the =ParsedLicense= to an output structure, if specified as the 5th
+    argument of the function.
+13. On success, return the ="res"= field of the JSON that was received from the
+    server.
+
+As mentioned, the license parsing function (=fcn.4071A0=) will be examined below,
+but it's important to note something from the caller first. This license parsing
+function receives a data structure which I labeled =ParsedLicense=, and we can
+determine the offset of its "expiry date" field from the date comparison
+code. The following assembly snippet shows all relevant instructions surrounding
+the call to the license parser from the online validation function.
+
+#+begin_src nasm
+0x004081e8      4c 8d a4 24 10 01 00 00           lea     r12, [rsp + 0x110]
+; ...
+0x00408b95      4c 89 e6                          mov     rsi, r12
+; ...
+0x00408bb1      48 b8 00 00 00 00 00 00 00 80     movabs  rax, 0x8000000000000000  ; LLONG_MIN
+0x00408bbb      48 89 84 24 28 01 00 00           mov     qword [rsp + 0x128], rax
+; ...
+0x00408bcb      e8 d0 e5 ff ff                    call    fcn.004071a0  ; License parser
+; ...
+0x00408bdd      e8 6e bc ff ff                    call    QDate::currentDate()
+0x00408be2      48 3b 84 24 28 01 00 00           cmp     rax, qword [rsp + 0x128]
+#+end_src
+
+The current date (result of calling =QDate::currentDate=, stored in =rax=) is
+compared against some 8-byte location on the stack at =[rsp + 0x128]=[fn::If you
+are not familiar with how local variables are stored on the stack, functions
+usually decrease the =rsp= register in the function prologue to reserve space for
+local variables, and then add positive offsets to that register to access
+addresses of that reserved space. In this function, =rsp= was decreased by =0x148=
+in =0x408184=, reserving 328 bytes; this is where the =ParsedLicense= structure
+lives, until the function returns.], which was cleared at =0x00408bbb=; this =0x128=
+is the position on the stack frame where the "expiry date" field resides. Since
+=fcn.004071a0= receives its "destination pointer" parameter in its second
+argument (this will be shown below), the base of the =ParsedLicense= structure
+must be loaded into the =rsi= register by the caller. The last write to the =rsi=
+register was at =0x00408b95=, using the value of =r12=; the last write to =r12= was at
+=0x004081e8=, using the address of =[rsp + 0x110]=[fn::We are able to easily trace
+back the write to =r12= because it is callee-saved according to Section 3.2.1 of
+the AMD64 ABI. This means that, although functions might use =r12= internally,
+they are required to restore its value before returning.].
+
+Therefore, =0x110= is the offset on the stack frame where the structure starts,
+and =0x128= is the offset where the "expiry date" lives; =0x18= is the offset in the
+=ParsedLicense= structure.
