@@ -172,6 +172,7 @@ pre.src .linenr {
 }
 
 pre.src-nasm::before { content: 'Assembler (NASM)'; }
+pre.src-js-json::before { content: 'JSON'; }
 
 /*----------------------------------------------------------------------------*/
 
