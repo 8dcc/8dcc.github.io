@@ -211,8 +211,10 @@
 <li><a href="#locating-the-top-level-validation-function">2.1. Locating the top-level validation function</a></li>
 <li><a href="#analyzing-the-top-level-validation-function">2.2. Analyzing the top-level validation function</a></li>
 <li><a href="#analyzing-the-base-path-function">2.3. Analyzing the base path function</a></li>
-<li><a href="#analyzing-the-parsing-function">2.4. Analyzing the parsing function</a></li>
+<li><a href="#analyzing-the-file-parsing-function">2.4. Analyzing the file parsing function</a></li>
 <li><a href="#analyzing-the-online-validation-function">2.5. Analyzing the online validation function</a></li>
+<li><a href="#analyzing-the-license-data-validator">2.6. Analyzing the license data validator</a></li>
+<li><a href="#analyzing-the-offline-validation-function">2.7. Analyzing the offline validation function</a></li>
 </ul>
 </li>
 </ul>
@@ -512,10 +514,11 @@ processed the entire input string up to the null-terminator. If the string
 was not processed entirely, <code>0x10</code> is returned.</li>
 <li>A new <code>QRegExp</code> object is initialized with the pattern <code>"^(.*):(\\d+)$"</code>. It is
 checked against the second argument of <code>fcn.00407b40</code>, likely because that
-function writes something the buffer which may or may not match the regexp.</li>
+function writes something the buffer which may or may not match the regular
+expression.</li>
 <li>If the regexp matches, function <code>fcn.00408170</code> is called and its return value
-is propagated. Otherwise, if the regexp didn&rsquo;t match function <code>fcn.00407f70</code> is
-called, also propagating its return value.</li>
+is propagated. Otherwise, if the regexp didn&rsquo;t match function <code>fcn.00407f70</code>
+is called, also propagating its return value.</li>
 </ol>
 
 <p>
@@ -624,9 +627,9 @@ license file.
 </div>
 </div>
 
-<div id="outline-container-analyzing-the-parsing-function" class="outline-3">
-<h3 id="analyzing-the-parsing-function"><span class="section-number-3">2.4.</span> Analyzing the parsing function</h3>
-<div class="outline-text-3" id="text-analyzing-the-parsing-function">
+<div id="outline-container-analyzing-the-file-parsing-function" class="outline-3">
+<h3 id="analyzing-the-file-parsing-function"><span class="section-number-3">2.4.</span> Analyzing the file parsing function</h3>
+<div class="outline-text-3" id="text-analyzing-the-file-parsing-function">
 <p>
 After building the full path to the <code>gwlicense.ini</code> file, the top-level function
 calls <code>fcn.00407b40</code>, passing it as argument. This function receives the path to
@@ -830,7 +833,156 @@ register was at <code>0x00408b95</code>, using the value of <code>r12</code>; th
 <p>
 Therefore, <code>0x110</code> is the offset on the stack frame where the structure starts,
 and <code>0x128</code> is the offset where the &ldquo;expiry date&rdquo; lives; <code>0x18</code> is the offset in the
-<code>ParsedLicense</code> structure.
+<code>ParsedLicense</code> structure. This will be very clear below, when looking at the
+license data validator.
+</p>
+</div>
+</div>
+
+<div id="outline-container-analyzing-the-license-data-validator" class="outline-3">
+<h3 id="analyzing-the-license-data-validator"><span class="section-number-3">2.6.</span> Analyzing the license data validator</h3>
+<div class="outline-text-3" id="text-analyzing-the-license-data-validator">
+<p>
+The <code>fcn.004071a0</code> function is the license data parser and validator. The
+decompilation by Ghidra is a bit big, so the following code has been simplified
+to reduce conditional nesting, improve function and variable names, etc.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">fcn004071a0</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">QByteArray</span>* <span style="color: #005f5f;">fileData</span>, <span style="color: #0031a9;">LicenseData</span>* <span style="color: #005f5f;">outLicData</span>) {
+    <span style="color: #0031a9;">QTextStream</span> <span style="color: #005f5f;">stream</span> = QTextStream(fileData);
+    <span style="color: #0031a9;">QByteArray</span> <span style="color: #005f5f;">licenseText</span>;
+    <span style="color: #0031a9;">QByteArray</span> <span style="color: #005f5f;">signature</span>;
+
+    <span style="color: #972500;">while</span> (<span style="color: #972500; font-weight: bold;">!</span>stream.atEnd()) {
+        <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">line</span> = stream.readLine();
+        <span style="color: #972500;">if</span> (line == <span style="color: #005e8b;">"-------------------------- BEGIN SIGN --------------------------"</span>)
+            <span style="color: #972500;">break</span>;
+        licenseText.append(line.toUtf8());
+        licenseText.append(<span style="color: #005e8b;">'</span><span style="color: #972500;">\n</span><span style="color: #005e8b;">'</span>);
+    }
+
+    <span style="color: #972500;">while</span> (<span style="color: #972500; font-weight: bold;">!</span>stream.atEnd()) {
+        <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">line</span> = stream.readLine();
+        <span style="color: #972500;">if</span> (line == <span style="color: #005e8b;">"--------------------------- END SIGN ---------------------------"</span>)
+            <span style="color: #972500;">break</span>;
+        signature.append(<span style="color: #2a5045;">QByteArray</span>::fromHex(line.toUtf8()));
+    }
+
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>fcn.<span style="color: #2a5045;">004060e0</span>(signature, licenseText)) {
+        <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">isGowinLicense</span> = licenseText.indexOf(<span style="color: #005e8b;">"License created by Gowin_LIC_Generator"</span>) != -<span style="color: #2a5045;">1</span>;
+        <span style="color: #972500;">return</span> isGowinLicense ? <span style="color: #2a5045;">3</span> : <span style="color: #2a5045;">4</span>;
+    }
+
+    <span style="color: #972500;">static</span> <span style="color: #0031a9;">QRegExp</span> <span style="color: #005f5f;">lineRegex</span>(<span style="color: #005e8b;">"^(</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">w+)</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">s*=</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">s*(</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">S+)?$"</span>);
+    <span style="color: #0031a9;">QTextStream</span> <span style="color: #005f5f;">licStream</span>(&amp;licenseText);
+    <span style="color: #972500;">while</span> (<span style="color: #972500; font-weight: bold;">!</span>licStream.atEnd()) {
+        <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">line</span> = licStream.readLine();
+        <span style="color: #972500;">if</span> (line.startsWith(<span style="color: #005e8b;">'#'</span>))
+            <span style="color: #972500;">continue</span>;
+        <span style="color: #972500;">if</span> (lineRegex.indexIn(line) == -<span style="color: #2a5045;">1</span>)
+            <span style="color: #972500;">continue</span>;
+
+        <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">key</span>   = lineRegex.cap(<span style="color: #2a5045;">1</span>);
+        <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">value</span> = lineRegex.cap(<span style="color: #2a5045;">2</span>);
+
+        <span style="color: #972500;">if</span> (key == <span style="color: #005e8b;">"MODE"</span>)
+            outLicData-&gt;mode = value;  <span style="color: #595959;">/* </span><span style="color: #595959;">offset 0x00</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">if</span> (key == <span style="color: #005e8b;">"TYPE"</span>)
+            outLicData-&gt;type = value;  <span style="color: #595959;">/* </span><span style="color: #595959;">offset 0x08</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">if</span> (key == <span style="color: #005e8b;">"HOST_ID"</span>)
+            outLicData-&gt;hostId = value;  <span style="color: #595959;">/* </span><span style="color: #595959;">offset 0x10</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">if</span> (key == <span style="color: #005e8b;">"EXP_DATE"</span>)
+            outLicData-&gt;expiry = <span style="color: #2a5045;">QDate</span>::fromString(value, <span style="color: #005e8b;">"yyyy-MM-dd"</span>);  <span style="color: #595959;">/* </span><span style="color: #595959;">offset 0x18</span><span style="color: #595959;"> */</span>
+        <span style="color: #972500;">if</span> (key == <span style="color: #005e8b;">"COUNT"</span>)
+            outLicData-&gt;count = value.toInt();  <span style="color: #595959;">/* </span><span style="color: #595959;">offset 0x20</span><span style="color: #595959;"> */</span>
+    }
+
+    <span style="color: #972500;">if</span> (outLicData-&gt;mode.isEmpty() || outLicData-&gt;type.isEmpty() ||
+        outLicData-&gt;hostId.isEmpty() || outLicData-&gt;expiry &gt; <span style="color: #2a5045;">0x16d3e147973</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">5</span>;
+
+    <span style="color: #972500;">if</span> (outLicData-&gt;mode == <span style="color: #005e8b;">"FLOATING"</span> &amp;&amp; outLicData-&gt;count == -<span style="color: #2a5045;">1</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">5</span>;
+
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
+}
+</pre>
+</div>
+
+<p>
+The logic of the function is as follows:
+</p>
+
+<ol class="org-ol">
+<li>Read the license text before the RSA signature into a buffer by scanning for
+the &ldquo;begin&rdquo; marker.</li>
+<li>Read the RSA signature block into a buffer by scanning for the &ldquo;end&rdquo; marker.</li>
+<li>Verify the license text against RSA signature using <code>fcn.004060e0</code>. If it
+doesn&rsquo;t match, the returned error code changes depending on whether or not a
+string is found.</li>
+<li>The <code>key=value</code> portion of the license is parsed, matching it against a
+regular expression for capturing the key and value separately. It ensures
+that it is not a comment, and then compares the key against 5
+possibilities. Depending on the key, a different offset is used for storing
+the value inside the structure.</li>
+<li>Finally, the function ensures that the license fields are present, and that
+the license date is within range<sup><a id="fnr.6" class="footref" href="#fn.6" role="doc-backlink">6</a></sup>. If the license mode is floating
+(obtained from a server), it ensures that the &ldquo;count&rdquo; value is not <code>-1</code>.</li>
+</ol>
+
+<p>
+The offset used when storing the <code>EXP_DATE</code> matches what we discovered in the
+previous section.
+</p>
+</div>
+</div>
+
+<div id="outline-container-analyzing-the-offline-validation-function" class="outline-3">
+<h3 id="analyzing-the-offline-validation-function"><span class="section-number-3">2.7.</span> Analyzing the offline validation function</h3>
+<div class="outline-text-3" id="text-analyzing-the-offline-validation-function">
+<p>
+Let&rsquo;s go back to the top-level validation function, <code>fcn00408e90</code>. After obtaining
+the contents of the license file, if they don&rsquo;t match the regexp
+<code>"^(.*):(\\d+)$"</code>, we can see that <code>fcn.00407f70</code> is called instead of <code>fcn.00408170</code>
+(the online-validation function).
+</p>
+
+<p>
+Again, the following code shows its simplified decompilation.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">fcn00407f70</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">QString</span>* <span style="color: #005f5f;">filePath</span>, <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">arg2</span>, <span style="color: #0031a9;">uint8_t</span> <span style="color: #005f5f;">arg3</span>) {
+    <span style="color: #0031a9;">QFile</span> <span style="color: #005f5f;">file</span> = QFile(filePath);
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>file.open(<span style="color: #2a5045;">QIODevice</span>::ReadOnly))
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">1</span>;
+
+    <span style="color: #0031a9;">QByteArray</span> <span style="color: #005f5f;">fileData</span> = file.readAll();
+    <span style="color: #972500;">if</span> (file.error() != <span style="color: #2a5045;">QFileDevice</span>::NoError)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">2</span>;
+
+    file.close();
+
+    <span style="color: #0031a9;">ParsedLicense</span> <span style="color: #005f5f;">parsedLicense</span>;
+    <span style="color: #0031a9;">int</span> <span style="color: #005f5f;">result</span> = fcn4071A0(&amp;fileData, &amp;parsedLicense);
+    <span style="color: #972500;">if</span> (result != <span style="color: #2a5045;">0</span>)
+        <span style="color: #972500;">return</span> result;
+
+    <span style="color: #972500;">return</span> fcn4070D0(&amp;parsedLicense, arg2, arg3);
+}
+</pre>
+</div>
+
+<p>
+We can see that it also calls <code>fcn.4071A0</code>, the same license data parsing function
+as the online validator, passing the file contents along with the pointer to an
+output <code>ParsedLicense</code> structure.
+</p>
+
+<p>
+Finally, an unknown function <code>fcn.4070D0</code> is called, passing a pointer to the
+parsed license structure, and the second and third arguments it received.
 </p>
 </div>
 </div>
@@ -865,6 +1017,10 @@ lives, until the function returns.</p></div></div>
 back the write to <code>r12</code> because it is callee-saved according to Section 3.2.1 of
 the AMD64 ABI. This means that, although functions might use <code>r12</code> internally,
 they are required to restore its value before returning.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.6" class="footnum" href="#fnr.6" role="doc-backlink">6</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Since <code>QDate</code> stores dates as a 64-bit
+Julian Day Number, the value <code>0x16d3e147973</code> is used to represent an invalid
+date, many centuries into the future.</p></div></div>
 
 
 </div>

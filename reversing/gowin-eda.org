@@ -269,10 +269,11 @@ From this, we can see the general structure of the function.
    was not processed entirely, =0x10= is returned.
 3. A new =QRegExp= object is initialized with the pattern ~"^(.*):(\\d+)$"~. It is
    checked against the second argument of =fcn.00407b40=, likely because that
-   function writes something the buffer which may or may not match the regexp.
+   function writes something the buffer which may or may not match the regular
+   expression.
 4. If the regexp matches, function =fcn.00408170= is called and its return value
-   is propagated. Otherwise, if the regexp didn't match function =fcn.00407f70= is
-   called, also propagating its return value.
+   is propagated. Otherwise, if the regexp didn't match function =fcn.00407f70=
+   is called, also propagating its return value.
 
 This can be converted into simpler pseudo-code:
 
@@ -364,9 +365,9 @@ could be the hostname of a Gowin developer, and =10559= is the port. Naturally, 
 aren't able to access this hostname from our machine, so this isn't a valid
 license file.
 
-** Analyzing the parsing function
+** Analyzing the file parsing function
 :PROPERTIES:
-:CUSTOM_ID: analyzing-the-parsing-function
+:CUSTOM_ID: analyzing-the-file-parsing-function
 :END:
 
 After building the full path to the =gwlicense.ini= file, the top-level function
@@ -554,4 +555,137 @@ they are required to restore its value before returning.].
 
 Therefore, =0x110= is the offset on the stack frame where the structure starts,
 and =0x128= is the offset where the "expiry date" lives; =0x18= is the offset in the
-=ParsedLicense= structure.
+=ParsedLicense= structure. This will be very clear below, when looking at the
+license data validator.
+
+** Analyzing the license data validator
+:PROPERTIES:
+:CUSTOM_ID: analyzing-the-license-data-validator
+:END:
+
+The =fcn.004071a0= function is the license data parser and validator. The
+decompilation by Ghidra is a bit big, so the following code has been simplified
+to reduce conditional nesting, improve function and variable names, etc.
+
+#+begin_src C++
+bool fcn004071a0(const QByteArray* fileData, LicenseData* outLicData) {
+    QTextStream stream = QTextStream(fileData);
+    QByteArray licenseText;
+    QByteArray signature;
+
+    while (!stream.atEnd()) {
+        QString line = stream.readLine();
+        if (line == "-------------------------- BEGIN SIGN --------------------------")
+            break;
+        licenseText.append(line.toUtf8());
+        licenseText.append('\n');
+    }
+
+    while (!stream.atEnd()) {
+        QString line = stream.readLine();
+        if (line == "--------------------------- END SIGN ---------------------------")
+            break;
+        signature.append(QByteArray::fromHex(line.toUtf8()));
+    }
+
+    if (!fcn.004060e0(signature, licenseText)) {
+        bool isGowinLicense = licenseText.indexOf("License created by Gowin_LIC_Generator") != -1;
+        return isGowinLicense ? 3 : 4;
+    }
+
+    static QRegExp lineRegex("^(\\w+)\\s*=\\s*(\\S+)?$");
+    QTextStream licStream(&licenseText);
+    while (!licStream.atEnd()) {
+        QString line = licStream.readLine();
+        if (line.startsWith('#'))
+            continue;
+        if (lineRegex.indexIn(line) == -1)
+            continue;
+
+        QString key   = lineRegex.cap(1);
+        QString value = lineRegex.cap(2);
+
+        if (key == "MODE")
+            outLicData->mode = value;  /* offset 0x00 */
+        if (key == "TYPE")
+            outLicData->type = value;  /* offset 0x08 */
+        if (key == "HOST_ID")
+            outLicData->hostId = value;  /* offset 0x10 */
+        if (key == "EXP_DATE")
+            outLicData->expiry = QDate::fromString(value, "yyyy-MM-dd");  /* offset 0x18 */
+        if (key == "COUNT")
+            outLicData->count = value.toInt();  /* offset 0x20 */
+    }
+
+    if (outLicData->mode.isEmpty() || outLicData->type.isEmpty() ||
+        outLicData->hostId.isEmpty() || outLicData->expiry > 0x16d3e147973)
+        return 5;
+
+    if (outLicData->mode == "FLOATING" && outLicData->count == -1)
+        return 5;
+
+    return 0;
+}
+#+end_src
+
+The logic of the function is as follows:
+
+1. Read the license text before the RSA signature into a buffer by scanning for
+   the "begin" marker.
+2. Read the RSA signature block into a buffer by scanning for the "end" marker.
+3. Verify the license text against RSA signature using =fcn.004060e0=. If it
+   doesn't match, the returned error code changes depending on whether or not a
+   string is found.
+4. The =key=value= portion of the license is parsed, matching it against a
+   regular expression for capturing the key and value separately. It ensures
+   that it is not a comment, and then compares the key against 5
+   possibilities. Depending on the key, a different offset is used for storing
+   the value inside the structure.
+5. Finally, the function ensures that the license fields are present, and that
+   the license date is within range[fn::Since =QDate= stores dates as a 64-bit
+   Julian Day Number, the value =0x16d3e147973= is used to represent an invalid
+   date, many centuries into the future.]. If the license mode is floating
+   (obtained from a server), it ensures that the "count" value is not =-1=.
+
+The offset used when storing the =EXP_DATE= matches what we discovered in the
+previous section.
+
+** Analyzing the offline validation function
+:PROPERTIES:
+:CUSTOM_ID: analyzing-the-offline-validation-function
+:END:
+
+Let's go back to the top-level validation function, =fcn00408e90=. After obtaining
+the contents of the license file, if they don't match the regexp
+~"^(.*):(\\d+)$"~, we can see that =fcn.00407f70= is called instead of =fcn.00408170=
+(the online-validation function).
+
+Again, the following code shows its simplified decompilation.
+
+#+begin_src C++
+int fcn00407f70(const QString* filePath, uint8_t arg2, uint8_t arg3) {
+    QFile file = QFile(filePath);
+    if (!file.open(QIODevice::ReadOnly))
+        return 1;
+
+    QByteArray fileData = file.readAll();
+    if (file.error() != QFileDevice::NoError)
+        return 2;
+
+    file.close();
+
+    ParsedLicense parsedLicense;
+    int result = fcn4071A0(&fileData, &parsedLicense);
+    if (result != 0)
+        return result;
+
+    return fcn4070D0(&parsedLicense, arg2, arg3);
+}
+#+end_src
+
+We can see that it also calls =fcn.4071A0=, the same license data parsing function
+as the online validator, passing the file contents along with the pointer to an
+output =ParsedLicense= structure.
+
+Finally, an unknown function =fcn.4070D0= is called, passing a pointer to the
+parsed license structure, and the second and third arguments it received.
