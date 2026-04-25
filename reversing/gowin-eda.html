@@ -211,10 +211,10 @@
 <li><a href="#locating-the-top-level-validation-function">2.1. Locating the top-level validation function</a></li>
 <li><a href="#analyzing-the-top-level-validation-function">2.2. Analyzing the top-level validation function</a></li>
 <li><a href="#analyzing-the-base-path-function">2.3. Analyzing the base path function</a></li>
-<li><a href="#analyzing-the-file-parsing-function">2.4. Analyzing the file parsing function</a></li>
-<li><a href="#analyzing-the-online-validation-function">2.5. Analyzing the online validation function</a></li>
+<li><a href="#analyzing-the-license-file-parser">2.4. Analyzing the license file parser</a></li>
+<li><a href="#analyzing-the-online-file-validator">2.5. Analyzing the online file validator</a></li>
 <li><a href="#analyzing-the-license-data-validator">2.6. Analyzing the license data validator</a></li>
-<li><a href="#analyzing-the-offline-validation-function">2.7. Analyzing the offline validation function</a></li>
+<li><a href="#analyzing-the-offline-file-validator">2.7. Analyzing the offline file validator</a></li>
 </ul>
 </li>
 </ul>
@@ -627,9 +627,9 @@ license file.
 </div>
 </div>
 
-<div id="outline-container-analyzing-the-file-parsing-function" class="outline-3">
-<h3 id="analyzing-the-file-parsing-function"><span class="section-number-3">2.4.</span> Analyzing the file parsing function</h3>
-<div class="outline-text-3" id="text-analyzing-the-file-parsing-function">
+<div id="outline-container-analyzing-the-license-file-parser" class="outline-3">
+<h3 id="analyzing-the-license-file-parser"><span class="section-number-3">2.4.</span> Analyzing the license file parser</h3>
+<div class="outline-text-3" id="text-analyzing-the-license-file-parser">
 <p>
 After building the full path to the <code>gwlicense.ini</code> file, the top-level function
 calls <code>fcn.00407b40</code>, passing it as argument. This function receives the path to
@@ -739,9 +739,9 @@ argument.
 </div>
 </div>
 
-<div id="outline-container-analyzing-the-online-validation-function" class="outline-3">
-<h3 id="analyzing-the-online-validation-function"><span class="section-number-3">2.5.</span> Analyzing the online validation function</h3>
-<div class="outline-text-3" id="text-analyzing-the-online-validation-function">
+<div id="outline-container-analyzing-the-online-file-validator" class="outline-3">
+<h3 id="analyzing-the-online-file-validator"><span class="section-number-3">2.5.</span> Analyzing the online file validator</h3>
+<div class="outline-text-3" id="text-analyzing-the-online-file-validator">
 <p>
 After reading the contents of the license file, the top-level function compares
 it to the regexp <code>"^(.*):(\\d+)$"</code>, if it matches, the function <code>fcn.00408170</code>
@@ -869,13 +869,13 @@ to reduce conditional nesting, improve function and variable names, etc.
         signature.append(<span style="color: #2a5045;">QByteArray</span>::fromHex(line.toUtf8()));
     }
 
-    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>fcn.<span style="color: #2a5045;">004060e0</span>(signature, licenseText)) {
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>fcn004060e0(signature, licenseText)) {
         <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">isGowinLicense</span> = licenseText.indexOf(<span style="color: #005e8b;">"License created by Gowin_LIC_Generator"</span>) != -<span style="color: #2a5045;">1</span>;
         <span style="color: #972500;">return</span> isGowinLicense ? <span style="color: #2a5045;">3</span> : <span style="color: #2a5045;">4</span>;
     }
 
-    <span style="color: #972500;">static</span> <span style="color: #0031a9;">QRegExp</span> <span style="color: #005f5f;">lineRegex</span>(<span style="color: #005e8b;">"^(</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">w+)</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">s*=</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">s*(</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">S+)?$"</span>);
-    <span style="color: #0031a9;">QTextStream</span> <span style="color: #005f5f;">licStream</span>(&amp;licenseText);
+    <span style="color: #972500;">static</span> <span style="color: #0031a9;">QRegExp</span> <span style="color: #005f5f;">lineRegex</span> = QRegExp(<span style="color: #005e8b;">"^(</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">w+)</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">s*=</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">s*(</span><span style="color: #972500;">\\</span><span style="color: #005e8b;">S+)?$"</span>);
+    <span style="color: #0031a9;">QTextStream</span> <span style="color: #005f5f;">licStream</span> = QTextStream(&amp;licenseText);
     <span style="color: #972500;">while</span> (<span style="color: #972500; font-weight: bold;">!</span>licStream.atEnd()) {
         <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">line</span> = licStream.readLine();
         <span style="color: #972500;">if</span> (line.startsWith(<span style="color: #005e8b;">'#'</span>))
@@ -938,9 +938,9 @@ previous section.
 </div>
 </div>
 
-<div id="outline-container-analyzing-the-offline-validation-function" class="outline-3">
-<h3 id="analyzing-the-offline-validation-function"><span class="section-number-3">2.7.</span> Analyzing the offline validation function</h3>
-<div class="outline-text-3" id="text-analyzing-the-offline-validation-function">
+<div id="outline-container-analyzing-the-offline-file-validator" class="outline-3">
+<h3 id="analyzing-the-offline-file-validator"><span class="section-number-3">2.7.</span> Analyzing the offline file validator</h3>
+<div class="outline-text-3" id="text-analyzing-the-offline-file-validator">
 <p>
 Let&rsquo;s go back to the top-level validation function, <code>fcn00408e90</code>. After obtaining
 the contents of the license file, if they don&rsquo;t match the regexp

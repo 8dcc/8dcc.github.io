@@ -365,9 +365,9 @@ could be the hostname of a Gowin developer, and =10559= is the port. Naturally, 
 aren't able to access this hostname from our machine, so this isn't a valid
 license file.
 
-** Analyzing the file parsing function
+** Analyzing the license file parser
 :PROPERTIES:
-:CUSTOM_ID: analyzing-the-file-parsing-function
+:CUSTOM_ID: analyzing-the-license-file-parser
 :END:
 
 After building the full path to the =gwlicense.ini= file, the top-level function
@@ -465,9 +465,9 @@ int fcn00407b40(const QString* path, QString* out_contents) {
 It simply reads the contents of the ~lic="..."~ line and writes it to its second
 argument.
 
-** Analyzing the online validation function
+** Analyzing the online file validator
 :PROPERTIES:
-:CUSTOM_ID: analyzing-the-online-validation-function
+:CUSTOM_ID: analyzing-the-online-file-validator
 :END:
 
 After reading the contents of the license file, the top-level function compares
@@ -588,13 +588,13 @@ bool fcn004071a0(const QByteArray* fileData, LicenseData* outLicData) {
         signature.append(QByteArray::fromHex(line.toUtf8()));
     }
 
-    if (!fcn.004060e0(signature, licenseText)) {
+    if (!fcn004060e0(signature, licenseText)) {
         bool isGowinLicense = licenseText.indexOf("License created by Gowin_LIC_Generator") != -1;
         return isGowinLicense ? 3 : 4;
     }
 
-    static QRegExp lineRegex("^(\\w+)\\s*=\\s*(\\S+)?$");
-    QTextStream licStream(&licenseText);
+    static QRegExp lineRegex = QRegExp("^(\\w+)\\s*=\\s*(\\S+)?$");
+    QTextStream licStream = QTextStream(&licenseText);
     while (!licStream.atEnd()) {
         QString line = licStream.readLine();
         if (line.startsWith('#'))
@@ -650,9 +650,9 @@ The logic of the function is as follows:
 The offset used when storing the =EXP_DATE= matches what we discovered in the
 previous section.
 
-** Analyzing the offline validation function
+** Analyzing the offline file validator
 :PROPERTIES:
-:CUSTOM_ID: analyzing-the-offline-validation-function
+:CUSTOM_ID: analyzing-the-offline-file-validator
 :END:
 
 Let's go back to the top-level validation function, =fcn00408e90=. After obtaining
