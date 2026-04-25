@@ -215,6 +215,7 @@
 <li><a href="#analyzing-the-online-file-validator">2.5. Analyzing the online file validator</a></li>
 <li><a href="#analyzing-the-license-data-validator">2.6. Analyzing the license data validator</a></li>
 <li><a href="#analyzing-the-offline-file-validator">2.7. Analyzing the offline file validator</a></li>
+<li><a href="#analyzing-the-mac-address-validator">2.8. Analyzing the MAC address validator</a></li>
 </ul>
 </li>
 </ul>
@@ -983,6 +984,80 @@ output <code>ParsedLicense</code> structure.
 <p>
 Finally, an unknown function <code>fcn.4070D0</code> is called, passing a pointer to the
 parsed license structure, and the second and third arguments it received.
+</p>
+</div>
+</div>
+
+<div id="outline-container-analyzing-the-mac-address-validator" class="outline-3">
+<h3 id="analyzing-the-mac-address-validator"><span class="section-number-3">2.8.</span> Analyzing the MAC address validator</h3>
+<div class="outline-text-3" id="text-analyzing-the-mac-address-validator">
+<p>
+After parsing the license data, the offline file validator calls <code>fcn.4070D0</code>. The
+following code shows its simplified definition.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #0031a9;">int</span> <span style="color: #3f578f;">fcn4070D0</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">ParsedLicense</span>* <span style="color: #005f5f;">lic</span>, <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">arg2</span>, <span style="color: #0031a9;">bool</span> <span style="color: #005f5f;">arg3</span>) {
+    <span style="color: #972500;">if</span> (lic-&gt;mode != <span style="color: #005e8b;">"NODELOCK"</span>)
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">6</span>;
+
+    <span style="color: #972500;">if</span> (<span style="color: #972500; font-weight: bold;">!</span>fcn406EA0(&amp;lic-&gt;hostId))
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">7</span>;
+
+    <span style="color: #972500;">if</span> (lic-&gt;expiry &lt; <span style="color: #2a5045;">QDate</span>::currentDate())
+        <span style="color: #972500;">return</span> <span style="color: #2a5045;">8</span>;
+
+    <span style="color: #972500;">if</span> (arg2) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">Show expiry warning through 'fcn.4067E0'</span><span style="color: #595959;"> */</span>
+    }
+
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">0</span>;
+}
+</pre>
+</div>
+
+<p>
+This function essentially does two things, call some unknown <code>fcn.406EA0</code>
+function, and validate the expiry date. Let&rsquo;s inspect the definition of
+<code>fcn.406EA0</code>. It receives the <code>hostId</code> member of the <code>ParsedLicense</code>, and returns a
+boolean.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-C++"><span style="color: #0031a9;">bool</span> <span style="color: #3f578f;">fcn406EA0</span>(<span style="color: #972500;">const</span> <span style="color: #0031a9;">QString</span>* <span style="color: #005f5f;">expectedHostId</span>) {
+    <span style="color: #0031a9;">QList</span>&lt;QNetworkInterface&gt; <span style="color: #005f5f;">interfaces</span> = <span style="color: #2a5045;">QNetworkInterface</span>::allInterfaces();
+
+    <span style="color: #972500;">for</span> (<span style="color: #972500;">const</span> <span style="color: #0031a9;">QNetworkInterface</span>&amp; <span style="color: #005f5f;">iface</span> : interfaces) {
+        <span style="color: #0031a9;">QString</span> <span style="color: #005f5f;">mac</span> = iface.hardwareAddress().remove(<span style="color: #005e8b;">':'</span>, <span style="color: #2a5045;">Qt</span>::CaseSensitive);
+
+        <span style="color: #972500;">if</span> (mac.isEmpty())
+            <span style="color: #972500;">continue</span>;
+
+        <span style="color: #972500;">if</span> (mac.compare(*expectedHostId, <span style="color: #2a5045;">Qt</span>::CaseInsensitive) == <span style="color: #2a5045;">0</span>)
+            <span style="color: #972500;">return</span> <span style="color: #2a5045;">true</span>;
+    }
+
+    <span style="color: #972500;">return</span> <span style="color: #2a5045;">false</span>;
+}
+</pre>
+</div>
+
+<p>
+This function obtains all network interfaces, iterates over each one, and checks
+if any of the MAC addresses match the received argument (case-insensitively and
+without the colons). Therefore, this function validates that the MAC address
+received in the <code>HOST_ID</code> value of the nodelock/offline license matches any of the
+MAC addresses from the current device.
+</p>
+
+<p>
+Note how the online/floating license validator doesn&rsquo;t call any of these
+functions; instead, it manually checked the expiry date.
+</p>
+
+<p>
+Now that we have the full picture on how the license validation works, we can
+start thinking about how the binary could be patched to skip it.
 </p>
 </div>
 </div>

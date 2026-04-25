@@ -689,3 +689,66 @@ output =ParsedLicense= structure.
 
 Finally, an unknown function =fcn.4070D0= is called, passing a pointer to the
 parsed license structure, and the second and third arguments it received.
+
+** Analyzing the MAC address validator
+:PROPERTIES:
+:CUSTOM_ID: analyzing-the-mac-address-validator
+:END:
+
+After parsing the license data, the offline file validator calls =fcn.4070D0=. The
+following code shows its simplified definition.
+
+#+begin_src C++
+int fcn4070D0(const ParsedLicense* lic, bool arg2, bool arg3) {
+    if (lic->mode != "NODELOCK")
+        return 6;
+
+    if (!fcn406EA0(&lic->hostId))
+        return 7;
+
+    if (lic->expiry < QDate::currentDate())
+        return 8;
+
+    if (arg2) {
+        /* Show expiry warning through 'fcn.4067E0' */
+    }
+
+    return 0;
+}
+#+end_src
+
+This function essentially does two things, call some unknown =fcn.406EA0=
+function, and validate the expiry date. Let's inspect the definition of
+=fcn.406EA0=. It receives the =hostId= member of the =ParsedLicense=, and returns a
+boolean.
+
+#+begin_src C++
+bool fcn406EA0(const QString* expectedHostId) {
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+
+    for (const QNetworkInterface& iface : interfaces) {
+        QString mac = iface.hardwareAddress().remove(':', Qt::CaseSensitive);
+
+        if (mac.isEmpty())
+            continue;
+
+        if (mac.compare(*expectedHostId, Qt::CaseInsensitive) == 0)
+            return true;
+    }
+
+    return false;
+}
+#+end_src
+
+This function obtains all network interfaces, iterates over each one, and checks
+if any of the MAC addresses match the received argument (case-insensitively and
+without the colons). Therefore, this function validates that the MAC address
+received in the =HOST_ID= value of the nodelock/offline license matches any of the
+MAC addresses from the current device.
+
+Note how the online/floating license validator doesn't call any of these
+functions; instead, it manually checked the expiry date.
+
+Now that we have the full picture on how the license validation works, we can
+start thinking about how the binary could be patched to skip it.
+
