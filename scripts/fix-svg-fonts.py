@@ -43,11 +43,12 @@ def patch_file(path):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Add monospace fallback to Courier New font-family '
-                    'declarations in SVG files.')
-    parser.add_argument('directory',
-                        help='Root directory to search recursively')
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--directory',
+        default='./img',
+        help='Root directory to search recursively'
+    )
     args = parser.parse_args()
 
     root = Path(args.directory)
