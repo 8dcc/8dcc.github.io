@@ -218,6 +218,18 @@
 <li><a href="#analyzing-the-mac-address-validator">2.8. Analyzing the MAC address validator</a></li>
 </ul>
 </li>
+<li><a href="#patching-the-binary">3. Patching the binary</a>
+<ul>
+<li><a href="#generating-our-own-license">3.1. Generating our own license</a></li>
+<li><a href="#avoiding-the-validation-entirely">3.2. Avoiding the validation entirely</a>
+<ul>
+<li><a href="#patching-the-call-to-the-top-level-function">3.2.1. Patching the <code>call</code> to the top-level function</a></li>
+<li><a href="#patching-the-test-of-the-validation-result">3.2.2. Patching the <code>test</code> of the validation result</a></li>
+<li><a href="#flipping-a-bit-on-the-jump-opcode">3.2.3. Flipping a bit on the jump opcode</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -1054,11 +1066,271 @@ MAC addresses from the current device.
 Note how the online/floating license validator doesn&rsquo;t call any of these
 functions; instead, it manually checked the expiry date.
 </p>
+</div>
+</div>
+</div>
 
+<div id="outline-container-patching-the-binary" class="outline-2">
+<h2 id="patching-the-binary"><span class="section-number-2">3.</span> Patching the binary</h2>
+<div class="outline-text-2" id="text-patching-the-binary">
 <p>
 Now that we have the full picture on how the license validation works, we can
-start thinking about how the binary could be patched to skip it.
+start thinking about how the binary could be patched to bypass it. The following
+diagram shows how the validation functions interact with each other.
 </p>
+
+
+<div id="fig1" class="figure">
+<p><img src="../img/gowin-eda1.svg" alt="gowin-eda1.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+Before getting into the possible methods, it&rsquo;s important to backup the <code>gw_ide</code>
+binary.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">cp /opt/gowin-eda-ide/bin/gw_ide gw_ide.original
+</pre>
+</div>
+</div>
+
+<div id="outline-container-generating-our-own-license" class="outline-3">
+<h3 id="generating-our-own-license"><span class="section-number-3">3.1.</span> Generating our own license</h3>
+<div class="outline-text-3" id="text-generating-our-own-license">
+<p>
+One of the most interesting solutions would be to generate our own RSA-1024 key
+pair, write and sign our own nodelock license (associated to our MAC
+address), and then replace the public key in the binary with our own.
+</p>
+
+<p>
+Generating the key pair is simple. From Linux:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">openssl genrsa -out my_private.pem <span style="color: #2a5045;">1024</span>
+openssl rsa -in my_private.pem -pubout -out my_public.pem
+</pre>
+</div>
+
+<p>
+Then, generate a valid license body with a MAC address from your machine.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">cat &gt; license_content.txt &lt;&lt; EOF
+<span style="color: #005e8b;">MODE=NODELOCK</span>
+<span style="color: #005e8b;">TYPE=Full</span>
+<span style="color: #005e8b;">HOST_ID=$(</span><span style="color: #721045;">ip link show | awk '/ether/ { print $2; exit }' | tr -d ':' | tr 'a-f' 'A-F'</span><span style="color: #005e8b;">)</span>
+<span style="color: #005e8b;">EXP_DATE=2099-12-31</span>
+<span style="color: #005e8b;">COUNT=1</span>
+<span style="color: #005e8b;">EOF</span>
+</pre>
+</div>
+
+<p>
+Then, sign the license body with the generated private key, saving the signature
+as hexadecimal ASCII.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">openssl dgst -sha256 -sign my_private.pem -out sig.bin license_content.txt
+hexdump -ve <span style="color: #005e8b;">'1/1 "%02x"'</span> sig.bin &gt; sig_hex.txt
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash">cat license_content.txt &gt; my_license.lic
+<span style="color: #721045;">echo</span> <span style="color: #005e8b;">"-------------------------- BEGIN SIGN --------------------------"</span> &gt;&gt; my_license.lic
+cat sig_hex.txt &gt;&gt; my_license.lic
+<span style="color: #721045;">echo</span> -e <span style="color: #005e8b;">"\n--------------------------- END SIGN ---------------------------"</span> &gt;&gt; my_license.lic
+</pre>
+</div>
+
+<p>
+We have generated a valid license, but we need to place our public RSA-1024 key
+in the binary. Since all RSA-1024 public keys are the same length, we can
+replace it directly<sup><a id="fnr.7" class="footref" href="#fn.7" role="doc-backlink">7</a></sup>. This can be done from Rizin,
+but it&rsquo;s easier to use a python script that directly replaces the string.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #972500;">with</span> <span style="color: #721045;">open</span>(<span style="color: #005e8b;">"my_public.pem"</span>) <span style="color: #972500;">as</span> f:
+    <span style="color: #005f5f;">new_key</span> = f.read().strip()  <span style="color: #595959;"># </span><span style="color: #595959;">strip trailing newline from file</span>
+
+<span style="color: #005f5f;">old_key</span> = (
+    <span style="color: #005e8b;">"-----BEGIN PUBLIC KEY-----</span><span style="color: #2a5045;">\n</span><span style="color: #005e8b;">"</span>
+    <span style="color: #005e8b;">"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDicOsV7qRM8ReSKExxF0wD+xF7</span><span style="color: #2a5045;">\n</span><span style="color: #005e8b;">"</span>
+    <span style="color: #005e8b;">"Jc1YqXFejXu9XpONB+yjZ4X+KUkYL2AY6AWFDlV0KFWccG/CCGrJRetLrg/EqcbU</span><span style="color: #2a5045;">\n</span><span style="color: #005e8b;">"</span>
+    <span style="color: #005e8b;">"7laQnU5wJSNlWf+n0g93g4JHVm1KClpJUXIq1Jb9WGR3mG6rmKRGp+iktqbn5Gwh</span><span style="color: #2a5045;">\n</span><span style="color: #005e8b;">"</span>
+    <span style="color: #005e8b;">"sDdmPxJC+BWJj73BpwIDAQAB</span><span style="color: #2a5045;">\n</span><span style="color: #005e8b;">"</span>
+    <span style="color: #005e8b;">"-----END PUBLIC KEY-----"</span>
+)
+
+<span style="color: #005f5f;">old_bytes</span> = old_key.encode()
+<span style="color: #005f5f;">new_bytes</span> = new_key.encode()
+
+<span style="color: #972500;">assert</span> <span style="color: #721045;">len</span>(old_bytes) == <span style="color: #721045;">len</span>(new_bytes), \
+    f<span style="color: #005e8b;">"Key length mismatch: </span>{<span style="color: #721045;">len</span>(old_bytes)}<span style="color: #005e8b;"> vs </span>{<span style="color: #721045;">len</span>(new_bytes)}<span style="color: #005e8b;">"</span>
+
+<span style="color: #972500;">with</span> <span style="color: #721045;">open</span>(<span style="color: #005e8b;">"/opt/gowin-eda-ide/bin/gw_ide"</span>, <span style="color: #005e8b;">"rb"</span>) <span style="color: #972500;">as</span> f:
+    <span style="color: #005f5f;">data</span> = f.read()
+
+<span style="color: #972500;">assert</span> old_bytes <span style="color: #972500;">in</span> data, <span style="color: #005e8b;">"Old public key not found in binary!"</span>
+
+<span style="color: #005f5f;">patched</span> = data.replace(old_bytes, new_bytes, <span style="color: #2a5045;">1</span>)
+
+<span style="color: #972500;">with</span> <span style="color: #721045;">open</span>(<span style="color: #005e8b;">"gw_ide.patched"</span>, <span style="color: #005e8b;">"wb"</span>) <span style="color: #972500;">as</span> f:
+    f.write(patched)
+
+<span style="color: #721045;">print</span>(<span style="color: #005e8b;">"Patched successfully."</span>)
+</pre>
+</div>
+
+<p>
+Then, we can replace the binary on the destination directory, verifying that the
+permissions are correct.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">sudo cp gw_ide.patched /opt/gowin-eda-ide/bin/gw_ide
+ls -l /opt/gowin-eda-ide/bin/gw_ide
+<span style="color: #595959;"># </span><span style="color: #595959;">-rwxr-xr-x 1 root root 69088 Jan 01 00:00 /opt/gowin-eda-ide/bin/gw_ide</span>
+</pre>
+</div>
+
+<p>
+If we now launch the IDE, we should be able to load our custom license, and it
+will be authenticated with the public key we just replaced.
+</p>
+
+<p>
+Note that this patch makes the floating license verification useless, since the
+public key used to verify the signature of the nodelock license is also used to
+encrypt messages sent to the floating license server. If the public key on the
+binary changes, the server won&rsquo;t be able to decrypt our messages with its
+private key.
+</p>
+</div>
+</div>
+
+<div id="outline-container-avoiding-the-validation-entirely" class="outline-3">
+<h3 id="avoiding-the-validation-entirely"><span class="section-number-3">3.2.</span> Avoiding the validation entirely</h3>
+<div class="outline-text-3" id="text-avoiding-the-validation-entirely">
+<p>
+Since the nodelock licenses are signed, we can&rsquo;t generate a valid license
+without patching the public key in binary. Instead of patching this, we could
+simply patch the instructions that validate the license to skip it
+entirely.
+</p>
+
+<p>
+There are multiple places where this could be done. Let&rsquo;s look at the call to
+the top-level validator, <code>fcn.408E90</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">...</span>
+<span style="color: #2a5045;">0x00405421</span>      be <span style="color: #2a5045;">01</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>                    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">esi</span>, <span style="color: #2a5045;">1</span>
+<span style="color: #2a5045;">0x00405426</span>      bf <span style="color: #2a5045;">01</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>                    <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">edi</span>, <span style="color: #2a5045;">1</span>
+<span style="color: #2a5045;">0x0040542b</span>      e8 <span style="color: #2a5045;">60</span> <span style="color: #2a5045;">3a</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>                    <span style="color: #721045;">call</span>    fcn.00408e90
+<span style="color: #2a5045;">0x00405430</span>      <span style="color: #2a5045;">85</span> c0                             <span style="color: #721045;">test</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+<span style="color: #2a5045;">0x00405432</span>      <span style="color: #2a5045;">75</span> <span style="color: #2a5045;">31</span>                             <span style="color: #721045;">jne</span>     <span style="color: #2a5045;">0x405465</span>
+<span style="color: #595959;">; </span><span style="color: #595959;">...</span>
+</pre>
+</div>
+</div>
+
+<div id="outline-container-patching-the-call-to-the-top-level-function" class="outline-4">
+<h4 id="patching-the-call-to-the-top-level-function"><span class="section-number-4">3.2.1.</span> Patching the <code>call</code> to the top-level function</h4>
+<div class="outline-text-4" id="text-patching-the-call-to-the-top-level-function">
+<p>
+First, we could patch the call itself, which is 5 bytes. By changing the <code>call</code>
+instruction to a <code>xor eax, eax</code> and 3 <code>nop</code> bytes, we can set <code>eax</code> to zero, making
+the jump condition false. The following snippet shows the instruction change.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">Original:</span>
+<span style="color: #2a5045;">0x0040542b</span>      e8 <span style="color: #2a5045;">60</span> <span style="color: #2a5045;">3a</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>                    <span style="color: #721045;">call</span>    fcn.00408e90
+
+<span style="color: #595959;">; </span><span style="color: #595959;">Patched:</span>
+<span style="color: #2a5045;">0x0040542b</span>      <span style="color: #2a5045;">31</span> c0                             <span style="color: #721045;">xor</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+<span style="color: #2a5045;">0x0040542d</span>      <span style="color: #2a5045;">90</span>                                <span style="color: #721045;">nop</span>
+<span style="color: #2a5045;">0x0040542e</span>      <span style="color: #2a5045;">90</span>                                <span style="color: #721045;">nop</span>
+<span style="color: #2a5045;">0x0040542f</span>      <span style="color: #2a5045;">90</span>                                <span style="color: #721045;">nop</span>
+</pre>
+</div>
+
+<p>
+To patch this from Rizin, the binary has to be open as writable by passing the
+<code>-w</code> argument. Then, we can replace the instructions by passing the new opcodes to
+the <code>wx</code> Rizin command.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm">$ rizin -w /
+wx <span style="color: #2a5045;">31c0909090</span> @ <span style="color: #2a5045;">0x0040542b</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-patching-the-test-of-the-validation-result" class="outline-4">
+<h4 id="patching-the-test-of-the-validation-result"><span class="section-number-4">3.2.2.</span> Patching the <code>test</code> of the validation result</h4>
+<div class="outline-text-4" id="text-patching-the-test-of-the-validation-result">
+<p>
+Instead of replacing 5 bytes, we can just replace the byte of the <code>test</code>
+instruction, turning it into a <code>xor</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">Original:</span>
+<span style="color: #2a5045;">0x00405430</span>      <span style="color: #2a5045;">85</span> c0                             <span style="color: #721045;">test</span>    <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+
+<span style="color: #595959;">; </span><span style="color: #595959;">Patched:</span>
+<span style="color: #2a5045;">0x00405430</span>      <span style="color: #2a5045;">31</span> c0                             <span style="color: #721045;">xor</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+
+<span style="color: #595959;">; </span><span style="color: #595959;">Alternative patched:</span>
+<span style="color: #2a5045;">0x00405430</span>      <span style="color: #2a5045;">33</span> c0                             <span style="color: #721045;">xor</span>     <span style="color: #005f5f;">eax</span>, <span style="color: #005f5f;">eax</span>
+</pre>
+</div>
+
+<p>
+Note that the <code>xor</code> instruction can be encoded as <code>0x31</code> or <code>0x33</code>, depending on
+whether the instruction accepts <code>r/m32</code> as the destination and <code>r32</code> as the source,
+or <code>r32</code> as the destination and <code>r/m32</code> as the source. Both produce the same result.
+</p>
+</div>
+</div>
+
+<div id="outline-container-flipping-a-bit-on-the-jump-opcode" class="outline-4">
+<h4 id="flipping-a-bit-on-the-jump-opcode"><span class="section-number-4">3.2.3.</span> Flipping a bit on the jump opcode</h4>
+<div class="outline-text-4" id="text-flipping-a-bit-on-the-jump-opcode">
+<p>
+Finally, the license valication can be skipped by patching a single <i>bit</i> on the
+binary. This can be done by replacing the opcode of the <code>jne</code> (i.e., <code>jnz</code>)
+instruction with the opcode of a <code>je</code> (i.e., <code>jz</code>) instruction, since they only
+differ in the least significant bit.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #595959;">; </span><span style="color: #595959;">Original:</span>
+<span style="color: #2a5045;">0x00405432</span>      <span style="color: #2a5045;">75</span> <span style="color: #2a5045;">31</span>                             <span style="color: #721045;">jne</span>     <span style="color: #2a5045;">0x405465</span>
+
+<span style="color: #595959;">; </span><span style="color: #595959;">Patched:</span>
+<span style="color: #2a5045;">0x00405432</span>      <span style="color: #2a5045;">74</span> <span style="color: #2a5045;">31</span>                             <span style="color: #721045;">je</span>      <span style="color: #2a5045;">0x405465</span>
+</pre>
+</div>
+
+<p>
+With this change, the license validation logic is inverted; whenever the
+function returns non-zero, the jump will be skipped, launching the IDE. Note
+however, that valid licenses will produce an error.
+</p>
+</div>
 </div>
 </div>
 </div>
@@ -1096,6 +1368,11 @@ they are required to restore its value before returning.</p></div></div>
 <div class="footdef"><sup><a id="fn.6" class="footnum" href="#fnr.6" role="doc-backlink">6</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Since <code>QDate</code> stores dates as a 64-bit
 Julian Day Number, the value <code>0x16d3e147973</code> is used to represent an invalid
 date, many centuries into the future.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.7" class="footnum" href="#fnr.7" role="doc-backlink">7</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Even if the length of public keys varied slightly, we
+could play with the newlines. Since they are ignored, we could remove the ones
+from the orignal string, allocating some space, and then append our own at the
+end of our license, filling the entire buffer.</p></div></div>
 
 
 </div>

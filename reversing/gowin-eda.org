@@ -749,6 +749,219 @@ MAC addresses from the current device.
 Note how the online/floating license validator doesn't call any of these
 functions; instead, it manually checked the expiry date.
 
-Now that we have the full picture on how the license validation works, we can
-start thinking about how the binary could be patched to skip it.
+* Patching the binary
+:PROPERTIES:
+:CUSTOM_ID: patching-the-binary
+:END:
 
+Now that we have the full picture on how the license validation works, we can
+start thinking about how the binary could be patched to bypass it. The following
+diagram shows how the validation functions interact with each other.
+
+#+NAME: fig1
+[[file:../img/gowin-eda1.svg]]
+
+Before getting into the possible methods, it's important to backup the =gw_ide=
+binary.
+
+#+begin_src bash
+cp /opt/gowin-eda-ide/bin/gw_ide gw_ide.original
+#+end_src
+
+** Generating our own license
+:PROPERTIES:
+:CUSTOM_ID: generating-our-own-license
+:END:
+
+One of the most interesting solutions would be to generate our own RSA-1024 key
+pair, write and sign our own nodelock license (associated to our MAC
+address), and then replace the public key in the binary with our own.
+
+Generating the key pair is simple. From Linux:
+
+#+begin_src bash
+openssl genrsa -out my_private.pem 1024
+openssl rsa -in my_private.pem -pubout -out my_public.pem
+#+end_src
+
+Then, generate a valid license body with a MAC address from your machine.
+
+#+begin_src bash
+cat > license_content.txt << EOF
+MODE=NODELOCK
+TYPE=Full
+HOST_ID=$(ip link show | awk '/ether/ { print $2; exit }' | tr -d ':' | tr 'a-f' 'A-F')
+EXP_DATE=2099-12-31
+COUNT=1
+EOF
+#+end_src
+
+Then, sign the license body with the generated private key, saving the signature
+as hexadecimal ASCII.
+
+#+begin_src bash
+openssl dgst -sha256 -sign my_private.pem -out sig.bin license_content.txt
+hexdump -ve '1/1 "%02x"' sig.bin > sig_hex.txt
+#+end_src
+
+#+begin_src bash
+cat license_content.txt > my_license.lic
+echo "-------------------------- BEGIN SIGN --------------------------" >> my_license.lic
+cat sig_hex.txt >> my_license.lic
+echo -e "\n--------------------------- END SIGN ---------------------------" >> my_license.lic
+#+end_src
+
+We have generated a valid license, but we need to place our public RSA-1024 key
+in the binary. Since all RSA-1024 public keys are the same length, we can
+replace it directly[fn::Even if the length of public keys varied slightly, we
+could play with the newlines. Since they are ignored, we could remove the ones
+from the orignal string, allocating some space, and then append our own at the
+end of our license, filling the entire buffer.]. This can be done from Rizin,
+but it's easier to use a python script that directly replaces the string.
+
+#+begin_src python
+with open("my_public.pem") as f:
+    new_key = f.read().strip()  # strip trailing newline from file
+
+old_key = (
+    "-----BEGIN PUBLIC KEY-----\n"
+    "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDicOsV7qRM8ReSKExxF0wD+xF7\n"
+    "Jc1YqXFejXu9XpONB+yjZ4X+KUkYL2AY6AWFDlV0KFWccG/CCGrJRetLrg/EqcbU\n"
+    "7laQnU5wJSNlWf+n0g93g4JHVm1KClpJUXIq1Jb9WGR3mG6rmKRGp+iktqbn5Gwh\n"
+    "sDdmPxJC+BWJj73BpwIDAQAB\n"
+    "-----END PUBLIC KEY-----"
+)
+
+old_bytes = old_key.encode()
+new_bytes = new_key.encode()
+
+assert len(old_bytes) == len(new_bytes), \
+    f"Key length mismatch: {len(old_bytes)} vs {len(new_bytes)}"
+
+with open("/opt/gowin-eda-ide/bin/gw_ide", "rb") as f:
+    data = f.read()
+
+assert old_bytes in data, "Old public key not found in binary!"
+
+patched = data.replace(old_bytes, new_bytes, 1)
+
+with open("gw_ide.patched", "wb") as f:
+    f.write(patched)
+
+print("Patched successfully.")
+#+end_src
+
+Then, we can replace the binary on the destination directory, verifying that the
+permissions are correct.
+
+#+begin_src bash
+sudo cp gw_ide.patched /opt/gowin-eda-ide/bin/gw_ide
+ls -l /opt/gowin-eda-ide/bin/gw_ide
+# -rwxr-xr-x 1 root root 69088 Jan 01 00:00 /opt/gowin-eda-ide/bin/gw_ide
+#+end_src
+
+If we now launch the IDE, we should be able to load our custom license, and it
+will be authenticated with the public key we just replaced.
+
+Note that this patch makes the floating license verification useless, since the
+public key used to verify the signature of the nodelock license is also used to
+encrypt messages sent to the floating license server. If the public key on the
+binary changes, the server won't be able to decrypt our messages with its
+private key.
+
+** Avoiding the validation entirely
+:PROPERTIES:
+:CUSTOM_ID: avoiding-the-validation-entirely
+:END:
+
+Since the nodelock licenses are signed, we can't generate a valid license
+without patching the public key in binary. Instead of patching this, we could
+simply patch the instructions that validate the license to skip it
+entirely.
+
+There are multiple places where this could be done. Let's look at the call to
+the top-level validator, =fcn.408E90=.
+
+#+begin_src nasm
+; ...
+0x00405421      be 01 00 00 00                    mov     esi, 1
+0x00405426      bf 01 00 00 00                    mov     edi, 1
+0x0040542b      e8 60 3a 00 00                    call    fcn.00408e90
+0x00405430      85 c0                             test    eax, eax
+0x00405432      75 31                             jne     0x405465
+; ...
+#+end_src
+
+*** Patching the =call= to the top-level function
+:PROPERTIES:
+:CUSTOM_ID: patching-the-call-to-the-top-level-function
+:END:
+
+First, we could patch the call itself, which is 5 bytes. By changing the =call=
+instruction to a =xor eax, eax= and 3 =nop= bytes, we can set =eax= to zero, making
+the jump condition false. The following snippet shows the instruction change.
+
+#+begin_src nasm
+; Original:
+0x0040542b      e8 60 3a 00 00                    call    fcn.00408e90
+
+; Patched:
+0x0040542b      31 c0                             xor     eax, eax
+0x0040542d      90                                nop
+0x0040542e      90                                nop
+0x0040542f      90                                nop
+#+end_src
+
+To patch this from Rizin, the binary has to be open as writable by passing the
+=-w= argument. Then, we can replace the instructions by passing the new opcodes to
+the =wx= Rizin command.
+
+#+begin_src nasm
+$ rizin -w /
+wx 31c0909090 @ 0x0040542b
+#+end_src
+
+*** Patching the =test= of the validation result
+:PROPERTIES:
+:CUSTOM_ID: patching-the-test-of-the-validation-result
+:END:
+
+Instead of replacing 5 bytes, we can just replace the byte of the =test=
+instruction, turning it into a =xor=.
+
+#+begin_src nasm
+; Original:
+0x00405430      85 c0                             test    eax, eax
+
+; Patched:
+0x00405430      31 c0                             xor     eax, eax
+
+; Alternative patched:
+0x00405430      33 c0                             xor     eax, eax
+#+end_src
+
+Note that the =xor= instruction can be encoded as =0x31= or =0x33=, depending on
+whether the instruction accepts =r/m32= as the destination and =r32= as the source,
+or =r32= as the destination and =r/m32= as the source. Both produce the same result.
+
+*** Flipping a bit on the jump opcode
+:PROPERTIES:
+:CUSTOM_ID: flipping-a-bit-on-the-jump-opcode
+:END:
+
+Finally, the license valication can be skipped by patching a single /bit/ on the
+binary. This can be done by replacing the opcode of the =jne= (i.e., =jnz=)
+instruction with the opcode of a =je= (i.e., =jz=) instruction, since they only
+differ in the least significant bit.
+
+#+begin_src nasm
+; Original:
+0x00405432      75 31                             jne     0x405465
+
+; Patched:
+0x00405432      74 31                             je      0x405465
+#+end_src
+
+With this change, the license validation logic is inverted; whenever the
+function returns non-zero, the jump will be skipped, launching the IDE. Note
+however, that valid licenses will produce an error.
