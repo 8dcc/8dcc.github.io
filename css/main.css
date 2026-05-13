@@ -192,6 +192,7 @@ code {
 a {
     color: rgb(0, 70, 200);
     text-decoration-color: rgba(0, 70, 200, 0.2);
+    text-decoration-thickness: 1px;
 }
 
 a[href^='#'] {
