@@ -5,8 +5,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reverse engineering and bypassing license verification by flipping a bit</title>
-<meta property="og:title" content="Reverse engineering and bypassing license verification by flipping a bit" />
+<title>Reverse engineering and bypassing license verification code by flipping a bit</title>
+<meta property="og:title" content="Reverse engineering and bypassing license verification code by flipping a bit" />
 <meta name="author" content="8dcc" />
 <meta name="generator" content="Org Mode" />
 <style>
@@ -200,7 +200,7 @@
 <div id="org-div-home-and-up">
   <a accesskey="u" href="index.html">Up</a> | <a accesskey="h" href="../index.html">Home</a>
 </div><div id="content" class="content">
-<h1 class="title">Reverse engineering and bypassing license verification by flipping a bit</h1>
+<h1 class="title">Reverse engineering and bypassing license verification code by flipping a bit</h1>
 <div id="table-of-contents" role="doc-toc">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
@@ -822,7 +822,7 @@ the call to the license parser from the online validation function.
 <span style="color: #595959;">; </span><span style="color: #595959;">...</span>
 <span style="color: #2a5045;">0x00408b95</span>      <span style="color: #2a5045;">4c</span> <span style="color: #2a5045;">89</span> e6                          <span style="color: #721045;">mov</span>     <span style="color: #005f5f;">rsi</span>, <span style="color: #005f5f;">r12</span>
 <span style="color: #595959;">; </span><span style="color: #595959;">...</span>
-<span style="color: #2a5045;">0x00408bb1</span>      <span style="color: #2a5045;">48</span> b8 <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">80</span>     movabs  <span style="color: #005f5f;">rax</span>, <span style="color: #2a5045;">0x8000000000000000</span>  <span style="color: #595959;">; </span><span style="color: #595959;">LLONG_MIN</span>
+<span style="color: #2a5045;">0x00408bb1</span>      <span style="color: #2a5045;">48</span> b8 <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">80</span>     <span style="color: #721045;">movabs</span>  <span style="color: #005f5f;">rax</span>, <span style="color: #2a5045;">0x8000000000000000</span>  <span style="color: #595959;">; </span><span style="color: #595959;">LLONG_MIN</span>
 <span style="color: #2a5045;">0x00408bbb</span>      <span style="color: #2a5045;">48</span> <span style="color: #2a5045;">89</span> <span style="color: #2a5045;">84</span> <span style="color: #2a5045;">24</span> <span style="color: #2a5045;">28</span> <span style="color: #2a5045;">01</span> <span style="color: #2a5045;">00</span> <span style="color: #2a5045;">00</span>           <span style="color: #721045;">mov</span>     <span style="color: #0031a9;">qword</span> [<span style="color: #005f5f;">rsp</span> + <span style="color: #2a5045;">0x128</span>], <span style="color: #005f5f;">rax</span>
 <span style="color: #595959;">; </span><span style="color: #595959;">...</span>
 <span style="color: #2a5045;">0x00408bcb</span>      e8 d0 e5 ff ff                    <span style="color: #721045;">call</span>    fcn.004071a0  <span style="color: #595959;">; </span><span style="color: #595959;">License parser</span>
